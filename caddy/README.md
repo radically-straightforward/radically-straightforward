@@ -22,5 +22,5 @@ $ npm install @radically-straightforward/caddy
 ## Use
 
 ```console
-$ npx caddy --version
+$ npx caddy
 ```
