@@ -8,7 +8,7 @@
 $ npm install @radically-straightforward/caddy
 ```
 
-> **Note:** For quick-and-easy testing you may run Caddy from the command line with `npx` without having to install it first explicitly:
+> **Note:** For quick-and-easy testing you may run Caddy from the command line with `npx` instead of installing it explicitly:
 >
 > ```console
 > $ npx @radically-straightforward/caddy
