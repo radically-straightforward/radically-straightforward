@@ -1,7 +1,7 @@
 {
   "name": "@radically-straightforward/caddy",
   "version": "1.0.0",
-  "description": "Radically Straightforward: Install Caddy",
+  "description": "Radically Straightforward · Install Caddy",
   "keywords": [
     "caddy",
     "file server",
@@ -34,5 +34,6 @@
   "devDependencies": {
     "execa": "^8.0.1",
     "prettier": "^3.1.0"
-  }
+  },
+  "prettier": {}
 }
