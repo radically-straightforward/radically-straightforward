@@ -27,6 +27,7 @@
     "preuninstall": "node scripts.mjs preuninstall"
   },
   "dependencies": {
-    "download": "^8.0.0"
+    "download": "^8.0.0",
+    "got": "^13.0.0"
   }
 }

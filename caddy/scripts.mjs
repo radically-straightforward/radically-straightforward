@@ -1,5 +1,6 @@
 import fs from "node:fs/promises";
 import path from "node:path";
+import got from "got";
 import download from "download";
 
 const directory = process.cwd().split(/[\\/]node_modules[\\/]/)[0];
@@ -13,10 +14,8 @@ switch (process.argv[2]) {
     } catch {}
     if (version === undefined)
       version = (
-        await (
-          await fetch(
-            "https://api.github.com/repos/caddyserver/caddy/releases/latest"
-          )
+        await got(
+          "https://api.github.com/repos/caddyserver/caddy/releases/latest"
         ).json()
       ).tag_name.slice(1);
 
