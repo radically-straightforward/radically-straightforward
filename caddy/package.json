@@ -24,10 +24,14 @@
   "bin": "caddy",
   "scripts": {
     "postinstall": "node scripts.mjs postinstall",
-    "preuninstall": "node scripts.mjs preuninstall"
+    "preuninstall": "node scripts.mjs preuninstall",
+    "test": "prettier --check \"./README.md\" --check \"./package.json\" --check \"./scripts.mjs\" --check \"./test.mjs\" --end-of-line auto && node --test"
   },
   "dependencies": {
     "download": "^8.0.0",
     "got": "^13.0.0"
+  },
+  "devDependencies": {
+    "prettier": "^3.1.0"
   }
 }
