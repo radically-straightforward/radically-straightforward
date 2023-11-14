@@ -8,6 +8,12 @@
 $ npm install @radically-straightforward/caddy
 ```
 
+> **Note:** For quick-and-easy testing you may run Caddy from the command line with `npx` without having to install it first explicitly:
+>
+> ```console
+> $ npx @radically-straightforward/caddy
+> ```
+
 > **Note:** By default the latest version of Caddy is installed. You may specify a version in `package.json` with a `caddy` property, for example:
 >
 > ```json5
