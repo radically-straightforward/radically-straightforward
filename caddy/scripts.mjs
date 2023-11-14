@@ -9,13 +9,13 @@ switch (process.argv[2]) {
     let version;
     try {
       version = JSON.parse(
-        await fs.readFile(path.join(directory, "package.json"), "utf-8")
+        await fs.readFile(path.join(directory, "package.json"), "utf-8"),
       ).caddy;
     } catch {}
     if (version === undefined)
       version = (
         await got(
-          "https://api.github.com/repos/caddyserver/caddy/releases/latest"
+          "https://api.github.com/repos/caddyserver/caddy/releases/latest",
         ).json()
       ).tag_name.slice(1);
 
@@ -29,7 +29,7 @@ switch (process.argv[2]) {
       {
         extract: true,
         filter: (file) => file.path.includes("caddy"),
-      }
+      },
     );
     break;
 
@@ -37,8 +37,8 @@ switch (process.argv[2]) {
     await fs.rm(
       path.join(
         directory,
-        `node_modules/.bin/caddy${process.platform === "win32" ? ".exe" : ""}`
-      )
+        `node_modules/.bin/caddy${process.platform === "win32" ? ".exe" : ""}`,
+      ),
     );
     break;
 }
