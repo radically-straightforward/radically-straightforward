@@ -30,3 +30,17 @@ $ npm install @radically-straightforward/caddy
 ```console
 $ npx caddy
 ```
+
+> **Note:** If the command above doesn’t work, which may happen in particular on Windows, use the path to the binary instead of `npx`:
+>
+> ```console
+> > .\node_modules\.bin\caddy
+> ```
+
+## Related Work
+
+**[`caddy-npm`](https://npm.im/caddy-npm)**
+
+Only supports specific versions of Caddy and requires an update to the package itself when a new version of Caddy is released. At the time of this writing (2023-11-14) the latest supported version is Caddy 2.1.1 from 2020-06-20 (more than three years old).
+
+`@radically-straightforward/caddy`, on the other hand, supports new versions of Caddy as soon as they’re released.
