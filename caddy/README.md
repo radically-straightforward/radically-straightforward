@@ -8,8 +8,7 @@
 $ npm install @radically-straightforward/caddy
 ```
 
-> **Note**
-> By default the latest version of Caddy is installed. You may specify a version in `package.json` with a `caddy` property, for example:
+> **Note** By default the latest version of Caddy is installed. You may specify a version in `package.json` with a `caddy` property, for example:
 >
 > ```json5
 > // package.json
