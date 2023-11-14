@@ -1,0 +1,21 @@
+on: push
+jobs:
+  caddy:
+    strategy:
+      matrix:
+        os: [windows, macos, ubuntu]
+    runs-on: ${{ matrix.os }}-latest
+    defaults:
+      run:
+        working-directory: ./caddy/
+    steps:
+      - uses: actions/checkout@main
+      - uses: actions/setup-node@main
+        with:
+          node-version: latest
+          registry-url: https://registry.npmjs.org/
+      - run: npm install-ci-test
+      - if: ${{ matrix.os == 'ubuntu' && startsWith(github.ref, 'refs/tags/caddy--') }}
+        run: npm publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
