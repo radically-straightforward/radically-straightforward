@@ -32,6 +32,7 @@
     "got": "^13.0.0"
   },
   "devDependencies": {
+    "execa": "^8.0.1",
     "prettier": "^3.1.0"
   }
 }
