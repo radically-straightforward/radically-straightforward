@@ -8,16 +8,16 @@
 $ npm install @radically-straightforward/caddy
 ```
 
-> **Note:** By default the latest version of Caddy is installed. You may specify a version in `package.json` with a `caddy` property, for example:
+> Note: By default the latest version of Caddy is installed. You may specify a version in `package.json` with a `caddy` property, for example:
 >
-> ```json
+> ```json5
 > // package.json
 > // ...
 > "caddy": "2.7.5",
 > // ...
 > ```
 
-> **Note:** The Caddy binary is installed under `node_modules/.bin/`, along with other binaries for npm packages.
+> Note: The Caddy binary is installed under `node_modules/.bin/`, along with other binaries for npm packages.
 
 ## Use
 
