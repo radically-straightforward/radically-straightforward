@@ -23,17 +23,22 @@
   },
   "bin": "caddy",
   "scripts": {
-    "postinstall": "node scripts.mjs postinstall",
-    "preuninstall": "node scripts.mjs preuninstall",
-    "test": "prettier --check \"./README.md\" --check \"./package.json\" --check \"./scripts.mjs\" --check \"./scripts.test.mjs\" --end-of-line auto && node --test"
+    "prepare": "tsc",
+    "postinstall": "node ./build/scripts.mjs postinstall",
+    "preuninstall": "node ./build/scripts.mjs preuninstall",
+    "test": "prettier --check \"./README.md\" --check \"./package.json\" --check \"./tsconfig.json\" --check \"./source/**/*.mts\" --end-of-line auto && npm run prepare && node --test ./build/"
   },
   "dependencies": {
     "download": "^8.0.0",
     "got": "^13.0.0"
   },
   "devDependencies": {
+    "@radically-straightforward/tsconfig": "^1.0.0",
+    "@types/download": "^8.0.5",
+    "@types/node": "^20.9.2",
     "execa": "^8.0.1",
-    "prettier": "^3.1.0"
+    "prettier": "^3.1.0",
+    "typescript": "^5.2.2"
   },
   "prettier": {}
 }
