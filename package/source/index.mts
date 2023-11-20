@@ -17,6 +17,7 @@ const name = JSON.parse(
 await execa("npm", ["dedupe"], {
   cwd: directory,
   env: { NODE_ENV: "production" },
+  stdio: "inherit",
 });
 
 await fs.mkdir(path.join(directory, "node_modules/.bin"), { recursive: true });
