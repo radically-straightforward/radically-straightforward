@@ -29,7 +29,8 @@
     "test": "prettier --check \"./README.md\" --check \"./package.json\" --check \"./tsconfig.json\" --check \"./source/**/*.mts\" --end-of-line auto && npm run prepare && node --test"
   },
   "dependencies": {
-    "archiver": "^6.0.1"
+    "archiver": "^6.0.1",
+    "execa": "^8.0.1"
   },
   "devDependencies": {
     "@radically-straightforward/tsconfig": "^1.0.0",
