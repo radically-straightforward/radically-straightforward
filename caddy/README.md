@@ -32,7 +32,7 @@ $ npm install @radically-straightforward/caddy
 
 > **Note:** The Caddy binary is installed under `node_modules/.bin/`, along with other binaries for npm packages.
 
-## Use
+## Usage
 
 ```console
 $ npx caddy

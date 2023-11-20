@@ -8,7 +8,7 @@
 $ npm install @radically-straightforward/tsconfig
 ```
 
-## Use
+## Usage
 
 `tsconfig.json`
 
