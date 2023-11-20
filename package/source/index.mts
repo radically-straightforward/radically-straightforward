@@ -16,7 +16,7 @@ const packageJSON = JSON.parse(
 await commander.program
   .name(packageJSON.name)
   .description(packageJSON.description)
-  .option("-i, --input <input>", "The application directory", ".")
+  .option("-i, --input <input>", "The application directory.", ".")
   .argument(
     "[command...]",
     "The command to start the application. The ‘$PACKAGE’ environment variable contains the path to the application directory.",
