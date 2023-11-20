@@ -23,8 +23,8 @@
   },
   "bin": "caddy",
   "scripts": {
-    "postinstall": "node ./build/scripts.mjs postinstall",
-    "preuninstall": "node ./build/scripts.mjs preuninstall",
+    "postinstall": "node ./scripts.mjs postinstall",
+    "preuninstall": "node ./scripts.mjs preuninstall",
     "test": "prettier --check \"./README.md\" --check \"./package.json\" --check \"./scripts.mjs\" --check \"./scripts.test.mjs\" --end-of-line auto && node --test"
   },
   "dependencies": {
