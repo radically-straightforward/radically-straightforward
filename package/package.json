@@ -25,6 +25,7 @@
   "types": "./build/index.d.mts",
   "bin": "./build/index.mjs",
   "scripts": {
+    "prepare": "tsc",
     "test": "prettier --check \"./README.md\" --check \"./package.json\" --check \"./tsconfig.json\" --check \"./source/**/*.mts\" --end-of-line auto && npm run prepare && node --test"
   },
   "devDependencies": {
