@@ -59,11 +59,6 @@ await commander.program
   .showHelpAfterError()
   .action(async (command: string[], { input }: { input: string }) => {
     input = path.resolve(input);
-    const name = JSON.parse(
-      await fs.readFile(path.join(input, "package.json"), "utf-8"),
-    )
-      .name.replaceAll("@", "")
-      .replaceAll("/", "--");
 
     await execa("npm", ["dedupe"], {
       cwd: input,
@@ -84,20 +79,25 @@ await commander.program
     const archiveStream = fsStream.createWriteStream(
       path.join(
         input,
-        `../${name}.${process.platform === "win32" ? "zip" : "tar.gz"}`,
+        `../${path.basename(input)}.${
+          process.platform === "win32" ? "zip" : "tar.gz"
+        }`,
       ),
     );
     archive.pipe(archiveStream);
-    archive.directory(input, `${name}/${name}--source`);
+    archive.directory(
+      input,
+      `${path.basename(input)}/${path.basename(input)}--source`,
+    );
     archive.append(
       sh`
         #!/usr/bin/env sh
     
-        export PACKAGE="$(dirname "$0")/${name}--source"
+        export PACKAGE="$(dirname "$0")/${path.basename(input)}--source"
         exec ${command.map((commandPart) => `"${commandPart}"`).join(" ")} "$@"
       `,
       {
-        name: `${name}/${name}`,
+        name: `${path.basename(input)}/${path.basename(input)}`,
         mode: 0o755,
       },
     );
