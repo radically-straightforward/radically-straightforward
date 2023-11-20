@@ -26,34 +26,35 @@ await commander.program
   .version(packageJSON.version)
   .addHelpText(
     "after",
-    "\n" +
-      dedent`
-        First, prepare the application for packaging. This may include running ‘npm install’, ‘npm run prepare’, and so forth.
+    dedent`\n
+      ---
 
-        Then, use ‘package’ to produce a package for distribution, for example:
-        
-          $ npx package
+      First, prepare the application for packaging. This may include running ‘npm install’, ‘npm run prepare’, and so forth.
 
-          Or:
+      Then, use ‘package’ to produce a package for distribution, for example:
+      
+        $ npx package
 
-          $ npx package --input "path-to-project" -- "$PACKAGE/node_modules/.bin/node" "$PACKAGE/path-to-entrypoint.mjs"
+        or:
 
-        Note: The process of packaging includes a call to ‘env NODE_ENV=production npm dedupe’, which removes development dependencies from the ‘node_modules/’ directory.
-        
-        The package will be available as a sibling of the application directory, for example:
+        $ npx package --input "path-to-project" -- "$PACKAGE/node_modules/.bin/node" "$PACKAGE/path-to-entrypoint.mjs"
 
-          - example-application/
-          - example-application.tar.gz
-        
-        When extracted, the package includes an entrypoint binary and the application source code, for example:
+      Note: The process of packaging includes a call to ‘env NODE_ENV=production npm dedupe’, which removes development dependencies from the ‘node_modules/’ directory.
+      
+      The package will be available as a sibling of the application directory, for example:
 
-          - example-application/example-application
-          - example-application/example-application--source/
+        - example-application/
+        - example-application.tar.gz
+      
+      When extracted, the package includes an entrypoint binary and the application source code, for example:
 
-        Example of calling the binary:
+        - example-application/example-application
+        - example-application/example-application--source/
 
-          $ ./example-application/example-application examples of some extra command-line arguments
-      `,
+      Example of calling the binary:
+
+        $ ./example-application/example-application examples of some extra command-line arguments
+    `,
   )
   .allowExcessArguments(false)
   .showHelpAfterError()
