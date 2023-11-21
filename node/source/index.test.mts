@@ -19,7 +19,7 @@ test(
   {
     ...(!process.stdin.isTTY
       ? {
-          skip: "node ./build/index.test.mjs",
+          skip: "Run interactive test with ‘node ./build/index.test.mjs’.",
         }
       : {}),
   },
