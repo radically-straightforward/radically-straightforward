@@ -8,6 +8,7 @@ import * as commander from "commander";
 import { execa } from "execa";
 import archiver from "archiver";
 import dedent from "dedent";
+import batch from "dedent";
 import sh from "dedent";
 
 const packageJSON = JSON.parse(
@@ -20,7 +21,7 @@ await commander.program
   .option("-i, --input <input>", "The application directory.", ".")
   .argument(
     "[command...]",
-    "The command to start the application. The ‘$PACKAGE’ environment variable contains the path to the application directory. The Node.js binary is available at ‘$PACKAGE/node_modules/.bin/node’, along with other binaries installed by npm. The default command expects the application entrypoint to be at ‘$PACKAGE/build/index.mjs’.",
+    "The command to start the application. The ‘$PACKAGE’ environment variable contains the path to the application directory. On Windows the ‘$PACKAGE’ syntax is converted into ‘%PACKAGE%’ automatically. The Node.js binary is available at ‘$PACKAGE/node_modules/.bin/node’, along with other binaries installed by npm. The default command expects the application entrypoint to be at ‘$PACKAGE/build/index.mjs’.",
     ["$PACKAGE/node_modules/.bin/node", "$PACKAGE/build/index.mjs"],
   )
   .version(packageJSON.version)
@@ -103,18 +104,34 @@ await commander.program
       input,
       `${path.basename(input)}/${path.basename(input)}--source`,
     );
-    archive.append(
-      sh`
-        #!/usr/bin/env sh
-    
-        export PACKAGE="$(dirname "$0")/${path.basename(input)}--source"
-        exec ${command.map((commandPart) => `"${commandPart}"`).join(" ")} "$@"
-      `,
-      {
-        name: `${path.basename(input)}/${path.basename(input)}`,
-        mode: 0o755,
-      },
-    );
+    if (process.platform === "win32")
+      archive.append(
+        batch`
+          @echo off
+          set PACKAGE=%~dp0${path.basename(input)}--source
+          ${command
+            .map(
+              (commandPart) =>
+                `"${commandPart.replaceAll("$PACKAGE", "%PACKAGE%")}"`,
+            )
+            .join(" ")} %*
+        `,
+        { name: `${path.basename(input)}/${path.basename(input)}.cmd` },
+      );
+    else
+      archive.append(
+        sh`
+          #!/usr/bin/env sh
+          export PACKAGE="$(dirname "$0")/${path.basename(input)}--source"
+          exec ${command
+            .map((commandPart) => `"${commandPart}"`)
+            .join(" ")} "$@"
+        `,
+        {
+          name: `${path.basename(input)}/${path.basename(input)}`,
+          mode: 0o755,
+        },
+      );
     await archive.finalize();
     await stream.finished(archiveStream);
   })
