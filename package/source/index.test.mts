@@ -6,9 +6,9 @@ import fs from "node:fs/promises";
 import { execa } from "execa";
 
 test(async () => {
-  await execa("node", ["../build/index.mjs"], {
-    cwd: "./example-application",
-  });
+  await execa("npm", ["ci"], { cwd: "./example-application" });
+  await execa("node", ["../build/index.mjs"], { cwd: "./example-application" });
+  await fs.rm("./example-application/node_modules/", { recursive: true });
   const directory = await fs.mkdtemp(
     path.join(os.tmpdir(), "radically-straightforward--package--test--"),
   );
