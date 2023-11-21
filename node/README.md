@@ -9,3 +9,5 @@ $ npm install @radically-straightforward/node
 ```
 
 ## Usage
+
+See [`source/index.mts`](source/index.mts).
