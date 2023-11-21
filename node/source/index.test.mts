@@ -14,16 +14,21 @@ test("elapsedTime()", () => {
   assert.equal(node.elapsedTime(128020188396416n, 128041549262166n), 21360n);
 });
 
-if (!process.stdin.isTTY)
-  console.log(
-    `Run the test for ‘eventLoopActive()’ manually with ‘npm run prepare && node ./build/index.test.mjs’.`,
-  );
-else
-  test("eventLoopActive()", async () => {
+test(
+  "eventLoopActive()",
+  {
+    ...(!process.stdin.isTTY
+      ? {
+          skip: "node ./build/index.test.mjs",
+        }
+      : {}),
+  },
+  async () => {
     console.log("eventLoopActive(): Press ⌃C to continue");
     await node.eventLoopActive();
     console.log("eventLoopActive(): Continuing…");
-  });
+  },
+);
 
 test("isExecuted()", async () => {
   assert(await node.isExecuted(import.meta.url));
