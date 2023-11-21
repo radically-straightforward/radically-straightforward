@@ -26,7 +26,7 @@ test(
   async () => {
     console.log("eventLoopActive(): Press ⌃C to continue");
     await node.eventLoopActive();
-    console.log("eventLoopActive(): Continuing…");
+    console.log("eventLoopActive(): Continuing...");
   },
 );
 
