@@ -33,7 +33,7 @@ The most notable difference between `caxa` and `package` is that `caxa` produces
 
 `package` also improves upon `caxa` in a few other aspects:
 
-- `package` is simpler to use. It provides fewer command-line options and sensible defaults. It doesn’t include obscure features of `caxa`, for example, the ability to generate a macOS Application Bundle (`.app`).
+- `package` is simpler to use. It provides fewer command-line options and sensible defaults. It doesn’t include obscure features of `caxa`, for example, the ability to generate a macOS Application Bundle (`.app`), and the ability to package from JavaScript as opposed to the command-line.
 
 - In macOS and Linux, `package` calls the underlying application with `exec`, replacing the current process instead of creating a child process. This simplifies the process tree and solves issues related to forwarding signals. Unfortunately Windows doesn’t support `exec`, so a child process is still used in that case.
 
