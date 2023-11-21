@@ -29,7 +29,7 @@ await commander.program
     "\n" +
       dedent`
         Tutorial:
-          First, prepare the application for packaging. This may include running ‘npm install’, ‘npm run prepare’, and so forth.
+          First, prepare the application for packaging. This may include running ‘npm ci’, ‘npm run prepare’, and so forth. You may also want to remove directories and files that shouldn’t be part of the package, for example, ‘.git’, ‘.env’, and so forth.
 
           Then, use ‘package’ to produce a package for distribution, for example:
           
