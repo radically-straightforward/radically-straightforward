@@ -16,8 +16,7 @@ $ npx package --help
 
 ## Related Work
 
-<details>
-<summary><a href="https://npm.im/caxa"><code>caxa</code></a></summary>
+**[`caxa`](https://npm.im/caxa)**
 
 `package` is the evolution of `caxa`.
 
@@ -37,13 +36,8 @@ The most notable difference between `caxa` and `package` is that `caxa` produces
 
 - In macOS and Linux, `package` calls the underlying application with `exec`, replacing the current process instead of creating a child process. This simplifies the process tree and solves issues related to forwarding signals. Unfortunately Windows doesn’t support `exec`, so a child process is still used in that case.
 
-</details>
-
-<details>
-<summary><a href="https://npm.im/pkg"><code>pkg</code></a></summary>
+**[`pkg`](https://npm.im/pkg)**
 
 The core issue with packaging Node.js applications into binaries are modules written in C/C++. The Node.js binary insists on loading those modules from the filesystem, so your application ends up having to be present as multiple files in the filesystem.
 
 `pkg` solves this issue by patching the Node.js binary. This solution produces an elegant output: a single binary for your application. Also, you may precompile your application into a V8 snapshot, which is faster to startup and allows for obfuscating the source code. But patching the Node.js binary has some disadvantages: it’s prone to errors (for example, issues related to ECMAScript modules), it needs to be updated when new versions of Node.js come out, it’s slow to build if you have to compile Node.js from scratch, and for some time `pkg` lagged behind Node.js releases.
-
-</details>
