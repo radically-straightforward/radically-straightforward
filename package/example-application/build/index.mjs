@@ -4,7 +4,10 @@ console.log(
   JSON.stringify(
     {
       argv: process.argv,
-      env: process.env,
+      env: {
+        PACKAGE: process.env.PACKAGE,
+        EXAMPLE_PROGRAM: process.env.EXAMPLE_PROGRAM,
+      },
       image: (
         await sharp({
           create: {
