@@ -5,7 +5,7 @@
 ## Installation
 
 ```console
-$ npm install @radically-straightforward/package
+$ npm install --save-dev @radically-straightforward/package
 ```
 
 ## Usage

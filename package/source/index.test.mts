@@ -12,8 +12,11 @@ test(async () => {
   const directory = await fs.mkdtemp(
     path.join(os.tmpdir(), "radically-straightforward--package--test--"),
   );
-  await execa("tar", ["-xvzf", "example-application.tar.gz", "-C", directory]);
-  await fs.rm("example-application.tar.gz");
+  const outputPackage = `example-application.${
+    process.platform === "win32" ? "zip" : "tar.gz"
+  }`;
+  await execa("tar", ["-xvzf", outputPackage, "-C", directory]);
+  await fs.rm(outputPackage);
   const result = await execa(
     path.join(directory, "example-application", "example-application"),
     ["examples", "of", "some", "extra", "command-line", "arguments"],

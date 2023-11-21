@@ -5,7 +5,7 @@
 ## Installation
 
 ```console
-$ npm install @radically-straightforward/tsconfig
+$ npm install --save-dev @radically-straightforward/tsconfig
 ```
 
 ## Usage
