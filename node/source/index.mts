@@ -6,7 +6,7 @@ import net from "node:net";
 export async function time(
   title: string,
   function_: (() => void) | (() => Promise<void>),
-) {
+): Promise<void> {
   const start = process.hrtime.bigint();
   await function_();
   time.report(title, elapsedTime(start));
