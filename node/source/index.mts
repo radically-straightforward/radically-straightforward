@@ -107,7 +107,7 @@ export function eventLoopActive(): Promise<void> {
 /**
  * Detect whether the file is being executed directly or being `import`ed into another file.
  *
- * This is useful for having a single file that can provide a CLI and a JavaScript API to the same functionality.
+ * This is useful for having a single file that can provide a CLI and a JavaScript API for the same functionality.
  *
  * @param importMetaUrl Must always be `import.meta.url`. This parameter is necessary because `import.meta.url` is relative to the source file in which it appears.
  *
