@@ -106,3 +106,10 @@ test("escape()", () => {
     `&quot;Leandro Facchinetti &lt;radically-straightforward@leafac.com&gt;&quot; &amp; &apos;Louie&apos;`,
   );
 });
+
+test("invalidXMLCharacters", () => {
+  assert.equal(
+    `abc\u{0}\bdef💩`.replace(htmlHelpers.invalidXMLCharacters, ""),
+    `abcdef💩`,
+  );
+});
