@@ -78,3 +78,9 @@ export function escape(text: string): string {
     .replaceAll(`"`, `&quot;`)
     .replaceAll(`'`, `&apos;`);
 }
+
+/**
+ * 0x000000
+ * 0x10FFFF
+ */
+export const invalidXMLCharacters = /[]/gv;
