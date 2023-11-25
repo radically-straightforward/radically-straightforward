@@ -16,17 +16,14 @@ export async function time(
 }
 
 /**
- * Reporter for the `time()` function. Override this function to change how reporting is done.
- *
- * @param time The elapsed time in milliseconds.
+ * Reporter for the `time()` function. Override this function to change how reporting is done. The `time` is provided in milliseconds.
  */
 time.report = (title: string, time: bigint): void => {
   console.log(`${title}: ${time}ms`);
 };
 
 /**
- * @param start The start time given in nanoseconds, as returned by `process.hrtime.bigint()`.
- * @returns The elapsed time in milliseconds.
+ * Provide the `start` and `end` times in nanoseconds, as returned by `process.hrtime.bigint()`. The elapsed time is returned in milliseconds.
  */
 export function elapsedTime(
   start: bigint,
@@ -40,7 +37,7 @@ export function elapsedTime(
  *
  * This is useful for starting multiple background jobs, web servers, and so forth in a single Node.js process and stop all of them gracefully when the application terminates.
  *
- * @example
+ * **Example**
  *
  * ```javascript
  * import timers from "node:timers/promises";
@@ -109,9 +106,9 @@ export function eventLoopActive(): Promise<void> {
  *
  * This is useful for having a single file that can provide a CLI and a JavaScript API for the same functionality.
  *
- * @param importMetaUrl Must always be `import.meta.url`. This parameter is necessary because `import.meta.url` is relative to the source file in which it appears.
+ * The `importMetaUrl` parameter must always be `import.meta.url`. This parameter is necessary because `import.meta.url` is relative to the source file in which it appears.
  *
- * @example
+ * **Example**
  *
  * ```javascript
  * import * as node from "@radically-straightforward/node";
@@ -133,11 +130,13 @@ export async function isExecuted(importMetaUrl: string): Promise<boolean> {
  * Detect whether binding to a port would succeed.
  *
  * There may be a race condition between checking a port availability and actually binding to it. But this function is useful, for example, to provide users with more friendly error messages upfront and propose to kill the offending processes with [`kill-port`](https://npm.im/kill-port).
+ *
+ * **References**
+ *
+ * - https://github.com/sindresorhus/get-port/blob/85c18678143f2c673bdaf5307971397b29ddf28b/index.js#L42-L54
+ * - https://github.com/node-modules/detect-port/blob/9804ad50f49e3256e54ac40165b16fa6c2fa8d5a/lib/detect-port.js
+ * - https://gist.github.com/timoxley/1689041
  */
-// References:
-//   - https://github.com/sindresorhus/get-port/blob/85c18678143f2c673bdaf5307971397b29ddf28b/index.js#L42-L54
-//   - https://github.com/node-modules/detect-port/blob/9804ad50f49e3256e54ac40165b16fa6c2fa8d5a/lib/detect-port.js
-//   - https://gist.github.com/timoxley/1689041
 export function portAvailable(
   port: number,
   hostname?: string,
