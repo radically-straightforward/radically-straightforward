@@ -63,7 +63,7 @@
  *
  *   Some other implementations avoid transforming `'` into the entity `&apos;`, because that entity isn’t understood by some versions of Internet Explorer.
  *
- * @see
+ * **References**
  *
  * - <https://github.com/lodash/lodash/blob/ddfd9b11a0126db2302cb70ec9973b66baec0975/lodash.js#L384-L390>
  * - <https://github.com/mathiasbynens/he/blob/36afe179392226cf1b6ccdb16ebbb7a5a844d93a/src/he.js#L35-L50>
@@ -94,7 +94,7 @@ export function escape(text: string): string {
  *
  * Notably, it does **not** include the “"compatibility characters", as defined in Unicode” mentioned in that section of the document, because that list was difficult to find and doesn’t seem to be very important.
  *
- * @example
+ * **Example**
  *
  * ```javascript
  * someUserInput.replace(invalidXMLCharacters, "") // Remove invalid XML characters
@@ -102,7 +102,7 @@ export function escape(text: string): string {
  * someUserInput.match(invalidXMLCharacters) // Detect whether there are invalid XML characters
  * ```
  *
- * @see
+ * **References**
  *
  * - <https://www.w3.org/TR/xml/#charsets>: An older version of the XML standard.
  * - <https://en.wikipedia.org/wiki/Valid_characters_in_XML>
