@@ -5,6 +5,8 @@ import net from "node:net";
 
 /**
  * Measure and report how much time it takes to run the given `function_`.
+ *
+ * If you wish to change how reporting is done, override the `time.report = (title: string, time: bigint): void` function, for which the `time` is provided in milliseconds.
  */
 export async function time(
   title: string,
@@ -15,9 +17,6 @@ export async function time(
   time.report(title, elapsedTime(start));
 }
 
-/**
- * Reporter for the `time()` function. Override this function to change how reporting is done. The `time` is provided in milliseconds.
- */
 time.report = (title: string, time: bigint): void => {
   console.log(`${title}: ${time}ms`);
 };
