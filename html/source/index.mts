@@ -43,17 +43,19 @@
  *
  *   The performance of the `escape()` function matters because it’s used a lot to escape user input when rendering HTML with the `` html`...` `` tagged template.
  *
- *   The relatively new string function `.replaceAll()` when used with a string parameter is faster than `.replace()` with a global regular expression.
+ *   The following are some details on how this implementation is made faster:
  *
- *   Perhaps surprisingly, calling `.replaceAll()` multiple times is faster than using a single regular expression of the kind `/[&<>"']/g`.
+ *   - The relatively new string function `.replaceAll()` when used with a string parameter is faster than `.replace()` with a global regular expression.
  *
- *   And even if we were to use a single regular expression, using `switch/case` would have been faster than the lookup tables that most other implementations use.
+ *   - Perhaps surprisingly, calling `.replaceAll()` multiple times is faster than using a single regular expression of the kind `/[&<>"']/g`.
  *
- *   And also if we were to use regular expressions, using the flag `v` incurs on a very small but consistent performance penalty.
+ *   - And even if we were to use a single regular expression, using `switch/case` would have been faster than the lookup tables that most other implementations use.
  *
- *   And also if we were to use regular expressions, `.replace()` is marginally but consistently faster than `.replaceAll()`.
+ *   - And also if we were to use regular expressions, using the flag `v` incurs on a very small but consistent performance penalty.
  *
- *   Measurements performed in Node.js 21.2.0.
+ *   - And also if we were to use regular expressions, `.replace()` is marginally but consistently faster than `.replaceAll()`.
+ *
+ *   - Measurements performed in Node.js 21.2.0.
  *
  * - **Supports modern browsers only.**
  *
@@ -84,9 +86,9 @@ export function escape(text: string): string {
  *
  * Use this to remove or replace invalid XML characters, or simply to detect that a string doesn’t contain them. This is particularly useful when generating XML based on user input.
  *
- * This list is based on **Extensible Markup Language (XML) 1.1 (Second Edition) § 2.2 Characters** (https://www.w3.org/TR/xml11/#charsets). In particular, it includes:
+ * This list is based on **Extensible Markup Language (XML) 1.1 (Second Edition), § 2.2 Characters** (https://www.w3.org/TR/xml11/#charsets). In particular, it includes:
  *
- * 1. Removing `\u{0}`, which is always invalid in XML.
+ * 1. `\u{0}`, which is always invalid in XML.
  * 2. The gaps between the allowed ranges in the production rule for `[2] Char` from the “Character Range” grammar.
  * 3. The discouraged characters from the **Note** in that section of the document.
  *
@@ -106,7 +108,7 @@ export function escape(text: string): string {
  * - <https://en.wikipedia.org/wiki/Valid_characters_in_XML>
  * - <https://en.wikipedia.org/wiki/XML>
  * - <https://github.com/felixrieseberg/sanitize-xml-string/blob/661bd881613c0f7555eb7d73b883b853b9826cc6/src/index.ts>: It was the inspiration for this code. The differences are:
- *   1. We export the regular expression, instead of encapsulating it in auxiliary functions, which arguably makes this more useful.
+ *   1. We export the regular expression, instead of encapsulating it in auxiliary functions, which arguably makes it more useful.
  *   2. We are more strict on what we consider to be valid characters (see description above).
  *   3. We use the regular expression flag `v` instead of `u` (see <https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp/unicodeSets>).
  */
