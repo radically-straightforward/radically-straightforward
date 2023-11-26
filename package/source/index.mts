@@ -16,7 +16,7 @@ const packageJSON = JSON.parse(
 );
 
 await commander.program
-  .name("package")
+  .name(packageJSON.name.replace(/^.*\//v, ""))
   .description(packageJSON.description)
   .option("-i, --input <input>", "The application directory.", ".")
   .argument(
