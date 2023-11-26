@@ -50,6 +50,8 @@ test(async () => {
 
       ## Extract TypeScript Documentation
 
+      <!-- DOCUMENTATION START: index.mts -->
+
       \`\`\`typescript
       async function time(
         title: string,
@@ -58,6 +60,8 @@ test(async () => {
       \`\`\`
 
       Example of documentation.
+
+      <!-- DOCUMENTATION END: index.mts -->
     `,
   );
 
@@ -88,6 +92,8 @@ test(async () => {
 
       ## Extract TypeScript Documentation
 
+      <!-- DOCUMENTATION START: index.mts -->
+
       \`\`\`typescript
       async function time(
         title: string,
@@ -96,6 +102,8 @@ test(async () => {
       \`\`\`
 
       Example of **modified** documentation.
+
+      <!-- DOCUMENTATION END: index.mts -->
     `,
   );
 });

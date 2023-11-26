@@ -31,11 +31,11 @@ await commander.program
       let documentation = await fs.readFile(input, "utf-8");
       for (const match of [
         ...documentation.matchAll(
-          /<!-- DOCUMENTATION(?: START)?: (?<directive>.*?) -->(?:.*?<!-- DOCUMENTATION END: \k<directive> -->)?/gv,
+          /<!-- DOCUMENTATION(?: START)?: (?<directive>.*?) -->(?:.*?<!-- DOCUMENTATION END: \k<directive> -->)?/gsv,
         ),
       ].reverse()) {
         if (match.groups === undefined || match.index === undefined) continue;
-        const matchReplacementParts: (string | (() => Promise<string>))[] = [];
+        const matchReplacementParts: (string | Promise<string>)[] = [];
         babelTraverse.default(
           babelParser.parse(
             await fs.readFile(
@@ -58,7 +58,7 @@ await commander.program
                 return;
               matchReplacementParts.push(
                 "```typescript\n",
-                async () =>
+                (async () =>
                   (
                     await prettier.format(
                       babelGenerator.default({
@@ -67,7 +67,7 @@ await commander.program
                       }).code,
                       { parser: "babel-ts" },
                     )
-                  ).replace(/\s*\{\s*\}\s*$/v, ""),
+                  ).replace(/\s*\{\s*\}\s*$/v, ""))(),
                 "\n```\n\n",
                 path.node.leadingComments[0].value
                   .replace(/^\s*\* ?/gmv, "")
@@ -77,15 +77,11 @@ await commander.program
             },
           },
         );
-        let matchReplacement = "";
-        for (const matchReplacementPart of matchReplacementParts)
-          matchReplacement +=
-            typeof matchReplacementPart === "string"
-              ? matchReplacementPart
-              : await matchReplacementPart();
         documentation =
           documentation.slice(0, match.index) +
-          matchReplacement +
+          `<!-- DOCUMENTATION START: ${match.groups.directive} -->\n\n` +
+          (await Promise.all(matchReplacementParts)).join("") +
+          `<!-- DOCUMENTATION END: ${match.groups.directive} -->` +
           documentation.slice(match.index + match[0].length);
       }
       await fs.writeFile(input, documentation);
