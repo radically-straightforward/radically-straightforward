@@ -29,7 +29,7 @@ test(async () => {
       /**
        * Example of function documentation with **Markdown**.
        */
-      export async function example(
+      export async function exampleFunctionDeclaration(
         a: string,
         b: number,
       ): Promise<void> {
@@ -39,7 +39,7 @@ test(async () => {
       /**
        * Example of constant documentation.
        */
-      export const age = 33;
+      export const exampleVariableDeclaration: number = 33;
     `,
   );
   await execa(
@@ -58,7 +58,10 @@ test(async () => {
       <!-- DOCUMENTATION START: index.mts -->
 
       \`\`\`typescript
-      async function example(a: string, b: number): Promise<void>;
+      async function exampleFunctionDeclaration(
+        a: string,
+        b: number,
+      ): Promise<void>
       \`\`\`
 
       Example of function documentation with **Markdown**.
@@ -66,7 +69,7 @@ test(async () => {
       ---
 
       \`\`\`typescript
-      const age = 33;
+      const exampleVariableDeclaration: number
       \`\`\`
 
       Example of constant documentation.
@@ -81,17 +84,12 @@ test(async () => {
       /**
        * Example of <ins>modified</ins> function documentation with **Markdown**.
        */
-      export async function example(
+      export async function exampleFunctionDeclaration(
         a: string,
         b: number,
       ): Promise<void> {
         // ...
       }
-
-      /**
-       * Example of constant documentation.
-       */
-      export const age = 33;
     `,
   );
   await execa(
@@ -110,18 +108,13 @@ test(async () => {
       <!-- DOCUMENTATION START: index.mts -->
 
       \`\`\`typescript
-      async function example(a: string, b: number): Promise<void>;
+      async function exampleFunctionDeclaration(
+        a: string,
+        b: number,
+      ): Promise<void>
       \`\`\`
 
       Example of <ins>modified</ins> function documentation with **Markdown**.
-
-      ---
-
-      \`\`\`typescript
-      const age = 33;
-      \`\`\`
-
-      Example of constant documentation.
 
       <!-- DOCUMENTATION END: index.mts -->
     `,

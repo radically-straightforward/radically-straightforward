@@ -61,15 +61,46 @@ await commander.program
                 (async () =>
                   (
                     await prettier.format(
-                      babelGenerator.default({
-                        ...(path.node.declaration as any),
-                        body: babelTypes.blockStatement([]),
-                      }).code,
+                      babelGenerator.default(
+                        path.node.declaration!.type === "FunctionDeclaration"
+                          ? {
+                              ...path.node.declaration,
+                              body: babelTypes.blockStatement([]),
+                            }
+                          : path.node.declaration!.type ===
+                              "VariableDeclaration"
+                            ? {
+                                ...path.node.declaration,
+                                declarations:
+                                  path.node.declaration.declarations.map(
+                                    (declaration) => ({
+                                      ...declaration,
+                                      init: babelTypes.identifier("___"),
+                                    }),
+                                  ),
+                              }
+                            : (() => {
+                                throw new Error(
+                                  `Unknown ‘ExportNamedDeclaration’: ‘${
+                                    babelGenerator.default(
+                                      path.node.declaration!,
+                                    ).code
+                                  }’`,
+                                );
+                              })(),
+                      ).code,
                       { parser: "babel-ts" },
                     )
                   )
-                    .trim()
-                    .replace(/\s*\{\s*\}$/v, ";"))(),
+                    .replace(
+                      path.node.declaration.type === "FunctionDeclaration"
+                        ? /\{\s*\}\s*$/v
+                        : path.node.declaration.type === "VariableDeclaration"
+                          ? /=\s*___;\s*$/v
+                          : /___/v,
+                      "",
+                    )
+                    .trim())(),
                 "\n```\n\n",
                 path.node.leadingComments[0].value
                   .replace(/^\s*\* ?/gmv, "")

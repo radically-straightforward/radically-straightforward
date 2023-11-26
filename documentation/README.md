@@ -22,4 +22,3 @@ $ npm install --save-dev @radically-straightforward/documentation
 - https://babeljs.io/docs/babel-traverse
 - https://babeljs.io/docs/babel-generator
 - https://babeljs.io/docs/babel-types
-
