@@ -16,11 +16,7 @@ const packageJSON = JSON.parse(
 await commander.program
   .name(packageJSON.name.replace(/^.*\//v, ""))
   .description(packageJSON.description)
-  .argument(
-    "[input...]",
-    "The files including directives for ‘documentation’ to process.",
-    ["./README.md"]
-  )
+  .argument("[input...]", "The files to process.", ["./README.md"])
   .version(packageJSON.version)
   .addHelpText("after", "\n" + dedent`TODO`)
   .allowExcessArguments(false)
