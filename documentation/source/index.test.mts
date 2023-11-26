@@ -43,7 +43,7 @@ test(async () => {
     { cwd: directory, stdio: "inherit" },
   );
   assert.equal(
-    (await fs.readFile(path.join(directory, "README.md"), "utf-8")).trim(),
+    await fs.readFile(path.join(directory, "README.md"), "utf-8"),
     // prettier-ignore
     markdown`
       # Example of \`@radically-straightforward/documentation\`
@@ -81,7 +81,7 @@ test(async () => {
     { cwd: directory, stdio: "inherit" },
   );
   assert.equal(
-    (await fs.readFile(path.join(directory, "README.md"), "utf-8")).trim(),
+    await fs.readFile(path.join(directory, "README.md"), "utf-8"),
     // prettier-ignore
     markdown`
       # Example of \`@radically-straightforward/documentation\`

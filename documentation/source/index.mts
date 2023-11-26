@@ -31,7 +31,7 @@ await commander.program
       let documentation = await fs.readFile(input, "utf-8");
       for (const match of [
         ...documentation.matchAll(
-          /<!-- DOCUMENTATION(?: START)?: (?<directive>.*?) -->(?:.*<!-- DOCUMENTATION END: \k<directive> -->)?/gv,
+          /<!-- DOCUMENTATION(?: START)?: (?<directive>.*?) -->(?:.*?<!-- DOCUMENTATION END: \k<directive> -->)?/gv,
         ),
       ].reverse()) {
         if (match.groups === undefined || match.index === undefined) continue;
