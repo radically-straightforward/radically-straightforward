@@ -58,16 +58,16 @@ test(async () => {
       # Example of \`@radically-straightforward/documentation\`
 
       ## Extract TypeScript Documentation
-
+      
       <!-- DOCUMENTATION START: index.mts -->
-
+      
       \`\`\`typescript
       async function exampleFunctionDeclaration(
         a: string,
         b: number,
       ): Promise<void>
       \`\`\`
-
+      
       Example of function documentation with **Markdown**.
 
       ---
@@ -77,11 +77,11 @@ test(async () => {
       \`\`\`
 
       Example of constant documentation.
-
+      
       <!-- DOCUMENTATION END: index.mts -->
-
+      
       ## Run Command
-
+      
       <!-- DOCUMENTATION START: $ head -n 1 ./index.mts -->
       
       \`\`\`
@@ -131,6 +131,16 @@ test(async () => {
       Example of <ins>modified</ins> function documentation with **Markdown**.
 
       <!-- DOCUMENTATION END: index.mts -->
+
+      ## Run Command
+      
+      <!-- DOCUMENTATION START: $ head -n 1 ./index.mts -->
+      
+      \`\`\`
+      /**
+      \`\`\`
+      
+      <!-- DOCUMENTATION END: $ head -n 1 ./index.mts -->
     `,
   );
 });
