@@ -8,6 +8,7 @@ jobs:
           - html
           - tsconfig
           - caddy
+          - documentation
           - package
         os:
           - windows
