@@ -1,11 +1,12 @@
 {
-  "name": "@radically-straightforward/html",
+  "name": "@radically-straightforward/documentation",
   "version": "1.0.0",
-  "description": "📄 HTML with Tagged Templates",
+  "description": "📚 Extract documentation from TypeScript source files to Markdown",
   "keywords": [
-    "html",
-    "tagged template",
-    "template literal"
+    "documentation",
+    "typescript",
+    "markdown",
+    "utilities"
   ],
   "homepage": "https://github.com/leafac/radically-straightforward",
   "repository": "https://github.com/leafac/radically-straightforward",
@@ -21,16 +22,21 @@
   "publishConfig": {
     "access": "public"
   },
-  "exports": "./build/index.mjs",
-  "types": "./build/index.d.mts",
+  "bin": "./build/index.mjs",
   "scripts": {
     "prepare": "tsc",
     "test": "npm run prepare && node --test && prettier --check \"./README.md\" --check \"./package.json\" --check \"./tsconfig.json\" --check \"./source/**/*.mts\" --end-of-line auto"
   },
+  "dependencies": {
+    "@babel/generator": "^7.23.4",
+    "@babel/parser": "^7.23.4",
+    "@babel/traverse": "^7.23.4"
+  },
   "devDependencies": {
     "@radically-straightforward/tsconfig": "^1.0.0",
-    "@types/node": "^20.9.3",
-    "prettier": "^3.1.0",
+    "@types/babel__generator": "^7.6.7",
+    "@types/babel__traverse": "^7.20.4",
+    "@types/node": "^20.10.0",
     "typescript": "^5.3.2"
   },
   "prettier": {}
