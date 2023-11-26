@@ -17,7 +17,7 @@ await commander.program
   .name("documentation")
   .description(packageJSON.description)
   .argument(
-    "<input...>",
+    "[input...]",
     "The files including directives for ‘documentation’ to process.",
     ["./README.md"]
   )
