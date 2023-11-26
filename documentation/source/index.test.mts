@@ -10,7 +10,7 @@ import { execa } from "execa";
 
 test(async () => {
   const directory = await fs.mkdtemp(
-    path.join(os.tmpdir(), "radically-straightforward--documentation--test--")
+    path.join(os.tmpdir(), "radically-straightforward--documentation--test--"),
   );
 
   await fs.writeFile(
@@ -21,13 +21,13 @@ test(async () => {
       ## Extract TypeScript Documentation
 
       <!-- DOCUMENTATION: index.mts -->
-    `
+    `,
   );
   await fs.writeFile(
     path.join(directory, "index.mts"),
     typescript`
       /**
-       * Example of **documentation**.
+       * Example of documentation.
        */
       export async function time(
         title: string,
@@ -35,33 +35,37 @@ test(async () => {
       ): Promise<void> {
         // ...
       }
-    `
+    `,
   );
   await execa(
     "node",
     [url.fileURLToPath(new URL("./index.mjs", import.meta.url))],
-    { cwd: directory }
+    { cwd: directory, stdio: "inherit" },
   );
   assert.equal(
-    await fs.readFile(path.join(directory, "README.md"), "utf-8"),
+    (await fs.readFile(path.join(directory, "README.md"), "utf-8")).trim(),
+    // prettier-ignore
     markdown`
       # Example of \`@radically-straightforward/documentation\`
 
       ## Extract TypeScript Documentation
 
-      <!-- DOCUMENTATION START: index.mts -->
+      \`\`\`typescript
+      async function time(
+        title: string,
+        function_: () => void | Promise<void>,
+      ): Promise<void>
+      \`\`\`
 
-      TODO
-
-      <!-- DOCUMENTATION END: index.mts -->
-    `
+      Example of documentation.
+    `,
   );
 
   await fs.writeFile(
     path.join(directory, "index.mts"),
     typescript`
       /**
-       * Example of modified **documentation**.
+       * Example of **modified** documentation.
        */
       export async function time(
         title: string,
@@ -69,25 +73,29 @@ test(async () => {
       ): Promise<void> {
         // ...
       }
-    `
+    `,
   );
   await execa(
     "node",
     [url.fileURLToPath(new URL("./index.mjs", import.meta.url))],
-    { cwd: directory }
+    { cwd: directory, stdio: "inherit" },
   );
   assert.equal(
-    await fs.readFile(path.join(directory, "README.md"), "utf-8"),
+    (await fs.readFile(path.join(directory, "README.md"), "utf-8")).trim(),
+    // prettier-ignore
     markdown`
       # Example of \`@radically-straightforward/documentation\`
 
       ## Extract TypeScript Documentation
 
-      <!-- DOCUMENTATION START: index.mts -->
+      \`\`\`typescript
+      async function time(
+        title: string,
+        function_: () => void | Promise<void>,
+      ): Promise<void>
+      \`\`\`
 
-      TODO
-
-      <!-- DOCUMENTATION END: index.mts -->
-    `
+      Example of **modified** documentation.
+    `,
   );
 });

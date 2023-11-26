@@ -13,14 +13,14 @@ test(async () => {
     undefined,
   );
 
-  await execa("npm", ["run", "preuninstall"]);
+  await execa("npm", ["run", "preuninstall"], { stdio: "inherit" });
 
   assert.notStrictEqual(
     await fs.access(caddy).catch(() => new Error()),
     undefined,
   );
 
-  await execa("npm", ["run", "postinstall"]);
+  await execa("npm", ["run", "postinstall"], { stdio: "inherit" });
 
   assert.strictEqual(
     await fs.access(caddy).catch(() => new Error()),

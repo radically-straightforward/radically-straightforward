@@ -6,8 +6,14 @@ import fs from "node:fs/promises";
 import { execa } from "execa";
 
 test(async () => {
-  await execa("npm", ["ci"], { cwd: "./example-application" });
-  await execa("node", ["../build/index.mjs"], { cwd: "./example-application" });
+  await execa("npm", ["ci"], {
+    cwd: "./example-application",
+    stdio: "inherit",
+  });
+  await execa("node", ["../build/index.mjs"], {
+    cwd: "./example-application",
+    stdio: "inherit",
+  });
   await fs.rm("./example-application/node_modules/", { recursive: true });
   const directory = await fs.mkdtemp(
     path.join(os.tmpdir(), "radically-straightforward--package--test--"),
@@ -15,7 +21,9 @@ test(async () => {
   const outputPackage = `example-application.${
     process.platform === "win32" ? "zip" : "tar.gz"
   }`;
-  await execa("tar", ["-xvzf", outputPackage, "-C", directory]);
+  await execa("tar", ["-xzf", outputPackage, "-C", directory], {
+    stdio: "inherit",
+  });
   await fs.rm(outputPackage);
   const result = await execa(
     path.join(directory, "example-application", "example-application"),
