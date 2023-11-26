@@ -35,7 +35,7 @@ await commander.program
         ),
       ].reverse()) {
         if (match.groups === undefined || match.index === undefined) continue;
-        const matchReplacementParts: (string | Promise<string>)[] = [];
+        const matchReplacementParts: (string | Promise<string>)[][] = [];
         babelTraverse.default(
           babelParser.parse(
             await fs.readFile(
@@ -56,7 +56,7 @@ await commander.program
                 !path.node.leadingComments[0].value.startsWith("*")
               )
                 return;
-              matchReplacementParts.push(
+              matchReplacementParts.push([
                 "```typescript\n",
                 (async () =>
                   (
@@ -67,21 +67,28 @@ await commander.program
                       }).code,
                       { parser: "babel-ts" },
                     )
-                  ).replace(/\s*\{\s*\}\s*$/v, ""))(),
+                  )
+                    .trim()
+                    .replace(/\s*\{\s*\}$/v, ";"))(),
                 "\n```\n\n",
                 path.node.leadingComments[0].value
                   .replace(/^\s*\* ?/gmv, "")
                   .trim(),
-                "\n\n",
-              );
+              ]);
             },
           },
         );
         documentation =
           documentation.slice(0, match.index) +
           `<!-- DOCUMENTATION START: ${match.groups.directive} -->\n\n` +
-          (await Promise.all(matchReplacementParts)).join("") +
-          `<!-- DOCUMENTATION END: ${match.groups.directive} -->` +
+          (
+            await Promise.all(
+              matchReplacementParts.map(async (matchReplacementPart) =>
+                (await Promise.all(matchReplacementPart)).join(""),
+              ),
+            )
+          ).join("\n\n---\n\n") +
+          `\n\n<!-- DOCUMENTATION END: ${match.groups.directive} -->` +
           documentation.slice(match.index + match[0].length);
       }
       await fs.writeFile(input, documentation);

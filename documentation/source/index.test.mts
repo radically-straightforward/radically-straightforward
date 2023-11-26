@@ -27,14 +27,19 @@ test(async () => {
     path.join(directory, "index.mts"),
     typescript`
       /**
-       * Example of documentation.
+       * Example of function documentation with **Markdown**.
        */
-      export async function time(
-        title: string,
-        function_: () => void | Promise<void>,
+      export async function example(
+        a: string,
+        b: number,
       ): Promise<void> {
         // ...
       }
+
+      /**
+       * Example of constant documentation.
+       */
+      export const age = 33;
     `,
   );
   await execa(
@@ -53,13 +58,18 @@ test(async () => {
       <!-- DOCUMENTATION START: index.mts -->
 
       \`\`\`typescript
-      async function time(
-        title: string,
-        function_: () => void | Promise<void>,
-      ): Promise<void>
+      async function example(a: string, b: number): Promise<void>;
       \`\`\`
 
-      Example of documentation.
+      Example of function documentation with **Markdown**.
+
+      ---
+
+      \`\`\`typescript
+      const age = 33;
+      \`\`\`
+
+      Example of constant documentation.
 
       <!-- DOCUMENTATION END: index.mts -->
     `,
@@ -69,14 +79,19 @@ test(async () => {
     path.join(directory, "index.mts"),
     typescript`
       /**
-       * Example of **modified** documentation.
+       * Example of <ins>modified</ins> function documentation with **Markdown**.
        */
-      export async function time(
-        title: string,
-        function_: () => void | Promise<void>,
+      export async function example(
+        a: string,
+        b: number,
       ): Promise<void> {
         // ...
       }
+
+      /**
+       * Example of constant documentation.
+       */
+      export const age = 33;
     `,
   );
   await execa(
@@ -95,13 +110,18 @@ test(async () => {
       <!-- DOCUMENTATION START: index.mts -->
 
       \`\`\`typescript
-      async function time(
-        title: string,
-        function_: () => void | Promise<void>,
-      ): Promise<void>
+      async function example(a: string, b: number): Promise<void>;
       \`\`\`
 
-      Example of **modified** documentation.
+      Example of <ins>modified</ins> function documentation with **Markdown**.
+
+      ---
+
+      \`\`\`typescript
+      const age = 33;
+      \`\`\`
+
+      Example of constant documentation.
 
       <!-- DOCUMENTATION END: index.mts -->
     `,
