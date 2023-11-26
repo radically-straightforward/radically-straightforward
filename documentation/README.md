@@ -14,3 +14,12 @@ $ npm install --save-dev @radically-straightforward/documentation
 
 - https://tsdoc.org/
 - https://typedoc.org/
+
+---
+
+- https://astexplorer.net/
+- https://babeljs.io/docs/babel-parser
+- https://babeljs.io/docs/babel-traverse
+- https://babeljs.io/docs/babel-generator
+- https://babeljs.io/docs/babel-types
+
