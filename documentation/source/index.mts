@@ -4,6 +4,7 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import * as commander from "commander";
 import dedent from "dedent";
+import { execaCommand } from "execa";
 import * as babelParser from "@babel/parser";
 import babelTraverse from "@babel/traverse";
 import babelTypes from "@babel/types";
@@ -36,79 +37,91 @@ await commander.program
       ].reverse()) {
         if (match.groups === undefined || match.index === undefined) continue;
         const matchReplacementParts: (string | Promise<string>)[][] = [];
-        babelTraverse.default(
-          babelParser.parse(
-            await fs.readFile(
-              path.join(input, "..", match.groups.directive),
-              "utf-8",
+        if (match.groups.directive.startsWith("$"))
+          matchReplacementParts.push([
+            "```\n",
+            (
+              await execaCommand(match.groups.directive.slice(1), {
+                cwd: path.dirname(input),
+                all: true,
+              })
+            ).all!,
+            "\n```",
+          ]);
+        else
+          babelTraverse.default(
+            babelParser.parse(
+              await fs.readFile(
+                path.join(input, "..", match.groups.directive),
+                "utf-8",
+              ),
+              {
+                sourceType: "module",
+                plugins: ["typescript"],
+              },
             ),
             {
-              sourceType: "module",
-              plugins: ["typescript"],
-            },
-          ),
-          {
-            ExportNamedDeclaration: (path) => {
-              if (
-                path.node.declaration === undefined ||
-                path.node.declaration === null ||
-                path.node.leadingComments?.length !== 1 ||
-                !path.node.leadingComments[0].value.startsWith("*")
-              )
-                return;
-              matchReplacementParts.push([
-                "```typescript\n",
-                (async () =>
-                  (
-                    await prettier.format(
-                      babelGenerator.default(
-                        path.node.declaration!.type === "FunctionDeclaration"
-                          ? {
-                              ...path.node.declaration,
-                              body: babelTypes.blockStatement([]),
-                            }
-                          : path.node.declaration!.type ===
-                              "VariableDeclaration"
+              ExportNamedDeclaration: (path) => {
+                if (
+                  path.node.declaration === undefined ||
+                  path.node.declaration === null ||
+                  path.node.leadingComments?.length !== 1 ||
+                  !path.node.leadingComments[0].value.startsWith("*")
+                )
+                  return;
+                matchReplacementParts.push([
+                  "```typescript\n",
+                  (async () =>
+                    (
+                      await prettier.format(
+                        babelGenerator.default(
+                          path.node.declaration!.type === "FunctionDeclaration"
                             ? {
                                 ...path.node.declaration,
-                                declarations:
-                                  path.node.declaration.declarations.map(
-                                    (declaration) => ({
-                                      ...declaration,
-                                      init: babelTypes.identifier("___"),
-                                    }),
-                                  ),
+                                body: babelTypes.blockStatement([]),
                               }
-                            : (() => {
-                                throw new Error(
-                                  `Unknown ‘ExportNamedDeclaration’: ‘${
-                                    babelGenerator.default(
-                                      path.node.declaration!,
-                                    ).code
-                                  }’`,
-                                );
-                              })(),
-                      ).code,
-                      { parser: "babel-ts" },
+                            : path.node.declaration!.type ===
+                                "VariableDeclaration"
+                              ? {
+                                  ...path.node.declaration,
+                                  declarations:
+                                    path.node.declaration.declarations.map(
+                                      (declaration) => ({
+                                        ...declaration,
+                                        init: babelTypes.identifier("___"),
+                                      }),
+                                    ),
+                                }
+                              : (() => {
+                                  throw new Error(
+                                    `Unknown ‘ExportNamedDeclaration’:\n${
+                                      babelGenerator.default(
+                                        path.node.declaration!,
+                                      ).code
+                                    }`,
+                                  );
+                                })(),
+                        ).code,
+                        { parser: "babel-ts" },
+                      )
                     )
-                  )
-                    .replace(
-                      path.node.declaration.type === "FunctionDeclaration"
-                        ? /\{\s*\}\s*$/v
-                        : path.node.declaration.type === "VariableDeclaration"
-                          ? /=\s*___;\s*$/v
-                          : /___/v,
-                      "",
-                    )
-                    .trim())(),
-                "\n```\n\n",
-                path.node.leadingComments[0].value
-                  .replace(/^\s*\* ?/gmv, "")
-                  .trim(),
-              ]);
+                      .replace(
+                        path.node.declaration.type === "FunctionDeclaration"
+                          ? /\{\s*\}\s*$/v
+                          : path.node.declaration.type === "VariableDeclaration"
+                            ? /=\s*___;\s*$/v
+                            : /___/v,
+                        "",
+                      )
+                      .trim())(),
+                  "\n```\n\n",
+                  path.node.leadingComments[0].value
+                    .replace(/^\s*\* ?/gmv, "")
+                    .trim(),
+                ]);
+              },
             },
-          },
-        );
+          );
         documentation =
           documentation.slice(0, match.index) +
           `<!-- DOCUMENTATION START: ${match.groups.directive} -->\n\n` +

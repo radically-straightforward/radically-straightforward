@@ -21,6 +21,10 @@ test(async () => {
       ## Extract TypeScript Documentation
 
       <!-- DOCUMENTATION: index.mts -->
+
+      ## Run Command
+
+      <!-- DOCUMENTATION: $ head -n 1 ./index.mts -->
     `,
   );
   await fs.writeFile(
@@ -75,6 +79,16 @@ test(async () => {
       Example of constant documentation.
 
       <!-- DOCUMENTATION END: index.mts -->
+
+      ## Run Command
+
+      <!-- DOCUMENTATION START: $ head -n 1 ./index.mts -->
+      
+      \`\`\`
+      /**
+      \`\`\`
+      
+      <!-- DOCUMENTATION END: $ head -n 1 ./index.mts -->
     `,
   );
 
