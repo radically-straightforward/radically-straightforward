@@ -55,10 +55,7 @@ await commander.program
                 path.join(input, "..", match.groups.directive),
                 "utf-8",
               ),
-              {
-                sourceType: "module",
-                plugins: ["typescript"],
-              },
+              { sourceType: "module", plugins: ["typescript"] },
             ),
             {
               ExportNamedDeclaration: (path) => {
@@ -110,7 +107,7 @@ await commander.program
                           ? /\{\s*\}\s*$/v
                           : path.node.declaration.type === "VariableDeclaration"
                             ? /=\s*___;\s*$/v
-                            : /___/v,
+                            : /NEVER/v,
                         "",
                       )
                       .trim())(),
