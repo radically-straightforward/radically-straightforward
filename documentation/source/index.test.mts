@@ -45,6 +45,11 @@ test(async () => {
        */
       export const exampleOfVariableDeclaration: number = 33;
 
+      /**
+       * Example of \`TSTypeAliasDeclaration\`.
+       */
+      export type ExampleOfTSTypeAliasDeclaration = string;
+
       // Example of last line for command.
     `,
   );
@@ -79,6 +84,14 @@ test(async () => {
       \`\`\`
 
       Example of \`VariableDeclaration\`.
+
+      ---
+
+      \`\`\`typescript
+      export type ExampleOfTSTypeAliasDeclaration = string
+      \`\`\`
+
+      Example of \`TSTypeAliasDeclaration\`.
       
       <!-- DOCUMENTATION END: index.mts -->
       

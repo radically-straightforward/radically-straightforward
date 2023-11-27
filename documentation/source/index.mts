@@ -101,9 +101,41 @@ await commander.program
                                       ),
                                   },
                                 }
+                              : path.node.declaration.type ===
+                                  "TSTypeAliasDeclaration"
+                                ? {
+                                    ...path.node,
+                                    leadingComments: [],
+                                    trailingComments: [],
+                                  }
+                                : (() => {
+                                    throw new Error(
+                                      `Unknown ‘Declaration’: ‘${
+                                        path.node.declaration.type
+                                      }’\n${
+                                        babelGenerator.default({
+                                          ...path.node,
+                                          leadingComments: [],
+                                          trailingComments: [],
+                                        }).code
+                                      }`,
+                                    );
+                                  })(),
+                        ).code,
+                        { parser: "babel-ts" },
+                      )
+                    )
+                      .replace(
+                        path.node.declaration.type === "FunctionDeclaration"
+                          ? /\{\s*\}\s*$/v
+                          : path.node.declaration.type === "VariableDeclaration"
+                            ? /=\s*___;\s*$/v
+                            : path.node.declaration.type ===
+                                "TSTypeAliasDeclaration"
+                              ? /;\s*$/v
                               : (() => {
                                   throw new Error(
-                                    `Unknown ‘ExportNamedDeclaration’: ‘${
+                                    `Unknown ‘Declaration’: ‘${
                                       path.node.declaration.type
                                     }’\n${
                                       babelGenerator.default({
@@ -114,16 +146,6 @@ await commander.program
                                     }`,
                                   );
                                 })(),
-                        ).code,
-                        { parser: "babel-ts" },
-                      )
-                    )
-                      .replace(
-                        path.node.declaration.type === "FunctionDeclaration"
-                          ? /\{\s*\}\s*$/v
-                          : path.node.declaration.type === "VariableDeclaration"
-                            ? /=\s*___;\s*$/v
-                            : /NEVER/v,
                         "",
                       )
                       .trim())(),
