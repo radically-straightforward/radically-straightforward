@@ -106,6 +106,7 @@ await commander.program
                                     }’\n${
                                       babelGenerator.default({
                                         ...path.node,
+                                        leadingComments: [],
                                         trailingComments: [],
                                       }).code
                                     }`,
