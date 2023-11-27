@@ -58,7 +58,9 @@ await commander.program
               { sourceType: "module", plugins: ["typescript"] },
             ),
             {
-              ExportNamedDeclaration: (path) => {
+              "ExportDefaultDeclaration|ExportNamedDeclaration": (
+                path: any,
+              ) => {
                 if (
                   path.node.declaration === undefined ||
                   path.node.declaration === null ||
@@ -72,7 +74,7 @@ await commander.program
                     (
                       await prettier.format(
                         babelGenerator.default(
-                          path.node.declaration!.type === "FunctionDeclaration"
+                          path.node.declaration.type === "FunctionDeclaration"
                             ? {
                                 ...path.node,
                                 leadingComments: [],
@@ -82,7 +84,7 @@ await commander.program
                                   body: babelTypes.blockStatement([]),
                                 },
                               }
-                            : path.node.declaration!.type ===
+                            : path.node.declaration.type ===
                                 "VariableDeclaration"
                               ? {
                                   ...path.node,
@@ -92,7 +94,7 @@ await commander.program
                                     ...path.node.declaration,
                                     declarations:
                                       path.node.declaration.declarations.map(
-                                        (declaration) => ({
+                                        (declaration: any) => ({
                                           ...declaration,
                                           init: babelTypes.identifier("___"),
                                         }),
@@ -102,7 +104,7 @@ await commander.program
                               : (() => {
                                   throw new Error(
                                     `Unknown ‘ExportNamedDeclaration’: ‘${
-                                      path.node.declaration!.type
+                                      path.node.declaration.type
                                     }’\n${
                                       babelGenerator.default({
                                         ...path.node,
