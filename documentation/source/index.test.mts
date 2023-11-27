@@ -31,11 +31,10 @@ test(async () => {
     path.join(directory, "index.mts"),
     typescript`
       /**
-       * Example of \`FunctionDeclaration\`, default export, and **Markdown**.
+       * Example of \`FunctionDeclaration\`.
        */
       export default async function exampleOfFunctionDeclaration(
-        a: string,
-        b: number,
+        exampleOfParameter: string,
       ): Promise<void> {
         // ...
       }
@@ -43,7 +42,7 @@ test(async () => {
       /**
        * Example of \`VariableDeclaration\`.
        */
-      export const exampleOfVariableDeclaration: number = 33;
+      export const exampleOfVariableDeclaration: string = "exampleOfVariableDeclaration";
 
       /**
        * Example of \`ClassDeclaration\`.
@@ -59,7 +58,7 @@ test(async () => {
         /**
          * Example of \`ClassProperty\`.
          */
-        exampleOfClassProperty: number = 33;
+        exampleOfClassProperty: string = "exampleOfClassProperty";
       }
 
       /**

@@ -67,38 +67,31 @@ await commander.program
                 )
                   return;
                 matchReplacementParts.push(
-                  "### ",
-                  ...(path.node.type === "ExportDefaultDeclaration"
-                    ? ["Default Export"]
-                    : [
-                        "`",
-                        path.node.declaration.type === "FunctionDeclaration"
-                          ? path.node.declaration.id.name + "()"
-                          : path.node.declaration.type ===
-                                "VariableDeclaration" &&
-                              path.node.declaration.declarations.length === 1
-                            ? path.node.declaration.declarations[0].id.name
-                            : path.node.declaration.type === "ClassDeclaration"
-                              ? path.node.declaration.id.name
-                              : path.node.declaration.type ===
-                                  "TSTypeAliasDeclaration"
-                                ? path.node.declaration.id.name
-                                : (() => {
-                                    throw new Error(
-                                      `Unknown ‘Declaration’: ‘${
-                                        path.node.declaration.type
-                                      }’\n${
-                                        babelGenerator.default({
-                                          ...path.node,
-                                          leadingComments: [],
-                                          trailingComments: [],
-                                        }).code
-                                      }`,
-                                    );
-                                  })(),
-                        "`",
-                      ]),
-                  "\n\n```typescript\n",
+                  "### `",
+                  path.node.declaration.type === "FunctionDeclaration"
+                    ? path.node.declaration.id.name + "()"
+                    : path.node.declaration.type === "VariableDeclaration" &&
+                        path.node.declaration.declarations.length === 1
+                      ? path.node.declaration.declarations[0].id.name
+                      : path.node.declaration.type === "ClassDeclaration"
+                        ? path.node.declaration.id.name
+                        : path.node.declaration.type ===
+                            "TSTypeAliasDeclaration"
+                          ? path.node.declaration.id.name
+                          : (() => {
+                              throw new Error(
+                                `Unknown ‘Declaration’: ‘${
+                                  path.node.declaration.type
+                                }’\n${
+                                  babelGenerator.default({
+                                    ...path.node,
+                                    leadingComments: [],
+                                    trailingComments: [],
+                                  }).code
+                                }`,
+                              );
+                            })(),
+                  "`\n\n```typescript\n",
                   (async () =>
                     (
                       await prettier.format(
