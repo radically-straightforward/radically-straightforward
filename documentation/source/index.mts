@@ -36,9 +36,9 @@ await commander.program
         ),
       ].reverse()) {
         if (match.groups === undefined || match.index === undefined) continue;
-        const matchReplacementParts: (string | Promise<string>)[][] = [];
+        const matchReplacementParts: (string | Promise<string>)[] = [];
         if (match.groups.directive.startsWith("$"))
-          matchReplacementParts.push([
+          matchReplacementParts.push(
             "```\n",
             (
               await execaCommand(match.groups.directive.slice(1), {
@@ -47,7 +47,7 @@ await commander.program
               })
             ).all!,
             "\n```",
-          ]);
+          );
         else
           babelTraverse.default(
             babelParser.parse(
@@ -66,8 +66,39 @@ await commander.program
                   !path.node.leadingComments[0].value.startsWith("*")
                 )
                   return;
-                matchReplacementParts.push([
-                  "```typescript\n",
+                matchReplacementParts.push(
+                  "### ",
+                  ...(path.node.type === "ExportDefaultDeclaration"
+                    ? ["Default Export"]
+                    : [
+                        "`",
+                        path.node.declaration.type === "FunctionDeclaration"
+                          ? path.node.declaration.id.name
+                          : path.node.declaration.type ===
+                                "VariableDeclaration" &&
+                              path.node.declaration.declarations.length === 1
+                            ? path.node.declaration.declarations[0].id.name
+                            : path.node.declaration.type === "ClassDeclaration"
+                              ? path.node.declaration.id.name
+                              : path.node.declaration.type ===
+                                  "TSTypeAliasDeclaration"
+                                ? path.node.declaration.id.name
+                                : (() => {
+                                    throw new Error(
+                                      `Unknown ‘Declaration’: ‘${
+                                        path.node.declaration.type
+                                      }’\n${
+                                        babelGenerator.default({
+                                          ...path.node,
+                                          leadingComments: [],
+                                          trailingComments: [],
+                                        }).code
+                                      }`,
+                                    );
+                                  })(),
+                        "`",
+                      ]),
+                  "\n\n```typescript\n",
                   (async () =>
                     (
                       await prettier.format(
@@ -83,20 +114,21 @@ await commander.program
                                 },
                               }
                             : path.node.declaration.type ===
-                                "VariableDeclaration"
+                                  "VariableDeclaration" &&
+                                path.node.declaration.declarations.length === 1
                               ? {
                                   ...path.node,
                                   leadingComments: [],
                                   trailingComments: [],
                                   declaration: {
                                     ...path.node.declaration,
-                                    declarations:
-                                      path.node.declaration.declarations.map(
-                                        (declaration: any) => ({
-                                          ...declaration,
-                                          init: babelTypes.identifier("___"),
-                                        }),
-                                      ),
+                                    declarations: [
+                                      {
+                                        ...path.node.declaration
+                                          .declarations[0],
+                                        init: babelTypes.identifier("___"),
+                                      },
+                                    ],
                                   },
                                 }
                               : path.node.declaration.type ===
@@ -169,7 +201,8 @@ await commander.program
                   path.node.leadingComments[0].value
                     .replace(/^\s*\* ?/gmv, "")
                     .trim(),
-                ]);
+                  "\n\n",
+                );
                 if (
                   path.node.declaration.type === "ClassDeclaration" &&
                   path.node.declaration.body.type === "ClassBody"
@@ -180,55 +213,49 @@ await commander.program
                       !classBodyNode.leadingComments[0].value.startsWith("*")
                     )
                       continue;
-                    matchReplacementParts.push([
-                      "```typescript\n",
+                    matchReplacementParts.push(
+                      "#### `",
+                      path.node.declaration.id.name,
+                      ".",
+                      classBodyNode.key.name,
+                      "`\n\n```typescript\n",
                       (async () =>
                         (
                           await prettier.format(
                             `class ___ {${
                               babelGenerator.default(
-                                classBodyNode.type === "ClassMethod"
+                                ["ClassMethod", "ClassPrivateMethod"].includes(
+                                  classBodyNode.type,
+                                )
                                   ? {
                                       ...classBodyNode,
                                       leadingComments: [],
                                       trailingComments: [],
                                       body: babelTypes.blockStatement([]),
                                     }
-                                  : classBodyNode.type === "ClassPrivateMethod"
+                                  : [
+                                        "ClassProperty",
+                                        "ClassPrivateProperty",
+                                      ].includes(classBodyNode.type)
                                     ? {
                                         ...classBodyNode,
                                         leadingComments: [],
                                         trailingComments: [],
-                                        body: babelTypes.blockStatement([]),
+                                        value: babelTypes.identifier("___"),
                                       }
-                                    : classBodyNode.type === "ClassProperty"
-                                      ? {
-                                          ...classBodyNode,
-                                          leadingComments: [],
-                                          trailingComments: [],
-                                          value: babelTypes.identifier("___"),
-                                        }
-                                      : classBodyNode.type ===
-                                          "ClassPrivateProperty"
-                                        ? {
-                                            ...classBodyNode,
-                                            leadingComments: [],
-                                            trailingComments: [],
-                                            value: babelTypes.identifier("___"),
-                                          }
-                                        : (() => {
-                                            throw new Error(
-                                              `Unknown ‘ClassBody.body’ element type: ‘${
-                                                classBodyNode.type
-                                              }’\n${
-                                                babelGenerator.default({
-                                                  ...classBodyNode,
-                                                  leadingComments: [],
-                                                  trailingComments: [],
-                                                }).code
-                                              }`,
-                                            );
-                                          })(),
+                                    : (() => {
+                                        throw new Error(
+                                          `Unknown ‘ClassBody.body’ element type: ‘${
+                                            classBodyNode.type
+                                          }’\n${
+                                            babelGenerator.default({
+                                              ...classBodyNode,
+                                              leadingComments: [],
+                                              trailingComments: [],
+                                            }).code
+                                          }`,
+                                        );
+                                      })(),
                               ).code
                             }}`,
                             { parser: "babel-ts" },
@@ -240,12 +267,14 @@ await commander.program
                           .slice(
                             0,
                             -(
-                              classBodyNode.type === "ClassMethod" ||
-                              classBodyNode.type === "ClassPrivateMethod"
+                              ["ClassMethod", "ClassPrivateMethod"].includes(
+                                classBodyNode.type,
+                              )
                                 ? "{}"
-                                : classBodyNode.type === "ClassProperty" ||
-                                    classBodyNode.type ===
-                                      "ClassPrivateProperty"
+                                : [
+                                      "ClassProperty",
+                                      "ClassPrivateProperty",
+                                    ].includes(classBodyNode.type)
                                   ? "= ___;"
                                   : (() => {
                                       throw new Error(
@@ -267,7 +296,8 @@ await commander.program
                       classBodyNode.leadingComments[0].value
                         .replace(/^\s*\* ?/gmv, "")
                         .trim(),
-                    ]);
+                      "\n\n",
+                    );
                   }
               },
             },
@@ -275,14 +305,8 @@ await commander.program
         documentation =
           documentation.slice(0, match.index) +
           `<!-- DOCUMENTATION START: ${match.groups.directive} -->\n\n` +
-          (
-            await Promise.all(
-              matchReplacementParts.map(async (matchReplacementPart) =>
-                (await Promise.all(matchReplacementPart)).join(""),
-              ),
-            )
-          ).join("\n\n---\n\n") +
-          `\n\n<!-- DOCUMENTATION END: ${match.groups.directive} -->` +
+          (await Promise.all(matchReplacementParts)).join("") +
+          `<!-- DOCUMENTATION END: ${match.groups.directive} -->` +
           documentation.slice(match.index + match[0].length);
       }
       await fs.writeFile(input, documentation);

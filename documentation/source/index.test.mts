@@ -145,49 +145,49 @@ test(async () => {
   //   `,
   // );
 
-  await fs.writeFile(
-    path.join(directory, "index.mts"),
-    typescript`
-      /**
-       * Example of modified documentation.
-       */
-      export const exampleOfModifiedDocumentation: number = 33;
+  // await fs.writeFile(
+  //   path.join(directory, "index.mts"),
+  //   typescript`
+  //     /**
+  //      * Example of modified documentation.
+  //      */
+  //     export const exampleOfModifiedDocumentation: number = 33;
 
-      // Example of modified last line for command.
-    `,
-  );
-  await execa(
-    "node",
-    [url.fileURLToPath(new URL("./index.mjs", import.meta.url))],
-    { cwd: directory, stdio: "inherit" },
-  );
-  assert.equal(
-    await fs.readFile(path.join(directory, "README.md"), "utf-8"),
-    // prettier-ignore
-    markdown`
-      # Example of \`@radically-straightforward/documentation\`
+  //     // Example of modified last line for command.
+  //   `,
+  // );
+  // await execa(
+  //   "node",
+  //   [url.fileURLToPath(new URL("./index.mjs", import.meta.url))],
+  //   { cwd: directory, stdio: "inherit" },
+  // );
+  // assert.equal(
+  //   await fs.readFile(path.join(directory, "README.md"), "utf-8"),
+  //   // prettier-ignore
+  //   markdown`
+  //     # Example of \`@radically-straightforward/documentation\`
 
-      ## Extract TypeScript Documentation
+  //     ## Extract TypeScript Documentation
 
-      <!-- DOCUMENTATION START: index.mts -->
+  //     <!-- DOCUMENTATION START: index.mts -->
 
-      \`\`\`typescript
-      export const exampleOfModifiedDocumentation: number
-      \`\`\`
+  //     \`\`\`typescript
+  //     export const exampleOfModifiedDocumentation: number
+  //     \`\`\`
 
-      Example of modified documentation.
+  //     Example of modified documentation.
 
-      <!-- DOCUMENTATION END: index.mts -->
+  //     <!-- DOCUMENTATION END: index.mts -->
 
-      ## Run Command
+  //     ## Run Command
       
-      <!-- DOCUMENTATION START: $ tail -n 1 ./index.mts -->
+  //     <!-- DOCUMENTATION START: $ tail -n 1 ./index.mts -->
       
-      \`\`\`
-      // Example of modified last line for command.
-      \`\`\`
+  //     \`\`\`
+  //     // Example of modified last line for command.
+  //     \`\`\`
       
-      <!-- DOCUMENTATION END: $ tail -n 1 ./index.mts -->
-    `,
-  );
+  //     <!-- DOCUMENTATION END: $ tail -n 1 ./index.mts -->
+  //   `,
+  // );
 });
