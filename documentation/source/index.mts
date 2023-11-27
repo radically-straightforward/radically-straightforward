@@ -91,7 +91,9 @@ await commander.program
                                 }
                               : (() => {
                                   throw new Error(
-                                    `Unknown ‘ExportNamedDeclaration’:\n${
+                                    `Unknown ‘ExportNamedDeclaration’: ‘${
+                                      path.node.declaration!.type
+                                    }’\n${
                                       babelGenerator.default(
                                         path.node.declaration!,
                                       ).code
