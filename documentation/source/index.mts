@@ -46,7 +46,7 @@ await commander.program
                 all: true,
               })
             ).all!,
-            "\n```",
+            "\n```\n\n",
           );
         else
           babelTraverse.default(

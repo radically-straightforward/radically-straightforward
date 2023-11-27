@@ -180,13 +180,13 @@ test(async () => {
   //     <!-- DOCUMENTATION END: index.mts -->
 
   //     ## Run Command
-      
+
   //     <!-- DOCUMENTATION START: $ tail -n 1 ./index.mts -->
-      
+
   //     \`\`\`
   //     // Example of modified last line for command.
   //     \`\`\`
-      
+
   //     <!-- DOCUMENTATION END: $ tail -n 1 ./index.mts -->
   //   `,
   // );
