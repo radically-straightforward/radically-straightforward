@@ -50,16 +50,6 @@ test(async () => {
        */
       export class ExampleOfClassDeclaration {
         /**
-         * Example of \`ClassProperty\`.
-         */
-        exampleOfClassProperty: number = 33;
-      
-        /**
-         * Example of \`ClassPrivateProperty\`.
-         */
-        #exampleOfClassPrivateProperty: number = 33;
-      
-        /**
          * Example of \`ClassMethod\`.
          */
         exampleOfClassMethod(): void {
@@ -72,6 +62,16 @@ test(async () => {
         #exampleOfClassMethod(): void {
           // ...
         }
+
+        /**
+         * Example of \`ClassProperty\`.
+         */
+        exampleOfClassProperty: number = 33;
+      
+        /**
+         * Example of \`ClassPrivateProperty\`.
+         */
+        #exampleOfClassPrivateProperty: number = 33;
       }
 
       /**
