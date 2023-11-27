@@ -16,7 +16,7 @@ const packageJSON = JSON.parse(
 );
 
 await commander.program
-  .name(packageJSON.name.replace(/^.*\//v, ""))
+  .name(packageJSON.name.replace(/^.*?\//v, ""))
   .description(packageJSON.description)
   .argument(
     "[input...]",
