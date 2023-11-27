@@ -31,9 +31,9 @@ test(async () => {
     path.join(directory, "index.mts"),
     typescript`
       /**
-       * Example of function declaration, default export, and **Markdown**.
+       * Example of \`FunctionDeclaration\`, default export, and **Markdown**.
        */
-      export default async function exampleFunctionDeclaration(
+      export default async function exampleOfFunctionDeclaration(
         a: string,
         b: number,
       ): Promise<void> {
@@ -41,9 +41,9 @@ test(async () => {
       }
 
       /**
-       * Example of constant declaration.
+       * Example of \`VariableDeclaration\`.
        */
-      export const exampleVariableDeclaration: number = 33;
+      export const exampleOfVariableDeclaration: number = 33;
 
       // Example of last line for command.
     `,
@@ -64,21 +64,21 @@ test(async () => {
       <!-- DOCUMENTATION START: index.mts -->
       
       \`\`\`typescript
-      export default async function exampleFunctionDeclaration(
+      export default async function exampleOfFunctionDeclaration(
         a: string,
         b: number,
       ): Promise<void>
       \`\`\`
       
-      Example of function declaration, default export, and **Markdown**.
+      Example of \`FunctionDeclaration\`, default export, and **Markdown**.
 
       ---
 
       \`\`\`typescript
-      export const exampleVariableDeclaration: number
+      export const exampleOfVariableDeclaration: number
       \`\`\`
 
-      Example of constant declaration.
+      Example of \`VariableDeclaration\`.
       
       <!-- DOCUMENTATION END: index.mts -->
       
@@ -100,7 +100,7 @@ test(async () => {
       /**
        * Example of modified documentation.
        */
-      export const exampleVariableDeclaration: number = 33;
+      export const exampleOfModifiedDocumentation: number = 33;
 
       // Example of modified last line for command.
     `,
@@ -121,7 +121,7 @@ test(async () => {
       <!-- DOCUMENTATION START: index.mts -->
 
       \`\`\`typescript
-      export const exampleVariableDeclaration: number
+      export const exampleOfModifiedDocumentation: number
       \`\`\`
 
       Example of modified documentation.
