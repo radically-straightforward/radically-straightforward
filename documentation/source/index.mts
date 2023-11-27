@@ -102,12 +102,50 @@ await commander.program
                                   },
                                 }
                               : path.node.declaration.type ===
-                                  "TSTypeAliasDeclaration"
+                                  "ClassDeclaration"
                                 ? {
                                     ...path.node,
                                     leadingComments: [],
                                     trailingComments: [],
+                                    declaration: {
+                                      ...path.node.declaration,
+                                      body: babelTypes.classBody([]),
+                                    },
                                   }
+                                : path.node.declaration.type ===
+                                    "TSTypeAliasDeclaration"
+                                  ? {
+                                      ...path.node,
+                                      leadingComments: [],
+                                      trailingComments: [],
+                                    }
+                                  : (() => {
+                                      throw new Error(
+                                        `Unknown ‘Declaration’: ‘${
+                                          path.node.declaration.type
+                                        }’\n${
+                                          babelGenerator.default({
+                                            ...path.node,
+                                            leadingComments: [],
+                                            trailingComments: [],
+                                          }).code
+                                        }`,
+                                      );
+                                    })(),
+                        ).code,
+                        { parser: "babel-ts" },
+                      )
+                    )
+                      .replace(
+                        path.node.declaration.type === "FunctionDeclaration"
+                          ? /\{\s*\}\s*$/v
+                          : path.node.declaration.type === "VariableDeclaration"
+                            ? /=\s*___;\s*$/v
+                            : path.node.declaration.type === "ClassDeclaration"
+                              ? /\{\s*\}\s*$/v
+                              : path.node.declaration.type ===
+                                  "TSTypeAliasDeclaration"
+                                ? /;\s*$/v
                                 : (() => {
                                     throw new Error(
                                       `Unknown ‘Declaration’: ‘${
@@ -121,31 +159,6 @@ await commander.program
                                       }`,
                                     );
                                   })(),
-                        ).code,
-                        { parser: "babel-ts" },
-                      )
-                    )
-                      .replace(
-                        path.node.declaration.type === "FunctionDeclaration"
-                          ? /\{\s*\}\s*$/v
-                          : path.node.declaration.type === "VariableDeclaration"
-                            ? /=\s*___;\s*$/v
-                            : path.node.declaration.type ===
-                                "TSTypeAliasDeclaration"
-                              ? /;\s*$/v
-                              : (() => {
-                                  throw new Error(
-                                    `Unknown ‘Declaration’: ‘${
-                                      path.node.declaration.type
-                                    }’\n${
-                                      babelGenerator.default({
-                                        ...path.node,
-                                        leadingComments: [],
-                                        trailingComments: [],
-                                      }).code
-                                    }`,
-                                  );
-                                })(),
                         "",
                       )
                       .trim())(),

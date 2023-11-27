@@ -46,6 +46,35 @@ test(async () => {
       export const exampleOfVariableDeclaration: number = 33;
 
       /**
+       * Example of \`ClassDeclaration\`.
+       */
+      export class ExampleOfClassDeclaration {
+        /**
+         * Example of \`ClassProperty\`.
+         */
+        exampleOfClassProperty: number = 33;
+      
+        /**
+         * Example of \`ClassPrivateProperty\`.
+         */
+        #exampleOfClassPrivateProperty: number = 33;
+      
+        /**
+         * Example of \`ClassMethod\`.
+         */
+        exampleOfClassMethod(): void {
+          // ...
+        }
+      
+        /**
+         * Example of \`ClassPrivateMethod\`.
+         */
+        #exampleOfClassMethod(): void {
+          // ...
+        }
+      }
+
+      /**
        * Example of \`TSTypeAliasDeclaration\`.
        */
       export type ExampleOfTSTypeAliasDeclaration = string;
@@ -84,6 +113,14 @@ test(async () => {
       \`\`\`
 
       Example of \`VariableDeclaration\`.
+
+      ---
+
+      \`\`\`typescript
+      export class ExampleOfClassDeclaration
+      \`\`\`
+
+      Example of \`ClassDeclaration\`.
 
       ---
 
