@@ -24,16 +24,16 @@ test(async () => {
 
       ## Run Command
 
-      <!-- DOCUMENTATION: $ head -n 1 ./index.mts -->
+      <!-- DOCUMENTATION: $ tail -n 1 ./index.mts -->
     `,
   );
   await fs.writeFile(
     path.join(directory, "index.mts"),
     typescript`
       /**
-       * Example of function documentation with **Markdown**.
+       * Example of function declaration, default export, and **Markdown**.
        */
-      export async function exampleFunctionDeclaration(
+      export default async function exampleFunctionDeclaration(
         a: string,
         b: number,
       ): Promise<void> {
@@ -41,9 +41,11 @@ test(async () => {
       }
 
       /**
-       * Example of constant documentation.
+       * Example of constant declaration.
        */
       export const exampleVariableDeclaration: number = 33;
+
+      // Example of last line for command.
     `,
   );
   await execa(
@@ -62,13 +64,13 @@ test(async () => {
       <!-- DOCUMENTATION START: index.mts -->
       
       \`\`\`typescript
-      export async function exampleFunctionDeclaration(
+      export default async function exampleFunctionDeclaration(
         a: string,
         b: number,
       ): Promise<void>
       \`\`\`
       
-      Example of function documentation with **Markdown**.
+      Example of function declaration, default export, and **Markdown**.
 
       ---
 
@@ -76,19 +78,19 @@ test(async () => {
       export const exampleVariableDeclaration: number
       \`\`\`
 
-      Example of constant documentation.
+      Example of constant declaration.
       
       <!-- DOCUMENTATION END: index.mts -->
       
       ## Run Command
       
-      <!-- DOCUMENTATION START: $ head -n 1 ./index.mts -->
+      <!-- DOCUMENTATION START: $ tail -n 1 ./index.mts -->
       
       \`\`\`
-      /**
+      // Example of last line for command.
       \`\`\`
       
-      <!-- DOCUMENTATION END: $ head -n 1 ./index.mts -->
+      <!-- DOCUMENTATION END: $ tail -n 1 ./index.mts -->
     `,
   );
 
@@ -96,14 +98,11 @@ test(async () => {
     path.join(directory, "index.mts"),
     typescript`
       /**
-       * Example of <ins>modified</ins> function documentation with **Markdown**.
+       * Example of modified documentation.
        */
-      export async function exampleFunctionDeclaration(
-        a: string,
-        b: number,
-      ): Promise<void> {
-        // ...
-      }
+      export const exampleVariableDeclaration: number = 33;
+
+      // Example of modified last line for command.
     `,
   );
   await execa(
@@ -122,25 +121,22 @@ test(async () => {
       <!-- DOCUMENTATION START: index.mts -->
 
       \`\`\`typescript
-      export async function exampleFunctionDeclaration(
-        a: string,
-        b: number,
-      ): Promise<void>
+      export const exampleVariableDeclaration: number
       \`\`\`
 
-      Example of <ins>modified</ins> function documentation with **Markdown**.
+      Example of modified documentation.
 
       <!-- DOCUMENTATION END: index.mts -->
 
       ## Run Command
       
-      <!-- DOCUMENTATION START: $ head -n 1 ./index.mts -->
+      <!-- DOCUMENTATION START: $ tail -n 1 ./index.mts -->
       
       \`\`\`
-      /**
+      // Example of modified last line for command.
       \`\`\`
       
-      <!-- DOCUMENTATION END: $ head -n 1 ./index.mts -->
+      <!-- DOCUMENTATION END: $ tail -n 1 ./index.mts -->
     `,
   );
 });
