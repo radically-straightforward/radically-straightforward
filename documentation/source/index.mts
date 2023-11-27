@@ -73,7 +73,7 @@ await commander.program
                     : [
                         "`",
                         path.node.declaration.type === "FunctionDeclaration"
-                          ? path.node.declaration.id.name
+                          ? path.node.declaration.id.name + "()"
                           : path.node.declaration.type ===
                                 "VariableDeclaration" &&
                               path.node.declaration.declarations.length === 1
@@ -218,25 +218,21 @@ await commander.program
                       path.node.declaration.id.name,
                       ".",
                       classBodyNode.key.name,
+                      ...(classBodyNode.type === "ClassMethod" ? ["()"] : ""),
                       "`\n\n```typescript\n",
                       (async () =>
                         (
                           await prettier.format(
                             `class ___ {${
                               babelGenerator.default(
-                                ["ClassMethod", "ClassPrivateMethod"].includes(
-                                  classBodyNode.type,
-                                )
+                                classBodyNode.type === "ClassMethod"
                                   ? {
                                       ...classBodyNode,
                                       leadingComments: [],
                                       trailingComments: [],
                                       body: babelTypes.blockStatement([]),
                                     }
-                                  : [
-                                        "ClassProperty",
-                                        "ClassPrivateProperty",
-                                      ].includes(classBodyNode.type)
+                                  : classBodyNode.type === "ClassProperty"
                                     ? {
                                         ...classBodyNode,
                                         leadingComments: [],
@@ -267,14 +263,9 @@ await commander.program
                           .slice(
                             0,
                             -(
-                              ["ClassMethod", "ClassPrivateMethod"].includes(
-                                classBodyNode.type,
-                              )
+                              classBodyNode.type === "ClassMethod"
                                 ? "{}"
-                                : [
-                                      "ClassProperty",
-                                      "ClassPrivateProperty",
-                                    ].includes(classBodyNode.type)
+                                : classBodyNode.type === "ClassProperty"
                                   ? "= ___;"
                                   : (() => {
                                       throw new Error(

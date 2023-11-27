@@ -57,21 +57,9 @@ test(async () => {
         }
       
         /**
-         * Example of \`ClassPrivateMethod\`.
-         */
-        #exampleOfClassMethod(): void {
-          // ...
-        }
-
-        /**
          * Example of \`ClassProperty\`.
          */
         exampleOfClassProperty: number = 33;
-      
-        /**
-         * Example of \`ClassPrivateProperty\`.
-         */
-        #exampleOfClassPrivateProperty: number = 33;
       }
 
       /**
