@@ -74,29 +74,40 @@ await commander.program
                         babelGenerator.default(
                           path.node.declaration!.type === "FunctionDeclaration"
                             ? {
-                                ...path.node.declaration,
-                                body: babelTypes.blockStatement([]),
+                                ...path.node,
+                                leadingComments: [],
+                                trailingComments: [],
+                                declaration: {
+                                  ...path.node.declaration,
+                                  body: babelTypes.blockStatement([]),
+                                },
                               }
                             : path.node.declaration!.type ===
                                 "VariableDeclaration"
                               ? {
-                                  ...path.node.declaration,
-                                  declarations:
-                                    path.node.declaration.declarations.map(
-                                      (declaration) => ({
-                                        ...declaration,
-                                        init: babelTypes.identifier("___"),
-                                      }),
-                                    ),
+                                  ...path.node,
+                                  leadingComments: [],
+                                  trailingComments: [],
+                                  declaration: {
+                                    ...path.node.declaration,
+                                    declarations:
+                                      path.node.declaration.declarations.map(
+                                        (declaration) => ({
+                                          ...declaration,
+                                          init: babelTypes.identifier("___"),
+                                        }),
+                                      ),
+                                  },
                                 }
                               : (() => {
                                   throw new Error(
                                     `Unknown ‘ExportNamedDeclaration’: ‘${
                                       path.node.declaration!.type
                                     }’\n${
-                                      babelGenerator.default(
-                                        path.node.declaration!,
-                                      ).code
+                                      babelGenerator.default({
+                                        ...path.node,
+                                        trailingComments: [],
+                                      }).code
                                     }`,
                                   );
                                 })(),

@@ -62,7 +62,7 @@ test(async () => {
       <!-- DOCUMENTATION START: index.mts -->
       
       \`\`\`typescript
-      async function exampleFunctionDeclaration(
+      export async function exampleFunctionDeclaration(
         a: string,
         b: number,
       ): Promise<void>
@@ -73,7 +73,7 @@ test(async () => {
       ---
 
       \`\`\`typescript
-      const exampleVariableDeclaration: number
+      export const exampleVariableDeclaration: number
       \`\`\`
 
       Example of constant documentation.
@@ -122,7 +122,7 @@ test(async () => {
       <!-- DOCUMENTATION START: index.mts -->
 
       \`\`\`typescript
-      async function exampleFunctionDeclaration(
+      export async function exampleFunctionDeclaration(
         a: string,
         b: number,
       ): Promise<void>
