@@ -134,16 +134,17 @@ await commander.program
                         { parser: "babel-ts" },
                       )
                     )
+                      .trim()
                       .replace(
                         path.node.declaration.type === "FunctionDeclaration"
-                          ? /\{\s*\}\s*$/v
+                          ? /\{\}$/v
                           : path.node.declaration.type === "VariableDeclaration"
-                            ? /=\s*___;\s*$/v
+                            ? /= ___;$/v
                             : path.node.declaration.type === "ClassDeclaration"
-                              ? /\{\s*\}\s*$/v
+                              ? /\{\}$/v
                               : path.node.declaration.type ===
                                   "TSTypeAliasDeclaration"
-                                ? /;\s*$/v
+                                ? /;$/v
                                 : (() => {
                                     throw new Error(
                                       `Unknown ‘Declaration’: ‘${
@@ -180,63 +181,69 @@ await commander.program
                       (async () =>
                         (
                           await prettier.format(
-                            babelGenerator.default(
-                              classBodyNode.type === "ClassMethod"
-                                ? {
-                                    ...classBodyNode,
-                                    leadingComments: [],
-                                    trailingComments: [],
-                                    body: babelTypes.blockStatement([]),
-                                  }
-                                : classBodyNode.type === "ClassPrivateMethod"
+                            `class ___ {${
+                              babelGenerator.default(
+                                classBodyNode.type === "ClassMethod"
                                   ? {
                                       ...classBodyNode,
                                       leadingComments: [],
                                       trailingComments: [],
                                       body: babelTypes.blockStatement([]),
                                     }
-                                  : classBodyNode.type === "ClassProperty"
+                                  : classBodyNode.type === "ClassPrivateMethod"
                                     ? {
                                         ...classBodyNode,
                                         leadingComments: [],
                                         trailingComments: [],
-                                        value: babelTypes.identifier("___"),
+                                        body: babelTypes.blockStatement([]),
                                       }
-                                    : classBodyNode.type ===
-                                        "ClassPrivateProperty"
+                                    : classBodyNode.type === "ClassProperty"
                                       ? {
                                           ...classBodyNode,
                                           leadingComments: [],
                                           trailingComments: [],
                                           value: babelTypes.identifier("___"),
                                         }
-                                      : (() => {
-                                          throw new Error(
-                                            `Unknown ‘ClassBody.body’ element type: ‘${
-                                              classBodyNode.type
-                                            }’\n${
-                                              babelGenerator.default({
-                                                ...classBodyNode,
-                                                leadingComments: [],
-                                                trailingComments: [],
-                                              }).code
-                                            }`,
-                                          );
-                                        })(),
-                            ).code,
+                                      : classBodyNode.type ===
+                                          "ClassPrivateProperty"
+                                        ? {
+                                            ...classBodyNode,
+                                            leadingComments: [],
+                                            trailingComments: [],
+                                            value: babelTypes.identifier("___"),
+                                          }
+                                        : (() => {
+                                            throw new Error(
+                                              `Unknown ‘ClassBody.body’ element type: ‘${
+                                                classBodyNode.type
+                                              }’\n${
+                                                babelGenerator.default({
+                                                  ...classBodyNode,
+                                                  leadingComments: [],
+                                                  trailingComments: [],
+                                                }).code
+                                              }`,
+                                            );
+                                          })(),
+                              ).code
+                            }}`,
                             { parser: "babel-ts" },
                           )
                         )
+                          .trim()
+                          .replace(/^class ___ \{/v, "")
+                          .replace(/\}$/v, "")
+                          .trim()
                           .replace(
                             classBodyNode.type === "ClassMethod"
-                              ? /\{\s*\}\s*$/v
+                              ? /\{\}$/v
                               : classBodyNode.type === "ClassPrivateMethod"
-                                ? /\{\s*\}\s*$/v
+                                ? /\{\}$/v
                                 : classBodyNode.type === "ClassProperty"
-                                  ? /=\s*___;\s*$/v
+                                  ? /= ___;$/v
                                   : classBodyNode.type ===
                                       "ClassPrivateProperty"
-                                    ? /=\s*___;\s*$/v
+                                    ? /= ___;$/v
                                     : (() => {
                                         throw new Error(
                                           `Unknown ‘ClassBody.body’ element type: ‘${
