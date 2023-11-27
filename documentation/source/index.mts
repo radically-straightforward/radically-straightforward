@@ -135,30 +135,34 @@ await commander.program
                       )
                     )
                       .trim()
-                      .replace(
-                        path.node.declaration.type === "FunctionDeclaration"
-                          ? /\{\}$/v
-                          : path.node.declaration.type === "VariableDeclaration"
-                            ? /= ___;$/v
-                            : path.node.declaration.type === "ClassDeclaration"
-                              ? /\{\}$/v
+                      .slice(
+                        0,
+                        -(
+                          path.node.declaration.type === "FunctionDeclaration"
+                            ? "{}"
+                            : path.node.declaration.type ===
+                                "VariableDeclaration"
+                              ? "= ___;"
                               : path.node.declaration.type ===
-                                  "TSTypeAliasDeclaration"
-                                ? /;$/v
-                                : (() => {
-                                    throw new Error(
-                                      `Unknown ‘Declaration’: ‘${
-                                        path.node.declaration.type
-                                      }’\n${
-                                        babelGenerator.default({
-                                          ...path.node,
-                                          leadingComments: [],
-                                          trailingComments: [],
-                                        }).code
-                                      }`,
-                                    );
-                                  })(),
-                        "",
+                                  "ClassDeclaration"
+                                ? "{}"
+                                : path.node.declaration.type ===
+                                    "TSTypeAliasDeclaration"
+                                  ? ";"
+                                  : (() => {
+                                      throw new Error(
+                                        `Unknown ‘Declaration’: ‘${
+                                          path.node.declaration.type
+                                        }’\n${
+                                          babelGenerator.default({
+                                            ...path.node,
+                                            leadingComments: [],
+                                            trailingComments: [],
+                                          }).code
+                                        }`,
+                                      );
+                                    })()
+                        ).length,
                       )
                       .trim())(),
                   "\n```\n\n",
@@ -231,33 +235,32 @@ await commander.program
                           )
                         )
                           .trim()
-                          .replace(/^class ___ \{/v, "")
-                          .replace(/\}$/v, "")
+                          .slice("class ___ {".length, -"}".length)
                           .trim()
-                          .replace(
-                            classBodyNode.type === "ClassMethod"
-                              ? /\{\}$/v
-                              : classBodyNode.type === "ClassPrivateMethod"
-                                ? /\{\}$/v
-                                : classBodyNode.type === "ClassProperty"
-                                  ? /= ___;$/v
-                                  : classBodyNode.type ===
+                          .slice(
+                            0,
+                            -(
+                              classBodyNode.type === "ClassMethod" ||
+                              classBodyNode.type === "ClassPrivateMethod"
+                                ? "{}"
+                                : classBodyNode.type === "ClassProperty" ||
+                                    classBodyNode.type ===
                                       "ClassPrivateProperty"
-                                    ? /= ___;$/v
-                                    : (() => {
-                                        throw new Error(
-                                          `Unknown ‘ClassBody.body’ element type: ‘${
-                                            classBodyNode.type
-                                          }’\n${
-                                            babelGenerator.default({
-                                              ...classBodyNode,
-                                              leadingComments: [],
-                                              trailingComments: [],
-                                            }).code
-                                          }`,
-                                        );
-                                      })(),
-                            "",
+                                  ? "= ___;"
+                                  : (() => {
+                                      throw new Error(
+                                        `Unknown ‘ClassBody.body’ element type: ‘${
+                                          classBodyNode.type
+                                        }’\n${
+                                          babelGenerator.default({
+                                            ...classBodyNode,
+                                            leadingComments: [],
+                                            trailingComments: [],
+                                          }).code
+                                        }`,
+                                      );
+                                    })()
+                            ).length,
                           )
                           .trim())(),
                       "\n```\n\n",
