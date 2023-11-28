@@ -77,7 +77,7 @@ In your documentation, include directives, for example:
 <!-- DOCUMENTATION: $ tail -n 1 ./index.mts -->
 ```
 
-> **Note:** Besides pointing at TypeScript files a directive may also contain a command line. This is useful, for example, to include the command-line help explaining command-line parameters (`<!-- DOCUMENTATION: $ ./example-tool --help -->`).
+> **Note:** Besides pointing at TypeScript files a directive may also contain a command line. This is useful, for example, to include the command-line help explaining command-line parameters: `<!-- DOCUMENTATION: $ ./example-tool --help -->`.
 
 Run this tool to extract the comments from the TypeScript files and include them in the documentation:
 
