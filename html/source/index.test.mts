@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import html, { HTML } from "./index.mjs";
 import * as htmlHelpers from "./index.mjs";
 
-test("html``", () => {
+test("html`___`", () => {
   assert.equal(html`<p>Leandro Facchinetti</p>`, `<p>Leandro Facchinetti</p>`);
 
   assert.equal(
@@ -27,13 +27,29 @@ test("html``", () => {
   );
 
   assert.equal(
-    html`<div>$${html`<p>${`<script>alert(1);</script>`}</p>`}</div>`,
-    `<div><p>&lt;script&gt;alert(1);&lt;/script&gt;</p></div>`,
+    html`
+      <div>
+        Good (escape once): $${html`<p>${`<script>alert(1);</script>`}</p>`}
+      </div>
+    `,
+    `
+      <div>
+        Good (escape once): <p>&lt;script&gt;alert(1);&lt;/script&gt;</p>
+      </div>
+    `,
   );
 
   assert.equal(
-    html`<div>${html`Double escaping: ${`<script>alert(1);</script>`}`}</div>`,
-    `<div>Double escaping: &amp;lt;script&amp;gt;alert(1);&amp;lt;/script&amp;gt;</div>`,
+    html`
+      <div>
+        Bad (double escaping): ${html`<p>${`<script>alert(1);</script>`}</p>`}
+      </div>
+    `,
+    `
+      <div>
+        Bad (double escaping): &lt;p&gt;&amp;lt;script&amp;gt;alert(1);&amp;lt;/script&amp;gt;&lt;/p&gt;
+      </div>
+    `,
   );
 
   assert.equal(

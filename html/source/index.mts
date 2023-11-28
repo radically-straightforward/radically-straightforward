@@ -4,9 +4,7 @@
 export type HTML = string;
 
 /**
- * A [tagged template](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_literals#tagged_templates) for HTML.
- *
- * For example:
+ * A [tagged template](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_literals#tagged_templates) for HTML:
  *
  * ```typescript
  * html`<p>Leandro Facchinetti</p>`;
@@ -15,39 +13,66 @@ export type HTML = string;
  * Sanitizes interpolations to prevent injection attacks:
  *
  * ```typescript
- * html`<p>${"Leandro Facchinetti"}</p>`; // => `<p>Leandro Facchinetti</p>`
- * html`<p>${`<script>alert(1);</script>`}</p>`; // => `<p>&lt;script&gt;alert(1);&lt;/script&gt;</p>`
+ * html`<p>${"Leandro Facchinetti"}</p>`;
+ * // => `<p>Leandro Facchinetti</p>`
+ * html`<p>${`<script>alert(1);</script>`}</p>`;
+ * // => `<p>&lt;script&gt;alert(1);&lt;/script&gt;</p>`
  * ```
  *
  * Opt out of sanitization with `$${___}` instead of `${___}`:
  *
  * ```typescript
- * html`<div>$${`<p>Leandro Facchinetti</p>`}</div>`; // => `<div><p>Leandro Facchinetti</p></div>`
+ * html`<div>$${`<p>Leandro Facchinetti</p>`}</div>`;
+ * // => `<div><p>Leandro Facchinetti</p></div>`
  * ```
  *
  * > **Note:** Only opt out of sanitization if you are sure that the interpolated string is safe, in particular it must not contain user input, otherwise you’d be open to injection attacks:
  * >
  * > ```typescript
- * > html`<div>$${`<script>alert(1);</script>`}</div>`; // => `<div><script>alert(1);</script></div>`
+ * > html`<div>$${`<script>alert(1);</script>`}</div>`;
+ * > // => `<div><script>alert(1);</script></div>`
  * > ```
  *
  * > **Note:** You must opt out of sanitization when the interpolated string is itself the result of `` html`___` ``, otherwise the escaping would be doubled:
  * >
  * > ```typescript
- * > html`<div>$${html`<p>${`<script>alert(1);</script>`}</p>`}</div>`; // => `<div><p>&lt;script&gt;alert(1);&lt;/script&gt;</p></div>`
- * > html`<div>${html`Double escaping: ${`<script>alert(1);</script>`}`}</div>`; // => `<div>Double escaping: &amp;lt;script&amp;gt;alert(1);&amp;lt;/script&amp;gt;</div>`
+ * > html`
+ * >   <div>
+ * >     Good (escape once): $${html`<p>${`<script>alert(1);</script>`}</p>`}
+ * >   </div>
+ * > `
+ * > // =>
+ * > // `
+ * > //   <div>
+ * > //     Good (escape once): <p>&lt;script&gt;alert(1);&lt;/script&gt;</p>
+ * > //   </div>
+ * > // `
+ * >
+ * > html`
+ * >   <div>
+ * >     Bad (double escaping): ${html`<p>${`<script>alert(1);</script>`}</p>`}
+ * >   </div>
+ * > `
+ * > // =>
+ * > // `
+ * > //   <div>
+ * > //     Bad (double escaping): &lt;p&gt;&amp;lt;script&amp;gt;alert(1);&amp;lt;/script&amp;gt;&lt;/p&gt;
+ * > //   </div>
+ * > // `
  * > ```
  *
  * > **Note:** As an edge case, if you need a literal `$` before an interpolation, interpolate the `$` itself:
  * >
  * > ```typescript
- * > html`<p>${"$"}${"Leandro Facchinetti"}</p>`; // => `<p>$Leandro Facchinetti</p>`
+ * > html`<p>${"$"}${"Leandro Facchinetti"}</p>`;
+ * > // => `<p>$Leandro Facchinetti</p>`
  * > ```
  *
  * Interpolated lists are joined:
  *
  * ```typescript
- * html`<p>${["Leandro", " ", "Facchinetti"]}</p>`; // => `<p>Leandro Facchinetti</p>`
+ * html`<p>${["Leandro", " ", "Facchinetti"]}</p>`;
+ * // => `<p>Leandro Facchinetti</p>`
  * ```
  *
  * > **Note:** Interpolated lists are sanitized:
