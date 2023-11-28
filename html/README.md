@@ -70,6 +70,8 @@ html`<p>${`<script>alert(1);</script>`}</p>`;
 // => `<p>&lt;script&gt;alert(1);&lt;/script&gt;</p>`
 ```
 
+> **Note:** This library works by concatenating strings. It doesn’t prettify the output (if you need that you may call [Prettier](https://prettier.io/) programmatically on the output of `` html`___` ``), and it doesn’t generate a [virtual DOM](https://reactjs.org/docs/faq-internals.html) of any kind. The virtue of doing things this way is that this library is conceptually simple and one order of magnitude faster than [React’s `renderToString()`](https://react.dev/reference/react-dom/server/renderToString).
+
 Opt out of sanitization with `$${___}` instead of `${___}`:
 
 ```typescript
