@@ -58,7 +58,7 @@ test(async () => {
         exampleOfClassMethod(): void {
           // ...
         }
-      
+
         /**
          * Example of \`ClassProperty\`.
          */

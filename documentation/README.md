@@ -56,7 +56,7 @@ Tutorial:
       exampleOfClassMethod(): void {
         // ...
       }
-    
+
       /**
        * Example of `ClassProperty`.
        */
@@ -67,7 +67,7 @@ Tutorial:
      * Example of `TSTypeAliasDeclaration`.
      */
     export type ExampleOfTSTypeAliasDeclaration = string;
-    
+
   Note: Include type annotations in function declarations, variable declarations, and class declarations. There are tools, for example, Visual Studio Code, which can display tooltips including types even when there are no type annotations because they infer the types based on the values in declarations, but this tool doesn’t do that.
 
   In your documentation (for example, ‘README.md’), include directives, for example:
