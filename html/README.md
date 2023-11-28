@@ -23,7 +23,7 @@ $ npm install @radically-straightforward/html
 >
 > **[Prettier](https://prettier.io):** A code formatter that supports HTML in tagged templates.
 >
-> **[Prettier - Code formatter](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode):** A [Visual Studio Code](https://code.visualstudio.com/) extension to use Prettier more conveniently.
+> **[Prettier - Code formatter](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode):** A [Visual Studio Code](https://code.visualstudio.com/) extension to use Prettier more ergonomically.
 >
 > **[es6-string-html](https://marketplace.visualstudio.com/items?itemName=Tobermory.es6-string-html):** A Visual Studio Code extension to syntax highlight HTML in tagged templates.
 
