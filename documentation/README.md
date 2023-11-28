@@ -30,9 +30,9 @@ Tutorial:
 
     /**
      * Example of `FunctionDeclaration`.
-     * 
+     *
      * **`exampleOfParameter`:** Example of some documentation about a parameter.
-     * 
+     *
      * **Return:** Example of some documentation about the return value.
      */
     export default async function exampleOfFunctionDeclaration(
