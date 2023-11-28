@@ -98,6 +98,15 @@ import * as htmlHelpers from "./index.mjs";
 //   });
 // });
 
+test("sanitize()", () => {
+  assert.equal(
+    htmlHelpers.sanitize(
+      `"Leandro Facchinetti \u{0}\b<radically-straightforward@leafac.com>" & 'Louie'`,
+    ),
+    `&quot;Leandro Facchinetti &lt;radically-straightforward@leafac.com&gt;&quot; &amp; &apos;Louie&apos;`,
+  );
+});
+
 test("escape()", () => {
   assert.equal(
     htmlHelpers.escape(
