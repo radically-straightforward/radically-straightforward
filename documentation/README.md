@@ -129,4 +129,4 @@ TSDoc is based on JSDoc tags, for example, `@param`, `@returns`, and so forth. I
 
 **[TypeDoc](https://typedoc.org/)**
 
-TypeDoc, in conjunction with [`typedoc-plugin-markdown`](https://www.npmjs.com/package/typedoc-plugin-markdown), does something very similar to this tool, but we found the formatting to be a bit clunky. We prefer to keep the TypeScript syntax, which is well-known. Also, we added a directive to run command lines, which are helpful, for example, when documenting command-line tools.
+TypeDoc, in conjunction with [`typedoc-plugin-markdown`](https://www.npmjs.com/package/typedoc-plugin-markdown), does something very similar to this tool, but it relies on JSDoc tags and we found the formatting that it produces to be a bit clunky—we prefer to keep the TypeScript syntax which is well-known. Also, we added a directive to run command lines, which are helpful, for example, when documenting command-line tools.
