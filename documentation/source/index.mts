@@ -188,7 +188,7 @@ await commander.program
                         ).length,
                       )
                       .trim())(),
-                  "\n```\n\n",
+                  ";\n```\n\n",
                   path.node.leadingComments[0].value
                     .replace(/^\s*\* ?/gmv, "")
                     .trim(),
@@ -274,7 +274,7 @@ await commander.program
                             ).length,
                           )
                           .trim())(),
-                      "\n```\n\n",
+                      ";\n```\n\n",
                       classBodyNode.leadingComments[0].value
                         .replace(/^\s*\* ?/gmv, "")
                         .trim(),

@@ -94,7 +94,7 @@ test(async () => {
       \`\`\`typescript
       export default async function exampleOfFunctionDeclaration(
         exampleOfParameter: string,
-      ): Promise<string>
+      ): Promise<string>;
       \`\`\`
       
       Example of \`FunctionDeclaration\`.
@@ -106,7 +106,7 @@ test(async () => {
       ### \`exampleOfVariableDeclaration\`
       
       \`\`\`typescript
-      export const exampleOfVariableDeclaration: string
+      export const exampleOfVariableDeclaration: string;
       \`\`\`
       
       Example of \`VariableDeclaration\`.
@@ -114,7 +114,7 @@ test(async () => {
       ### \`ExampleOfClassDeclaration\`
       
       \`\`\`typescript
-      export class ExampleOfClassDeclaration
+      export class ExampleOfClassDeclaration;
       \`\`\`
       
       Example of \`ClassDeclaration\`.
@@ -122,7 +122,7 @@ test(async () => {
       #### \`ExampleOfClassDeclaration.exampleOfClassMethod()\`
       
       \`\`\`typescript
-      exampleOfClassMethod(): void
+      exampleOfClassMethod(): void;
       \`\`\`
       
       Example of \`ClassMethod\`.
@@ -130,7 +130,7 @@ test(async () => {
       #### \`ExampleOfClassDeclaration.exampleOfClassProperty\`
       
       \`\`\`typescript
-      exampleOfClassProperty: string
+      exampleOfClassProperty: string;
       \`\`\`
       
       Example of \`ClassProperty\`.
@@ -138,7 +138,7 @@ test(async () => {
       ### \`ExampleOfTSTypeAliasDeclaration\`
       
       \`\`\`typescript
-      export type ExampleOfTSTypeAliasDeclaration = string
+      export type ExampleOfTSTypeAliasDeclaration = string;
       \`\`\`
       
       Example of \`TSTypeAliasDeclaration\`.
@@ -187,7 +187,7 @@ test(async () => {
       ### \`exampleOfModifiedDocumentation\`
       
       \`\`\`typescript
-      export const exampleOfModifiedDocumentation: string
+      export const exampleOfModifiedDocumentation: string;
       \`\`\`
       
       Example of modified documentation.
