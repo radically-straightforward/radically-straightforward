@@ -116,9 +116,9 @@ Notably, it does **not** include the “"compatibility characters", as defined i
 **Example**
 
 ```javascript
-someUserInput.replace(invalidXMLCharacters, "") // Remove invalid XML characters.
-someUserInput.replace(invalidXMLCharacters, "�") // Replace invalid XML characters with the Unicode replacement character.
-someUserInput.match(invalidXMLCharacters) // Detect whether there are invalid XML characters.
+someUserInput.replace(invalidXMLCharacters, ""); // Remove invalid XML characters.
+someUserInput.replace(invalidXMLCharacters, "�"); // Replace invalid XML characters with the Unicode replacement character.
+someUserInput.match(invalidXMLCharacters); // Detect whether there are invalid XML characters.
 ```
 
 **References**
