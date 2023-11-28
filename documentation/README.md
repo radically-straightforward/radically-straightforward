@@ -99,13 +99,9 @@ You must rerun this tool when the TypeScript files are modified. We suggest incl
 }
 ```
 
----
+### `$ npx documentation --help`
 
-```console
-$ npx documentation --help
-```
-
-<!-- Oh, the irony! 🙃 If we were to use this tool to generate the block below it would be confused by the other directives in the examples, so we had to copy-and-paste this one by hand. But it should be the last time we have to do this! 🙌 -->
+<!-- Oh, the irony! 🙃 If we were to use this tool to generate this section it would be confused by the other directives in the examples, so we had to copy-and-paste this one by hand. But it should be the last time we have to do this! 🙌 -->
 
 ```
 Usage: documentation [options] [input...]
