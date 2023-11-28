@@ -73,13 +73,9 @@ html`<p>${`<script>alert(1);</script>`}</p>`;
 > **Note:** Sanitization is only part of the defense against injection attacks. Also deploy the following measures:
 >
 > - Serve your pages with UTF-8 encoding.
->
 > - Have your server send the header `Content-Type: text/html; charset=utf-8`.
->
 > - If you want to be extra sure that the encoding will be picked up by the browser, include a `<meta charset="utf-8" />` meta tag. (But HTML 5 documents must be encoded in UTF-8, so it should be sufficient to declare your document as HTML 5 by starting it with `<!DOCTYPE html>`.)
->
 > - Always use quotes around HTML attributes (for example, `href="https://leafac.com"` instead of `href=https://leafac.com`).
->
 > - See <https://wonko.com/post/html-escaping/>.
 
 > **Note:** This library works by concatenating strings. It doesn’t prettify the output (if you need that you may, for example, call [Prettier](https://prettier.io/) programmatically on the output of `` html`___` ``), and it doesn’t generate any kind of [virtual DOM](https://reactjs.org/docs/faq-internals.html). The virtues of this approach are that this library is conceptually simple and it is one order of magnitude faster than [`ReactDOMServer.renderToStaticMarkup()`](https://react.dev/reference/react-dom/server/renderToStaticMarkup) (performance matters because rendering may be one of the most time-consuming tasks in responding to a request).
