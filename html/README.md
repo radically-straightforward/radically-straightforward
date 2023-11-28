@@ -10,6 +10,11 @@ $ npm install @radically-straightforward/html
 
 ## Usage
 
+```typescript
+import html, { HTML } from "@radically-straightforward/html";
+import * as htmlHelpers from "@radically-straightforward/html";
+```
+
 <!-- DOCUMENTATION START: ./source/index.mts -->
 
 ### `HTML`

@@ -10,6 +10,10 @@ $ npm install @radically-straightforward/node
 
 ## Usage
 
+```typescript
+import * as node from "@radically-straightforward/node";
+```
+
 <!-- DOCUMENTATION START: ./source/index.mts -->
 
 ### `time()`
