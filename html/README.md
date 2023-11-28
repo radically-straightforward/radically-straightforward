@@ -1,12 +1,33 @@
+<!--
+- Currently whether a substitution is safe is determined by the context (`${...}` vs `$${...}`). Consider introducing a notion of marking a substitution as safe in and of itself and bypassing escaping even when using `${...}`.
+  - You can’t add custom properties to native values like strings, so it would have to be a wrapper, for example:
+    ```javascript
+    const example = new String("hello");
+    example.htmlSafe = true;
+    ```
+  - As far as I remember, this is Ruby on Rail’s design.
+  - Perhaps this is a bad idea, because having more than one way to do things may lead to confusion and errors in people’s code. Besides, we haven’t needed this so far.
+-->
+
 # Radically Straightforward · HTML
 
-**📄 HTML with Tagged Templates**
+**📄 HTML in [Tagged Templates](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_literals#tagged_templates)**
 
 ## Installation
 
 ```console
 $ npm install @radically-straightforward/html
 ```
+
+> **Note:** We recommend the following tools:
+>
+> **[Prettier](https://prettier.io):** A code formatter that supports HTML in tagged templates.
+>
+> **[Prettier - Code formatter](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode):** A [Visual Studio Code](https://code.visualstudio.com/) extension to use Prettier more conveniently.
+>
+> **[es6-string-html](https://marketplace.visualstudio.com/items?itemName=Tobermory.es6-string-html):** A Visual Studio Code extension to syntax highlight HTML in tagged templates.
+
+> **Note:** This tool is primarily designed for rendering HTML on the server with Node.js, but it also works in the browser.
 
 ## Usage
 
@@ -34,7 +55,83 @@ export default function html(
 ): HTML;
 ```
 
-**TODO:** Review, test, and document.
+A [tagged template](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_literals#tagged_templates) for HTML.
+
+For example:
+
+```typescript
+html`<p>Leandro Facchinetti</p>`;
+```
+
+Sanitizes interpolations to prevent injection attacks:
+
+```typescript
+html`<p>${"Leandro Facchinetti"}</p>`; // => `<p>Leandro Facchinetti</p>`
+html`<p>${`<script>alert(1);</script>`}</p>`; // => `<p>&lt;script&gt;alert(1);&lt;/script&gt;</p>`
+```
+
+Opt out of sanitization with `$${___}` instead of `${___}`:
+
+```typescript
+html`<div>$${`<p>Leandro Facchinetti</p>`}</div>`; // => `<div><p>Leandro Facchinetti</p></div>`
+```
+
+> **Note:** Only opt out of sanitization if you are sure that the interpolated string is safe, in particular it must not contain user input, otherwise you’d be open to injection attacks:
+>
+> ```typescript
+> html`<div>$${`<script>alert(1);</script>`}</div>`; // => `<div><script>alert(1);</script></div>`
+> ```
+
+> **Note:** You must opt out of sanitization when the interpolated string is itself the result of `` html`___` ``, otherwise the escaping would be doubled:
+>
+> ```typescript
+> html`<div>$${html`<p>${`<script>alert(1);</script>`}</p>`}</div>`; // => `<div><p>&lt;script&gt;alert(1);&lt;/script&gt;</p></div>`
+> html`<div>${html`Double escaping: ${`<script>alert(1);</script>`}`}</div>`; // => `<div>Double escaping: &amp;lt;script&amp;gt;alert(1);&amp;lt;/script&amp;gt;</div>`
+> ```
+
+> **Note:** As an edge case, if you need a literal `$` before an interpolation, interpolate the `$` itself:
+>
+> ```typescript
+>  html`<p>${"$"}${"Leandro Facchinetti"}</p>`; // => `<p>$Leandro Facchinetti</p>`
+> ```
+
+Interpolated lists are joined:
+
+```typescript
+html`<p>${["Leandro", " ", "Facchinetti"]}</p>`; // => `<p>Leandro Facchinetti</p>`
+```
+
+> **Note:** Interpolated lists are sanitized:
+>
+> ```typescript
+> html`
+>   <p>
+>     ${["Leandro", " ", "<script>alert(1);</script>", " ", "Facchinetti"]}
+>   </p>
+> `
+> // =>
+> // `
+> //   <p>
+> //     Leandro &lt;script&gt;alert(1);&lt;/script&gt; Facchinetti
+> //   </p>
+> // `
+> ```
+>
+> You may opt out of the sanitization of interpolated lists by using `$${___}` instead of `${___}`:
+>
+> ```typescript
+> html`
+>   <ul>
+>     $${[html`<li>Leandro</li>`, html`<li>Facchinetti</li>`]}
+>   </ul>
+> `
+> // =>
+> // `
+> //   <ul>
+> //     <li>Leandro</li><li>Facchinetti</li>
+> //   </ul>
+> // `
+> ```
 
 ### `sanitize()`
 

@@ -17,23 +17,28 @@ test("html``", () => {
   );
 
   assert.equal(
-    html`<p>${html`${`<script>alert(1);</script>`}`}</p>`,
-    `<p>&amp;lt;script&amp;gt;alert(1);&amp;lt;/script&amp;gt;</p>`,
+    html`<div>$${`<p>Leandro Facchinetti</p>`}</div>`,
+    `<div><p>Leandro Facchinetti</p></div>`,
   );
 
   assert.equal(
-    html`<p>$${html`${`<script>alert(1);</script>`}`}</p>`,
-    `<p>&lt;script&gt;alert(1);&lt;/script&gt;</p>`,
+    html`<div>$${`<script>alert(1);</script>`}</div>`,
+    `<div><script>alert(1);</script></div>`,
   );
 
   assert.equal(
-    html`<p>$${`<span>Leandro Facchinetti</span>`}</p>`,
-    `<p><span>Leandro Facchinetti</span></p>`,
+    html`<div>$${html`<p>${`<script>alert(1);</script>`}</p>`}</div>`,
+    `<div><p>&lt;script&gt;alert(1);&lt;/script&gt;</p></div>`,
   );
 
   assert.equal(
-    html`<p>${html`${"$"}${`<script>alert(1);</script>`}`}</p>`,
-    `<p>$&amp;lt;script&amp;gt;alert(1);&amp;lt;/script&amp;gt;</p>`,
+    html`<div>${html`Double escaping: ${`<script>alert(1);</script>`}`}</div>`,
+    `<div>Double escaping: &amp;lt;script&amp;gt;alert(1);&amp;lt;/script&amp;gt;</div>`,
+  );
+
+  assert.equal(
+    html`<p>${"$"}${"Leandro Facchinetti"}</p>`,
+    `<p>$Leandro Facchinetti</p>`,
   );
 
   assert.equal(
@@ -44,7 +49,7 @@ test("html``", () => {
   assert.equal(
     html`
       <p>
-        ${["Leandro", " ", `<script>alert(1);</script>`, " ", "Facchinetti"]}
+        ${["Leandro", " ", "<script>alert(1);</script>", " ", "Facchinetti"]}
       </p>
     `,
     `
@@ -57,7 +62,7 @@ test("html``", () => {
   assert.equal(
     html`
       <ul>
-        $${[`<li>Leandro</li>`, `<li>Facchinetti</li>`]}
+        $${[html`<li>Leandro</li>`, html`<li>Facchinetti</li>`]}
       </ul>
     `,
     `

@@ -1,7 +1,7 @@
 {
   "name": "@radically-straightforward/html",
   "version": "1.0.0",
-  "description": "📄 HTML with Tagged Templates",
+  "description": "📄 HTML in Tagged Templates",
   "keywords": [
     "html",
     "tagged template",
