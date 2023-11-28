@@ -1,38 +1,61 @@
-// export type HTML = string;
+/**
+ * A type alias to make your type annotations more specific.
+ */
+export type HTML = string;
 
-// export default function html(
-//   templateStrings: TemplateStringsArray,
-//   ...substitutions: (string | string[])[]
-// ): HTML {
-//   let output = "";
+/**
+ * **TODO:** Review, test, and document.
+ */
+export default function html(
+  templateStrings: TemplateStringsArray,
+  ...substitutions: (string | string[])[]
+): HTML {
+  let output = "";
 
-//   for (const index of substitutions.keys()) {
-//     const templateString = templateStrings[index];
-//     const unsafeSubstitution = templateString.endsWith("$");
-//     output += unsafeSubstitution ? templateString.slice(0, -1) : templateString;
+  for (const index of substitutions.keys()) {
+    const templateString = templateStrings[index];
+    const unsafeSubstitution = templateString.endsWith("$");
+    output += unsafeSubstitution ? templateString.slice(0, -1) : templateString;
 
-//     const substitution = substitutions[index];
-//     if (Array.isArray(substitution)) {
-//       if (unsafeSubstitution)
-//         for (const substitutionPart of substitution) output += substitutionPart;
-//       else
-//         for (const substitutionPart of substitution)
-//           output += entities.escapeUTF8(
-//             sanitizeXMLCharacters.sanitize(substitutionPart),
-//           );
-//     } else {
-//       if (unsafeSubstitution) output += substitution;
-//       else
-//         output += entities.escapeUTF8(
-//           sanitizeXMLCharacters.sanitize(substitution),
-//         );
-//     }
-//   }
+    const substitution = substitutions[index];
+    if (Array.isArray(substitution)) {
+      if (unsafeSubstitution)
+        for (const substitutionPart of substitution) output += substitutionPart;
+      else
+        for (const substitutionPart of substitution)
+          output += sanitize(substitutionPart);
+    } else {
+      if (unsafeSubstitution) output += substitution;
+      else output += sanitize(substitution);
+    }
+  }
 
-//   output += templateStrings.at(-1);
+  output += templateStrings.at(-1);
 
-//   return output;
-// }
+  return output;
+}
+
+/**
+ * Sanitize text for safe insertion in HTML. `sanitize()` escapes characters that are meaningful in HTML syntax and replaces invalid XML characters with a string of your choosing—an empty string (`""`) by default. You may provide the `replacement` as a parameter or set a new default by overwriting `sanitize.replacement`. For example, to use the Unicode replacement character:
+ *
+ * ```typescript
+ * sanitize.replacement = "�";
+ * ```
+ *
+ * > **Note:** The `` html`___` `` tagged template already calls `sanitize()`, so you must **not** call `sanitize()` yourself or the sanitization would happen twice.
+ *
+ * > **Note:** The sanitization that we refer to here is at the character level, not cleaning up certain tags while preserving others. For that, we recommend [`rehype-sanitize`](https://npm.im/rehype-sanitize).
+ *
+ * > **Note:** Even this sanitization isn’t enough in certain contexts, for example, HTML attributes without quotes: `<a href=${sanitize(___)}>`.
+ */
+export function sanitize(
+  text: string,
+  replacement: string = sanitize.replacement,
+): string {
+  return escape(text).replace(invalidXMLCharacters, replacement);
+}
+
+sanitize.replacement = "";
 
 /**
  * Escape characters that are HTML syntax and make `text` safe to interpolate in HTML.
@@ -41,7 +64,7 @@
  *
  * - **Performance.**
  *
- *   The performance of the `escape()` function matters because it’s used a lot to escape user input when rendering HTML with the `` html`...` `` tagged template.
+ *   The performance of the `escape()` function matters because it’s used a lot to escape user input when rendering HTML with the `` html`___` `` tagged template.
  *
  *   The following are some details on how this implementation is made faster:
  *
@@ -97,9 +120,9 @@ export function escape(text: string): string {
  * **Example**
  *
  * ```javascript
- * someUserInput.replace(invalidXMLCharacters, "") // Remove invalid XML characters
- * someUserInput.replace(invalidXMLCharacters, "\u{FFFD}") // Replace invalid XML characters with `�`, the Unicode replacement character
- * someUserInput.match(invalidXMLCharacters) // Detect whether there are invalid XML characters
+ * someUserInput.replace(invalidXMLCharacters, "") // Remove invalid XML characters.
+ * someUserInput.replace(invalidXMLCharacters, "�") // Replace invalid XML characters with the Unicode replacement character.
+ * someUserInput.match(invalidXMLCharacters) // Detect whether there are invalid XML characters.
  * ```
  *
  * **References**
