@@ -165,7 +165,7 @@ test(async () => {
     [url.fileURLToPath(new URL("./index.mjs", import.meta.url))],
     { cwd: directory, stdio: "inherit" },
   );
-  console.log(await fs.readFile(path.join(directory, "README.md"), "utf-8"));
+  // console.log(await fs.readFile(path.join(directory, "README.md"), "utf-8"));
   assert.equal(
     await fs.readFile(path.join(directory, "README.md"), "utf-8"),
     // prettier-ignore
