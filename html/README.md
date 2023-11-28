@@ -92,7 +92,7 @@ html`<div>$${`<p>Leandro Facchinetti</p>`}</div>`; // => `<div><p>Leandro Facchi
 > **Note:** As an edge case, if you need a literal `$` before an interpolation, interpolate the `$` itself:
 >
 > ```typescript
->  html`<p>${"$"}${"Leandro Facchinetti"}</p>`; // => `<p>$Leandro Facchinetti</p>`
+> html`<p>${"$"}${"Leandro Facchinetti"}</p>`; // => `<p>$Leandro Facchinetti</p>`
 > ```
 
 Interpolated lists are joined:
@@ -105,15 +105,11 @@ html`<p>${["Leandro", " ", "Facchinetti"]}</p>`; // => `<p>Leandro Facchinetti</
 >
 > ```typescript
 > html`
->   <p>
->     ${["Leandro", " ", "<script>alert(1);</script>", " ", "Facchinetti"]}
->   </p>
+>   <p>${["Leandro", " ", "<script>alert(1);</script>", " ", "Facchinetti"]}</p>
 > `
 > // =>
 > // `
-> //   <p>
-> //     Leandro &lt;script&gt;alert(1);&lt;/script&gt; Facchinetti
-> //   </p>
+> //   <p>Leandro &lt;script&gt;alert(1);&lt;/script&gt; Facchinetti</p>
 > // `
 > ```
 >
@@ -124,7 +120,7 @@ html`<p>${["Leandro", " ", "Facchinetti"]}</p>`; // => `<p>Leandro Facchinetti</
 >   <ul>
 >     $${[html`<li>Leandro</li>`, html`<li>Facchinetti</li>`]}
 >   </ul>
-> `
+> `;
 > // =>
 > // `
 > //   <ul>
