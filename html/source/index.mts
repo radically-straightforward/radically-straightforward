@@ -40,7 +40,7 @@ export type HTML = string;
  * >   <div>
  * >     Good (escape once): $${html`<p>${`<script>alert(1);</script>`}</p>`}
  * >   </div>
- * > `
+ * > `;
  * > // =>
  * > // `
  * > //   <div>
@@ -52,7 +52,7 @@ export type HTML = string;
  * >   <div>
  * >     Bad (double escaping): ${html`<p>${`<script>alert(1);</script>`}</p>`}
  * >   </div>
- * > `
+ * > `;
  * > // =>
  * > // `
  * > //   <div>

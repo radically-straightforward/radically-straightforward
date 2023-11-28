@@ -91,7 +91,7 @@ html`<div>$${`<p>Leandro Facchinetti</p>`}</div>`;
 >   <div>
 >     Good (escape once): $${html`<p>${`<script>alert(1);</script>`}</p>`}
 >   </div>
-> `
+> `;
 > // =>
 > // `
 > //   <div>
@@ -103,7 +103,7 @@ html`<div>$${`<p>Leandro Facchinetti</p>`}</div>`;
 >   <div>
 >     Bad (double escaping): ${html`<p>${`<script>alert(1);</script>`}</p>`}
 >   </div>
-> `
+> `;
 > // =>
 > // `
 > //   <div>
@@ -115,13 +115,15 @@ html`<div>$${`<p>Leandro Facchinetti</p>`}</div>`;
 > **Note:** As an edge case, if you need a literal `$` before an interpolation, interpolate the `$` itself:
 >
 > ```typescript
-> html`<p>${"$"}${"Leandro Facchinetti"}</p>`; // => `<p>$Leandro Facchinetti</p>`
+> html`<p>${"$"}${"Leandro Facchinetti"}</p>`;
+> // => `<p>$Leandro Facchinetti</p>`
 > ```
 
 Interpolated lists are joined:
 
 ```typescript
-html`<p>${["Leandro", " ", "Facchinetti"]}</p>`; // => `<p>Leandro Facchinetti</p>`
+html`<p>${["Leandro", " ", "Facchinetti"]}</p>`;
+// => `<p>Leandro Facchinetti</p>`
 ```
 
 > **Note:** Interpolated lists are sanitized:
