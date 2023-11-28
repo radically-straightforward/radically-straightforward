@@ -259,3 +259,23 @@ someUserInput.match(invalidXMLCharacters); // Detect whether there are invalid X
   3. We use the regular expression flag `v` instead of `u` (see <https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp/unicodeSets>).
 
 <!-- DOCUMENTATION END: ./source/index.mts -->
+
+## Related Work
+
+### [`html-template-tag`](https://npm.im/html-template-tag)
+
+- Was a major inspiration for this. Its design is simple and great. In particular, I love (and stole) the idea of using `$${...}` to mark unsafe interpolation of trusted HTML.
+- [Doesn’t encode arrays by default](https://github.com/AntonioVdlC/html-template-tag/issues/10).
+
+### [`common-tags`](https://npm.im/common-tags)
+
+- Doesn’t encode interpolated values by default.
+- Uses the `safeHtml` tag, which isn’t recognized by Prettier or the Visual Studio Code extension es6-string-html extension.
+
+### [`escape-html-template-tag`](https://npm.im/escape-html-template-tag)
+
+- Less ergonomic API with `escapeHtml.safe()` and `escapeHtml.join()` instead of the `$${}` trick.
+
+### [`lit-html`](https://npm.im/lit-html), [`nanohtml`](https://npm.im/nanohtml), [`htm`](https://npm.im/htm), and [`viperhtml`](https://npm.im/viperhtml)
+
+- Have the notion of virtual DOM instead of simple string concatenation.
