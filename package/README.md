@@ -87,7 +87,7 @@ Finally `package` creates a `.zip` (Windows) or a `.tar.gz` (macOS or Linux) inc
 
 ## Related Work
 
-**[`caxa`](https://npm.im/caxa)**
+### [`caxa`](https://npm.im/caxa)
 
 `package` is the evolution of `caxa`.
 
@@ -107,7 +107,7 @@ The most notable difference between `caxa` and `package` is that `caxa` produces
 
 - In macOS and Linux, `package` calls the underlying application with `exec`, replacing the current process instead of creating a child process. This simplifies the process tree and solves issues related to forwarding signals. Unfortunately Windows doesn’t support `exec`, so a child process is still used in that case.
 
-**[`pkg`](https://npm.im/pkg)**
+### [`pkg`](https://npm.im/pkg)
 
 The core issue with packaging Node.js applications into binaries are modules written in C/C++. The Node.js binary insists on loading those modules from the filesystem, so your application ends up having to be present as multiple files in the filesystem.
 

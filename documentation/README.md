@@ -119,7 +119,7 @@ Options:
 
 ## Related Work
 
-**[TSDoc](https://tsdoc.org/)**
+### [TSDoc](https://tsdoc.org/)
 
 TSDoc is based on JSDoc tags, for example, `@param`, `@returns`, and so forth. In this tool we avoid JSDoc markup and use only Markdown, because:
 
@@ -127,6 +127,6 @@ TSDoc is based on JSDoc tags, for example, `@param`, `@returns`, and so forth. I
 2. Sometimes JSDoc and Markdown interact unpredictably.
 3. Most of the benefit of JSDoc is in informing types, which is subsumed by TypeScript.
 
-**[TypeDoc](https://typedoc.org/)**
+### [TypeDoc](https://typedoc.org/)
 
 TypeDoc, in conjunction with [`typedoc-plugin-markdown`](https://www.npmjs.com/package/typedoc-plugin-markdown), does something very similar to this tool, but it relies on JSDoc tags and we found the formatting that it produces to be a bit clunky—we prefer to keep the TypeScript syntax which is well-known. Also, we added a directive to run command lines, which are helpful, for example, when documenting command-line tools.
