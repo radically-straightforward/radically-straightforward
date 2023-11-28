@@ -55,7 +55,7 @@ export type HTML = string;
  * > ```typescript
  * > html`
  * >   <p>${["Leandro", " ", "<script>alert(1);</script>", " ", "Facchinetti"]}</p>
- * > `
+ * > `;
  * > // =>
  * > // `
  * > //   <p>Leandro &lt;script&gt;alert(1);&lt;/script&gt; Facchinetti</p>

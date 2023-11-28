@@ -106,7 +106,7 @@ html`<p>${["Leandro", " ", "Facchinetti"]}</p>`; // => `<p>Leandro Facchinetti</
 > ```typescript
 > html`
 >   <p>${["Leandro", " ", "<script>alert(1);</script>", " ", "Facchinetti"]}</p>
-> `
+> `;
 > // =>
 > // `
 > //   <p>Leandro &lt;script&gt;alert(1);&lt;/script&gt; Facchinetti</p>
