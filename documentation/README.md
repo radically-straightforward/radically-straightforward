@@ -110,15 +110,9 @@ Tutorial:
 TSDoc is based on JSDoc tags, for example, `@param`, `@returns`, and so forth. In this tool we avoid JSDoc markup and use only Markdown, because:
 
 1. JSDoc is yet another markup language to learn.
-2. Sometimes JSDoc and Markdown interacts badly.
-3. Most of the benefit of JSDoc is informing types, which is subsumed by TypeScript.
+2. Sometimes JSDoc and Markdown interact badly.
+3. Most of the benefit of JSDoc is in informing types, which is subsumed by TypeScript.
 
 **[TypeDoc](https://typedoc.org/)**
 
-In conjunction with [`typedoc-plugin-markdown`](https://www.npmjs.com/package/typedoc-plugin-markdown) this does something very similar to this tool, but we found the formatting to be a bit clunky. We prefer to keep the TypeScript syntax, which is well-known. Also, we added the command-line directives (`<!-- DOCUMENTATION START: $ echo "Hello World" -->
-
-```
-"Hello World"
-```
-
-<!-- DOCUMENTATION END: $ echo "Hello World" -->`), which are helpful, for example, when documenting command-line tools.
+In conjunction with [`typedoc-plugin-markdown`](https://www.npmjs.com/package/typedoc-plugin-markdown) this does something very similar to this tool, but we found the formatting to be a bit clunky. We prefer to keep the TypeScript syntax, which is well-known. Also, we added directives which run command lines, which are helpful, for example, when documenting command-line tools.
