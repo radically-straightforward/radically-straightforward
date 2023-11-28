@@ -57,7 +57,7 @@ sanitize.replacement = "�";
 
 > **Note:** The sanitization that we refer to here is at the character level, not cleaning up certain tags while preserving others. For that, we recommend [`rehype-sanitize`](https://npm.im/rehype-sanitize).
 
-> **Note:** Even this sanitization isn’t enough in certain contexts, for example, HTML attributes without quotes: `<a href=${sanitize(___)}>`.
+> **Note:** Even this sanitization isn’t enough in certain contexts, for example, HTML attributes without quotes `<a href=${sanitize(___)}>` could still lead to XSS attacks.
 
 ### `escape()`
 
@@ -65,7 +65,7 @@ sanitize.replacement = "�";
 export function escape(text: string): string;
 ```
 
-Escape characters that are HTML syntax and make `text` safe to interpolate in HTML.
+Escape characters that are meaningful in HTML syntax.
 
 What sets this implementation apart from existing ones are the following:
 
@@ -105,7 +105,7 @@ What sets this implementation apart from existing ones are the following:
 ### `invalidXMLCharacters`
 
 ```typescript
-export const invalidXMLCharacters;
+export const invalidXMLCharacters: RegExp;
 ```
 
 A regular expression that matches invalid XML characters.

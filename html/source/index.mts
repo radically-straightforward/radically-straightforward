@@ -48,7 +48,7 @@ export default function html(
  *
  * > **Note:** The sanitization that we refer to here is at the character level, not cleaning up certain tags while preserving others. For that, we recommend [`rehype-sanitize`](https://npm.im/rehype-sanitize).
  *
- * > **Note:** Even this sanitization isn’t enough in certain contexts, for example, HTML attributes without quotes: `<a href=${sanitize(___)}>`.
+ * > **Note:** Even this sanitization isn’t enough in certain contexts, for example, HTML attributes without quotes `<a href=${sanitize(___)}>` could still lead to XSS attacks.
  */
 export function sanitize(
   text: string,
@@ -60,7 +60,7 @@ export function sanitize(
 sanitize.replacement = "";
 
 /**
- * Escape characters that are HTML syntax and make `text` safe to interpolate in HTML.
+ * Escape characters that are meaningful in HTML syntax.
  *
  * What sets this implementation apart from existing ones are the following:
  *
@@ -137,5 +137,5 @@ export function escape(text: string): string {
  *   2. We are more strict on what we consider to be valid characters (see description above).
  *   3. We use the regular expression flag `v` instead of `u` (see <https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp/unicodeSets>).
  */
-export const invalidXMLCharacters =
+export const invalidXMLCharacters: RegExp =
   /[\u{0}-\u{8}\u{B}-\u{C}\u{E}-\u{1F}\u{7F}-\u{84}\u{86}-\u{9F}\u{D800}-\u{DFFF}\u{FDD0}-\u{FDDF}\u{FFFE}-\u{FFFF}\u{1FFFE}-\u{1FFFF}\u{2FFFE}-\u{2FFFF}\u{3FFFE}-\u{3FFFF}\u{4FFFE}-\u{4FFFF}\u{5FFFE}-\u{5FFFF}\u{6FFFE}-\u{6FFFF}\u{7FFFE}-\u{7FFFF}\u{8FFFE}-\u{8FFFF}\u{9FFFE}-\u{9FFFF}\u{AFFFE}-\u{AFFFF}\u{BFFFE}-\u{BFFFF}\u{CFFFE}-\u{CFFFF}\u{DFFFE}-\u{DFFFF}\u{EFFFE}-\u{EFFFF}\u{FFFFE}-\u{FFFFF}\u{10FFFE}-\u{10FFFF}]/gv;
