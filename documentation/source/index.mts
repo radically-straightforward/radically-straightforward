@@ -24,7 +24,81 @@ await commander.program
     ["./README.md"],
   )
   .version(packageJSON.version)
-  .addHelpText("after", "\n" + dedent`TODO`)
+  .addHelpText(
+    "after",
+    "\n" +
+      dedent`
+        Tutorial:
+          Document your TypeScript code with comments of the form ‘/** ... */’ containing Markdown (not JSDoc) above ‘export’ed function declarations, variable declarations, class declarations, and TypeScript types alias declarations, for example:
+
+            /**
+             * Example of \`FunctionDeclaration\`.
+             */
+            export default async function exampleOfFunctionDeclaration(
+              exampleOfParameter: string,
+            ): Promise<void> {
+              // ...
+            }
+      
+            /**
+             * Example of \`VariableDeclaration\`.
+             */
+            export const exampleOfVariableDeclaration: string = "exampleOfVariableDeclaration";
+      
+            /**
+             * Example of \`ClassDeclaration\`.
+             */
+            export class ExampleOfClassDeclaration {
+              /**
+               * Example of \`ClassMethod\`.
+               */
+              exampleOfClassMethod(): void {
+                // ...
+              }
+            
+              /**
+               * Example of \`ClassProperty\`.
+               */
+              exampleOfClassProperty: string = "exampleOfClassProperty";
+            }
+      
+            /**
+             * Example of \`TSTypeAliasDeclaration\`.
+             */
+            export type ExampleOfTSTypeAliasDeclaration = string;
+            
+          Note: Include type annotations in function declarations, variable declarations, and class declarations. Tools like Visual Studio Code may infer types based on the values and include them in the documentation, but this tool doesn’t.
+
+          In your documentation (for example, ‘README.md’), include directives, for example:
+
+            # Example of \`@radically-straightforward/documentation\`
+
+            ## Extract TypeScript Documentation
+      
+            <!-- DOCUMENTATION: index.mts -->
+      
+            ## Run Command
+      
+            <!-- DOCUMENTATION: $ tail -n 1 ./index.mts -->
+
+            // Example of last line for command.
+
+          Note: Besides pointing at TypeScript files a directive may also contain a command-line. This tool’s ‘README.md’, for example, includes this help document that you’re reading which was extracted by using something that amounts to ‘<!-- DOCUMENTATION: $ npx package --help -->’.
+    
+          Then run this tool to extract the comments from the TypeScript files and include them in the documentation:
+
+            $ npx documentation
+
+          You must rerun this tool when the TypeScript files are modified. We suggest including it as part of the build process, for example, in ‘package.json’:
+
+            {
+              scripts: {
+                "prepare": "... && documentation"
+              }
+            }
+    
+      `,
+  )
   .allowExcessArguments(false)
   .showHelpAfterError()
   .action(async (inputs: string[]) => {
