@@ -70,7 +70,7 @@ In your documentation, include directives, for example:
 
 ## Extract TypeScript Documentation
 
-<!-- DOCUMENTATION: index.mts -->
+<!-- DOCUMENTATION: ./index.mts -->
 
 ## Run Command
 

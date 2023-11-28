@@ -20,7 +20,7 @@ test(async () => {
 
       ## Extract TypeScript Documentation
 
-      <!-- DOCUMENTATION: index.mts -->
+      <!-- DOCUMENTATION: ./index.mts -->
 
       ## Run Command
 
@@ -87,7 +87,7 @@ test(async () => {
 
       ## Extract TypeScript Documentation
       
-      <!-- DOCUMENTATION START: index.mts -->
+      <!-- DOCUMENTATION START: ./index.mts -->
       
       ### \`exampleOfFunctionDeclaration()\`
       
@@ -143,7 +143,7 @@ test(async () => {
       
       Example of \`TSTypeAliasDeclaration\`.
       
-      <!-- DOCUMENTATION END: index.mts -->
+      <!-- DOCUMENTATION END: ./index.mts -->
       
       ## Run Command
       
@@ -182,7 +182,7 @@ test(async () => {
 
       ## Extract TypeScript Documentation
       
-      <!-- DOCUMENTATION START: index.mts -->
+      <!-- DOCUMENTATION START: ./index.mts -->
       
       ### \`exampleOfModifiedDocumentation\`
       
@@ -192,7 +192,7 @@ test(async () => {
       
       Example of modified documentation.
       
-      <!-- DOCUMENTATION END: index.mts -->
+      <!-- DOCUMENTATION END: ./index.mts -->
       
       ## Run Command
       
