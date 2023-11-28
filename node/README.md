@@ -18,7 +18,7 @@ $ npm install @radically-straightforward/node
 export async function time(
   title: string,
   function_: () => void | Promise<void>,
-): Promise<void>
+): Promise<void>;
 ```
 
 Measure and report how much time it takes to run the given `function_`.
@@ -31,7 +31,7 @@ If you wish to change how reporting is done, override the `time.report: (title: 
 export function elapsedTime(
   start: bigint,
   end: bigint = process.hrtime.bigint(),
-): bigint
+): bigint;
 ```
 
 Provide the `start` and `end` times in nanoseconds, as returned by `process.hrtime.bigint()`. The elapsed time is returned in milliseconds.
@@ -39,7 +39,7 @@ Provide the `start` and `end` times in nanoseconds, as returned by `process.hrti
 ### `eventLoopActive()`
 
 ```typescript
-export function eventLoopActive(): Promise<void>
+export function eventLoopActive(): Promise<void>;
 ```
 
 Keep the event loop active until an operating system signal is received, even when there are no other reasons for the event loop to stay active (no network ports open, no timers, and so forth).
@@ -87,7 +87,7 @@ console.log("Server closed.");
 ### `isExecuted()`
 
 ```typescript
-export async function isExecuted(importMetaUrl: string): Promise<boolean>
+export async function isExecuted(importMetaUrl: string): Promise<boolean>;
 ```
 
 Detect whether the file is being executed directly or being `import`ed into another file.
@@ -114,7 +114,7 @@ if (await node.isExecuted(import.meta.url)) doSomething();
 export function portAvailable(
   port: number,
   hostname?: string,
-): Promise<boolean>
+): Promise<boolean>;
 ```
 
 Detect whether binding to a port would succeed.
