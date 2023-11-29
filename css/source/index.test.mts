@@ -8,7 +8,7 @@ test(async () => {
     await prettier.format(
       css`
         body {
-          background-color: red;
+          background-color: ${"red"};
         }
       `,
       { parser: "css" },

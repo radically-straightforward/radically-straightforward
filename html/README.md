@@ -129,14 +129,14 @@ html`<div>$${`<p>Leandro Facchinetti</p>`}</div>`;
 > // => `<p>$Leandro Facchinetti</p>`
 > ```
 
-Interpolated lists are joined:
+Interpolated arrays are joined:
 
 ```typescript
 html`<p>${["Leandro", " ", "Facchinetti"]}</p>`;
 // => `<p>Leandro Facchinetti</p>`
 ```
 
-> **Note:** Interpolated lists are sanitized:
+> **Note:** Interpolated arrays are sanitized:
 >
 > ```typescript
 > html`
@@ -148,7 +148,7 @@ html`<p>${["Leandro", " ", "Facchinetti"]}</p>`;
 > // `
 > ```
 >
-> You may opt out of the sanitization of interpolated lists by using `$${___}` instead of `${___}`:
+> You may opt out of the sanitization of interpolated arrays by using `$${___}` instead of `${___}`:
 >
 > ```typescript
 > html`
