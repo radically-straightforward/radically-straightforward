@@ -1,0 +1,46 @@
+{
+  "name": "@radically-straightforward/css",
+  "version": "1.0.0",
+  "description": "💄 CSS in Tagged Templates",
+  "keywords": [
+    "css",
+    "tagged template",
+    "template literal",
+    "design system"
+  ],
+  "homepage": "https://github.com/leafac/radically-straightforward",
+  "repository": "https://github.com/leafac/radically-straightforward",
+  "bugs": "https://github.com/leafac/radically-straightforward/issues",
+  "funding": [
+    "https://patreon.com/leafac",
+    "https://github.com/sponsors/leafac",
+    "https://paypal.me/LeandroFacchinettiEU",
+    "https://btc.com/34KJBgtaFYMtDqpSgMayw9qiKWg2GQXA9M"
+  ],
+  "author": "Leandro Facchinetti <radically-straightforward@leafac.com> (https://leafac.com)",
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  },
+  "exports": {
+    ".": "./build/index.mjs",
+    "./static/index.css": "./build/static/index.css"
+  },
+  "types": "./build/index.d.mts",
+  "scripts": {
+    "prepare": "tsc && postcss --use postcss-nested --use autoprefixer --output ./build/static/index.css ./static/index.css && documentation",
+    "test": "npm run prepare && node --test && prettier --check \"./README.md\" --check \"./package.json\" --check \"./tsconfig.json\" --check \"./source/**/*.mts\" --check \"./static/**/*.css\""
+  },
+  "devDependencies": {
+    "@radically-straightforward/documentation": "^1.0.1",
+    "@radically-straightforward/tsconfig": "^1.0.0",
+    "@types/node": "^20.9.3",
+    "autoprefixer": "^10.4.16",
+    "postcss": "^8.4.31",
+    "postcss-cli": "^10.1.0",
+    "postcss-nested": "^6.0.1",
+    "prettier": "^3.1.0",
+    "typescript": "^5.3.2"
+  },
+  "prettier": {}
+}
