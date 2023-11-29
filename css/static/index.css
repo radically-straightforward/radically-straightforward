@@ -16,7 +16,6 @@ RESET
 ::before,
 ::after {
   font: inherit;
-  line-height: inherit;
   text-decoration: inherit;
   text-size-adjust: 100%;
   -webkit-font-smoothing: antialiased;
