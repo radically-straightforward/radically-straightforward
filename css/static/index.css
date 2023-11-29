@@ -47,7 +47,7 @@ RESET
 DESIGN SYSTEM
 
 - https://github.com/tailwindlabs/tailwindcss/blob/1d72dc269956bbdac96c33172bddf831b4f682ec/stubs/defaultConfig.stub.js
-- https://github.com/tailwindlabs/tailwindcss/blob/cb8af0ce12ce4789d5b18529d38f6c730e201f14/src/public/colors.js
+- https://github.com/tailwindlabs/tailwindcss/blob/767b78cc3069dcc2007a0c7119e70ba466430e10/src/public/colors.js
 */
 :root {
   --font-family--sans-serif: ui-sans-serif, system-ui, -apple-system,
