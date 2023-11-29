@@ -10,7 +10,22 @@ test(async () => {
         body {
           background-color: red;
         }
+      `,
+      { parser: "css" },
+    ),
+    await prettier.format(
+      `
+        body {
+          background-color: red;
+        }
+      `,
+      { parser: "css" },
+    ),
+  );
 
+  assert.equal(
+    await prettier.format(
+      css`
         ${["red", "green", "blue"].map(
           (color) => css`
             .text--${color} {
@@ -23,10 +38,6 @@ test(async () => {
     ),
     await prettier.format(
       `
-        body {
-          background-color: red;
-        }
-
         .text--red {
           color: red;
         }
