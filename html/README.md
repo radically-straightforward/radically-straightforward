@@ -175,7 +175,7 @@ export function sanitize(
 
 Sanitize text for safe insertion in HTML.
 
-`sanitize()` escapes characters that are meaningful in HTML syntax and replaces invalid XML characters with a string of your choosing—by default, an empty string (`""`). You may provide the `replacement` as a parameter or set a new default by overwriting `sanitize.replacement`. For example, to use the Unicode replacement character:
+`sanitize()` escapes characters that are meaningful in HTML syntax and replaces invalid XML characters with a string of your choosing—by default, an empty string (`""`). You may provide the `replacement` as a parameter or set a new default by overwriting `sanitize.replacement`. For example, to use the [Unicode replacement character](https://en.wikipedia.org/wiki/Specials_(Unicode_block)#Replacement_character):
 
 ```typescript
 sanitize.replacement = "�";
@@ -183,9 +183,9 @@ sanitize.replacement = "�";
 
 > **Note:** The `` html`___` `` tagged template already calls `sanitize()`, so you must **not** call `sanitize()` yourself or the sanitization would happen twice.
 
-> **Note:** The sanitization that we refer to here is at the character level, not cleaning up certain tags while preserving others. For that, we recommend [`rehype-sanitize`](https://npm.im/rehype-sanitize).
+> **Note:** The sanitization to which we refer here is at the character level, not cleaning up certain tags while preserving others. For that, we recommend [`rehype-sanitize`](https://npm.im/rehype-sanitize).
 
-> **Note:** Even this sanitization isn’t enough in certain contexts, for example, HTML attributes without quotes `<a href=${sanitize(___)}>` could still lead to XSS attacks.
+> **Note:** Even this sanitization isn’t enough in certain contexts, for example, HTML attributes without quotes (`<a href=${sanitize(___)}>`) could still lead to XSS attacks.
 
 ### `escape()`
 
@@ -199,11 +199,11 @@ What sets this implementation apart from existing ones are the following:
 
 - **Performance.**
 
-  The performance of the `escape()` function matters because it’s used a lot to escape user input when rendering HTML with the `` html`___` `` tagged template.
+  The performance of the `escape()` function matters because it’s used frequently to escape user input when rendering HTML with the `` html`___` `` tagged template.
 
   The following are some details on how this implementation is made faster:
 
-  - The relatively new string function `.replaceAll()` when used with a string parameter is faster than `.replace()` with a global regular expression.
+  - The relatively new string function `.replaceAll()` when used with a string parameter is faster than `.replace()` with a regular expression.
 
   - Perhaps surprisingly, calling `.replaceAll()` multiple times is faster than using a single regular expression of the kind `/[&<>"']/g`.
 
@@ -217,7 +217,7 @@ What sets this implementation apart from existing ones are the following:
 
 - **Supports modern browsers only.**
 
-  Most other implementations treat characters such as `` ` ``, which could cause problems in Internet Explorer 8 and older.
+  Most other implementations escape characters such as `` ` ``, which could cause problems in Internet Explorer 8 and older.
 
   Some other implementations avoid transforming `'` into the entity `&apos;`, because that entity isn’t understood by some versions of Internet Explorer.
 
@@ -272,7 +272,7 @@ someUserInput.match(invalidXMLCharacters); // Detect whether there are invalid X
 
 ### [`html-template-tag`](https://npm.im/html-template-tag)
 
-- Was a major inspiration for this. Its design is simple and great. In particular, I love (and stole) the idea of using `$${...}` to mark unsafe interpolation of trusted HTML.
+- Was a major inspiration for this. Its design is simple and great. In particular, I love (and stole) the idea of using `$${___}` for opting out of sanitization.
 - [Doesn’t encode arrays by default](https://github.com/AntonioVdlC/html-template-tag/issues/10).
 
 ### [`common-tags`](https://npm.im/common-tags)
