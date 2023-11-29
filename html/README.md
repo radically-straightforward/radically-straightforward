@@ -175,7 +175,7 @@ export function sanitize(
 
 Sanitize text for safe insertion in HTML.
 
-`sanitize()` escapes characters that are meaningful in HTML syntax and replaces invalid XML characters with a string of your choosing—by default, an empty string (`""`). You may provide the `replacement` as a parameter or set a new default by overwriting `sanitize.replacement`. For example, to use the [Unicode replacement character](https://en.wikipedia.org/wiki/Specials_(Unicode_block)#Replacement_character):
+`sanitize()` escapes characters that are meaningful in HTML syntax and replaces invalid XML characters with a string of your choosing—by default, an empty string (`""`). You may provide the `replacement` as a parameter or set a new default by overwriting `sanitize.replacement`. For example, to use the [Unicode replacement character](<https://en.wikipedia.org/wiki/Specials_(Unicode_block)#Replacement_character>):
 
 ```typescript
 sanitize.replacement = "�";
