@@ -1,7 +1,12 @@
+/**
+ * A type alias to make your type annotations more specific.
+ */
+export type CSS = string;
+
 export default function css(
   templateStrings: TemplateStringsArray,
-  ...substitutions: (string | string[])[]
-): string {
+  ...substitutions: (CSS | CSS[])[]
+): CSS {
   let output = "";
 
   for (const index of substitutions.keys()) {
