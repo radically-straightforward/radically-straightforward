@@ -3,6 +3,10 @@ jobs:
   job:
     strategy:
       matrix:
+        os:
+          - windows
+          - macos
+          - ubuntu
         package:
           - node
           - html
@@ -10,10 +14,6 @@ jobs:
           - caddy
           - documentation
           - package
-        os:
-          - windows
-          - macos
-          - ubuntu
     runs-on: ${{ matrix.os }}-latest
     defaults:
       run:
