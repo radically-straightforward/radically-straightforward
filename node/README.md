@@ -16,6 +16,49 @@ import * as node from "@radically-straightforward/node";
 
 <!-- DOCUMENTATION START: ./source/index.mts -->
 
+### `isExecuted()`
+
+```typescript
+export async function isExecuted(importMetaUrl: string): Promise<boolean>;
+```
+
+Detect whether the file is being executed directly or being `import`ed into another file.
+
+This is useful for having a single file that can provide a CLI and a JavaScript API for the same functionality.
+
+The `importMetaUrl` parameter must always be `import.meta.url`. This parameter is necessary because `import.meta.url` is relative to the source file in which it appears.
+
+**Example**
+
+```javascript
+import * as node from "@radically-straightforward/node";
+
+export function doSomething() {
+  console.log("Do something...");
+}
+
+if (await node.isExecuted(import.meta.url)) doSomething();
+```
+
+### `portAvailable()`
+
+```typescript
+export function portAvailable(
+  port: number,
+  hostname?: string,
+): Promise<boolean>;
+```
+
+Detect whether binding to a port would succeed.
+
+There may be a race condition between checking a port availability and actually binding to it. But this function is useful, for example, to provide users with more friendly error messages upfront and propose to kill the offending processes with [`kill-port`](https://npm.im/kill-port).
+
+**References**
+
+- https://github.com/sindresorhus/get-port/blob/85c18678143f2c673bdaf5307971397b29ddf28b/index.js#L42-L54
+- https://github.com/node-modules/detect-port/blob/9804ad50f49e3256e54ac40165b16fa6c2fa8d5a/lib/detect-port.js
+- https://gist.github.com/timoxley/1689041
+
 ### `time()`
 
 ```typescript
@@ -87,48 +130,5 @@ await eventLoopActive;
 server.close();
 console.log("Server closed.");
 ```
-
-### `isExecuted()`
-
-```typescript
-export async function isExecuted(importMetaUrl: string): Promise<boolean>;
-```
-
-Detect whether the file is being executed directly or being `import`ed into another file.
-
-This is useful for having a single file that can provide a CLI and a JavaScript API for the same functionality.
-
-The `importMetaUrl` parameter must always be `import.meta.url`. This parameter is necessary because `import.meta.url` is relative to the source file in which it appears.
-
-**Example**
-
-```javascript
-import * as node from "@radically-straightforward/node";
-
-export function doSomething() {
-  console.log("Do something...");
-}
-
-if (await node.isExecuted(import.meta.url)) doSomething();
-```
-
-### `portAvailable()`
-
-```typescript
-export function portAvailable(
-  port: number,
-  hostname?: string,
-): Promise<boolean>;
-```
-
-Detect whether binding to a port would succeed.
-
-There may be a race condition between checking a port availability and actually binding to it. But this function is useful, for example, to provide users with more friendly error messages upfront and propose to kill the offending processes with [`kill-port`](https://npm.im/kill-port).
-
-**References**
-
-- https://github.com/sindresorhus/get-port/blob/85c18678143f2c673bdaf5307971397b29ddf28b/index.js#L42-L54
-- https://github.com/node-modules/detect-port/blob/9804ad50f49e3256e54ac40165b16fa6c2fa8d5a/lib/detect-port.js
-- https://gist.github.com/timoxley/1689041
 
 <!-- DOCUMENTATION END: ./source/index.mts -->
