@@ -1,7 +1,7 @@
-import timers from "node:timers/promises";
-import url from "node:url";
 import fs from "node:fs/promises";
+import url from "node:url";
 import net from "node:net";
+import timers from "node:timers/promises";
 
 /**
  * Detect whether the file is being executed directly or being `import`ed into another file.
