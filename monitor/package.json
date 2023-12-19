@@ -1,0 +1,15 @@
+{
+  "scripts": {
+    "prepare": "tsc",
+    "start": "nodemon --watch \"./source/**/*.mts\" --watch \"./configuration/**/*.mjs\" --ext \"*\" --exec \"npm run prepare && node ./build/index.mjs ./configuration/development.mjs\"",
+    "test": "npm run prepare && prettier --check \"./README.md\" --check \"./package.json\" --check \"./tsconfig.json\" --check \"./source/**/*.mts\""
+  },
+  "devDependencies": {
+    "@radically-straightforward/package": "^1.0.0",
+    "@radically-straightforward/tsconfig": "^1.0.0",
+    "@types/node": "^20.10.5",
+    "prettier": "^3.1.1",
+    "typescript": "^5.3.3"
+  },
+  "prettier": {}
+}

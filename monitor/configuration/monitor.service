@@ -1,0 +1,11 @@
+[Unit]
+Description=Monitor
+After=network.target
+
+[Service]
+ExecStart=/root/monitor/monitor /root/monitor/configuration.mjs
+User=root
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
