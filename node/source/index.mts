@@ -85,13 +85,13 @@ export function elapsedTime(
 }
 
 /**
- * Graceful termination. `await` for this function between the code that starts the application and the code that stops it. If the code that stops the application takes longer than `timeout` to complete, the application exits forcefully.
+ * Graceful termination. `await` for this function between the code that starts the application and the code that stops it. If the code that stops the application takes longer than `timeout` to complete, the application terminates forcefully.
  *
  * > **Note:** What determines that the application should stop are the events in `shouldTerminate.events`, which include operating system signals, for example, `SIGINT` sent by `⌃C`, `SIGTERM` sent by `kill`, `SIGUSR2` sent by [`nodemon`](https://npm.im/nodemon) and so forth.
  *
  * > **Note:** Some signals, for example, `SIGKILL` sent by `kill -9`, cannot be handled and cause the process to terminate immediately without the opportunity to run any more code.
  *
- * > **Note:** Some of the events put the process in a special mode that cannot handle asynchronous functions, so ideally the code that stops the application is all synchronous.
+ * > **Note:** Some of the events put the process in a state that cannot handle asynchronous functions correctly, so ideally the code that stops the application is all synchronous.
  *
  * **Example**
  *
@@ -105,7 +105,7 @@ export function elapsedTime(
  * });
  * const server = application.listen(3000);
  * await node.shouldTerminate();
- * // If you comment the line below the `server` doesn’t stop and the application remains running for 10 seconds, when `shouldTerminate()` kills it forcefully.
+ * // If you comment the line below the ‘server’ doesn’t stop and the application remains running for 10 seconds, when ‘shouldTerminate()’ terminates it forcefully.
  * server.close();
  * ```
  */
