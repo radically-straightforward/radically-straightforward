@@ -85,70 +85,47 @@ export function elapsedTime(
 }
 
 /**
- * Keep the event loop active until an operating system signal is received, even when there are no other reasons for the event loop to stay active (no network ports open, no timers, and so forth).
+ * Graceful termination. `await` for this function between the code that starts the application and the code that stops it. If the code that stops the application takes longer than `timeout` to complete, the application exits forcefully.
  *
- * This is useful for starting multiple background jobs, web servers, and so forth in a single Node.js process and stop all of them gracefully when the application terminates.
+ * > **Note:** What determines that the application should stop are the events in `shouldTerminate.events`, which include operating system signals, for example, `SIGINT` sent by `⌃C`, `SIGTERM` sent by `kill`, `SIGUSR2` sent by [`nodemon`](https://npm.im/nodemon) and so forth.
+ *
+ * > **Note:** Some signals, for example, `SIGKILL` sent by `kill -9`, cannot be handled and cause the process to terminate immediately without the opportunity to run any more code.
+ *
+ * > **Note:** Some of the events put the process in a special mode that cannot handle asynchronous functions, so ideally the code that stops the application is all synchronous.
  *
  * **Example**
  *
  * ```javascript
- * import timers from "node:timers/promises";
- * import net from "node:net";
+ * import express from "express";
  * import * as node from "@radically-straightforward/node";
  *
- * // Add the signal event listeners as soon as possible.
- * const eventLoopActive = node.eventLoopActive();
- *
- * // Start background jobs.
- * (async () => {
- *   while (true) {
- *     console.log("Background job...");
- *
- *     await timers
- *       // Sleep for a random amount of time to prevent the machine from being overloaded with all background jobs firing at the same time.
- *       .setTimeout(1000 + Math.random() * 1000, undefined, {
- *         // Don’t keep a reference to the timer, because the event loop will be kept alive by `eventLoopActive` and we want the event loop to **give up** on the background job when it’s time to terminate.
- *         ref: false,
- *       })
- *       .catch(() => {});
- *   }
- * })();
- *
- * // Start server.
- * const server = net.createServer();
- * server.listen(8000);
- * console.log("Server listening on port 8000 and waiting for signal...");
- *
- * // Wait for signal.
- * await eventLoopActive;
- *
- * // Cleanup.
+ * const application = express();
+ * application.get("/", (request, response) => {
+ *   response.send("Hello world");
+ * });
+ * const server = application.listen(3000);
+ * await node.shouldTerminate();
+ * // If you comment the line below the `server` doesn’t stop and the application remains running for 10 seconds, when `shouldTerminate()` kills it forcefully.
  * server.close();
- * console.log("Server closed.");
  * ```
  */
-export function eventLoopActive(): Promise<void> {
+export function shouldTerminate(timeout: number = 10 * 1000): Promise<void> {
   return new Promise<void>((resolve) => {
-    const abortController = new AbortController();
-    timers
-      .setInterval(1 << 30, undefined, {
-        signal: abortController.signal,
-      })
-      [Symbol.asyncIterator]()
-      .next()
-      .catch(() => {});
-    for (const event of [
-      "exit",
-      "SIGHUP",
-      "SIGINT",
-      "SIGQUIT",
-      "SIGTERM",
-      "SIGUSR2",
-      "SIGBREAK",
-    ])
-      process.on(event, () => {
-        abortController.abort();
+    for (const event of shouldTerminate.events)
+      process.on(event, async () => {
         resolve();
+        await timers.setTimeout(timeout, undefined, { ref: false });
+        process.exit(1);
       });
   });
 }
+
+shouldTerminate.events = [
+  "exit",
+  "SIGHUP",
+  "SIGINT",
+  "SIGQUIT",
+  "SIGTERM",
+  "SIGUSR2",
+  "SIGBREAK",
+];

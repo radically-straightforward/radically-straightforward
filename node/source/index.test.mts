@@ -42,7 +42,7 @@ test("elapsedTime()", () => {
 });
 
 test(
-  "eventLoopActive()",
+  "shouldTerminate()",
   {
     ...(!process.stdin.isTTY
       ? {
@@ -51,8 +51,12 @@ test(
       : {}),
   },
   async () => {
-    console.log("eventLoopActive(): Press ⌃C to continue");
-    await node.eventLoopActive();
-    console.log("eventLoopActive(): Continuing...");
+    const server = net.createServer();
+    server.listen(9124);
+    console.log("shouldTerminate(): Press ⌃C to continue...");
+    await node.shouldTerminate();
+    console.log("shouldTerminate(): ...continuing");
+    // Comment the following line and the tests should hang and forcefully terminate after 10 seconds.
+    server.close();
   },
 );
