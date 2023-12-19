@@ -17,53 +17,43 @@ await commander.program
   .allowExcessArguments(false)
   .showHelpAfterError()
   .action(async (configuration: string) => {
+    const eventLoopActive = node.eventLoopActive();
+
     const application: {
       version: string;
       configuration: {
-        monitors: {
-          target: Got.OptionsOfUnknownResponseBody;
-          email: {
-            options: any;
-            defaults: nodemailer.SendMailOptions;
-          };
-        }[];
+        targets: Got.OptionsOfUnknownResponseBody[];
+        email: {
+          options: any;
+          defaults: nodemailer.SendMailOptions;
+        };
         interval: number;
-        got: Got.ExtendOptions;
       };
-      log(...messageParts: string[]): void;
+      log: (...messageParts: string[]) => void;
     } = {
       version,
       configuration: (await import(url.pathToFileURL(configuration).href))
         .default,
-      log(...messageParts) {
+      log: (...messageParts) => {
         console.log([new Date().toISOString(), ...messageParts].join(" \t"));
       },
     };
 
     application.configuration.interval ??= 5 * 60 * 1000;
 
-    const gotClient = got.extend(
-      application.configuration.got ?? {
-        timeout: {
-          request: 5 * 1000,
-        },
-        retry: {
-          limit: 5,
-        },
-      },
-    );
-
     application.log(
       "MONITOR",
       application.version,
       "STARTING...",
-      JSON.stringify(
-        application.configuration.monitors.map((monitor) => monitor.target),
-      ),
+      JSON.stringify(application.configuration.targets),
     );
 
-    const notifiedMonitors = new Set<
-      (typeof application)["configuration"]["monitors"][number]
+    process.once("exit", () => {
+      application.log("STOPPED");
+    });
+
+    const notifiedTargets = new Set<
+      (typeof application)["configuration"]["targets"][number]
     >();
 
     (async () => {
@@ -72,8 +62,14 @@ await commander.program
           application.log("STARTING...", JSON.stringify(monitor.target));
 
           try {
+            // timeout: {
+            //   request: 5 * 1000,
+            // },
+            // retry: {
+            //   limit: 5,
+            // },
             const response = await gotClient(monitor.target);
-            notifiedMonitors.delete(monitor);
+            notifiedTargets.delete(monitor);
             application.log(
               "SUCCESS",
               JSON.stringify(monitor.target),
@@ -87,7 +83,7 @@ await commander.program
               String(error),
               error?.stack,
             );
-            if (notifiedMonitors.has(monitor))
+            if (notifiedTargets.has(monitor))
               application.log(
                 "SKIPPING SENDING ALERT BECAUSE PREVIOUS ERROR HASN’T BEEN RESOLVED YET...",
                 JSON.stringify(monitor.target),
@@ -107,7 +103,7 @@ ${String(error)}
 ${error?.stack}
 </pre>`,
                   });
-                notifiedMonitors.add(monitor);
+                notifiedTargets.add(monitor);
                 application.log(
                   "ALERT SENT",
                   JSON.stringify(monitor.target),
@@ -133,11 +129,7 @@ ${error?.stack}
       }
     })();
 
-    await node.eventLoopActive();
-
-    process.once("exit", () => {
-      application.log("STOPPED");
-    });
+    await eventLoopActive;
 
     await timers.setTimeout(10 * 1000, undefined, { ref: false });
     process.exit(1);
