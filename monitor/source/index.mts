@@ -1,22 +1,17 @@
-#!/usr/bin/env node
-
-import fs from "node:fs/promises";
 import timers from "node:timers/promises";
 import url from "node:url";
 import * as commander from "commander";
 import { got } from "got";
 import * as Got from "got";
 import nodemailer from "nodemailer";
-import * as node from "@leafac/node";
-import html from "@leafac/html";
+import * as node from "@radically-straightforward/node";
+import html from "@radically-straightforward/html";
 
-const version = JSON.parse(
-  await fs.readFile(new URL("../package.json", import.meta.url), "utf8")
-).version;
+const version = "1.0.0";
 
 await commander.program
   .name("monitor")
-  .description("Radically Straightforward Monitoring")
+  .description("👀 Monitor web applications and send email alerts")
   .argument("<configuration>", "Path to configuration file.")
   .version(version)
   .allowExcessArguments(false)
@@ -55,7 +50,7 @@ await commander.program
         retry: {
           limit: 5,
         },
-      }
+      },
     );
 
     application.log(
@@ -63,12 +58,12 @@ await commander.program
       application.version,
       "STARTING...",
       JSON.stringify(
-        application.configuration.monitors.map((monitor) => monitor.target)
-      )
+        application.configuration.monitors.map((monitor) => monitor.target),
+      ),
     );
 
     const notifiedMonitors = new Set<
-      typeof application["configuration"]["monitors"][number]
+      (typeof application)["configuration"]["monitors"][number]
     >();
 
     (async () => {
@@ -83,49 +78,47 @@ await commander.program
               "SUCCESS",
               JSON.stringify(monitor.target),
               String(response.statusCode),
-              JSON.stringify(response.timings)
+              JSON.stringify(response.timings),
             );
           } catch (error: any) {
             application.log(
               "ERROR",
               JSON.stringify(monitor.target),
               String(error),
-              error?.stack
+              error?.stack,
             );
             if (notifiedMonitors.has(monitor))
               application.log(
                 "SKIPPING SENDING ALERT BECAUSE PREVIOUS ERROR HASN’T BEEN RESOLVED YET...",
-                JSON.stringify(monitor.target)
+                JSON.stringify(monitor.target),
               );
             else {
               try {
                 const sentMessageInfo = await nodemailer
                   .createTransport(
                     monitor.email.options,
-                    monitor.email.defaults
+                    monitor.email.defaults,
                   )
                   .sendMail({
                     subject: `⚠️ ‘${JSON.stringify(monitor.target)}’ IS DOWN`,
-                    html: html`
-                      <pre>
+                    html: html`<pre>
 ${String(error)}
 
 ${error?.stack}
-</pre>
-                    `,
+</pre>`,
                   });
                 notifiedMonitors.add(monitor);
                 application.log(
                   "ALERT SENT",
                   JSON.stringify(monitor.target),
-                  sentMessageInfo.response ?? ""
+                  sentMessageInfo.response ?? "",
                 );
               } catch (error: any) {
                 application.log(
                   "CATASTROPHIC ERROR TRYING TO SEND ALERT",
                   JSON.stringify(monitor.target),
                   String(error),
-                  error?.stack
+                  error?.stack,
                 );
               }
             }
