@@ -1,6 +1,6 @@
 # Radically Straightforward · Node
 
-**🛠️ Utilities for Node.js**
+**🔨 Utilities for Node.js**
 
 ## Installation
 
