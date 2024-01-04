@@ -47,11 +47,13 @@ import deepFreeze from "deep-freeze-es6";
  *
  * > **Note:** The default notion of equality used to intern values is [Lodash’s `isEqual()`](https://lodash.com/docs/4.17.15#isEqual). You may change that by overriding `intern.isEqual` before using `intern()` for the first time.
  *
- * > **Note:** You must not mutate an interned value. Interned values are deeply [frozen](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/freeze) with [`deep-freeze-es6`](https://npm.im/deep-freeze-es6) to prevent you from doing so.
+ * > **Note:** You must not mutate an interned value. Interned values are deeply [frozen](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/freeze) with [`deep-freeze-es6`](https://npm.im/deep-freeze-es6) to prevent you from mutating them.
  *
  * > **Note:** Interning a value is a costly operation which grows more expensive as you intern more values. Only intern values when really necessary.
  *
  * > **Note:** The pool of interned values is an array that is available as `intern.pool`.
+ *
+ * > **Note:** The pool of interned values holds [`WeakRef`s](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/WeakRef) to the values.
  *
  * **Related Work**
  *
@@ -59,7 +61,7 @@ import deepFreeze from "deep-freeze-es6";
  *
  * A proposal to include immutable objects (Records) and immutable arrays (Tuples) in JavaScript. This subsumes most of the need for `intern()` even though it doesn’t cover `Map`s, `Set`s, regular expressions, and so forth.
  *
- * It includes [a polyfill](https://github.com/bloomberg/record-tuple-polyfill) which works very similarly to `intern()` but requires different functions for different data types.
+ * It includes a [polyfill](https://github.com/bloomberg/record-tuple-polyfill) which works very similarly to `intern()` but requires different functions for different data types.
  *
  * **[`collections-deep-equal`](https://npm.im/collections-deep-equal)**
  *
@@ -69,7 +71,7 @@ import deepFreeze from "deep-freeze-es6";
  *
  * `collections-deep-equal` does more work on every manipulation of the data structure, for example, when looking up a key in a `Map`, so it may be slower.
  *
- * `collections-deep-equal` has different intern pools for each `Map` or `Set` instead of `intern()`’s single global intern pool, which may be advantageous because smaller pools may be faster to traverse.
+ * `collections-deep-equal` has different intern pools for each `Map` and `Set` instead of `intern()`’s single global intern pool, which may be advantageous because smaller pools may be faster to traverse.
  *
  * **[Immutable.js](https://npm.im/immutable), [`collections`](https://npm.im/collections), [`mori`](https://npm.im/mori), [TypeScript Collections](https://npm.im/typescript-collections), [`prelude-ts`](https://npm.im/prelude-ts), [`collectable`](https://npm.im/collectable), and so forth**
  *
