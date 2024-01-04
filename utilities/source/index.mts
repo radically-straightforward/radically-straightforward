@@ -107,7 +107,7 @@ import lodash from "lodash";
  * - Instead of [Lodash’s `isEqual()`](https://lodash.com/docs/4.17.15#isEqual), we also considered defaulting to [Node.js’s notion of deep equality](https://nodejs.org/dist/latest-v21.x/docs/api/util.html#utilisdeepstrictequalval1-val2) with the [`deep-equal`](https://npm.im/package/deep-equal) polyfill for the browser.
  */
 
-export function intern(value: any) {
+export function intern<T extends WeakKey>(value: T): T {
   for (const internWeakRef of intern.pool) {
     const internValue = internWeakRef.deref();
     if (intern.isEqual(value, internValue)) return internValue;
