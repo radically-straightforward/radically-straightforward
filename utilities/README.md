@@ -125,7 +125,7 @@ Similar to `collections-deep-equal` but either incomplete, or lacking type defin
 
 **Implementation Notes**
 
-- Instead of [Lodash’s `isEqual()`](https://lodash.com/docs/4.17.15#isEqual), we also considered defaulting to [Node.js’s notion of deep equality](https://nodejs.org/dist/latest-v21.x/docs/api/util.html#utilisdeepstrictequalval1-val2) with the [`deep-equal`](https://npm.im/package/deep-equal) polyfill for the browser.
+- Besides [Lodash’s `isEqual()`](https://lodash.com/docs/4.17.15#isEqual) we also considered defaulting to [Node.js’s notion of deep equality](https://nodejs.org/dist/latest-v21.x/docs/api/util.html#utilisdeepstrictequalval1-val2) with the [`deep-equal`](https://npm.im/package/deep-equal) polyfill for the browser.
 
 - Besides [`deep-freeze-es6`](https://npm.im/deep-freeze-es6) we also considered doing the deep freezing with [`deep-freeze-strict`](https://npm.im/deep-freeze-strict), [`deep-freeze-node`](https://npm.im/deep-freeze-node), and [`deep-freeze`](https://npm.im/deep-freeze).
 
