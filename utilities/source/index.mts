@@ -1,246 +1,137 @@
 import lodash from "lodash";
 
-/*
-**Collections Deep Equal** provides Maps and Sets which have the same API as native Maps and Sets, except that their notion of equality is [`util.isDeepStrictEqual()`]():
-
-```js
-import { Map, Set } from "collections-deep-equal";
-
-const object = { name: "Leandro", age: 29 };
-const deepEqualObject = { name: "Leandro", age: 29 };
-
-const map = new Map();
-assert(map.get(deepEqualObject) === "value");
-
-const set = new Set();
-assert(set.has(deepEqualObject));
-```
-
-## Installation
-
-Install with `npm`:
-
-```console
-$ npm install collections-deep-equal
-```
-
-The package comes with type definitions for [TypeScript](https://www.typescriptlang.org).
-
-If you wish to use only **Collections Deep Equal** and not native Maps and Sets, import the library:
-
-```js
-import { Map, Set } from "collections-deep-equal";
-```
-
-If you wish to use both **Collections Deep Equal** as well as native Maps and Sets in the same module, rename on import:
-
-```js
-import {
-  Map as MapDeepEqual,
-  Set as SetDeepEqual,
-} from "collections-deep-equal";
-```
-
-## Caveats
-
-### Performance
-
-**Collections Deep Equal** hasn’t been benchmarked, but it should be orders of magnitude slower than the native collections, because for every access it iterates over all keys and calls `deepEqual()` on them. It’s a straightforward, if naive, implementation.
-
-### Mutation
-
-If you mutate objects, then the collections using them change as well:
-
-```js
-const object = { name: "Leandro", age: 29 };
-const deepEqualObject = { name: "Leandro", age: 29 };
-
-const map = new Map();
-map.set(object, "value");
-object.age = 30;
-assert(!map.has(deepEqualObject));
-deepEqualObject.age = 30;
-assert(map.has(deepEqualObject));
-```
-
-## Additional Features
-
-### `merge()`
-
-```js
-assert.deepEqual(
-  new Map([
-    ["a", new Set([1])],
-    ["b", new Set([2])],
-  ]).merge(
-    new Map([
-      ["b", new Set([3])],
-      ["c", new Set([4])],
-    ])
-  ),
-  new Map([
-    ["a", new Set([1])],
-    ["b", new Set([2, 3])],
-    ["c", new Set([4])],
-  ])
-);
-
-assert.deepEqual(new Set([1]).merge(new Set([2])), new Set([1, 2]));
-```
-
-### `toJSON()`
-
-```js
-assert(JSON.stringify(new Map([["a", 1]])) === `[["a",1]]`);
-assert(JSON.stringify(new Set([1, 2])) === `[1,2]`);
-```
-
-## Related Work
-
-### People Discussing the Issue
-
-- https://2ality.com/2015/01/es6-maps-sets.html#why-can’t-i-configure-how-maps-and-sets-compare-keys-and-values%3F
-- https://stackoverflow.com/questions/21838436/map-using-tuples-or-objects
-- https://esdiscuss.org/topic/maps-with-object-keys
-- https://medium.com/@modernserf/the-tyranny-of-triple-equals-de46cc0c5723
-
-### Other Libraries That Implementation Alternative Collections
-
-- https://immutable-js.github.io/immutable-js/
-- http://swannodette.github.io/mori/
-- https://www.npmjs.com/package/typescript-collections
-- https://www.npmjs.com/package/prelude-ts
-- https://www.npmjs.com/package/collectable
-- https://www.collectionsjs.com
-
-The advantages of **Collections Deep Equal** over these libraries are:
-
-1. You don’t have to buy into completely new data structures like Immutable.js’s Records. These other data structures may have different APIs and therefore have a bit of a learning curve; they may be more difficult to inspect in debuggers; they may not work well with other libraries, forcing you to convert back and forth; and they may annoying to use in TypeScript.
-
-2. The notion of equality is determined by the data structures, not by the elements. In most of these libraries, elements are forced to implement `equals()` and `hash()`, which makes sense in a object-oriented style, but not in a functional style.
-
-3. Immutability is possible and encouraged, but not enforced. For better and for worse.
-
-4. **Collections Deep Equal** is [so simple](source/index.ts) that you could maintain it yourself if it’s abandoned, like some of the packages above seem to have been. But don’t worry, **Collections Deep Equal** is being used in [my dissertation](https://github.com/leafac/yocto-cfa), so it’ll stick around.
-
-### Other Approaches to Immutability
-
-- https://immerjs.github.io/immer/docs/introduction
-- https://www.npmjs.com/package/seamless-immutable
-- https://www.npmjs.com/package/icepick
-- https://www.npmjs.com/package/deep-freeze
-
-These libraries don’t provide new data structures. They’re just facilitating the use of immutable data structures, which may pave the way to a new notion of equality.
-
-### Very Similar But Incomplete Approaches
-
-- https://www.npmjs.com/package/es6-array-map
-- https://www.npmjs.com/package/valuecollection
-- https://www.npmjs.com/package/@strong-roots-capital/map-objects
-
-These libraries are very similar to **Collections Deep Equal** in spirit, but their implementations are either incomplete, or they lack type definitions, and so forth.
-
-### Definitive Solutions
-
-- https://github.com/tc39/proposal-record-tuple
-- https://github.com/sebmarkbage/ecmascript-immutable-data-structures
-- https://github.com/DavidBruant/Map-Set.prototype.toJSON
-
-Proposals to change the JavaScript language in ways that would make this package obsolete.
-
-## Changelog
-
-### 3.0.1 · 2022-10-15
-
-- Hotfix of 3.0.0 release, which didn’t include the `build/` files 🤦‍♂️
-
-### 3.0.0 · 2022-10-15
-
-- Modernized the codebase & turned it into an [ESM-only package](https://gist.github.com/sindresorhus/a39789f98801d908bbc7ff3ecc99d99c).
-
-### 2.0.0 · 2020-06-26
-
-- The names of the exports are now `Map` and `Set`, with the intent of overriding the native implementation on import.
-
-### 1.1.0 · 2020-03-24
-
-- Use [`util.isDeepStrictEqual()`](https://nodejs.org/api/util.html#util_util_isdeepstrictequal_val1_val2) instead of [`deep-equal`](https://www.npmjs.com/package/deep-equal).
-
-### 1.0.1 · 2020-03-23
-
-- Better `README` formatting.
-
-### 1.0.0 · 2020-03-04
-
-- Initial release with `MapDeepEqual` and `SetDeepEqual`.
-
-
-
-
-
-
-
-
-
-
-Possible notions of equality:
-- Deep equality
-  - https://nodejs.org/api/util.html#utilisdeepstrictequalval1-val2
-    - But we need some sort of polyfill for the browser
-  - https://lodash.com/docs/4.17.15#isEqual
-- Shallow equality
-  - https://legacy.reactjs.org/docs/react-api.html#reactpurecomponent
-  - But we need some implementation of shallow equality
-  - Faster than deep equality
-  - Makes for awkward constructors: `valueObject({ a: valueObject([1, 2, 3] )})` (note how each layer needs a call to `valueObject())`
-  - That’s what the existing proposal does
-- Freeze?
-  - https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/freeze
-  - Deeply?
-    - https://github.com/christophehurpeau/deep-freeze-es6
-- WeakRef?
-
-Notes:
-- Immutability
-
-Discussions:
-- https://medium.com/@modernserf/the-tyranny-of-triple-equals-de46cc0c5723
-- https://twitter.com/swannodette/status/1067962983924539392
-  - https://gist.github.com/modernserf/c000e62d40f678cf395e3f360b9b0e43
-
-Proposals:
-- https://github.com/tc39/proposal-record-tuple
-- https://github.com/sebmarkbage/ecmascript-immutable-data-structures
-
-Existing solutions:
-- https://github.com/immutable-js/immutable-js
-- https://github.com/immerjs/immer
-
-*/
-
-export function deduplicate(value: any) {
-  const deduplicatedValue = deduplicate.values.find((deduplicatedValue) =>
-    lodash.isEqual(value, deduplicatedValue),
-  );
-  if (deduplicatedValue !== undefined) return deduplicatedValue;
-  deduplicate.values.push(value);
+/**
+ * [Interning](https://en.wikipedia.org/wiki/Interning_(computer_science)) a value makes it unique across the program, which is useful for checking equality with `===` (reference equality), using it as a key in a `Map`, adding it to a `Set`, and so forth:
+ *
+ * ```javascript
+ * import { intern as $ } from "@radically-straightforward/utilities";
+ *
+ * [1] === [1]; // => false
+ * $([1]) === $([1]); // => true
+ *
+ * {
+ *   const map = new Map();
+ *   map.set([1], 1);
+ *   map.set([1], 2);
+ *   map.size; // => 2
+ *   map.get([1]); // => undefined
+ * }
+ *
+ * {
+ *   const map = new Map();
+ *   map.set($([1]), 1);
+ *   map.set($([1]), 2);
+ *   map.size; // => 1
+ *   map.get($([1])); // => 2
+ * }
+ *
+ * {
+ *   const set = new Set();
+ *   set.add([1]);
+ *   set.add([1]);
+ *   set.size; // => 2
+ *   set.has([1]); // => false
+ * }
+ *
+ * {
+ *   const set = new Set();
+ *   set.add($([1]));
+ *   set.add($([1]));
+ *   set.size; // => 1
+ *   set.has($([1])); // => true
+ * }
+ * ```
+ *
+ * > **Note:** We recommend that you alias `intern as $` when importing it to make your code less noisy.
+ *
+ * > **Note:** The default notion of equality used to intern values is [Lodash’s `isEqual()`](https://lodash.com/docs/4.17.15#isEqual). You may change that by overriding `intern.isEqual` before using `intern()` for the first time.
+ *
+ * > **Note:** You must not mutate an interned value. Interned values are deeply [frozen](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/freeze) to try and prevent you from doing so.
+ *
+ * > **Note:** Interning a value is a costly operation which grows more expensive as you intern more values. Only intern values when really necessary.
+ *
+ * > **Note:** The pool of interned values is an array that is available as `intern.pool`.
+ *
+ * **Related Work**
+ *
+ * **[JavaScript Records & Tuples Proposal](https://github.com/tc39/proposal-record-tuple)**
+ *
+ * A proposal to include immutable objects (Records) and immutable arrays (Tuples) in JavaScript. This subsumes most of the need for `intern()`. It doesn’t cover `Map`s, `Set`s, regular expressions, and so forth.
+ *
+ * It includes [a polyfill](https://github.com/bloomberg/record-tuple-polyfill) which works very similarly to `intern()` but requires different functions for different data types.
+ *
+ * **[`collections-deep-equal`](https://npm.im/collections-deep-equal)**
+ *
+ * A previous solution to this problem which took a different approach: Instead of interning the values and allowing you to use JavaScript’s `Map`s and `Set`s, `collections-deep-equal` extends `Map`s and `Set`s with a different notion of equality.
+ *
+ * `collections-deep-equal` doesn’t address the issue of comparing values with `===` (reference equality).
+ *
+ * `collections-deep-equal` does more work on every manipulation of the data structure, for example, when looking up a key in a `Map`, so it may be slower.
+ *
+ * `collections-deep-equal` has different intern pools for each `Map` or `Set` instead of `intern()`’s single global pool, which may be advantageous because smaller pools may be faster to traverse.
+ *
+ * **[Immutable.js](https://npm.im/immutable), [`collections`](https://npm.im/collections), [`mori`](https://npm.im/mori), [TypeScript Collections](https://npm.im/typescript-collections), [`prelude-ts`](https://npm.im/prelude-ts), [`collectable`](https://npm.im/collectable), and so forth**
+ *
+ * Similar to `collections-deep-equal`, these libraries implement their own data structures instead of relying on JavaScript’s `Map`s and `Set`s. Some of them go a step further and add their own notions of objects and arrays, which requires you to convert your values back and forth, may not show up nicely in the JavaScript inspector, may be less ergonomic to use with TypeScript, and so forth.
+ *
+ * The advantage of these libraries over interning is that they may be faster.
+ *
+ * **[`immer`](https://npm.im/immer) and [`icepick`](https://npm.im/icepick)**
+ *
+ * Introduce a new way to create values based on existing values.
+ *
+ * **[`seamless-immutable`](https://npm.im/seamless-immutable)**
+ *
+ * Modifies existing values more profoundly than freezing.
+ *
+ * **[`es6-array-map`](https://npm.im/es6-array-map), [`valuecollection`](https://npm.im/valuecollection), [`@strong-roots-capital/map-objects`](https://npm.im/@strong-roots-capital/map-objects), and so forth**
+ *
+ * Similar to `collections-deep-equal` but either incomplete, or lacking type definitions, and so forth.
+ *
+ * **Other**
+ *
+ * - <https://2ality.com/2015/01/es6-maps-sets.html#why-can’t-i-configure-how-maps-and-sets-compare-keys-and-values%3F>
+ * - <https://stackoverflow.com/questions/21838436/map-using-tuples-or-objects>
+ * - <https://esdiscuss.org/topic/maps-with-object-keys>
+ * - <https://medium.com/@modernserf/the-tyranny-of-triple-equals-de46cc0c5723>
+ * - <https://medium.com/@modernserf/the-tyranny-of-triple-equals-de46cc0c5723>
+ * - <https://twitter.com/swannodette/status/1067962983924539392>
+ * - <https://gist.github.com/modernserf/c000e62d40f678cf395e3f360b9b0e43>
+ *
+ * **Implementation Notes**
+ *
+ * - By default `intern()` uses a notion of equality that is deep: it compares, for example, objects within objects by value. This is more ergonomic, because it means that you only have to call `intern()` on the outer object, for example, `$({ a: { b: 2 } })` instead of `$({ a: ${ b: 2 } })`. But this is slower.
+ *
+ *   You may replace the notion of equality with shallow equality and use the `$({ a: ${ b: 2 } })` pattern to speed things up. That is, for example, [what React does](https://legacy.reactjs.org/docs/react-api.html#reactpurecomponent). It’s also what the [**JavaScript Records & Tuples Proposal**](https://github.com/tc39/proposal-record-tuple) includes as of January 2024.
+ *
+ * - Instead of [Lodash’s `isEqual()`](https://lodash.com/docs/4.17.15#isEqual), we also considered defaulting to [Node.js’s notion of deep equality](https://nodejs.org/dist/latest-v21.x/docs/api/util.html#utilisdeepstrictequalval1-val2) with the [`deep-equal`](https://npm.im/package/deep-equal) polyfill for the browser.
+ */
+
+export function intern(value: any) {
+  for (const internWeakRef of intern.pool) {
+    const internValue = internWeakRef.deref();
+    if (intern.isEqual(value, internValue)) return internValue;
+  }
+  intern.pool.push(new WeakRef(value));
   return value;
 }
 
-deduplicate.values = [] as any[];
+intern.isEqual = lodash.isEqual;
+
+intern.pool = [] as WeakRef<any>[];
 
 /*
 
 
-https://www.npmjs.com/package/p-timeout
-https://www.npmjs.com/package/delay
-https://www.npmjs.com/package/sleep-promise
-https://www.npmjs.com/package/promise-timeout
-https://www.npmjs.com/package/sleep
-https://www.npmjs.com/package/timeout-as-promise
-https://www.npmjs.com/package/delayed
-https://www.npmjs.com/package/sleep-async
-https://www.npmjs.com/package/promise.timeout
+https://npm.im/package/p-timeout
+https://npm.im/package/delay
+https://npm.im/package/sleep-promise
+https://npm.im/package/promise-timeout
+https://npm.im/package/sleep
+https://npm.im/package/timeout-as-promise
+https://npm.im/package/delayed
+https://npm.im/package/sleep-async
+https://npm.im/package/promise.timeout
 
 */
 // /**

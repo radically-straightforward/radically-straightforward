@@ -1,22 +1,44 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import * as utilities from "./index.mjs";
+import { intern as $ } from "./index.mjs";
 
-test("deduplicate()", () => {
-  assert(
-    utilities.deduplicate({ name: "Leandro", age: 33 }) ===
-      utilities.deduplicate({ name: "Leandro", age: 33 }),
-  );
+test("intern()", () => {
+  // @ts-ignore
+  assert(([1] === [1]) === false);
+  assert($([1]) === $([1]));
 
-  const setWithDuplicates = new Set();
-  setWithDuplicates.add({ name: "Leandro", age: 33 });
-  setWithDuplicates.add({ name: "Leandro", age: 33 });
-  assert.equal(setWithDuplicates.size, 2);
+  {
+    const map = new Map();
+    map.set([1], 1);
+    map.set([1], 2);
+    assert.equal(map.size, 2);
+    assert.equal(map.get([1]), undefined);
+  }
 
-  const setWithoutDuplicates = new Set();
-  setWithoutDuplicates.add(utilities.deduplicate({ name: "Leandro", age: 33 }));
-  setWithoutDuplicates.add(utilities.deduplicate({ name: "Leandro", age: 33 }));
-  assert.equal(setWithoutDuplicates.size, 1);
+  {
+    const map = new Map();
+    map.set($([1]), 1);
+    map.set($([1]), 2);
+    assert.equal(map.size, 1);
+    assert.equal(map.get($([1])), 2);
+  }
+
+  {
+    const set = new Set();
+    set.add([1]);
+    set.add([1]);
+    assert.equal(set.size, 2);
+    assert(set.has([1]) === false);
+  }
+
+  {
+    const set = new Set();
+    set.add($([1]));
+    set.add($([1]));
+    assert.equal(set.size, 1);
+    assert(set.has($([1])));
+  }
 });
 
 // test(
