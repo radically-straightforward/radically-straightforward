@@ -75,7 +75,7 @@ $([1]) === $([1]); // => true
 
 > **Note:** Interning a value is a costly operation which grows more expensive as you intern more values. Only intern values when really necessary.
 
-> **Note:** The pool of interned values is available as `intern.pool: Map<Symbol, WeakRef<any>>`. There’s a `FinalizationRegistry` that cleans up values that have been garbage collected.
+> **Note:** The pool of interned values is available as `intern.pool: Map<Symbol, WeakRef<any>>`. There’s a `FinalizationRegistry` at `intern.finalizationRegistry` that cleans up values that have been garbage collected.
 
 **Related Work**
 

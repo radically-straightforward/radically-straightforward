@@ -8,8 +8,9 @@ jobs:
           - macos
           - ubuntu
         package:
-          - node
           - html
+          - utilities
+          - node
           - tsconfig
           - caddy
           - documentation
