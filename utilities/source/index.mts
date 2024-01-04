@@ -109,7 +109,6 @@ import deepFreeze from "deep-freeze-es6";
  *
  * - Besides [`deep-freeze-es6`](https://npm.im/deep-freeze-es6) we also considered doing the deep freezing with [`deep-freeze-strict`](https://npm.im/deep-freeze-strict), [`deep-freeze-node`](https://npm.im/deep-freeze-node), and [`deep-freeze`](https://npm.im/deep-freeze).
  */
-
 export function intern<T extends WeakKey>(value: T): T {
   for (const internWeakRef of intern.pool) {
     const internValue = internWeakRef.deref();
