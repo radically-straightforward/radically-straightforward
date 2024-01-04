@@ -1,5 +1,5 @@
 import test from "node:test";
-import http from "node:http";
+import express from "express";
 import * as node from "./index.mjs";
 
 test(
@@ -12,12 +12,13 @@ test(
       : {}),
   },
   async () => {
-    const server = http.createServer();
-    server.listen(8000);
-    console.log("shouldTerminate(): Press ⌃C to continue...");
+    const application = express();
+    application.get("/", (request, response) => {
+      response.send("Hello world");
+    });
+    const server = application.listen(3000);
     await node.shouldTerminate();
-    console.log("shouldTerminate(): ...continuing");
-    // Comment the following line and the tests should hang and forcefully terminate after 10 seconds.
+    // If you comment the line below the ‘server’ doesn’t stop and the application remains running for 10 seconds, when ‘shouldTerminate()’ terminates it forcefully.
     server.close();
   },
 );
