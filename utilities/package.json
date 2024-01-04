@@ -28,6 +28,7 @@
     "test": "npm run prepare && node --test && prettier --check \"./README.md\" --check \"./package.json\" --check \"./tsconfig.json\" --check \"./source/**/*.mts\""
   },
   "dependencies": {
+    "deep-freeze-es6": "^3.0.2",
     "lodash": "^4.17.21"
   },
   "devDependencies": {

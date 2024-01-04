@@ -39,6 +39,10 @@ test("intern()", () => {
     assert.equal(set.size, 1);
     assert(set.has($([1])));
   }
+
+  assert.throws(() => {
+    $([1])[0] = 2;
+  });
 });
 
 // test(

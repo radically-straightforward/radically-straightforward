@@ -1,4 +1,5 @@
 import lodash from "lodash";
+import deepFreeze from "deep-freeze-es6";
 
 /**
  * [Interning](<https://en.wikipedia.org/wiki/Interning_(computer_science)>) a value makes it unique across the program, which is useful for checking equality with `===` (reference equality), using it as a key in a `Map`, adding it to a `Set`, and so forth:
@@ -46,7 +47,7 @@ import lodash from "lodash";
  *
  * > **Note:** The default notion of equality used to intern values is [Lodash’s `isEqual()`](https://lodash.com/docs/4.17.15#isEqual). You may change that by overriding `intern.isEqual` before using `intern()` for the first time.
  *
- * > **Note:** You must not mutate an interned value. Interned values are deeply [frozen](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/freeze) to try and prevent you from doing so.
+ * > **Note:** You must not mutate an interned value. Interned values are deeply [frozen](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/freeze) with [`deep-freeze-es6`](https://npm.im/deep-freeze-es6) to prevent you from doing so.
  *
  * > **Note:** Interning a value is a costly operation which grows more expensive as you intern more values. Only intern values when really necessary.
  *
@@ -105,6 +106,8 @@ import lodash from "lodash";
  *   You may replace the notion of equality with shallow equality and use the `$({ a: $({ b: 2 }) })` pattern to speed things up. That is, for example, [what React does](https://legacy.reactjs.org/docs/react-api.html#reactpurecomponent). It’s also what the [**JavaScript Records & Tuples Proposal**](https://github.com/tc39/proposal-record-tuple) includes as of January 2024, so it may make your code easier to port in the future.
  *
  * - Instead of [Lodash’s `isEqual()`](https://lodash.com/docs/4.17.15#isEqual), we also considered defaulting to [Node.js’s notion of deep equality](https://nodejs.org/dist/latest-v21.x/docs/api/util.html#utilisdeepstrictequalval1-val2) with the [`deep-equal`](https://npm.im/package/deep-equal) polyfill for the browser.
+ *
+ * - Besides [`deep-freeze-es6`](https://npm.im/deep-freeze-es6) we also considered doing the deep freezing with [`deep-freeze-strict`](https://npm.im/deep-freeze-strict), [`deep-freeze-node`](https://npm.im/deep-freeze-node), and [`deep-freeze`](https://npm.im/deep-freeze).
  */
 
 export function intern<T extends WeakKey>(value: T): T {
@@ -112,7 +115,7 @@ export function intern<T extends WeakKey>(value: T): T {
     const internValue = internWeakRef.deref();
     if (intern.isEqual(value, internValue)) return internValue;
   }
-  intern.pool.push(new WeakRef(value));
+  intern.pool.push(new WeakRef(deepFreeze(value)));
   return value;
 }
 
