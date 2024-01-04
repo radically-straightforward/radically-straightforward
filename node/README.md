@@ -38,7 +38,7 @@ export function shouldTerminate({
 
 Graceful termination. `await` for this function between the code that starts the application and the code that gracefully terminates it. If the code that gracefully terminates the application takes longer than `timeout` to complete, then the application terminates forcefully.
 
-**Note:** This function must be called at most once in your application.
+> **Note:** This function must be called at most once in your application.
 
 > **Note:** What determines that the application should terminate are the `events`, which by default include operating system signals, for example, `SIGINT` sent by `⌃C`, `SIGTERM` sent by `kill`, `SIGUSR2` sent by [`nodemon`](https://npm.im/nodemon), `exit` send by Node.js in the case of an uncaught exception, and so forth.
 
@@ -46,7 +46,7 @@ Graceful termination. `await` for this function between the code that starts the
 
 > **Note:** Some of the events put the process in a state that cannot handle asynchronous functions, so the code that terminates the application should be synchronous.
 
-**Note:** If the process is terminated forcefully, then its exit error code is `1`.
+> **Note:** If the process is terminated forcefully, then its exit error code is `1`.
 
 **Example**
 
