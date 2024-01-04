@@ -56,7 +56,7 @@ import lodash from "lodash";
  *
  * **[JavaScript Records & Tuples Proposal](https://github.com/tc39/proposal-record-tuple)**
  *
- * A proposal to include immutable objects (Records) and immutable arrays (Tuples) in JavaScript. This subsumes most of the need for `intern()`. It doesn’t cover `Map`s, `Set`s, regular expressions, and so forth.
+ * A proposal to include immutable objects (Records) and immutable arrays (Tuples) in JavaScript. This subsumes most of the need for `intern()` even though it doesn’t cover `Map`s, `Set`s, regular expressions, and so forth.
  *
  * It includes [a polyfill](https://github.com/bloomberg/record-tuple-polyfill) which works very similarly to `intern()` but requires different functions for different data types.
  *
@@ -68,7 +68,7 @@ import lodash from "lodash";
  *
  * `collections-deep-equal` does more work on every manipulation of the data structure, for example, when looking up a key in a `Map`, so it may be slower.
  *
- * `collections-deep-equal` has different intern pools for each `Map` or `Set` instead of `intern()`’s single global pool, which may be advantageous because smaller pools may be faster to traverse.
+ * `collections-deep-equal` has different intern pools for each `Map` or `Set` instead of `intern()`’s single global intern pool, which may be advantageous because smaller pools may be faster to traverse.
  *
  * **[Immutable.js](https://npm.im/immutable), [`collections`](https://npm.im/collections), [`mori`](https://npm.im/mori), [TypeScript Collections](https://npm.im/typescript-collections), [`prelude-ts`](https://npm.im/prelude-ts), [`collectable`](https://npm.im/collectable), and so forth**
  *
@@ -100,9 +100,9 @@ import lodash from "lodash";
  *
  * **Implementation Notes**
  *
- * - By default `intern()` uses a notion of equality that is deep: it compares, for example, objects within objects by value. This is more ergonomic, because it means that you only have to call `intern()` on the outer object, for example, `$({ a: { b: 2 } })` instead of `$({ a: ${ b: 2 } })`. But this is slower.
+ * - By default `intern()` uses a notion of equality that is deep: it compares, for example, objects within objects by value. This is more ergonomic, because it means that you only have to call `intern()` on the outer object, for example, `$({ a: { b: 2 } })` instead of `$({ a: $({ b: 2 }) })`. But this is slower.
  *
- *   You may replace the notion of equality with shallow equality and use the `$({ a: ${ b: 2 } })` pattern to speed things up. That is, for example, [what React does](https://legacy.reactjs.org/docs/react-api.html#reactpurecomponent). It’s also what the [**JavaScript Records & Tuples Proposal**](https://github.com/tc39/proposal-record-tuple) includes as of January 2024.
+ *   You may replace the notion of equality with shallow equality and use the `$({ a: $({ b: 2 }) })` pattern to speed things up. That is, for example, [what React does](https://legacy.reactjs.org/docs/react-api.html#reactpurecomponent). It’s also what the [**JavaScript Records & Tuples Proposal**](https://github.com/tc39/proposal-record-tuple) includes as of January 2024, so it may make your code easier to port in the future.
  *
  * - Instead of [Lodash’s `isEqual()`](https://lodash.com/docs/4.17.15#isEqual), we also considered defaulting to [Node.js’s notion of deep equality](https://nodejs.org/dist/latest-v21.x/docs/api/util.html#utilisdeepstrictequalval1-val2) with the [`deep-equal`](https://npm.im/package/deep-equal) polyfill for the browser.
  */
