@@ -1,3 +1,5 @@
+import lodash from "lodash";
+
 /*
 **Collections Deep Equal** provides Maps and Sets which have the same API as native Maps and Sets, except that their notion of equality is [`util.isDeepStrictEqual()`]():
 
@@ -188,6 +190,7 @@ Possible notions of equality:
   - https://lodash.com/docs/4.17.15#isEqual
 - Shallow equality
   - https://legacy.reactjs.org/docs/react-api.html#reactpurecomponent
+  - But we need some implementation of shallow equality
   - Faster than deep equality
   - Makes for awkward constructors: `valueObject({ a: valueObject([1, 2, 3] )})` (note how each layer needs a call to `valueObject())`
   - That’s what the existing proposal does
@@ -215,18 +218,40 @@ Existing solutions:
 
 */
 
+export function deduplicate(value: any) {
+  const deduplicatedValue = deduplicate.values.find((deduplicatedValue) =>
+    lodash.isEqual(value, deduplicatedValue),
+  );
+  if (deduplicatedValue !== undefined) return deduplicatedValue;
+  deduplicate.values.push(value);
+  return value;
+}
+
+deduplicate.values = [] as any[];
+
+/*
 
 
+https://www.npmjs.com/package/p-timeout
+https://www.npmjs.com/package/delay
+https://www.npmjs.com/package/sleep-promise
+https://www.npmjs.com/package/promise-timeout
+https://www.npmjs.com/package/sleep
+https://www.npmjs.com/package/timeout-as-promise
+https://www.npmjs.com/package/delayed
+https://www.npmjs.com/package/sleep-async
+https://www.npmjs.com/package/promise.timeout
 
+*/
 // /**
 //     - Remove uses of `node:timers/promises`?
-//  * 
+//  *
 //  * TODO: In universal JavaScript, implement a way to **canonicalize** objects using deepEquals to be used in Sets and as Map keys (then deprecate `collections-deep-equal`).
 //  *   - value objects
 //  *   - https://lodash.com/docs/4.17.15#isEqual
 //  * TODO: Implement using setTimeout and let it be usable in client-side JavaScript as well.
 //  * TODO: Explain the differences between this and `setInterval()` (wait for completion before setting the next scheduler, and force a job to run)
-//  * 
+//  *
 //  * Start a background job that runs every given `interval`.
 //  *
 //  * You may use `backgroundJob.run()` to force the background job to run right away.
@@ -289,4 +314,3 @@ Existing solutions:
 //     },
 //   };
 // }
-

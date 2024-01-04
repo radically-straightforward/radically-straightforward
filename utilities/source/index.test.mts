@@ -1,3 +1,24 @@
+import test from "node:test";
+import assert from "node:assert/strict";
+import * as utilities from "./index.mjs";
+
+test("deduplicate()", () => {
+  assert(
+    utilities.deduplicate({ name: "Leandro", age: 33 }) ===
+      utilities.deduplicate({ name: "Leandro", age: 33 }),
+  );
+
+  const setWithDuplicates = new Set();
+  setWithDuplicates.add({ name: "Leandro", age: 33 });
+  setWithDuplicates.add({ name: "Leandro", age: 33 });
+  assert.equal(setWithDuplicates.size, 2);
+
+  const setWithoutDuplicates = new Set();
+  setWithoutDuplicates.add(utilities.deduplicate({ name: "Leandro", age: 33 }));
+  setWithoutDuplicates.add(utilities.deduplicate({ name: "Leandro", age: 33 }));
+  assert.equal(setWithoutDuplicates.size, 1);
+});
+
 // test(
 //   "backgroundJob()",
 //   {
