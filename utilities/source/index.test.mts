@@ -40,6 +40,8 @@ test("intern()", () => {
     assert(set.has($([1])));
   }
 
+  assert.notEqual($([1]), $([2]));
+
   assert.throws(() => {
     $([1])[0] = 2;
   });

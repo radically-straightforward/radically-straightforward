@@ -45,15 +45,17 @@ import deepFreeze from "deep-freeze-es6";
  *
  * > **Note:** We recommend that you alias `intern as $` when importing it to make your code less noisy.
  *
- * > **Note:** The default notion of equality used to intern values is [Lodash’s `isEqual()`](https://lodash.com/docs/4.17.15#isEqual). You may change that by overriding `intern.isEqual` before using `intern()` for the first time.
+ * > **Note:** The default notion of equality used to intern values is [Lodash’s `isEqual()`](https://lodash.com/docs/4.17.15#isEqual). You may change that by overriding `intern.isEqual: (value: any, other: any) => boolean` before using `intern()` for the first time.
+ * >
+ * > In particular, note that `intern()` uses a notion of equality that is deep: it compares, for example, objects within objects by value. This is more ergonomic, because it means that you only have to call `intern()` on the outer object, for example, `$({ a: { b: 2 } })` instead of `$({ a: $({ b: 2 }) })`. But this is slower.
+ * >
+ * > You may replace the notion of equality with shallow equality and use the `$({ a: $({ b: 2 }) })` pattern to speed things up. That is, for example, [what React does](https://legacy.reactjs.org/docs/react-api.html#reactpurecomponent). It’s also what the [**JavaScript Records & Tuples Proposal**](https://github.com/tc39/proposal-record-tuple) includes as of January 2024, so it may make your code easier to adapt in the future.
  *
  * > **Note:** You must not mutate an interned value. Interned values are deeply [frozen](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/freeze) with [`deep-freeze-es6`](https://npm.im/deep-freeze-es6) to prevent you from mutating them.
  *
  * > **Note:** Interning a value is a costly operation which grows more expensive as you intern more values. Only intern values when really necessary.
  *
- * > **Note:** The pool of interned values is an array that is available as `intern.pool`.
- *
- * > **Note:** The pool of interned values holds [`WeakRef`s](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/WeakRef) to the values.
+ * > **Note:** The pool of interned values is available as `intern.pool: Map<Symbol, WeakRef<any>>`. There’s a `FinalizationRegistry` that cleans up values that have been garbage collected.
  *
  * **Related Work**
  *
@@ -103,28 +105,36 @@ import deepFreeze from "deep-freeze-es6";
  *
  * **Implementation Notes**
  *
- * - By default `intern()` uses a notion of equality that is deep: it compares, for example, objects within objects by value. This is more ergonomic, because it means that you only have to call `intern()` on the outer object, for example, `$({ a: { b: 2 } })` instead of `$({ a: $({ b: 2 }) })`. But this is slower.
- *
- *   You may replace the notion of equality with shallow equality and use the `$({ a: $({ b: 2 }) })` pattern to speed things up. That is, for example, [what React does](https://legacy.reactjs.org/docs/react-api.html#reactpurecomponent). It’s also what the [**JavaScript Records & Tuples Proposal**](https://github.com/tc39/proposal-record-tuple) includes as of January 2024, so it may make your code easier to port in the future.
- *
  * - Instead of [Lodash’s `isEqual()`](https://lodash.com/docs/4.17.15#isEqual), we also considered defaulting to [Node.js’s notion of deep equality](https://nodejs.org/dist/latest-v21.x/docs/api/util.html#utilisdeepstrictequalval1-val2) with the [`deep-equal`](https://npm.im/package/deep-equal) polyfill for the browser.
  *
  * - Besides [`deep-freeze-es6`](https://npm.im/deep-freeze-es6) we also considered doing the deep freezing with [`deep-freeze-strict`](https://npm.im/deep-freeze-strict), [`deep-freeze-node`](https://npm.im/deep-freeze-node), and [`deep-freeze`](https://npm.im/deep-freeze).
  */
 export function intern<T extends WeakKey>(value: T): T {
-  for (const internWeakRef of intern.pool) {
+  for (const internWeakRef of intern.pool.values()) {
     const internValue = internWeakRef.deref();
     if (intern.isEqual(value, internValue)) return internValue;
   }
-  intern.pool.push(new WeakRef(deepFreeze(value)));
+  const key = Symbol();
+  deepFreeze(value);
+  intern.pool.set(key, new WeakRef(value));
+  intern.finalizationRegistry.register(value, key);
   return value;
 }
 
 intern.isEqual = lodash.isEqual;
 
-intern.pool = [] as WeakRef<any>[];
+intern.pool = new Map<Symbol, WeakRef<any>>();
+
+intern.finalizationRegistry = new FinalizationRegistry<Symbol>((key) => {
+  intern.pool.delete(key);
+});
 
 /*
+
+
+Math.random().toString(36).slice(2)
+
+
 
 
 https://npm.im/package/p-timeout
