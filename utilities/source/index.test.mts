@@ -7,6 +7,7 @@ test("intern()", () => {
   // @ts-ignore
   assert(([1] === [1]) === false);
   assert($([1]) === $([1]));
+  assert($([1]) !== $([2]));
 
   {
     const map = new Map();
@@ -40,7 +41,10 @@ test("intern()", () => {
     assert(set.has($([1])));
   }
 
-  assert.notEqual($([1]), $([2]));
+  assert.throws(() => {
+    $([1, {}]);
+  });
+  assert($([1, $({})]) === $([1, $({})]));
 
   assert.throws(() => {
     $([1])[0] = 2;
