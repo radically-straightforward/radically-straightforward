@@ -19,7 +19,13 @@ import * as node from "@radically-straightforward/utilities";
 ### `intern()`
 
 ```typescript
-export function intern<T extends WeakKey>(value: T): T;
+export function intern<
+  T extends
+    | Array<unknown>
+    | {
+        [key: string]: unknown;
+      },
+>(value: T): T;
 ```
 
 [Interning](<https://en.wikipedia.org/wiki/Interning_(computer_science)>) a value makes it unique across the program, which is useful for checking equality with `===` (reference equality), using it as a key in a `Map`, adding it to a `Set`, and so forth:

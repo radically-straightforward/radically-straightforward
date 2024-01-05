@@ -98,7 +98,9 @@
  * - <https://twitter.com/swannodette/status/1067962983924539392>
  * - <https://gist.github.com/modernserf/c000e62d40f678cf395e3f360b9b0e43>
  */
-export function intern<T extends WeakKey>(value: T): T {
+export function intern<T extends Array<unknown> | { [key: string]: unknown }>(
+  value: T,
+): T {
   const type = Array.isArray(value)
     ? "tuple"
     : typeof value === "object" && value !== null
@@ -129,7 +131,7 @@ export function intern<T extends WeakKey>(value: T): T {
           "undefined",
         ].includes(typeof innerValue) ||
         innerValue === null ||
-        innerValue[intern.interned] === true
+        (innerValue as any)[intern.interned] === true
       )
     )
       throw new Error(
