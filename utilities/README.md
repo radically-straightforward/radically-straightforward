@@ -11,7 +11,7 @@ $ npm install @radically-straightforward/utilities
 ## Usage
 
 ```typescript
-import * as node from "@radically-straightforward/utilities";
+import * as utilities from "@radically-straightforward/utilities";
 ```
 
 <!-- DOCUMENTATION START: ./source/index.mts -->
