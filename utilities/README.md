@@ -16,6 +16,18 @@ import * as utilities from "@radically-straightforward/utilities";
 
 <!-- DOCUMENTATION START: ./source/index.mts -->
 
+### `Intern`
+
+```typescript
+export type Intern<Type> = Readonly<
+  Type & {
+    [internSymbol]: true;
+  }
+>;
+```
+
+Utility type for `intern()`.
+
 ### `intern()`
 
 ```typescript
@@ -25,19 +37,19 @@ export function intern<
     | {
         [key: string]: unknown;
       },
->(value: T): T;
+>(value: T): Intern<T>;
 ```
 
 [Interning](<https://en.wikipedia.org/wiki/Interning_(computer_science)>) a value makes it unique across the program, which is useful for checking equality with `===` (reference equality), using it as a key in a `Map`, adding it to a `Set`, and so forth:
 
-```javascript
+```typescript
 import { intern as $ } from "@radically-straightforward/utilities";
 
 [1] === [1]; // => false
 $([1]) === $([1]); // => true
 
 {
-  const map = new Map();
+  const map = new Map<number[], number>();
   map.set([1], 1);
   map.set([1], 2);
   map.size; // => 2
@@ -45,7 +57,7 @@ $([1]) === $([1]); // => true
 }
 
 {
-  const map = new Map();
+  const map = new Map<utilities.Intern<number[]>, number>();
   map.set($([1]), 1);
   map.set($([1]), 2);
   map.size; // => 1
@@ -53,7 +65,7 @@ $([1]) === $([1]); // => true
 }
 
 {
-  const set = new Set();
+  const set = new Set<number[]>();
   set.add([1]);
   set.add([1]);
   set.size; // => 2
@@ -61,7 +73,7 @@ $([1]) === $([1]); // => true
 }
 
 {
-  const set = new Set();
+  const set = new Set<utilities.Intern<number[]>>();
   set.add($([1]));
   set.add($([1]));
   set.size; // => 1

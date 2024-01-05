@@ -4,13 +4,14 @@ import * as utilities from "./index.mjs";
 import { intern as $ } from "./index.mjs";
 
 test("intern()", () => {
-  // @ts-ignore
+  // @ts-expect-error
   assert(([1] === [1]) === false);
   assert($([1]) === $([1]));
+
   assert($([1]) !== $([2]));
 
   {
-    const map = new Map();
+    const map = new Map<number[], number>();
     map.set([1], 1);
     map.set([1], 2);
     assert.equal(map.size, 2);
@@ -18,7 +19,7 @@ test("intern()", () => {
   }
 
   {
-    const map = new Map();
+    const map = new Map<utilities.Intern<number[]>, number>();
     map.set($([1]), 1);
     map.set($([1]), 2);
     assert.equal(map.size, 1);
@@ -26,7 +27,7 @@ test("intern()", () => {
   }
 
   {
-    const set = new Set();
+    const set = new Set<number[]>();
     set.add([1]);
     set.add([1]);
     assert.equal(set.size, 2);
@@ -34,7 +35,7 @@ test("intern()", () => {
   }
 
   {
-    const set = new Set();
+    const set = new Set<utilities.Intern<number[]>>();
     set.add($([1]));
     set.add($([1]));
     assert.equal(set.size, 1);
@@ -47,6 +48,7 @@ test("intern()", () => {
   assert($([1, $({})]) === $([1, $({})]));
 
   assert.throws(() => {
+    // @ts-expect-error
     $([1])[0] = 2;
   });
 });

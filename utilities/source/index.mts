@@ -1,14 +1,19 @@
 /**
+ * Utility type for `intern()`.
+ */
+export type Intern<Type> = Readonly<Type & { [internSymbol]: true }>;
+
+/**
  * [Interning](<https://en.wikipedia.org/wiki/Interning_(computer_science)>) a value makes it unique across the program, which is useful for checking equality with `===` (reference equality), using it as a key in a `Map`, adding it to a `Set`, and so forth:
  *
- * ```javascript
+ * ```typescript
  * import { intern as $ } from "@radically-straightforward/utilities";
  *
  * [1] === [1]; // => false
  * $([1]) === $([1]); // => true
  *
  * {
- *   const map = new Map();
+ *   const map = new Map<number[], number>();
  *   map.set([1], 1);
  *   map.set([1], 2);
  *   map.size; // => 2
@@ -16,7 +21,7 @@
  * }
  *
  * {
- *   const map = new Map();
+ *   const map = new Map<utilities.Intern<number[]>, number>();
  *   map.set($([1]), 1);
  *   map.set($([1]), 2);
  *   map.size; // => 1
@@ -24,7 +29,7 @@
  * }
  *
  * {
- *   const set = new Set();
+ *   const set = new Set<number[]>();
  *   set.add([1]);
  *   set.add([1]);
  *   set.size; // => 2
@@ -32,7 +37,7 @@
  * }
  *
  * {
- *   const set = new Set();
+ *   const set = new Set<utilities.Intern<number[]>>();
  *   set.add($([1]));
  *   set.add($([1]));
  *   set.size; // => 1
@@ -100,7 +105,7 @@
  */
 export function intern<T extends Array<unknown> | { [key: string]: unknown }>(
   value: T,
-): T {
+): Intern<T> {
   const type = Array.isArray(value)
     ? "tuple"
     : typeof value === "object" && value !== null
@@ -109,15 +114,15 @@ export function intern<T extends Array<unknown> | { [key: string]: unknown }>(
           throw new Error(`Failed to intern value.`);
         })();
   const keys = Object.keys(value);
-  for (const internWeakRef of intern.pools[type].values()) {
+  for (const internWeakRef of intern.pool[type].values()) {
     const internValue = internWeakRef.deref();
     if (
       internValue === undefined ||
       keys.length !== Object.keys(internValue).length
     )
       continue;
-    if (keys.every((key) => (value as any)[key] === internValue[key]))
-      return internValue;
+    if (keys.every((key) => (value as any)[key] === (internValue as any)[key]))
+      return internValue as any;
   }
   for (const innerValue of Object.values(value))
     if (
@@ -131,32 +136,32 @@ export function intern<T extends Array<unknown> | { [key: string]: unknown }>(
           "undefined",
         ].includes(typeof innerValue) ||
         innerValue === null ||
-        (innerValue as any)[intern.interned] === true
+        (innerValue as any)[internSymbol] === true
       )
     )
       throw new Error(
         `Failed to intern value because of non-interned inner value.`,
       );
   const key = Symbol();
-  (value as any)[intern.interned] = true;
+  (value as any)[internSymbol] = true;
   Object.freeze(value);
-  intern.pools[type].set(key, new WeakRef(value));
+  intern.pool[type].set(key, new WeakRef(value as any));
   intern.finalizationRegistry.register(value, { type, key });
-  return value;
+  return value as any;
 }
 
-intern.interned = Symbol("interned");
+export const internSymbol = Symbol("intern");
 
-intern.pools = {
-  tuple: new Map<Symbol, WeakRef<any>>(),
-  record: new Map<Symbol, WeakRef<any>>(),
+intern.pool = {
+  tuple: new Map<Symbol, WeakRef<Intern<unknown[]>>>(),
+  record: new Map<Symbol, WeakRef<Intern<{ [key: string]: unknown }>>>(),
 };
 
 intern.finalizationRegistry = new FinalizationRegistry<{
   type: "tuple" | "record";
   key: Symbol;
 }>(({ type, key }) => {
-  intern.pools[type].delete(key);
+  intern.pool[type].delete(key);
 });
 
 /*
