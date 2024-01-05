@@ -7,6 +7,7 @@ test("intern()", () => {
   // @ts-expect-error
   assert(([1] === [1]) === false);
   assert($([1]) === $([1]));
+  assert($({ a: 1, b: 2 }) === $({ b: 2, a: 1 }));
 
   assert($([1]) !== $([2]));
 
@@ -43,6 +44,7 @@ test("intern()", () => {
   }
 
   assert.throws(() => {
+    // @ts-expect-error
     $([1, {}]);
   });
   assert($([1, $({})]) === $([1, $({})]));

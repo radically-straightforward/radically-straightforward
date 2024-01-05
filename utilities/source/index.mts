@@ -4,6 +4,19 @@
 export type Intern<Type> = Readonly<Type & { [internSymbol]: true }>;
 
 /**
+ * Utility type for `intern()`.
+ */
+export type InternInnerValue =
+  | string
+  | number
+  | bigint
+  | boolean
+  | symbol
+  | undefined
+  | null
+  | Intern<unknown>;
+
+/**
  * [Interning](<https://en.wikipedia.org/wiki/Interning_(computer_science)>) a value makes it unique across the program, which is useful for checking equality with `===` (reference equality), using it as a key in a `Map`, adding it to a `Set`, and so forth:
  *
  * ```typescript
@@ -55,6 +68,8 @@ export type Intern<Type> = Readonly<Type & { [internSymbol]: true }>;
  *
  * > **Note:** Interning a value is a costly operation which grows more expensive as you intern more values. Only intern values when really necessary.
  *
+ * > **Note:** Interned objects do not preserve the order of the attributes: `$({ a: 1, b: 2 }) === $({ b: 2, a: 1 })`.
+ *
  * > **Note:** The pool of interned values is available as `intern.pool`. There’s a `FinalizationRegistry` at `intern.finalizationRegistry` that cleans up interned values that have been garbage collected.
  *
  * **Related Work**
@@ -103,9 +118,9 @@ export type Intern<Type> = Readonly<Type & { [internSymbol]: true }>;
  * - <https://twitter.com/swannodette/status/1067962983924539392>
  * - <https://gist.github.com/modernserf/c000e62d40f678cf395e3f360b9b0e43>
  */
-export function intern<T extends Array<unknown> | { [key: string]: unknown }>(
-  value: T,
-): Intern<T> {
+export function intern<
+  T extends Array<InternInnerValue> | { [key: string]: InternInnerValue },
+>(value: T): Intern<T> {
   const type = Array.isArray(value)
     ? "tuple"
     : typeof value === "object" && value !== null
@@ -153,8 +168,11 @@ export function intern<T extends Array<unknown> | { [key: string]: unknown }>(
 export const internSymbol = Symbol("intern");
 
 intern.pool = {
-  tuple: new Map<Symbol, WeakRef<Intern<unknown[]>>>(),
-  record: new Map<Symbol, WeakRef<Intern<{ [key: string]: unknown }>>>(),
+  tuple: new Map<Symbol, WeakRef<Intern<InternInnerValue[]>>>(),
+  record: new Map<
+    Symbol,
+    WeakRef<Intern<{ [key: string]: InternInnerValue }>>
+  >(),
 };
 
 intern.finalizationRegistry = new FinalizationRegistry<{

@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.0.3 · 2024-01-05
+
+- Made `intern()` more strict in terms of types and provide auxiliary types for it.
+
 ## 0.0.2 · 2024-01-05
 
 - **Breaking Change:** Modified `intern()` to be shallow, which may be easier to reason about and faster.

@@ -28,14 +28,30 @@ export type Intern<Type> = Readonly<
 
 Utility type for `intern()`.
 
+### `InternInnerValue`
+
+```typescript
+export type InternInnerValue =
+  | string
+  | number
+  | bigint
+  | boolean
+  | symbol
+  | undefined
+  | null
+  | Intern<unknown>;
+```
+
+Utility type for `intern()`.
+
 ### `intern()`
 
 ```typescript
 export function intern<
   T extends
-    | Array<unknown>
+    | Array<InternInnerValue>
     | {
-        [key: string]: unknown;
+        [key: string]: InternInnerValue;
       },
 >(value: T): Intern<T>;
 ```
@@ -90,6 +106,8 @@ $([1]) === $([1]); // => true
 > **Note:** You must not mutate an interned value. Interned values are [frozen](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/freeze) to prevent mutation.
 
 > **Note:** Interning a value is a costly operation which grows more expensive as you intern more values. Only intern values when really necessary.
+
+> **Note:** Interned objects do not preserve the order of the attributes: `$({ a: 1, b: 2 }) === $({ b: 2, a: 1 })`.
 
 > **Note:** The pool of interned values is available as `intern.pool`. There’s a `FinalizationRegistry` at `intern.finalizationRegistry` that cleans up interned values that have been garbage collected.
 
