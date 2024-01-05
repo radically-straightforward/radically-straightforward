@@ -20,7 +20,6 @@ import * as node from "@radically-straightforward/node";
 
 ```typescript
 export function shouldTerminate({
-  timeout = 10 * 1000,
   events = [
     "exit",
     "SIGHUP",
@@ -30,9 +29,12 @@ export function shouldTerminate({
     "SIGUSR2",
     "SIGBREAK",
   ],
+  timeout = 10 * 1000,
+  forcefulExitCode = 1,
 }: {
-  timeout?: number;
   events?: string[];
+  timeout?: number;
+  forcefulExitCode?: number;
 } = {}): Promise<void>;
 ```
 
@@ -45,8 +47,6 @@ Graceful termination. `await` for this function between the code that starts the
 > **Note:** Some signals, for example, `SIGKILL` sent by `kill -9`, cannot be handled and cause the process to terminate immediately without the opportunity to run any more code.
 
 > **Note:** Some of the events put the process in a state that cannot handle asynchronous functions, so the code that terminates the application should be synchronous.
-
-> **Note:** If the process is terminated forcefully, then its exit error code is `1`.
 
 **Example**
 

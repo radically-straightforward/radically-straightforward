@@ -9,8 +9,6 @@
  *
  * > **Note:** Some of the events put the process in a state that cannot handle asynchronous functions, so the code that terminates the application should be synchronous.
  *
- * > **Note:** If the process is terminated forcefully, then its exit error code is `1`.
- *
  * **Example**
  *
  * ```javascript
@@ -28,7 +26,6 @@
  * ```
  */
 export function shouldTerminate({
-  timeout = 10 * 1000,
   events = [
     "exit",
     "SIGHUP",
@@ -38,16 +35,19 @@ export function shouldTerminate({
     "SIGUSR2",
     "SIGBREAK",
   ],
+  timeout = 10 * 1000,
+  forcefulExitCode = 1,
 }: {
-  timeout?: number;
   events?: string[];
+  timeout?: number;
+  forcefulExitCode?: number;
 } = {}): Promise<void> {
   return new Promise((resolve) => {
     for (const event of events)
-      process.on(event, async () => {
+      process.on(event, () => {
         resolve();
         setTimeout(() => {
-          process.exit(1);
+          process.exit(forcefulExitCode);
         }, timeout).unref();
       });
   });

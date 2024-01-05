@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- `shouldTerminate()`: Added the option of specifying a different `forcefulExitCode`.
+
 ## 2.0.0 · 2024-01-04
 
 - **Breaking Change:** `eventLoopActive()` has been replaced with `shouldTerminate()`, which not only listens to events that should cause the application to stop, but also terminates the application forcefully if it doesn’t terminate gracefully within a timeout.
