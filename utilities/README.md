@@ -157,4 +157,12 @@ Similar to `collections-deep-equal` but either incomplete, or lacking type defin
 - <https://twitter.com/swannodette/status/1067962983924539392>
 - <https://gist.github.com/modernserf/c000e62d40f678cf395e3f360b9b0e43>
 
+### `randomString()`
+
+```typescript
+export function randomString();
+```
+
+A fast random string generator. The generated strings are 10 or 11 characters in length. The generated strings include the characters `[0-9a-z]`. The generated strings are **not** cryptographically secure—if you need that, then use [`crypto-random-string`](https://npm.im/crypto-random-string).
+
 <!-- DOCUMENTATION END: ./source/index.mts -->

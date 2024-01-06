@@ -55,6 +55,12 @@ test("intern()", () => {
   });
 });
 
+test("randomString()", () => {
+  const randomString = utilities.randomString();
+  assert(10 <= randomString.length && randomString.length <= 11);
+  assert.match(randomString, /^[0-9a-z]+$/);
+});
+
 // test(
 //   "backgroundJob()",
 //   {

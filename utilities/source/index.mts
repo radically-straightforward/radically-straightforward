@@ -182,23 +182,28 @@ intern.finalizationRegistry = new FinalizationRegistry<{
   intern.pool[type].delete(key);
 });
 
+/**
+ * A fast random string generator. The generated strings are 10 or 11 characters in length. The generated strings include the characters `[0-9a-z]`. The generated strings are **not** cryptographically secure—if you need that, then use [`crypto-random-string`](https://npm.im/crypto-random-string).
+ */
+export function randomString() {
+  return Math.random().toString(36).slice(2);
+}
+
 /*
 
 
-Math.random().toString(36).slice(2)
 
 
 
-
-https://npm.im/package/p-timeout
-https://npm.im/package/delay
-https://npm.im/package/sleep-promise
-https://npm.im/package/promise-timeout
-https://npm.im/package/sleep
-https://npm.im/package/timeout-as-promise
-https://npm.im/package/delayed
-https://npm.im/package/sleep-async
-https://npm.im/package/promise.timeout
+https://npm.im/p-timeout
+https://npm.im/delay
+https://npm.im/sleep-promise
+https://npm.im/promise-timeout
+https://npm.im/sleep
+https://npm.im/timeout-as-promise
+https://npm.im/delayed
+https://npm.im/sleep-async
+https://npm.im/promise.timeout
 
 */
 // /**
