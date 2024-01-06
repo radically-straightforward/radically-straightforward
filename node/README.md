@@ -30,11 +30,11 @@ export function shouldTerminate({
     "SIGBREAK",
   ],
   timeout = 10 * 1000,
-  forcefulExitCode = 1,
+  forcefulTerminationExitCode = 1,
 }: {
   events?: string[];
   timeout?: number;
-  forcefulExitCode?: number;
+  forcefulTerminationExitCode?: number;
 } = {}): Promise<void>;
 ```
 

@@ -36,18 +36,18 @@ export function shouldTerminate({
     "SIGBREAK",
   ],
   timeout = 10 * 1000,
-  forcefulExitCode = 1,
+  forcefulTerminationExitCode = 1,
 }: {
   events?: string[];
   timeout?: number;
-  forcefulExitCode?: number;
+  forcefulTerminationExitCode?: number;
 } = {}): Promise<void> {
   return new Promise((resolve) => {
     for (const event of events)
       process.on(event, () => {
         resolve();
         setTimeout(() => {
-          process.exit(forcefulExitCode);
+          process.exit(forcefulTerminationExitCode);
         }, timeout).unref();
       });
   });

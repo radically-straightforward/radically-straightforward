@@ -1,8 +1,8 @@
 # Changelog
 
-## Unreleased
+## 2.0.1 · 2024-01-06
 
-- `shouldTerminate()`: Added the option of specifying a different `forcefulExitCode`.
+- `shouldTerminate()`: Added the option of specifying a `forcefulTerminationExitCode`.
 
 ## 2.0.0 · 2024-01-04
 
