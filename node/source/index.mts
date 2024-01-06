@@ -13,6 +13,7 @@
  *
  * ```javascript
  * import express from "express";
+ * import * as utilities from "@radically-straightforward/utilities";
  * import * as node from "@radically-straightforward/node";
  *
  * const application = express();
@@ -20,9 +21,18 @@
  *   response.send("Hello world");
  * });
  * const server = application.listen(3000);
+ * const backgroundJob = utilities.backgroundJob(
+ *   { interval: 3 * 1000 },
+ *   async () => {
+ *     console.log("Background job.");
+ *   },
+ * );
+ * console.log("shouldTerminate(): Press ⌃C to gracefully terminate...");
  * await node.shouldTerminate();
- * // If you comment the line below the ‘server’ doesn’t stop and the application remains running for 10 seconds, when ‘shouldTerminate()’ terminates it forcefully.
+ * console.log("shouldTerminate(): Starting graceful termination...");
+ * // If you comment one of the lines below the application remains running for 10 seconds, when ‘shouldTerminate()’ terminates it forcefully.
  * server.close();
+ * backgroundJob.stop();
  * ```
  */
 export function shouldTerminate({

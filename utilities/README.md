@@ -86,7 +86,7 @@ backgroundJob.stop();
 export function sleep(duration: number): Promise<void>;
 ```
 
-A promisified version of `setTimeout()`. It doesn’t offer a way to `clearTimeout()`. Useful in the browser—in Node.js you’re better served by [`timersPromises.setTimeout()`](https://nodejs.org/dist/latest-v21.x/docs/api/timers.html#timerspromisessettimeoutdelay-value-options).
+A promisified version of `setTimeout()`. Bare-bones: It doesn’t even offer a way to `clearTimeout()`. Useful in JavaScript that may run in the browser—if you’re only targeting Node.js then you’re better served by [`timersPromises.setTimeout()`](https://nodejs.org/dist/latest-v21.x/docs/api/timers.html#timerspromisessettimeoutdelay-value-options).
 
 ### `randomString()`
 
