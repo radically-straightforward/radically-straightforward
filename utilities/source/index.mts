@@ -1,4 +1,112 @@
 /**
+ * Start a background job that runs every `interval`.
+ *
+ * This is different from `setInterval()` in the following ways:
+ *
+ * 1. The interval counts **between** jobs, so slow background jobs don’t get called concurrently:
+ *
+ *    ```
+ *    setInterval()
+ *    | SLOW BACKGROUND JOB |
+ *    | INTERVAL | SLOW BACKGROUND JOB |
+ *               | INTERVAL | ...
+ *
+ *    backgroundJob()
+ *    | SLOW BACKGROUND JOB | INTERVAL | SLOW BACKGROUND JOB | INTERVAL | ...
+ *    ```
+ *
+ * 2. We introduce a random `intervalVariance` to avoid many background jobs from starting at the same time and overloading the machine.
+ *
+ * 3. You may use `backgroundJob.run()` to force the background job to run right away. If the background job is already running, calling `backgroundJob.run()` schedules it to run again as soon as possible (not waiting the interval).
+ *
+ * 4. You may use `backgroundJob.stop()` to stop the background job. If the background job is running, it will finish but it will not be scheduled to run again. This is similar to how an HTTP server may terminate gracefully by stopping accepting new requests but finishing responding to existing requests. After a job has been stopped, you may not `backgroundJob.run()` it again (calling `backgroundJob.run()` has no effect).
+ *
+ * **Example**
+ *
+ * ```javascript
+ * import * as utilities from "@radically-straightforward/utilities";
+ * import * as node from "@radically-straightforward/node";
+ *
+ * const backgroundJob = utilities.backgroundJob(
+ *   { interval: 3 * 1000 },
+ *   async () => {
+ *     console.log("backgroundJob(): Running background job...");
+ *     await utilities.sleep(3 * 1000);
+ *     console.log("backgroundJob(): ...finished running background job.");
+ *   },
+ * );
+ * console.log(
+ *   "backgroundJob(): Press ⌃Z to force background job to run and ⌃C to continue...",
+ * );
+ * process.on("SIGTSTP", () => {
+ *   backgroundJob.run();
+ * });
+ * await node.shouldTerminate();
+ * backgroundJob.stop();
+ * ```
+ */
+export function backgroundJob(
+  {
+    interval,
+    intervalVariance = 0.1,
+  }: { interval: number; intervalVariance?: number },
+  job: () => void | Promise<void>,
+): { run: () => void; stop: () => void } {
+  let state:
+    | "initial"
+    | "running"
+    | "runningAndMarkedForRerun"
+    | "sleeping"
+    | "stopped" = "initial";
+  let timeout: any = undefined;
+  async function run() {
+    state = "running";
+    await job();
+    if (state === "running" || state === "runningAndMarkedForRerun") {
+      timeout = setTimeout(
+        run,
+        (state as any) === "runningAndMarkedForRerun"
+          ? 0
+          : interval + interval * intervalVariance * Math.random(),
+      );
+      state = "sleeping";
+    }
+  }
+  run();
+  return {
+    run: () => {
+      switch (state) {
+        case "sleeping":
+          clearTimeout(timeout);
+          run();
+          break;
+        case "running":
+          state = "runningAndMarkedForRerun";
+          break;
+      }
+    },
+    stop: () => {
+      if (state === "sleeping") clearTimeout(timeout);
+      state = "stopped";
+    },
+  };
+}
+
+/**
+ * A promisified version of `setTimeout()`. It doesn’t offer a way to `clearTimeout()`. Useful in the browser—in Node.js you’re better served by [`timersPromises.setTimeout()`](https://nodejs.org/dist/latest-v21.x/docs/api/timers.html#timerspromisessettimeoutdelay-value-options).
+ */
+export function sleep(duration: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, duration));
+}
+
+/**
+ * A fast random string generator. The generated strings are 10 or 11 characters in length. The generated strings include the characters `[0-9a-z]`. The generated strings are **not** cryptographically secure—if you need that, then use [`crypto-random-string`](https://npm.im/crypto-random-string).
+ */
+export function randomString(): string {
+  return Math.random().toString(36).slice(2);
+}
+
+/**
  * Utility type for `intern()`.
  */
 export type Intern<Type> = Readonly<Type & { [internSymbol]: true }>;
@@ -181,111 +289,3 @@ intern.finalizationRegistry = new FinalizationRegistry<{
 }>(({ type, key }) => {
   intern.pool[type].delete(key);
 });
-
-/**
- * A fast random string generator. The generated strings are 10 or 11 characters in length. The generated strings include the characters `[0-9a-z]`. The generated strings are **not** cryptographically secure—if you need that, then use [`crypto-random-string`](https://npm.im/crypto-random-string).
- */
-export function randomString(): string {
-  return Math.random().toString(36).slice(2);
-}
-
-/**
- * A promisified version of `setTimeout()`. It doesn’t offer a way to `clearTimeout()`. Useful in the browser—in Node.js you’re better served by [`timersPromises.setTimeout()`](https://nodejs.org/dist/latest-v21.x/docs/api/timers.html#timerspromisessettimeoutdelay-value-options).
- */
-export function sleep(duration: number): Promise<void> {
-  return new Promise((resolve) => setTimeout(resolve, duration));
-}
-
-/**
- * Start a background job that runs every `interval`.
- *
- * This is different from `setInterval()` in the following ways:
- *
- * 1. The interval counts **between** jobs, so slow background jobs don’t get called concurrently:
- *
- *    ```
- *    setInterval()
- *    | SLOW BACKGROUND JOB |
- *    | INTERVAL | SLOW BACKGROUND JOB |
- *               | INTERVAL | ...
- *
- *    backgroundJob()
- *    | SLOW BACKGROUND JOB | INTERVAL | SLOW BACKGROUND JOB | INTERVAL | ...
- *    ```
- *
- * 2. We introduce a random `intervalVariance` to avoid many background jobs from starting at the same time and overloading the machine.
- *
- * 3. You may use `backgroundJob.run()` to force the background job to run right away. If the background job is already running, calling `backgroundJob.run()` schedules it to run again as soon as possible (not waiting the interval).
- *
- * 4. You may use `backgroundJob.stop()` to stop the background job. If the background job is running, it will finish but it will not be scheduled to run again. This is similar to how an HTTP server may terminate gracefully by stopping accepting new requests but finishing responding to existing requests. After a job has been stopped, you may not `backgroundJob.run()` it again (calling `backgroundJob.run()` has no effect).
- *
- * **Example**
- *
- * ```javascript
- * import * as utilities from "@radically-straightforward/utilities";
- * import * as node from "@radically-straightforward/node";
- *
- * const backgroundJob = utilities.backgroundJob(
- *   { interval: 3 * 1000 },
- *   async () => {
- *     console.log("backgroundJob(): Running background job...");
- *     await utilities.sleep(3 * 1000);
- *     console.log("backgroundJob(): ...finished running background job.");
- *   },
- * );
- * console.log(
- *   "backgroundJob(): Press ⌃Z to force background job to run and ⌃C to continue...",
- * );
- * process.on("SIGTSTP", () => {
- *   backgroundJob.run();
- * });
- * await node.shouldTerminate();
- * backgroundJob.stop();
- * ```
- */
-export function backgroundJob(
-  {
-    interval,
-    intervalVariance = 0.1,
-  }: { interval: number; intervalVariance?: number },
-  job: () => void | Promise<void>,
-): { run: () => void; stop: () => void } {
-  let state:
-    | "initial"
-    | "running"
-    | "runningAndMarkedForRerun"
-    | "sleeping"
-    | "stopped" = "initial";
-  let timeout: any = undefined;
-  async function run() {
-    state = "running";
-    await job();
-    if (state === "running" || state === "runningAndMarkedForRerun") {
-      timeout = setTimeout(
-        run,
-        (state as any) === "runningAndMarkedForRerun"
-          ? 0
-          : interval + interval * intervalVariance * Math.random(),
-      );
-      state = "sleeping";
-    }
-  }
-  run();
-  return {
-    run: () => {
-      switch (state) {
-        case "sleeping":
-          clearTimeout(timeout);
-          run();
-          break;
-        case "running":
-          state = "runningAndMarkedForRerun";
-          break;
-      }
-    },
-    stop: () => {
-      if (state === "sleeping") clearTimeout(timeout);
-      state = "stopped";
-    },
-  };
-}
