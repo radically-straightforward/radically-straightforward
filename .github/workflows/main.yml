@@ -62,13 +62,14 @@ jobs:
       matrix:
         package:
           - monitor
-    if: ${{ startsWith(github.ref, format('refs/tags/{0}--', matrix.package)) }}
     needs: applications
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/download-artifact@main
+      - if: ${{ startsWith(github.ref, format('refs/tags/{0}--', matrix.package)) }}
+        uses: actions/download-artifact@main
         with:
           pattern: ${{ matrix.package }}--*
-      - uses: softprops/action-gh-release@master
+      - if: ${{ startsWith(github.ref, format('refs/tags/{0}--', matrix.package)) }}
+        uses: softprops/action-gh-release@master
         with:
           files: ./**/*.*
