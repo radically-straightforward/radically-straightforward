@@ -1,7 +1,7 @@
 {
   "scripts": {
     "prepare": "tsc && documentation",
-    "start": "nodemon --watch \"./package.json\" --watch \"./source/**/*.mts\" --watch \"./configuration/**/*.mjs\" --ext \"*\" --exec \"npm run prepare && node ./build/index.mjs ./configuration/development.mjs\"",
+    "start": "concurrently \"maildev --web 8000 --smtp 8001 --mail-directory ./data/ --ip localhost\" \"nodemon --watch \\\"./package.json\\\" --watch \\\"./source/**/*.mts\\\" --watch \\\"./configuration/**/*.mjs\\\" --ext \\\"*\\\" --exec \\\"npm run prepare && node ./build/index.mjs ./configuration/development.mjs\\\"\"",
     "test": "npm run prepare && node --test && prettier --check \"./README.md\" --check \"./package.json\" --check \"./tsconfig.json\" --check \"./source/**/*.mts\""
   },
   "dependencies": {
@@ -18,6 +18,9 @@
     "@radically-straightforward/tsconfig": "^1.0.0",
     "@types/node": "^20.10.8",
     "@types/nodemailer": "^6.4.14",
+    "concurrently": "^8.2.2",
+    "maildev": "^2.1.0",
+    "nodemon": "^3.0.2",
     "prettier": "^3.1.1",
     "typescript": "^5.3.3"
   },
