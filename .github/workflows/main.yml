@@ -15,6 +15,7 @@ jobs:
           - caddy
           - documentation
           - package
+          - monitor
     runs-on: ${{ matrix.os }}-latest
     defaults:
       run:
