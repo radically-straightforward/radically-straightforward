@@ -1,20 +1,22 @@
 {
   "scripts": {
-    "prepare": "tsc",
-    "start": "nodemon --watch \"./source/**/*.mts\" --watch \"./configuration/**/*.mjs\" --ext \"*\" --exec \"npm run prepare && node ./build/index.mjs ./configuration/development.mjs\"",
-    "test": "npm run prepare && prettier --check \"./README.md\" --check \"./package.json\" --check \"./tsconfig.json\" --check \"./source/**/*.mts\""
+    "prepare": "tsc && documentation",
+    "start": "nodemon --watch \"./package.json\" --watch \"./source/**/*.mts\" --watch \"./configuration/**/*.mjs\" --ext \"*\" --exec \"npm run prepare && node ./build/index.mjs ./configuration/development.mjs\"",
+    "test": "npm run prepare && node --test && prettier --check \"./README.md\" --check \"./package.json\" --check \"./tsconfig.json\" --check \"./source/**/*.mts\""
   },
   "dependencies": {
     "@radically-straightforward/html": "^1.0.0",
-    "@radically-straightforward/node": "^1.0.0",
+    "@radically-straightforward/node": "^2.0.1",
+    "@radically-straightforward/utilities": "^1.0.0",
     "commander": "^11.1.0",
     "got": "^14.0.0",
-    "nodemailer": "^6.9.7"
+    "nodemailer": "^6.9.8"
   },
   "devDependencies": {
+    "@radically-straightforward/documentation": "^1.0.1",
     "@radically-straightforward/package": "^1.0.0",
     "@radically-straightforward/tsconfig": "^1.0.0",
-    "@types/node": "^20.10.5",
+    "@types/node": "^20.10.8",
     "@types/nodemailer": "^6.4.14",
     "prettier": "^3.1.1",
     "typescript": "^5.3.3"
