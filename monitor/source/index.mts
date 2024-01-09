@@ -118,7 +118,8 @@ ${error?.stack}
     );
 
     await node.shouldTerminate();
+
     backgroundJob.stop();
-    console.log("STOPPED.");
+    application.log("STOPPED.");
   })
   .parseAsync();
