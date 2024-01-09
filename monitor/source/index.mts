@@ -37,6 +37,21 @@ await commander.program
       },
     };
 
+    // console.log("MONITOR IS STARTING...");
+    // const job = utilities.backgroundJob({ interval: 3 * 1000 }, async () => {
+    //   await nodemailer
+    //     .createTransport({ host: "localhost", port: 8001 })
+    //     .sendMail({
+    //       from: "Monitor <monitor@leafac.com>",
+    //       to: "Leandro Facchinetti <system-administrator@leafac.com>",
+    //       subject: `Example of email`,
+    //       html: html`Hello at ${new Date().toISOString()}`,
+    //     });
+    // });
+    // await node.shouldTerminate();
+    // console.log("...MONITOR IS SHUTTING DOWN.");
+    // job.stop();
+
     //     application.configuration.interval ??= 5 * 60 * 1000;
 
     //     application.log(
