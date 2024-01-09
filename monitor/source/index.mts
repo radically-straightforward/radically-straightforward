@@ -17,39 +17,25 @@ await commander.program
   .allowExcessArguments(false)
   .showHelpAfterError()
   .action(async (configuration: string) => {
-    console.log("MONITOR IS STARTING...");
-    const job = utilities.backgroundJob({ interval: 3 * 1000 }, async () => {
-      await nodemailer
-        .createTransport({ host: "localhost", port: 8001 })
-        .sendMail({
-          from: "Monitor <monitor@leafac.com>",
-          to: "Leandro Facchinetti <system-administrator@leafac.com>",
-          subject: `Example of email`,
-          html: html`Hello at ${new Date().toISOString()}`,
-        });
-    });
-    await node.shouldTerminate();
-    console.log("...MONITOR IS SHUTTING DOWN.");
-    job.stop();
-    //     const application: {
-    //       version: string;
-    //       configuration: {
-    //         targets: Got.OptionsOfUnknownResponseBody[];
-    //         email: {
-    //           options: any;
-    //           defaults: nodemailer.SendMailOptions;
-    //         };
-    //         interval: number;
-    //       };
-    //       log: (...messageParts: string[]) => void;
-    //     } = {
-    //       version,
-    //       configuration: (await import(url.pathToFileURL(configuration).href))
-    //         .default,
-    //       log: (...messageParts) => {
-    //         console.log([new Date().toISOString(), ...messageParts].join(" \t"));
-    //       },
-    //     };
+    const application: {
+      version: string;
+      configuration: {
+        targets: Got.OptionsOfUnknownResponseBody[];
+        email: {
+          options: any;
+          defaults: nodemailer.SendMailOptions;
+        };
+        interval: number;
+      };
+      log: (...messageParts: string[]) => void;
+    } = {
+      version,
+      configuration: (await import(url.pathToFileURL(configuration).href))
+        .default,
+      log: (...messageParts) => {
+        console.log([new Date().toISOString(), ...messageParts].join(" \t"));
+      },
+    };
 
     //     application.configuration.interval ??= 5 * 60 * 1000;
 
