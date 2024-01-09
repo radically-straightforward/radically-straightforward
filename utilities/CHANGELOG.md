@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.1 · 2024-01-09
+
+- Added `log()`.
+
 ## 1.0.0 · 2024-01-06
 
 - Added `backgroundJob()`.
