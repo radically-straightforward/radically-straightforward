@@ -45,6 +45,10 @@ test("randomString()", () => {
   assert.match(randomString, /^[0-9a-z]+$/);
 });
 
+test("randomString()", () => {
+  utilities.log("EXAMPLE", "OF", "TAB-SEPARATED LOGGING");
+});
+
 test("intern()", () => {
   // @ts-expect-error
   assert(([1] === [1]) === false);

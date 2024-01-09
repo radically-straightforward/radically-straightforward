@@ -96,6 +96,14 @@ export function randomString(): string;
 
 A fast random string generator. The generated strings are 10 or 11 characters in length. The generated strings include the characters `[0-9a-z]`. The generated strings are **not** cryptographically secure—if you need that, then use [`crypto-random-string`](https://npm.im/crypto-random-string).
 
+### `log()`
+
+```typescript
+export function log(...messageParts: string[]): void;
+```
+
+Tab-separated logging.
+
 ### `Intern`
 
 ```typescript

@@ -107,6 +107,13 @@ export function randomString(): string {
 }
 
 /**
+ * Tab-separated logging.
+ */
+export function log(...messageParts: string[]): void {
+  console.log(messageParts.join(" \t"));
+}
+
+/**
  * Utility type for `intern()`.
  */
 export type Intern<Type> = Readonly<Type & { [internSymbol]: true }>;
