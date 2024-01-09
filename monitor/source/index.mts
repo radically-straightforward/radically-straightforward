@@ -33,118 +33,92 @@ await commander.program
       configuration: (await import(url.pathToFileURL(configuration).href))
         .default,
       log: (...messageParts) => {
-        console.log([new Date().toISOString(), ...messageParts].join(" \t"));
+        utilities.log(new Date().toISOString(), ...messageParts);
       },
     };
 
-    // console.log("MONITOR IS STARTING...");
-    // const job = utilities.backgroundJob({ interval: 3 * 1000 }, async () => {
-    //   await nodemailer
-    //     .createTransport({ host: "localhost", port: 8001 })
-    //     .sendMail({
-    //       from: "Monitor <monitor@leafac.com>",
-    //       to: "Leandro Facchinetti <system-administrator@leafac.com>",
-    //       subject: `Example of email`,
-    //       html: html`Hello at ${new Date().toISOString()}`,
-    //     });
-    // });
-    // await node.shouldTerminate();
-    // console.log("...MONITOR IS SHUTTING DOWN.");
-    // job.stop();
+    application.configuration.interval ??= 5 * 60 * 1000;
 
-    //     application.configuration.interval ??= 5 * 60 * 1000;
+    application.log(
+      "MONITOR",
+      application.version,
+      "STARTING...",
+      JSON.stringify(application.configuration.targets),
+    );
 
-    //     application.log(
-    //       "MONITOR",
-    //       application.version,
-    //       "STARTING...",
-    //       JSON.stringify(application.configuration.targets),
-    //     );
+    const alertedTargets = new Set<
+      (typeof application)["configuration"]["targets"][number]
+    >();
 
-    //     process.once("exit", () => {
-    //       application.log("STOPPED");
-    //     });
+    const backgroundJob = utilities.backgroundJob(
+      { interval: application.configuration.interval },
+      async () => {
+        for (const target of application.configuration.targets) {
+          application.log("STARTING...", JSON.stringify(target));
 
-    //     const notifiedTargets = new Set<
-    //       (typeof application)["configuration"]["targets"][number]
-    //     >();
+          try {
+            const response = await got({
+              timeout: { request: 5 * 1000 },
+              retry: { limit: 5 },
+              ...target,
+            });
+            alertedTargets.delete(target);
+            application.log(
+              "SUCCESS",
+              JSON.stringify(target),
+              String(response.statusCode),
+              JSON.stringify(response.timings),
+            );
+          } catch (error: any) {
+            application.log(
+              "ERROR",
+              JSON.stringify(target),
+              String(error),
+              error?.stack,
+            );
+            if (alertedTargets.has(target))
+              application.log(
+                "SKIPPING SENDING ALERT BECAUSE PREVIOUS ERROR HASN’T BEEN RESOLVED YET...",
+                JSON.stringify(target),
+              );
+            else
+              try {
+                const sentMessageInfo = await nodemailer
+                  .createTransport(application.configuration.email.options)
+                  .sendMail({
+                    ...application.configuration.email.defaults,
+                    subject: `⚠️ MONITOR: ‘${JSON.stringify(target)}’`,
+                    html: html`
+                      <pre>
+${String(error)}
 
-    //     (async () => {
-    //       while (true) {
-    //         for (const monitor of application.configuration.monitors) {
-    //           application.log("STARTING...", JSON.stringify(monitor.target));
+${error?.stack}
+</pre>
+                    `,
+                  });
+                alertedTargets.add(target);
+                application.log(
+                  "ALERT SENT",
+                  JSON.stringify(target),
+                  sentMessageInfo.response ?? "",
+                );
+              } catch (error: any) {
+                application.log(
+                  "CATASTROPHIC ERROR TRYING TO SEND ALERT",
+                  JSON.stringify(target),
+                  String(error),
+                  error?.stack,
+                );
+              }
+          }
 
-    //           try {
-    //             // timeout: {
-    //             //   request: 5 * 1000,
-    //             // },
-    //             // retry: {
-    //             //   limit: 5,
-    //             // },
-    //             const response = await gotClient(monitor.target);
-    //             notifiedTargets.delete(monitor);
-    //             application.log(
-    //               "SUCCESS",
-    //               JSON.stringify(monitor.target),
-    //               String(response.statusCode),
-    //               JSON.stringify(response.timings),
-    //             );
-    //           } catch (error: any) {
-    //             application.log(
-    //               "ERROR",
-    //               JSON.stringify(monitor.target),
-    //               String(error),
-    //               error?.stack,
-    //             );
-    //             if (notifiedTargets.has(monitor))
-    //               application.log(
-    //                 "SKIPPING SENDING ALERT BECAUSE PREVIOUS ERROR HASN’T BEEN RESOLVED YET...",
-    //                 JSON.stringify(monitor.target),
-    //               );
-    //             else {
-    //               try {
-    //                 const sentMessageInfo = await nodemailer
-    //                   .createTransport(
-    //                     monitor.email.options,
-    //                     monitor.email.defaults,
-    //                   )
-    //                   .sendMail({
-    //                     subject: `⚠️ ‘${JSON.stringify(monitor.target)}’ IS DOWN`,
-    //                     html: html`<pre>
-    // ${String(error)}
+          application.log("FINISHED.", JSON.stringify(target));
+        }
+      },
+    );
 
-    // ${error?.stack}
-    // </pre>`,
-    //                   });
-    //                 notifiedTargets.add(monitor);
-    //                 application.log(
-    //                   "ALERT SENT",
-    //                   JSON.stringify(monitor.target),
-    //                   sentMessageInfo.response ?? "",
-    //                 );
-    //               } catch (error: any) {
-    //                 application.log(
-    //                   "CATASTROPHIC ERROR TRYING TO SEND ALERT",
-    //                   JSON.stringify(monitor.target),
-    //                   String(error),
-    //                   error?.stack,
-    //                 );
-    //               }
-    //             }
-    //           }
-
-    //           application.log("FINISHED", JSON.stringify(monitor.target));
-    //         }
-
-    //         await timers.setTimeout(application.configuration.interval, undefined, {
-    //           ref: false,
-    //         });
-    //       }
-    //     })();
-
-    //     await eventLoopActive;
-
-    //     await timers.setTimeout(10 * 1000, undefined, { ref: false });
-    //     process.exit(1);
+    await node.shouldTerminate();
+    backgroundJob.stop();
+    console.log("STOPPED.");
   })
   .parseAsync();
