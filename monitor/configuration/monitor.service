@@ -3,7 +3,7 @@ Description=Monitor
 After=network.target
 
 [Service]
-ExecStart=/root/monitor/monitor /root/monitor/configuration.mjs
+ExecStart=/root/monitor/monitor/monitor /root/monitor/configuration.mjs
 User=root
 Restart=always
 
