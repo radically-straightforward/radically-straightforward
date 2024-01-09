@@ -62,7 +62,7 @@ jobs:
       matrix:
         package:
           - monitor
-    if: startsWith(github.ref, format('refs/tags/{0}--', matrix.package))
+    if: ${{ startsWith(github.ref, format('refs/tags/{0}--', matrix.package)) }}
     needs: applications
     runs-on: ubuntu-latest
     steps:
