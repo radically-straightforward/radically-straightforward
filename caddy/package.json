@@ -25,7 +25,7 @@
   "scripts": {
     "postinstall": "node ./scripts.mjs postinstall",
     "preuninstall": "node ./scripts.mjs preuninstall",
-    "test": "node --test && prettier --check \"./README.md\" --check \"./package.json\" --check \"./scripts.mjs\" --check \"./scripts.test.mjs\""
+    "test": "node --test && prettier --check \"./README.md\" --check \"./CHANGELOG.md\" --check \"./package.json\" --check \"./scripts.mjs\" --check \"./scripts.test.mjs\""
   },
   "dependencies": {
     "download": "^8.0.0",

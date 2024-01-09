@@ -2,7 +2,7 @@
   "scripts": {
     "prepare": "tsc && documentation",
     "start": "concurrently \"maildev --web 8000 --smtp 8001 --mail-directory ./data/ --ip localhost\" \"nodemon --watch \\\"./package.json\\\" --watch \\\"./source/**/*.mts\\\" --watch \\\"./configuration/**/*.mjs\\\" --ext \\\"*\\\" --exec \\\"npm run prepare && node ./build/index.mjs ./configuration/development.mjs\\\"\"",
-    "test": "npm run prepare && prettier --check \"./README.md\" --check \"./package.json\" --check \"./tsconfig.json\" --check \"./source/**/*.mts\""
+    "test": "npm run prepare && prettier --check \"./README.md\" --check \"./CHANGELOG.md\" --check \"./package.json\" --check \"./tsconfig.json\" --check \"./source/**/*.mts\""
   },
   "dependencies": {
     "@radically-straightforward/html": "^1.0.0",

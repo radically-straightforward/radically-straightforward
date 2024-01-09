@@ -21,7 +21,7 @@
     "access": "public"
   },
   "scripts": {
-    "test": "prettier --check \"./README.md\" --check \"./package.json\" --check \"./tsconfig.json\""
+    "test": "prettier --check \"./README.md\" --check \"./CHANGELOG.md\" --check \"./package.json\" --check \"./tsconfig.json\""
   },
   "devDependencies": {
     "prettier": "^3.1.0"

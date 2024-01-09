@@ -24,7 +24,7 @@
   "bin": "./build/index.mjs",
   "scripts": {
     "prepare": "tsc && documentation",
-    "test": "npm run prepare && node --test && prettier --check \"./README.md\" --check \"./package.json\" --check \"./tsconfig.json\" --check \"./source/**/*.mts\""
+    "test": "npm run prepare && node --test && prettier --check \"./README.md\" --check \"./CHANGELOG.md\" --check \"./package.json\" --check \"./tsconfig.json\" --check \"./source/**/*.mts\""
   },
   "dependencies": {
     "archiver": "^6.0.1",

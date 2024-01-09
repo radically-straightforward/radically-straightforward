@@ -29,7 +29,7 @@
   "types": "./build/index.d.mts",
   "scripts": {
     "prepare": "tsc && postcss --use postcss-nested --use autoprefixer --output ./build/static/index.css ./static/index.css && documentation",
-    "test": "npm run prepare && node --test && prettier --check \"./README.md\" --check \"./package.json\" --check \"./tsconfig.json\" --check \"./source/**/*.mts\" --check \"./static/**/*.css\""
+    "test": "npm run prepare && node --test && prettier --check \"./README.md\" --check \"./CHANGELOG.md\" --check \"./package.json\" --check \"./tsconfig.json\" --check \"./source/**/*.mts\" --check \"./static/**/*.css\""
   },
   "devDependencies": {
     "@radically-straightforward/documentation": "^1.0.1",
