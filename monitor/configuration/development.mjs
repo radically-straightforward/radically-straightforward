@@ -4,10 +4,7 @@ export default {
     { url: "https://non-existent.leafac.com" },
   ],
   email: {
-    options: {
-      streamTransport: true,
-      buffer: true,
-    },
+    options: { host: "localhost", port: 8001 },
     defaults: {
       from: "Monitor <monitor@leafac.com>",
       to: "Leandro Facchinetti <system-administrator@leafac.com>",

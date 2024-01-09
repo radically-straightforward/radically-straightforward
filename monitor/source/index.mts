@@ -3,8 +3,9 @@ import * as commander from "commander";
 import { got } from "got";
 import * as Got from "got";
 import nodemailer from "nodemailer";
-import * as node from "@radically-straightforward/node";
+import * as utilities from "@radically-straightforward/utilities";
 import html from "@radically-straightforward/html";
+import * as node from "@radically-straightforward/node";
 
 const version = "1.0.0";
 
@@ -17,8 +18,19 @@ await commander.program
   .showHelpAfterError()
   .action(async (configuration: string) => {
     console.log("MONITOR IS STARTING...");
+    const job = utilities.backgroundJob({ interval: 3 * 1000 }, async () => {
+      await nodemailer
+        .createTransport({ host: "localhost", port: 8001 })
+        .sendMail({
+          from: "Monitor <monitor@leafac.com>",
+          to: "Leandro Facchinetti <system-administrator@leafac.com>",
+          subject: `Example of email`,
+          html: html`Hello at ${new Date().toISOString()}`,
+        });
+    });
     await node.shouldTerminate();
     console.log("...MONITOR IS SHUTTING DOWN.");
+    job.stop();
     //     const application: {
     //       version: string;
     //       configuration: {
