@@ -89,14 +89,17 @@ test("intern()", () => {
     assert(set.has($([1])));
   }
 
-  assert.throws(() => {
-    // @ts-expect-error
-    $([1, {}]);
-  });
-  assert($([1, $({})]) === $([1, $({})]));
+  {
+    console.log("1");
+    assert.throws(() => {
+      // @ts-expect-error
+      $([1, {}]);
+    });
+    assert($([1, $({})]) === $([1, $({})]));
 
-  assert.throws(() => {
-    // @ts-expect-error
-    $([1])[0] = 2;
-  });
+    assert.throws(() => {
+      // @ts-expect-error
+      $([1])[0] = 2;
+    });
+  }
 });

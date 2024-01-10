@@ -236,24 +236,6 @@ export type InternInnerValue =
 export function intern<
   T extends Array<InternInnerValue> | { [key: string]: InternInnerValue },
 >(value: T): Intern<T> {
-  const type = Array.isArray(value)
-    ? "tuple"
-    : typeof value === "object" && value !== null
-      ? "record"
-      : (() => {
-          throw new Error(`Failed to intern value.`);
-        })();
-  const keys = Object.keys(value);
-  for (const internWeakRef of intern.pool[type].values()) {
-    const internValue = internWeakRef.deref();
-    if (
-      internValue === undefined ||
-      keys.length !== Object.keys(internValue).length
-    )
-      continue;
-    if (keys.every((key) => (value as any)[key] === (internValue as any)[key]))
-      return internValue as any;
-  }
   for (const innerValue of Object.values(value))
     if (
       !(
@@ -272,27 +254,86 @@ export function intern<
       throw new Error(
         `Failed to intern value because of non-interned inner value.`,
       );
-  const key = Symbol();
-  (value as any)[internSymbol] = true;
-  Object.freeze(value);
-  intern.pool[type].set(key, new WeakRef(value as any));
-  intern.finalizationRegistry.register(value, { type, key });
+
+  const entries = Array.isArray(value)
+    ? value.entries()
+    : Object.entries(value).sort(([aKey], [bKey]) => aKey.localeCompare(bKey));
+
+  // Find leaf node, creating intermediate nodes as necessary
+  let node = intern.rootInternNode;
+  for (const [key, innerValue] of entries) {
+    if (node.children === undefined) node.children = new Map();
+    if (!node.children.has(key)) node.children.set(key, new Map());
+    const valueMap = node.children.get(key)!;
+    if (!valueMap.has(innerValue))
+      valueMap.set(innerValue, { parent: node, key: key, value: innerValue });
+    node = valueMap.get(innerValue)!;
+  }
+
+  // Special case empty object
+  if (node.root) {
+    return (Array.isArray(value) ? nullTuple : nullRecord) as any;
+  }
+
+  // If we already have a value, return it
+  if (node.finalValue !== undefined) return node.finalValue.deref()!;
+
+  // Otherwise create a new value
+  intern.markValueAsInterned(value);
+
+  node.finalValue = new WeakRef(value);
+
+  intern.finalizationRegistry.register(value, node);
   return value as any;
 }
 
 export const internSymbol = Symbol("intern");
-
-intern.pool = {
-  tuple: new Map<Symbol, WeakRef<Intern<InternInnerValue[]>>>(),
-  record: new Map<
-    Symbol,
-    WeakRef<Intern<{ [key: string]: InternInnerValue }>>
-  >(),
+intern.markValueAsInterned = (value: InternValue) => {
+  Object.defineProperty(value, internSymbol, {
+    enumerable: false,
+    value: true,
+  });
+  Object.freeze(value);
 };
 
-intern.finalizationRegistry = new FinalizationRegistry<{
-  type: "tuple" | "record";
-  key: Symbol;
-}>(({ type, key }) => {
-  intern.pool[type].delete(key);
+const nullTuple: any[] = [];
+const nullRecord = {};
+intern.markValueAsInterned(nullTuple);
+intern.markValueAsInterned(nullRecord);
+
+type InternNode =
+  | {
+      /** The intermediate key for this node ie `node.key = node.parent.get(key).get(value).key` */
+      key: InternKey;
+      /** The intermediate value for this node ie `node.value = node.parent.get(key).get(value).value` */
+      value: InternValue;
+      /** The final Tuple or Record we have interned */
+      finalValue?: WeakRef<InternValue>;
+      children?: InternCache;
+      parent: InternNode;
+      root?: false;
+    }
+  | { root: true; children?: InternCache; parent?: undefined };
+type InternCache = Map<InternKey, Map<InternValue, InternNode>>;
+type InternKey = any;
+type InternValue = any;
+
+intern.rootInternNode = { root: true, children: undefined } as InternNode;
+
+intern.finalizationRegistry = new FinalizationRegistry<InternNode>((node) => {
+  // Value has been garbage collected prune the tree
+  let currentNode: InternNode | undefined = node;
+  while (currentNode?.parent) {
+    // If the current node has no children and no final value, delete it
+    if (!currentNode.children?.size && !currentNode.finalValue) {
+      currentNode.parent.children
+        ?.get(currentNode.key)
+        ?.delete(currentNode.value);
+
+      if (currentNode.parent.children?.get(currentNode.key)?.size === 0)
+        currentNode.parent.children.delete(currentNode.key);
+    }
+
+    currentNode = currentNode.parent;
+  }
 });
