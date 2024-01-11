@@ -24,21 +24,17 @@
   },
   "exports": {
     ".": "./build/index.mjs",
-    "./static/index.css": "./build/static/index.css"
+    "./static/index.css": "./static/index.css"
   },
   "types": "./build/index.d.mts",
   "scripts": {
-    "prepare": "tsc && postcss --use postcss-nested --use autoprefixer --output ./build/static/index.css ./static/index.css && documentation",
+    "prepare": "tsc && documentation",
     "test": "npm run prepare && node --test && prettier --check \"./README.md\" --check \"./CHANGELOG.md\" --check \"./package.json\" --check \"./tsconfig.json\" --check \"./source/**/*.mts\" --check \"./static/**/*.css\""
   },
   "devDependencies": {
     "@radically-straightforward/documentation": "^1.0.1",
     "@radically-straightforward/tsconfig": "^1.0.0",
     "@types/node": "^20.9.3",
-    "autoprefixer": "^10.4.16",
-    "postcss": "^8.4.31",
-    "postcss-cli": "^10.1.0",
-    "postcss-nested": "^6.0.1",
     "prettier": "^3.1.0",
     "typescript": "^5.3.2"
   },
