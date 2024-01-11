@@ -66,7 +66,7 @@ test("intern()", () => {
   }
 
   {
-    const map = new Map<utilities.Intern<number[]>, number>();
+    const map = new Map<utilities.Interned<number[]>, number>();
     map.set($([1]), 1);
     map.set($([1]), 2);
     assert.equal(map.size, 1);
@@ -82,7 +82,7 @@ test("intern()", () => {
   }
 
   {
-    const set = new Set<utilities.Intern<number[]>>();
+    const set = new Set<utilities.Interned<number[]>>();
     set.add($([1]));
     set.add($([1]));
     assert.equal(set.size, 1);

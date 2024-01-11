@@ -116,7 +116,7 @@ export function log(...messageParts: string[]): void {
 /**
  * Utility type for `intern()`.
  */
-export type Intern<Type> = Readonly<Type & { [internSymbol]: true }>;
+export type Interned<Type> = Readonly<Type & { [internSymbol]: true }>;
 
 /**
  * Utility type for `intern()`.
@@ -129,7 +129,7 @@ export type InternInnerValue =
   | symbol
   | undefined
   | null
-  | Intern<unknown>;
+  | Interned<unknown>;
 
 /**
  * [Interning](<https://en.wikipedia.org/wiki/Interning_(computer_science)>) a value makes it unique across the program, which is useful for checking equality with `===` (reference equality), using it as a key in a `Map`, adding it to a `Set`, and so forth:
@@ -235,7 +235,7 @@ export type InternInnerValue =
  */
 export function intern<
   T extends Array<InternInnerValue> | { [key: string]: InternInnerValue },
->(value: T): Intern<T> {
+>(value: T): Interned<T> {
   for (const innerValue of Object.values(value))
     if (
       !(
@@ -259,7 +259,7 @@ export function intern<
     ? value.entries()
     : Object.entries(value).sort(([aKey], [bKey]) => aKey.localeCompare(bKey));
 
-  // Find leaf node, creating intermediate nodes as necessary
+  // Find leaf node, creating intermediary nodes as necessary
   let node = intern._rootInternNode;
   for (const [key, innerValue] of entries) {
     if (node.children === undefined) node.children = new Map();
@@ -276,17 +276,17 @@ export function intern<
   }
 
   // If we already have a value, return it
-  if (node.finalValue !== undefined) return node.finalValue.deref()!;
+  if (node.internedValue !== undefined) return node.internedValue.deref()!;
 
   // Otherwise intern the value and cache it
-  intern._markValueAsInterned(value);
-  node.finalValue = new WeakRef(value);
+  intern._markInterned(value);
+  node.internedValue = new WeakRef(value);
   intern._finalizationRegistry.register(value, node);
-  return value as any;
+  return value as Interned<T>;
 }
 
 const internSymbol = Symbol("intern");
-intern._markValueAsInterned = (value: InternValue) => {
+intern._markInterned = (value: any) => {
   Object.defineProperty(value, internSymbol, {
     enumerable: false,
     value: true,
@@ -294,30 +294,29 @@ intern._markValueAsInterned = (value: InternValue) => {
   Object.freeze(value);
 };
 
-intern.isInterned = (value: InternValue): boolean =>
+intern.isInterned = (value: any): boolean =>
   (value as any)[internSymbol] === true;
 
 const nullTuple: any[] = [];
-intern._markValueAsInterned(nullTuple);
+intern._markInterned(nullTuple);
 const nullRecord = {};
-intern._markValueAsInterned(nullRecord);
+intern._markInterned(nullRecord);
 
 type InternNode =
   | {
-      /** The intermediate key for this node ie `node.key = node.parent.get(node.key).get(node.value).key` */
-      key: InternKey;
-      /** The intermediate value for this node ie `node.value = node.parent.get(node.key).get(node.value).value` */
-      value: InternValue;
+      /** The intermediary key for this node ie `node.key = node.parent.get(node.key).get(node.value).key` */
+      key: InternInnerKey;
+      /** The intermediary value for this node ie `node.value = node.parent.get(node.key).get(node.value).value` */
+      value: InternInnerValue;
       /** The final Tuple or Record we have interned */
-      finalValue?: WeakRef<InternValue>;
+      internedValue?: WeakRef<Interned<any>>;
       children?: InternCache;
       parent: InternNode;
       root?: false;
     }
   | { root: true; children?: InternCache; parent?: undefined };
-type InternCache = Map<InternKey, Map<InternValue, InternNode>>;
-type InternKey = any;
-type InternValue = any;
+type InternCache = Map<InternInnerKey, Map<InternInnerValue, InternNode>>;
+type InternInnerKey = any;
 
 intern._rootInternNode = { root: true } as InternNode;
 
@@ -326,7 +325,7 @@ intern._finalizationRegistry = new FinalizationRegistry<InternNode>((node) => {
   let currentNode: InternNode | undefined = node;
   while (currentNode?.parent) {
     // If the current node has no children and no final value, delete it
-    if (!currentNode.children?.size && !currentNode.finalValue) {
+    if (!currentNode.children?.size && !currentNode.internedValue) {
       currentNode.parent.children
         ?.get(currentNode.key)
         ?.delete(currentNode.value);
