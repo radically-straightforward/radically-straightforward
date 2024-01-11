@@ -278,11 +278,9 @@ export function intern<
   // If we already have a value, return it
   if (node.finalValue !== undefined) return node.finalValue.deref()!;
 
-  // Otherwise create a new value
+  // Otherwise intern the value and cache it
   intern._markValueAsInterned(value);
-
   node.finalValue = new WeakRef(value);
-
   intern._finalizationRegistry.register(value, node);
   return value as any;
 }
