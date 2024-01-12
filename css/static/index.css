@@ -2,17 +2,17 @@
 /* RESET */
 
 /*
-https://necolas.github.io/normalize.css/8.0.1/normalize.css
-https://meyerweb.com/eric/tools/css/reset/
-https://github.com/twbs/bootstrap/blob/649c2bb0bf326db36cbbf7e72c0541b19749a70e/dist/css/bootstrap-reboot.css
-https://github.com/sindresorhus/modern-normalize/blob/1fc6b5a86676b7ac8abc62d04d6080f92debc70f/modern-normalize.css
-https://github.com/suitcss/base/blob/50d5ad1e0d6790eb3df29b705db3684a9909894f/lib/base.css
-https://github.com/tailwindlabs/tailwindcss/blob/b442c912e2d052ad026fd2e3d31bc450f620a784/src/plugins/css/preflight.css
-https://github.com/jensimmons/cssremedy/blob/468e31a7eda599eea2003ed7983c190828ffb5fd/css/remedy.css
-https://github.com/csstools/sanitize.css/tree/776bd4d72654ddb54aa5071b2cd10bb1957f7f97
-https://unpkg.com/browse/@tailwindcss/forms@0.3.2/dist/forms.css
-https://chriscoyier.net/2023/10/03/being-picky-about-a-css-reset-for-fun-pleasure/
-https://piccalil.li/blog/a-more-modern-css-reset/
+  https://necolas.github.io/normalize.css/8.0.1/normalize.css
+  https://meyerweb.com/eric/tools/css/reset/
+  https://github.com/twbs/bootstrap/blob/649c2bb0bf326db36cbbf7e72c0541b19749a70e/dist/css/bootstrap-reboot.css
+  https://github.com/sindresorhus/modern-normalize/blob/1fc6b5a86676b7ac8abc62d04d6080f92debc70f/modern-normalize.css
+  https://github.com/suitcss/base/blob/50d5ad1e0d6790eb3df29b705db3684a9909894f/lib/base.css
+  https://github.com/tailwindlabs/tailwindcss/blob/b442c912e2d052ad026fd2e3d31bc450f620a784/src/plugins/css/preflight.css
+  https://github.com/jensimmons/cssremedy/blob/468e31a7eda599eea2003ed7983c190828ffb5fd/css/remedy.css
+  https://github.com/csstools/sanitize.css/tree/776bd4d72654ddb54aa5071b2cd10bb1957f7f97
+  https://unpkg.com/browse/@tailwindcss/forms@0.3.2/dist/forms.css
+  https://chriscoyier.net/2023/10/03/being-picky-about-a-css-reset-for-fun-pleasure/
+  https://piccalil.li/blog/a-more-modern-css-reset/
 */
 
 *,
@@ -50,386 +50,59 @@ https://piccalil.li/blog/a-more-modern-css-reset/
 /* DESIGN SYSTEM */
 
 /*
-https://github.com/tailwindlabs/tailwindcss/blob/3971f2a23ec18bfd4fee41ab3766477ba38f6774/stubs/config.full.js
-https://github.com/tailwindlabs/tailwindcss/blob/3971f2a23ec18bfd4fee41ab3766477ba38f6774/src/public/colors.js
+  https://github.com/tailwindlabs/tailwindcss/blob/3971f2a23ec18bfd4fee41ab3766477ba38f6774/stubs/config.full.js
+  https://github.com/tailwindlabs/tailwindcss/blob/3971f2a23ec18bfd4fee41ab3766477ba38f6774/src/public/colors.js
 */
 :root {
-  --font-family--sans-serif: ui-sans-serif, system-ui, -apple-system,
-    BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans",
-    sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol",
-    "Noto Color Emoji";
+  --font-family--sans-serif: ui-sans-serif, system-ui, sans-serif,
+    "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
   --font-family--serif: ui-serif, Georgia, Cambria, "Times New Roman", Times,
     serif;
   --font-family--monospace: ui-monospace, SFMono-Regular, Menlo, Monaco,
     Consolas, "Liberation Mono", "Courier New", monospace;
 
-  --font-size--2xs: 0.625rem;
-  --line-height--2xs: 0.875rem;
-  --font-size--xs: 0.75rem;
-  --line-height--xs: 1rem;
-  --font-size--sm: 0.875rem;
-  --line-height--sm: 1.25rem;
-  --font-size--base: 1rem;
-  --line-height--base: 1.5rem;
-  --font-size--lg: 1.125rem;
-  --line-height--lg: 1.75rem;
-  --font-size--xl: 1.25rem;
-  --line-height--xl: 1.75rem;
-  --font-size--2xl: 1.5rem;
-  --line-height--2xl: 2rem;
-  --font-size--3xl: 1.875rem;
-  --line-height--3xl: 2.25rem;
-  --font-size--4xl: 2.25rem;
-  --line-height--4xl: 2.5rem;
-  --font-size--5xl: 3rem;
-  --line-height--5xl: 1;
-  --font-size--6xl: 3.75rem;
-  --line-height--6xl: 1;
-  --font-size--7xl: 4.5rem;
-  --line-height--7xl: 1;
-  --font-size--8xl: 6rem;
-  --line-height--8xl: 1;
-  --font-size--9xl: 8rem;
-  --line-height--9xl: 1;
+  --font-size--2-5: 0.625rem;
+  --font-size--2-5--line-height: 0.875rem;
+  --font-size--3: 0.75rem;
+  --font-size--3--line-height: 1rem;
+  --font-size--3-5: 0.875rem;
+  --font-size--3-5--line-height: 1.25rem;
+  --font-size--4: 1rem;
+  --font-size--4--line-height: 1.5rem;
+  --font-size--4-5: 1.125rem;
+  --font-size--4-5--line-height: 1.75rem;
+  --font-size--5: 1.25rem;
+  --font-size--5--line-height: 1.75rem;
+  --font-size--6: 1.5rem;
+  --font-size--6--line-height: 2rem;
+  --font-size--7-5: 1.875rem;
+  --font-size--7-5--line-height: 2.25rem;
+  --font-size--9: 2.25rem;
+  --font-size--9--line-height: 2.5rem;
+  --font-size--12: 3rem;
+  --font-size--12--line-height: 1;
+  --font-size--15: 3.75rem;
+  --font-size--15--line-height: 1;
+  --font-size--18: 4.5rem;
+  --font-size--18--line-height: 1;
+  --font-size--24: 6rem;
+  --font-size--24--line-height: 1;
+  --font-size--32: 8rem;
+  --font-size--32--line-height: 1;
 
-  --font-weight--thin: 100;
-  --font-weight--extralight: 200;
-  --font-weight--light: 300;
-  --font-weight--normal: 400;
-  --font-weight--medium: 500;
-  --font-weight--semibold: 600;
-  --font-weight--bold: 700;
-  --font-weight--extrabold: 800;
-  --font-weight--black: 900;
+  --line-height--1: 1;
+  --line-height--1-25: 1.25;
+  --line-height--1-375: 1.375;
+  --line-height--1-5: 1.5;
+  --line-height--1-625: 1.625;
+  --line-height--2: 2;
 
-  --letter-spacing--tighter: -0.05em;
-  --letter-spacing--tight: -0.025em;
-  --letter-spacing--normal: 0em;
-  --letter-spacing--wide: 0.025em;
-  --letter-spacing--wider: 0.05em;
-  --letter-spacing--widest: 0.1em;
-
-  --width--0: 0rem;
-  --width--xs: 20rem;
-  --width--sm: 24rem;
-  --width--md: 28rem;
-  --width--lg: 32rem;
-  --width--xl: 36rem;
-  --width--2xl: 42rem;
-  --width--3xl: 48rem;
-  --width--4xl: 56rem;
-  --width--5xl: 64rem;
-  --width--6xl: 72rem;
-  --width--7xl: 80rem;
-  --width--prose: 65ch;
-
-  --space---96: -24rem;
-  --space---80: -20rem;
-  --space---72: -18rem;
-  --space---64: -16rem;
-  --space---60: -15rem;
-  --space---56: -14rem;
-  --space---52: -13rem;
-  --space---48: -12rem;
-  --space---44: -11rem;
-  --space---40: -10rem;
-  --space---36: -9rem;
-  --space---32: -8rem;
-  --space---28: -7rem;
-  --space---24: -6rem;
-  --space---20: -5rem;
-  --space---16: -4rem;
-  --space---14: -3.5rem;
-  --space---12: -3rem;
-  --space---11: -2.75rem;
-  --space---10: -2.5rem;
-  --space---9: -2.25rem;
-  --space---8: -2rem;
-  --space---7: -1.75rem;
-  --space---6: -1.5rem;
-  --space---5: -1.25rem;
-  --space---4: -1rem;
-  --space---3-5: -0.875rem;
-  --space---3: -0.75rem;
-  --space---2-5: -0.625rem;
-  --space---2: -0.5rem;
-  --space---1-5: -0.375rem;
-  --space---1: -0.25rem;
-  --space---0-5: -0.125rem;
-  --space---px: -1px;
-  --space--0: 0px;
-  --space--px: 1px;
-  --space--0-5: 0.125rem;
-  --space--1: 0.25rem;
-  --space--1-5: 0.375rem;
-  --space--2: 0.5rem;
-  --space--2-5: 0.625rem;
-  --space--3: 0.75rem;
-  --space--3-5: 0.875rem;
-  --space--4: 1rem;
-  --space--5: 1.25rem;
-  --space--6: 1.5rem;
-  --space--7: 1.75rem;
-  --space--8: 2rem;
-  --space--9: 2.25rem;
-  --space--10: 2.5rem;
-  --space--11: 2.75rem;
-  --space--12: 3rem;
-  --space--14: 3.5rem;
-  --space--16: 4rem;
-  --space--20: 5rem;
-  --space--24: 6rem;
-  --space--28: 7rem;
-  --space--32: 8rem;
-  --space--36: 9rem;
-  --space--40: 10rem;
-  --space--44: 11rem;
-  --space--48: 12rem;
-  --space--52: 13rem;
-  --space--56: 14rem;
-  --space--60: 15rem;
-  --space--64: 16rem;
-  --space--72: 18rem;
-  --space--80: 20rem;
-  --space--96: 24rem;
-
-  --border-width--0: 0px;
-  --border-width--1: 1px;
-  --border-width--2: 2px;
-  --border-width--4: 4px;
-  --border-width--8: 8px;
-
-  --border-radius--none: 0px;
-  --border-radius--sm: 0.125rem;
-  --border-radius--base: 0.25rem;
-  --border-radius--md: 0.375rem;
-  --border-radius--lg: 0.5rem;
-  --border-radius--xl: 0.75rem;
-  --border-radius--2xl: 1rem;
-  --border-radius--3xl: 1.5rem;
-  --border-radius--full: 9999px;
-  --border-radius--circle: 50%;
-
-  --outline--none: 2px solid transparent;
-  --outline--white: 2px dotted white;
-  --outline--black: 2px dotted black;
-
-  --box-shadow--none: none;
-  --box-shadow--sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-  --box-shadow--base: 0 1px 3px 0 rgba(0, 0, 0, 0.1),
-    0 1px 2px 0 rgba(0, 0, 0, 0.06);
-  --box-shadow--md: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
-    0 2px 4px -1px rgba(0, 0, 0, 0.06);
-  --box-shadow--lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1),
-    0 4px 6px -2px rgba(0, 0, 0, 0.05);
-  --box-shadow--xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1),
-    0 10px 10px -5px rgba(0, 0, 0, 0.04);
-  --box-shadow--2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-  --box-shadow--inner: inset 0 2px 4px 0 rgba(0, 0, 0, 0.06);
-
-  --stroke-width--0: 0;
-  --stroke-width--1: 1;
-  --stroke-width--2: 2;
-
-  --opacity--0: 0;
-  --opacity--5: 0.05;
-  --opacity--10: 0.1;
-  --opacity--20: 0.2;
-  --opacity--25: 0.25;
-  --opacity--30: 0.3;
-  --opacity--40: 0.4;
-  --opacity--50: 0.5;
-  --opacity--60: 0.6;
-  --opacity--70: 0.7;
-  --opacity--75: 0.75;
-  --opacity--80: 0.8;
-  --opacity--90: 0.9;
-  --opacity--95: 0.95;
-  --opacity--100: 1;
-
-  --order--none: 0;
-  --order--first: -9999;
-  --order--last: 9999;
-
-  --z-index--auto: auto;
-  --z-index---1: -1;
-  --z-index--0: 0;
-  --z-index--10: 10;
-  --z-index--20: 20;
-  --z-index--30: 30;
-  --z-index--40: 40;
-  --z-index--50: 50;
-
-  --rotate---180: -180deg;
-  --rotate---90: -90deg;
-  --rotate---45: -45deg;
-  --rotate---12: -12deg;
-  --rotate---6: -6deg;
-  --rotate---3: -3deg;
-  --rotate---2: -2deg;
-  --rotate---1: -1deg;
-  --rotate--0: 0deg;
-  --rotate--1: 1deg;
-  --rotate--2: 2deg;
-  --rotate--3: 3deg;
-  --rotate--6: 6deg;
-  --rotate--12: 12deg;
-  --rotate--45: 45deg;
-  --rotate--90: 90deg;
-  --rotate--180: 180deg;
-
-  --scale--0: 0;
-  --scale--50: 0.5;
-  --scale--75: 0.75;
-  --scale--90: 0.9;
-  --scale--95: 0.95;
-  --scale--100: 1;
-  --scale--105: 1.05;
-  --scale--110: 1.1;
-  --scale--125: 1.25;
-  --scale--150: 1.5;
-
-  --skew---12: -12deg;
-  --skew---6: -6deg;
-  --skew---3: -3deg;
-  --skew---2: -2deg;
-  --skew---1: -1deg;
-  --skew--0: 0deg;
-  --skew--1: 1deg;
-  --skew--2: 2deg;
-  --skew--3: 3deg;
-  --skew--6: 6deg;
-  --skew--12: 12deg;
-
-  --brightness--0: 0;
-  --brightness--50: 0.5;
-  --brightness--75: 0.75;
-  --brightness--90: 0.9;
-  --brightness--95: 0.95;
-  --brightness--100: 1;
-  --brightness--105: 1.05;
-  --brightness--110: 1.1;
-  --brightness--125: 1.25;
-  --brightness--150: 1.5;
-  --brightness--200: 2;
-
-  --contrast--0: 0;
-  --contrast--50: 0.5;
-  --contrast--75: 0.75;
-  --contrast--100: 1;
-  --contrast--125: 1.25;
-  --contrast--150: 1.5;
-  --contrast--200: 2;
-
-  --saturate--0: 0;
-  --saturate--50: 0.5;
-  --saturate--100: 1;
-  --saturate--150: 1.5;
-  --saturate--200: 2;
-
-  --blur--none: 0px;
-  --blur--sm: 4px;
-  --blur--base: 8px;
-  --blur--md: 12px;
-  --blur--lg: 16px;
-  --blur--xl: 24px;
-  --blur--2xl: 40px;
-  --blur--3xl: 64px;
-
-  --sepia--0: 0;
-  --sepia--base: 100%;
-
-  --drop-shadow--none: 0 0 #0000;
-  --drop-shadow--sm: 0 1px 1px rgba(0, 0, 0, 0.05);
-  --drop-shadow--base: 0 1px 2px rgba(0, 0, 0, 0.1),
-    0 1px 1px rgba(0, 0, 0, 0.06);
-  --drop-shadow--md: 0 4px 3px rgba(0, 0, 0, 0.07),
-    0 2px 2px rgba(0, 0, 0, 0.06);
-  --drop-shadow--lg: 0 10px 8px rgba(0, 0, 0, 0.04),
-    0 4px 3px rgba(0, 0, 0, 0.1);
-  --drop-shadow--xl: 0 20px 13px rgba(0, 0, 0, 0.03),
-    0 8px 5px rgba(0, 0, 0, 0.08);
-  --drop-shadow--2xl: 0 25px 25px rgba(0, 0, 0, 0.15);
-
-  --transition-property--none: none;
-  --transition-property--all: all;
-  --transition-property--base: background-color, border-color, color, fill,
-    stroke, opacity, box-shadow, transform, filter, backdrop-filter;
-  --transition-property--colors: background-color, border-color, color, fill,
-    stroke;
-  --transition-property--opacity: opacity;
-  --transition-property--box-shadow: box-shadow;
-  --transition-property--transform: transform;
-
-  --transition-duration--75: 75ms;
-  --transition-duration--100: 100ms;
-  --transition-duration--150: 150ms;
-  --transition-duration--200: 200ms;
-  --transition-duration--300: 300ms;
-  --transition-duration--500: 500ms;
-  --transition-duration--700: 700ms;
-  --transition-duration--1000: 1000ms;
-
-  @media (prefers-reduced-motion: reduce) {
-    --transition-duration--75: 1ms;
-    --transition-duration--100: 1ms;
-    --transition-duration--150: 1ms;
-    --transition-duration--200: 1ms;
-    --transition-duration--300: 1ms;
-    --transition-duration--500: 1ms;
-    --transition-duration--700: 1ms;
-    --transition-duration--1000: 1ms;
-  }
-
-  --transition-timing-function--base: cubic-bezier(0.4, 0, 0.2, 1);
-  --transition-timing-function--linear: linear;
-  --transition-timing-function--in: cubic-bezier(0.4, 0, 1, 1);
-  --transition-timing-function--out: cubic-bezier(0, 0, 0.2, 1);
-  --transition-timing-function--in-out: cubic-bezier(0.4, 0, 0.2, 1);
-
-  --animation--none: none;
-  --animation--spin: spin 1s linear infinite;
-  @keyframes spin {
-    from {
-      transform: rotate(0deg);
-    }
-    to {
-      transform: rotate(360deg);
-    }
-  }
-  --animation--ping: ping 1s cubic-bezier(0, 0, 0.2, 1) infinite;
-  @keyframes ping {
-    75%,
-    100% {
-      transform: scale(2);
-      opacity: 0;
-    }
-  }
-  --animation--pulse: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-  @keyframes pulse {
-    0%,
-    100% {
-      opacity: 1;
-    }
-    50% {
-      opacity: 0.5;
-    }
-  }
-  --animation--bounce: bounce 1s infinite;
-  @keyframes bounce {
-    0%,
-    100% {
-      transform: translateY(0%);
-      animationtimingfunction: cubic-bezier(0.8, 0, 1, 1);
-    }
-    50% {
-      transform: translateY(-20%);
-      animationtimingfunction: cubic-bezier(0, 0, 0.2, 1);
-    }
-  }
-
-  --color--transparent: transparent;
-  --color--current: currentColor;
+  --letter-spacing---2: -0.05em;
+  --letter-spacing---1: -0.025em;
+  --letter-spacing--0: 0em;
+  --letter-spacing--1: 0.025em;
+  --letter-spacing--2: 0.05em;
+  --letter-spacing--4: 0.1em;
 
   --color--black: #000000;
   --color--white: #ffffff;
@@ -697,19 +370,331 @@ https://github.com/tailwindlabs/tailwindcss/blob/3971f2a23ec18bfd4fee41ab3766477
   --color--rose--800: #9f1239;
   --color--rose--900: #881337;
   --color--rose--950: #4c0519;
+
+  --opacity--0: 0;
+  --opacity--5: 0.05;
+  --opacity--10: 0.1;
+  --opacity--15: 0.15;
+  --opacity--20: 0.2;
+  --opacity--25: 0.25;
+  --opacity--30: 0.3;
+  --opacity--35: 0.35;
+  --opacity--40: 0.4;
+  --opacity--45: 0.45;
+  --opacity--50: 0.5;
+  --opacity--55: 0.55;
+  --opacity--60: 0.6;
+  --opacity--65: 0.65;
+  --opacity--70: 0.7;
+  --opacity--75: 0.75;
+  --opacity--80: 0.8;
+  --opacity--85: 0.85;
+  --opacity--90: 0.9;
+  --opacity--95: 0.95;
+  --opacity--100: 1;
+
+  --space--0: 0px;
+  --space--px: 1px;
+  --space---px: -1px;
+  --space--0-5: 0.125rem;
+  --space---0-5: -0.125rem;
+  --space--1: 0.25rem;
+  --space---1: -0.25rem;
+  --space--1-5: 0.375rem;
+  --space---1-5: -0.375rem;
+  --space--2: 0.5rem;
+  --space---2: -0.5rem;
+  --space--2-5: 0.625rem;
+  --space---2-5: -0.625rem;
+  --space--3: 0.75rem;
+  --space---3: -0.75rem;
+  --space--3-5: 0.875rem;
+  --space---3-5: -0.875rem;
+  --space--4: 1rem;
+  --space---4: -1rem;
+  --space--5: 1.25rem;
+  --space---5: -1.25rem;
+  --space--6: 1.5rem;
+  --space---6: -1.5rem;
+  --space--7: 1.75rem;
+  --space---7: -1.75rem;
+  --space--8: 2rem;
+  --space---8: -2rem;
+  --space--9: 2.25rem;
+  --space---9: -2.25rem;
+  --space--10: 2.5rem;
+  --space---10: -2.5rem;
+  --space--11: 2.75rem;
+  --space---11: -2.75rem;
+  --space--12: 3rem;
+  --space---12: -3rem;
+  --space--14: 3.5rem;
+  --space---14: -3.5rem;
+  --space--16: 4rem;
+  --space---16: -4rem;
+  --space--20: 5rem;
+  --space---20: -5rem;
+  --space--24: 6rem;
+  --space---24: -6rem;
+  --space--28: 7rem;
+  --space---28: -7rem;
+  --space--32: 8rem;
+  --space---32: -8rem;
+  --space--36: 9rem;
+  --space---36: -9rem;
+  --space--40: 10rem;
+  --space---40: -10rem;
+  --space--44: 11rem;
+  --space---44: -11rem;
+  --space--48: 12rem;
+  --space---48: -12rem;
+  --space--52: 13rem;
+  --space---52: -13rem;
+  --space--56: 14rem;
+  --space---56: -14rem;
+  --space--60: 15rem;
+  --space---60: -15rem;
+  --space--64: 16rem;
+  --space---64: -16rem;
+  --space--72: 18rem;
+  --space---72: -18rem;
+  --space--80: 20rem;
+  --space---80: -20rem;
+  --space--96: 24rem;
+  --space---96: -24rem;
+  --space--112: 28rem;
+  --space---112: -28rem;
+  --space--128: 32rem;
+  --space---128: -32rem;
+  --space--144: 36rem;
+  --space---144: -36rem;
+  --space--168: 42rem;
+  --space---168: -42rem;
+  --space--192: 48rem;
+  --space---192: -48rem;
+  --space--224: 56rem;
+  --space---224: -56rem;
+  --space--256: 64rem;
+  --space---256: -64rem;
+  --space--288: 72rem;
+  --space---288: -72rem;
+  --space--320: 80rem;
+  --space---320: -80rem;
+  --space--prose: 65ch;
+  --space---prose: -65ch;
+
+  --aspect-ratio--square: 1 / 1;
+  --aspect-ratio--video: 16 / 9;
+
+  --border-width--0: 0px;
+  --border-width--1: 1px;
+  --border-width--2: 2px;
+  --border-width--4: 4px;
+  --border-width--8: 8px;
+
+  --border-radius--0: 0rem;
+  --border-radius--0-5: 0.125rem;
+  --border-radius--1: 0.25rem;
+  --border-radius--1-5: 0.375rem;
+  --border-radius--2: 0.5rem;
+  --border-radius--3: 0.75rem;
+  --border-radius--4: 1rem;
+  --border-radius--6: 1.5rem;
+  --border-radius--circle: 100%;
+  --border-radius--round: 9999px;
+
+  --box-shadow--0: 0 0 #0000;
+  --box-shadow--1: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --box-shadow--2: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+  --box-shadow--4: 0 4px 6px -1px rgb(0 0 0 / 0.1),
+    0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --box-shadow--10: 0 10px 15px -3px rgb(0 0 0 / 0.1),
+    0 4px 6px -4px rgb(0 0 0 / 0.1);
+  --box-shadow--20: 0 20px 25px -5px rgb(0 0 0 / 0.1),
+    0 8px 10px -6px rgb(0 0 0 / 0.1);
+  --box-shadow--25: 0 25px 50px -12px rgb(0 0 0 / 0.25);
+  --box-shadow--inset: inset 0 2px 4px 0 rgb(0 0 0 / 0.05);
+
+  --transform--scale--0: 0;
+  --transform--scale--50: 0.5;
+  --transform--scale--75: 0.75;
+  --transform--scale--90: 0.9;
+  --transform--scale--95: 0.95;
+  --transform--scale--100: 1;
+  --transform--scale--105: 1.05;
+  --transform--scale--110: 1.1;
+  --transform--scale--125: 1.25;
+  --transform--scale--150: 1.5;
+
+  --transform--rotate--0: rotate(0deg);
+  --transform--rotate--1: rotate(1deg);
+  --transform--rotate--2: rotate(2deg);
+  --transform--rotate--3: rotate(3deg);
+  --transform--rotate--6: rotate(6deg);
+  --transform--rotate--12: rotate(12deg);
+  --transform--rotate--45: rotate(45deg);
+  --transform--rotate--90: rotate(90deg);
+  --transform--rotate--180: rotate(180deg);
+
+  --transform--skew--0: 0deg;
+  --transform--skew--1: 1deg;
+  --transform--skew--2: 2deg;
+  --transform--skew--3: 3deg;
+  --transform--skew--6: 6deg;
+  --transform--skew--12: 12deg;
+
+  --filter--blur--0: blur(0px);
+  --filter--blur--4: blur(4px);
+  --filter--blur--8: blur(8px);
+  --filter--blur--12: blur(12px);
+  --filter--blur--16: blur(16px);
+  --filter--blur--24: blur(24px);
+  --filter--blur--40: blur(40px);
+  --filter--blur--64: blur(64px);
+
+  --filter--brightness--0: brightness(0);
+  --filter--brightness--50: brightness(0.5);
+  --filter--brightness--75: brightness(0.75);
+  --filter--brightness--90: brightness(0.9);
+  --filter--brightness--95: brightness(0.95);
+  --filter--brightness--100: brightness(1);
+  --filter--brightness--105: brightness(1.05);
+  --filter--brightness--110: brightness(1.1);
+  --filter--brightness--125: brightness(1.25);
+  --filter--brightness--150: brightness(1.5);
+  --filter--brightness--200: brightness(2);
+
+  --filter--contrast--0: contrast(0);
+  --filter--contrast--50: contrast(0.5);
+  --filter--contrast--75: contrast(0.75);
+  --filter--contrast--100: contrast(1);
+  --filter--contrast--125: contrast(1.25);
+  --filter--contrast--150: contrast(1.5);
+  --filter--contrast--200: contrast(2);
+
+  --filter--drop-shadow--0: drop-shadow(0 0 #0000);
+  --filter--drop-shadow--1: drop-shadow(0 1px 1px rgb(0 0 0 / 0.05));
+  --filter--drop-shadow--2: drop-shadow(0 1px 2px rgb(0 0 0 / 0.1))
+    drop-shadow(0 1px 1px rgb(0 0 0 / 0.06));
+  --filter--drop-shadow--4: drop-shadow(0 4px 3px rgb(0 0 0 / 0.07))
+    drop-shadow(0 2px 2px rgb(0 0 0 / 0.06));
+  --filter--drop-shadow--10: drop-shadow(0 10px 8px rgb(0 0 0 / 0.04))
+    drop-shadow(0 4px 3px rgb(0 0 0 / 0.1));
+  --filter--drop-shadow--20: drop-shadow(0 20px 13px rgb(0 0 0 / 0.03))
+    drop-shadow(0 8px 5px rgb(0 0 0 / 0.08));
+  --filter--drop-shadow--25: drop-shadow(0 25px 25px rgb(0 0 0 / 0.15));
+
+  --filter--grayscale--0: grayscale(0%);
+  --filter--grayscale--100: grayscale(100%);
+
+  --filter--hue-rotate--0: hue-rotate(0deg);
+  --filter--hue-rotate--15: hue-rotate(15deg);
+  --filter--hue-rotate--30: hue-rotate(30deg);
+  --filter--hue-rotate--60: hue-rotate(60deg);
+  --filter--hue-rotate--90: hue-rotate(90deg);
+  --filter--hue-rotate--180: hue-rotate(180deg);
+
+  --filter--invert--0: invert(0%);
+  --filter--invert--100: invert(100%);
+
+  --filter--saturate--0: saturate(0);
+  --filter--saturate--50: saturate(0.5);
+  --filter--saturate--100: saturate(1);
+  --filter--saturate--150: saturate(1.5);
+  --filter--saturate--200: saturate(2);
+
+  --filter--sepia--0: sepia(0%);
+  --filter--sepia--100: sepia(100%);
+
+  --transition-property--none: none;
+  --transition-property--all: all;
+  --transition-property--colors: color, background-color, border-color,
+    text-decoration-color, fill, stroke;
+  --transition-property--base: color, background-color, border-color,
+    text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter,
+    backdrop-filter;
+  --transition-property--opacity: opacity;
+  --transition-property--shadow: box-shadow;
+  --transition-property--transform: transform;
+
+  --transition-duration--0: 0ms;
+  --transition-duration--75: 75ms;
+  --transition-duration--100: 100ms;
+  --transition-duration--150: 150ms;
+  --transition-duration--200: 200ms;
+  --transition-duration--300: 300ms;
+  --transition-duration--500: 500ms;
+  --transition-duration--700: 700ms;
+  --transition-duration--1000: 1000ms;
+  @media (prefers-reduced-motion) {
+    --transition-duration--75: 1ms;
+    --transition-duration--100: 1ms;
+    --transition-duration--150: 1ms;
+    --transition-duration--200: 1ms;
+    --transition-duration--300: 1ms;
+    --transition-duration--500: 1ms;
+    --transition-duration--700: 1ms;
+    --transition-duration--1000: 1ms;
+  }
+
+  --transition-timing-function--ease-linear: linear;
+  --transition-timing-function--ease-in: cubic-bezier(0.4, 0, 1, 1);
+  --transition-timing-function--ease-out: cubic-bezier(0, 0, 0.2, 1);
+  --transition-timing-function--ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+
+  --animation--none: none;
+  --animation--spin: spin 1s linear infinite;
+  @keyframes spin {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
+  --animation--ping: ping 1s cubic-bezier(0, 0, 0.2, 1) infinite;
+  @keyframes ping {
+    75%,
+    100% {
+      transform: scale(2);
+      opacity: 0;
+    }
+  }
+  --animation--pulse: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  @keyframes pulse {
+    0%,
+    100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.5;
+    }
+  }
+  --animation--bounce: bounce 1s infinite;
+  @keyframes bounce {
+    0%,
+    100% {
+      transform: translateY(-25%);
+      animation-timing-function: cubic-bezier(0.8, 0, 1, 1);
+    }
+    50% {
+      transform: translateY(0);
+      animation-timing-function: cubic-bezier(0, 0, 0.2, 1);
+    }
+  }
 }
 
 /******************************************************************************/
 /* HELPERS */
 
 /*
-https://github.com/twbs/bootstrap/blob/7d9adb702d96f9eb4706afb12cd73c9654979575/scss/mixins/_visually-hidden.scss
-https://tailwindcss.com/docs/screen-readers
-https://www.a11yproject.com/posts/2013-01-11-how-to-hide-content/
-https://hugogiraudel.com/2016/10/13/css-hide-and-seek/
-https://github.com/twbs/bootstrap/issues/25686
-https://accessibility.18f.gov/hidden-content/
-https://stackoverflow.com/questions/8570050/page-jumps-to-the-top-when-checkbox-is-clicked
+  https://github.com/twbs/bootstrap/blob/7d9adb702d96f9eb4706afb12cd73c9654979575/scss/mixins/_visually-hidden.scss
+  https://tailwindcss.com/docs/screen-readers
+  https://www.a11yproject.com/posts/2013-01-11-how-to-hide-content/
+  https://hugogiraudel.com/2016/10/13/css-hide-and-seek/
+  https://github.com/twbs/bootstrap/issues/25686
+  https://accessibility.18f.gov/hidden-content/
+  https://stackoverflow.com/questions/8570050/page-jumps-to-the-top-when-checkbox-is-clicked
 */
 
 .visually-hidden,
