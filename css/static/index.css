@@ -526,23 +526,23 @@
   --transform--scale--125: 1.25;
   --transform--scale--150: 1.5;
 
-  --transform--rotate--0: rotate(0deg);
-  --transform--rotate--1: rotate(1deg);
-  --transform--rotate---1: rotate(-1deg);
-  --transform--rotate--2: rotate(2deg);
-  --transform--rotate---2: rotate(-2deg);
-  --transform--rotate--3: rotate(3deg);
-  --transform--rotate---3: rotate(-3deg);
-  --transform--rotate--6: rotate(6deg);
-  --transform--rotate---6: rotate(-6deg);
-  --transform--rotate--12: rotate(12deg);
-  --transform--rotate---12: rotate(-12deg);
-  --transform--rotate--45: rotate(45deg);
-  --transform--rotate---45: rotate(-45deg);
-  --transform--rotate--90: rotate(90deg);
-  --transform--rotate---90: rotate(-90deg);
-  --transform--rotate--180: rotate(180deg);
-  --transform--rotate---180: rotate(-180deg);
+  --transform--rotate--0: 0deg;
+  --transform--rotate--1: 1deg;
+  --transform--rotate---1: -1deg;
+  --transform--rotate--2: 2deg;
+  --transform--rotate---2: -2deg;
+  --transform--rotate--3: 3deg;
+  --transform--rotate---3: -3deg;
+  --transform--rotate--6: 6deg;
+  --transform--rotate---6: -6deg;
+  --transform--rotate--12: 12deg;
+  --transform--rotate---12: -12deg;
+  --transform--rotate--45: 45deg;
+  --transform--rotate---45: -45deg;
+  --transform--rotate--90: 90deg;
+  --transform--rotate---90: -90deg;
+  --transform--rotate--180: 180deg;
+  --transform--rotate---180: -180deg;
 
   --transform--skew--0: 0deg;
   --transform--skew--1: 1deg;
@@ -568,56 +568,56 @@
     drop-shadow(0 8px 5px rgb(0 0 0 / 0.08));
   --filter--drop-shadow--25: drop-shadow(0 25px 25px rgb(0 0 0 / 0.15));
 
-  --filter--blur--0: blur(0px);
-  --filter--blur--4: blur(4px);
-  --filter--blur--8: blur(8px);
-  --filter--blur--12: blur(12px);
-  --filter--blur--16: blur(16px);
-  --filter--blur--24: blur(24px);
-  --filter--blur--40: blur(40px);
-  --filter--blur--64: blur(64px);
+  --filter--brightness--0: 0;
+  --filter--brightness--50: 0.5;
+  --filter--brightness--75: 0.75;
+  --filter--brightness--90: 0.9;
+  --filter--brightness--95: 0.95;
+  --filter--brightness--100: 1;
+  --filter--brightness--105: 1.05;
+  --filter--brightness--110: 1.1;
+  --filter--brightness--125: 1.25;
+  --filter--brightness--150: 1.5;
+  --filter--brightness--200: 2;
 
-  --filter--brightness--0: brightness(0);
-  --filter--brightness--50: brightness(0.5);
-  --filter--brightness--75: brightness(0.75);
-  --filter--brightness--90: brightness(0.9);
-  --filter--brightness--95: brightness(0.95);
-  --filter--brightness--100: brightness(1);
-  --filter--brightness--105: brightness(1.05);
-  --filter--brightness--110: brightness(1.1);
-  --filter--brightness--125: brightness(1.25);
-  --filter--brightness--150: brightness(1.5);
-  --filter--brightness--200: brightness(2);
+  --filter--contrast--0: 0;
+  --filter--contrast--50: 0.5;
+  --filter--contrast--75: 0.75;
+  --filter--contrast--100: 1;
+  --filter--contrast--125: 1.25;
+  --filter--contrast--150: 1.5;
+  --filter--contrast--200: 2;
 
-  --filter--contrast--0: contrast(0);
-  --filter--contrast--50: contrast(0.5);
-  --filter--contrast--75: contrast(0.75);
-  --filter--contrast--100: contrast(1);
-  --filter--contrast--125: contrast(1.25);
-  --filter--contrast--150: contrast(1.5);
-  --filter--contrast--200: contrast(2);
+  --filter--saturate--0: 0;
+  --filter--saturate--50: 0.5;
+  --filter--saturate--100: 1;
+  --filter--saturate--150: 1.5;
+  --filter--saturate--200: 2;
 
-  --filter--saturate--0: saturate(0);
-  --filter--saturate--50: saturate(0.5);
-  --filter--saturate--100: saturate(1);
-  --filter--saturate--150: saturate(1.5);
-  --filter--saturate--200: saturate(2);
+  --filter--grayscale--0: 0%;
+  --filter--grayscale--100: 100%;
 
-  --filter--grayscale--0: grayscale(0%);
-  --filter--grayscale--100: grayscale(100%);
+  --filter--invert--0: 0%;
+  --filter--invert--100: 100%;
 
-  --filter--invert--0: invert(0%);
-  --filter--invert--100: invert(100%);
+  --filter--sepia--0: 0%;
+  --filter--sepia--100: 100%;
 
-  --filter--sepia--0: sepia(0%);
-  --filter--sepia--100: sepia(100%);
+  --filter--hue-rotate--0: 0deg;
+  --filter--hue-rotate--15: 15deg;
+  --filter--hue-rotate--30: 30deg;
+  --filter--hue-rotate--60: 60deg;
+  --filter--hue-rotate--90: 90deg;
+  --filter--hue-rotate--180: 180deg;
 
-  --filter--hue-rotate--0: hue-rotate(0deg);
-  --filter--hue-rotate--15: hue-rotate(15deg);
-  --filter--hue-rotate--30: hue-rotate(30deg);
-  --filter--hue-rotate--60: hue-rotate(60deg);
-  --filter--hue-rotate--90: hue-rotate(90deg);
-  --filter--hue-rotate--180: hue-rotate(180deg);
+  --filter--blur--0: 0px;
+  --filter--blur--4: 4px;
+  --filter--blur--8: 8px;
+  --filter--blur--12: 12px;
+  --filter--blur--16: 16px;
+  --filter--blur--24: 24px;
+  --filter--blur--40: 40px;
+  --filter--blur--64: 64px;
 
   --transition-property--none: none;
   --transition-property--all: all;
@@ -627,7 +627,7 @@
     text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter,
     backdrop-filter;
   --transition-property--opacity: opacity;
-  --transition-property--shadow: box-shadow;
+  --transition-property--box-shadow: box-shadow;
   --transition-property--transform: transform;
 
   --transition-duration--0: 0ms;
