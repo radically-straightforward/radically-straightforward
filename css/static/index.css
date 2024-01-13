@@ -500,7 +500,7 @@
   --border-radius--3: 0.75rem;
   --border-radius--4: 1rem;
   --border-radius--6: 1.5rem;
-  --border-radius--circle: 100%;
+  --border-radius--circle: 50%;
   --border-radius--round: 9999px;
 
   --box-shadow--0: 0 0 #0000;
@@ -528,20 +528,45 @@
 
   --transform--rotate--0: rotate(0deg);
   --transform--rotate--1: rotate(1deg);
+  --transform--rotate---1: rotate(-1deg);
   --transform--rotate--2: rotate(2deg);
+  --transform--rotate---2: rotate(-2deg);
   --transform--rotate--3: rotate(3deg);
+  --transform--rotate---3: rotate(-3deg);
   --transform--rotate--6: rotate(6deg);
+  --transform--rotate---6: rotate(-6deg);
   --transform--rotate--12: rotate(12deg);
+  --transform--rotate---12: rotate(-12deg);
   --transform--rotate--45: rotate(45deg);
+  --transform--rotate---45: rotate(-45deg);
   --transform--rotate--90: rotate(90deg);
+  --transform--rotate---90: rotate(-90deg);
   --transform--rotate--180: rotate(180deg);
+  --transform--rotate---180: rotate(-180deg);
 
   --transform--skew--0: 0deg;
   --transform--skew--1: 1deg;
+  --transform--skew---1: -1deg;
   --transform--skew--2: 2deg;
+  --transform--skew---2: -2deg;
   --transform--skew--3: 3deg;
+  --transform--skew---3: -3deg;
   --transform--skew--6: 6deg;
+  --transform--skew---6: -6deg;
   --transform--skew--12: 12deg;
+  --transform--skew---12: -12deg;
+
+  --filter--drop-shadow--0: drop-shadow(0 0 #0000);
+  --filter--drop-shadow--1: drop-shadow(0 1px 1px rgb(0 0 0 / 0.05));
+  --filter--drop-shadow--2: drop-shadow(0 1px 2px rgb(0 0 0 / 0.1))
+    drop-shadow(0 1px 1px rgb(0 0 0 / 0.06));
+  --filter--drop-shadow--4: drop-shadow(0 4px 3px rgb(0 0 0 / 0.07))
+    drop-shadow(0 2px 2px rgb(0 0 0 / 0.06));
+  --filter--drop-shadow--10: drop-shadow(0 10px 8px rgb(0 0 0 / 0.04))
+    drop-shadow(0 4px 3px rgb(0 0 0 / 0.1));
+  --filter--drop-shadow--20: drop-shadow(0 20px 13px rgb(0 0 0 / 0.03))
+    drop-shadow(0 8px 5px rgb(0 0 0 / 0.08));
+  --filter--drop-shadow--25: drop-shadow(0 25px 25px rgb(0 0 0 / 0.15));
 
   --filter--blur--0: blur(0px);
   --filter--blur--4: blur(4px);
@@ -572,20 +597,20 @@
   --filter--contrast--150: contrast(1.5);
   --filter--contrast--200: contrast(2);
 
-  --filter--drop-shadow--0: drop-shadow(0 0 #0000);
-  --filter--drop-shadow--1: drop-shadow(0 1px 1px rgb(0 0 0 / 0.05));
-  --filter--drop-shadow--2: drop-shadow(0 1px 2px rgb(0 0 0 / 0.1))
-    drop-shadow(0 1px 1px rgb(0 0 0 / 0.06));
-  --filter--drop-shadow--4: drop-shadow(0 4px 3px rgb(0 0 0 / 0.07))
-    drop-shadow(0 2px 2px rgb(0 0 0 / 0.06));
-  --filter--drop-shadow--10: drop-shadow(0 10px 8px rgb(0 0 0 / 0.04))
-    drop-shadow(0 4px 3px rgb(0 0 0 / 0.1));
-  --filter--drop-shadow--20: drop-shadow(0 20px 13px rgb(0 0 0 / 0.03))
-    drop-shadow(0 8px 5px rgb(0 0 0 / 0.08));
-  --filter--drop-shadow--25: drop-shadow(0 25px 25px rgb(0 0 0 / 0.15));
+  --filter--saturate--0: saturate(0);
+  --filter--saturate--50: saturate(0.5);
+  --filter--saturate--100: saturate(1);
+  --filter--saturate--150: saturate(1.5);
+  --filter--saturate--200: saturate(2);
 
   --filter--grayscale--0: grayscale(0%);
   --filter--grayscale--100: grayscale(100%);
+
+  --filter--invert--0: invert(0%);
+  --filter--invert--100: invert(100%);
+
+  --filter--sepia--0: sepia(0%);
+  --filter--sepia--100: sepia(100%);
 
   --filter--hue-rotate--0: hue-rotate(0deg);
   --filter--hue-rotate--15: hue-rotate(15deg);
@@ -593,18 +618,6 @@
   --filter--hue-rotate--60: hue-rotate(60deg);
   --filter--hue-rotate--90: hue-rotate(90deg);
   --filter--hue-rotate--180: hue-rotate(180deg);
-
-  --filter--invert--0: invert(0%);
-  --filter--invert--100: invert(100%);
-
-  --filter--saturate--0: saturate(0);
-  --filter--saturate--50: saturate(0.5);
-  --filter--saturate--100: saturate(1);
-  --filter--saturate--150: saturate(1.5);
-  --filter--saturate--200: saturate(2);
-
-  --filter--sepia--0: sepia(0%);
-  --filter--sepia--100: sepia(100%);
 
   --transition-property--none: none;
   --transition-property--all: all;
