@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 1.0.0 · 2024-01-23
 
 - Initial release, based on [`@leafac/css`](https://www.npmjs.com/package/@leafac/css). There are breaking changes: Mostly variables that have been renamed into a better scheme, and some that have been removed:
 
