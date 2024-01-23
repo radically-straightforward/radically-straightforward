@@ -6,7 +6,7 @@
           content="width=device-width, initial-scale=1, maximum-scale=1"
         />
 AND OTHER META STUFF FROM LAYOUTS.MTS IN COURSELORE
-        
+
 
 https://www.refactoringui.com/
 
