@@ -1,6 +1,24 @@
 <!--
-## Authoring CSS
+## Authoring
 
+- Define properties in the following order:
+  1.  Font and text properties.
+  2.  Colors, from foreground to background (for example, `color` then `background-color`).
+  3.  Box model, from the inside out (for example, `width`, then `padding`, then `border`, then `margin`, then `outline`).
+  4.  Positioning of element with respect to container (for example, `position`).
+  5.  Positioning of children (for example, `display: flex;`).
+  6.  Interactions (for example, `cursor`).
+  7.  Transformations.
+  8.  Animations.
+  9.  States (for example, `:hover`).
+  10. Variations (for example, breakpoints and dark mode).
+  11. Children, including `::before` and `::after`.
+- Don’t use the same set of breakpoints all the time. Analyze case by case, and set breakpoints accordingly. (And besides, CSS variables don’t work for setting breakpoints, because they’re defined in `:root`, and the media query lives outside the scope of a selector.)
+- Layers
+  - Global styles (for example, font)
+  - Components for things like form inputs and buttons
+  - Inline styles everywhere else
+- Extraction: Often it doesn’t make sense to extract CSS, because the HTML structure is fundamental. Extracting using JavaScript functions makes more sense.
 - Document: Don’t use `#ids`, because of specificity (use `key=""`s instead, for compatibility with `@radically-straightforward/javascript`)
 - Interpolation
   - What I think of as interpolation many libraries call “dynamic” properties/styles/etc.
@@ -49,6 +67,8 @@
 ### Other CSS-in-JS Tools
 
 - https://vanilla-extract.style
+- https://xstyled.dev/
+- https://linaria.dev/
 - https://www.npmjs.com/package/csjs
 - https://www.npmjs.com/package/radium
 
@@ -88,6 +108,7 @@
     - Node.js native module (N-API) based on the canonical implementation.
     - Updated recently.
     - The only one to provide XXH3
+  - https://github.com/bryc/code/tree/master/jshash/hashes
 
 ### JavaScript Compilation
 

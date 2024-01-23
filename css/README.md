@@ -1,86 +1,11 @@
 <!--
-color: var(--color--green--200);
-
-You’ll write something like:
-
-color: ${css.color.green[200]};
-
-
-xxhash
-
-https://xstyled.dev
-
-https://github.com/bryc/code/tree/master/jshash/hashes
-
-https://linaria.dev/
- -->
-
-<!-- What else is there to love about Tailwind? The docs (including the book), and the design system -->
-
-<!-- And sometimes in those situations extracting CSS components isn’t the right level of abstraction, because the component also has opinions on the HTML. React, for example, but we can do it much more simply. -->
-
-<!-- Put a code example right away -->
-
-<!-- <meta
-            name="viewport"
-            content="width=device-width, initial-scale=1, maximum-scale=1"
-          /> -->
-
-<!--
-trust your eyes
-
-screens: don’t use a set of breakpoints, instead look at the interface, determine when it isn’t working anymore, and add a breakpoint there (also, CSS custom properties don’t work in media queries)
-
-approach:
-reset
-design system
-global styles (for example, font)
-components for things like form inputs and buttons
-inline styles everywhere else
-
-think about styles and order them in the stylesheet inside-out
-
-
-- https://tailwindcss.com/docs/utility-first#why-not-just-use-inline-styles
-
-      // TODO: Make this possibly faster by using Rehype instead of JSDOM (though we have to benchmark to be sure…)
-      //       https://developer.mozilla.org/en-US/docs/Web/CSS/Pseudo-classes
-      //         https://www.npmjs.com/package/pseudo-classes
-      //       https://developer.mozilla.org/en-US/docs/Web/CSS/Pseudo-elements
-      //       https://github.com/postcss/postcss
-      //       https://github.com/brettstimmerman/mensch
-      // https://stackoverflow.com/questions/10963997/css-parser-for-javascript
-      // https://github.com/CSSLint/parser-lib
-      // https://github.com/NV/CSSOM
-      // https://github.com/reworkcss/css
-      // https://www.npmjs.com/package/cssparser
-      // https://rahulnpadalkar.medium.com/css-parser-in-javascript-578eba0977e5
-      // https://github.com/rahulnpadalkar/CSSParser
-      // http://glazman.org/JSCSSP/
-
-      // https://github.com/postcss/postcss-scss
-      // https://github.com/postcss/postcss-js
-      // https://github.com/jonathantneal/precss
-      // https://github.com/postcss/postcss-nested (more installations than the one below)
-      // https://github.com/jonathantneal/postcss-nesting (closer to the standard and more stars than the one above)
-
-      // https://github.com/jsdom/cssstyle
-      // https://github.com/reworkcss/css
-      // https://github.com/css/csso
-      // https://github.com/csstree/csstree
-      // https://github.com/brettstimmerman/mensch
-
-
-
-Use @leafac/html with [Prettier](https://prettier.io) (automatic formatting), and the Visual Studio Code extensions [Prettier - Code formatter](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode) (Prettier support) and [es6-string-html](https://marketplace.visualstudio.com/items?itemName=Tobermory.es6-string-html) (syntax highlighting).
-
-
-### Related Projects
-
-
-### Prior Art
-
-
+- Present CSS variables as JavaScript variables, for example, replace `color: var(--color--green--200);` with `color: ${css.color.green[200]};`.
+  - Advantages:
+    - Autocomplete.
+    - Type checking.
+  - Disadvantages:
+    - Layer of indirection (think of experimenting in browser developer tools: you still have to know the CSS variable, and you can’t copy-and-paste the result of your experiments).
+    - Potentially awkward to extend (think of defining new colors).
 -->
 
 # Radically Straightforward · CSS
@@ -189,21 +114,7 @@ To use this framework:
 
 3. Learn about the framework, particularly the design system, by reading the [the source](./static/index.css).
 
-4. (Optional but recommended) Follow the CSS coding style of the framework. In particular, define properties in the following order:
-
-   1. Font and text properties.
-   2. Colors, from foreground to background (for example, `color` then `background-color`).
-   3. Box model, from the inside out (for example, `width`, then `padding`, then `border`, then `margin`, then `outline`).
-   4. Positioning of element with respect to container (for example, `position`).
-   5. Positioning of children (for example, `display: flex;`).
-   6. Interactions (for example, `cursor`).
-   7. Transformations.
-   8. Animations.
-   9. States (for example, `:hover`).
-   10. Variations (for example, breakpoints and dark mode).
-   11. Children, including `::before` and `::after`.
-
-5. (Optional but recommended) Transpile for broader browser support and bundle your CSS. This framework uses modern CSS features, for example, CSS Nesting and properties that need to be prefixed. We recommend [`@radically-straightforward/build`](https://npm.im/@radically-straightforward/build).
+4. (Optional but recommended) Transpile for broader browser support and bundle your CSS. This framework uses modern CSS features, for example, CSS Nesting and properties that need to be prefixed. We recommend [`@radically-straightforward/build`](https://npm.im/@radically-straightforward/build).
 
 ## Related Work
 
@@ -236,6 +147,8 @@ But `@radically-straightforward/css` is different from Tailwind in how it solves
 - **Responsive design** and **Hover, focus, and other states.** Media queries, pseudo-elements, children, and so forth, are supported in `@radically-straightforward/css` paired with `@radically-straightforward/build`, all while still colocating HTML and its corresponding CSS—you can think of it as inline styles infused with the power of nesting.
 
 > **Note:** Another small quality-of-life gain of `@radically-straightforward/build` over Tailwind: Prettier formats CSS in tagged templates over multiple lines, making the code more readable than the long lines of `class`es in Tailwind.
+
+> **Note:** [Tailwind’s documentation](https://tailwindcss.com/docs/installation) is fantastic and worth the read. It’s a great supplement to [MDN](https://developer.mozilla.org/en-US/docs/Web/CSS), full of examples, and concentrates the most useful CSS properties all in one place. And it includes the CSS version of everything, so you can skip over the Tailwind classes and still benefit from the documentation.
 
 ### [Open Props](https://open-props.style)
 
