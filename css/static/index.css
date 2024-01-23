@@ -754,6 +754,7 @@ Also useful for form elements that should be focusable, but not visible, for exa
 The `.visually-hidden--interactive` variation makes the element visible when in focus, which is useful, for example, for “Skip to Content” links at the start of the page.
 
 **References**
+
 - <https://github.com/twbs/bootstrap/blob/7d9adb702d96f9eb4706afb12cd73c9654979575/scss/mixins/_visually-hidden.scss>
 - <https://tailwindcss.com/docs/screen-readers>
 - <https://www.a11yproject.com/posts/2013-01-11-how-to-hide-content/>
