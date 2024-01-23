@@ -153,7 +153,7 @@ export default function html(
  *
  * > **Note:** The `` html`___` `` tagged template already calls `sanitize()`, so you must **not** call `sanitize()` yourself or the sanitization would happen twice.
  *
- * > **Note:** The sanitization to which we refer here is at the character level, not cleaning up certain tags while preserving others. For that, we recommend [`rehype-sanitize`](https://npm.im/rehype-sanitize).
+ * > **Note:** The sanitization to which we refer here is at the character level, not cleaning up certain tags while preserving others. For that, we recommend [`rehype-sanitize`](https://www.npmjs.com/package/rehype-sanitize).
  *
  * > **Note:** Even this sanitization isn’t enough in certain contexts, for example, HTML attributes without quotes (`<a href=${sanitize(___)}>`) could still lead to XSS attacks.
  */

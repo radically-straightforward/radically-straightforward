@@ -248,4 +248,3 @@ But `@radically-straightforward/css` is different from Tailwind in how it solves
 ### [Open Props](https://open-props.style)
 
 It’s a design system similar in spirit to the one included in `@radically-straightforward/css`, in the sense that it’s also presented a CSS variables. Open Props takes the approach of normalizing CSS across browsers, instead of resetting browser styles; it comes with more transitions and animations, and fewer sizes. It also comes with an approach of fixed breakpoints, while in `@radically-straightforward/css`’s style we prefer to use breakpoints case-by-case.
-

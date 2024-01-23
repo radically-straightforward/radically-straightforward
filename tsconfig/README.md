@@ -24,6 +24,6 @@ $ npm install --save-dev @radically-straightforward/tsconfig
 
 ## Related Work
 
-### [`@sindresorhus/tsconfig`](https://npm.im/@sindresorhus/tsconfig)
+### [`@sindresorhus/tsconfig`](https://www.npmjs.com/package/@sindresorhus/tsconfig)
 
 Similar in spirit, but we make fewer decisions in terms of syntax (`noImplicitReturns`, `noImplicitOverride`, and so forth), we enable `isolatedModules` for [esbuild’s benefit](https://esbuild.github.io/content-types/#isolated-modules), and so forth.

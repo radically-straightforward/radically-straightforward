@@ -94,7 +94,7 @@ A promisified version of `setTimeout()`. Bare-bones: It doesn’t even offer a w
 export function randomString(): string;
 ```
 
-A fast random string generator. The generated strings are 10 or 11 characters in length. The generated strings include the characters `[0-9a-z]`. The generated strings are **not** cryptographically secure—if you need that, then use [`crypto-random-string`](https://npm.im/crypto-random-string).
+A fast random string generator. The generated strings are 10 or 11 characters in length. The generated strings include the characters `[0-9a-z]`. The generated strings are **not** cryptographically secure—if you need that, then use [`crypto-random-string`](https://www.npmjs.com/package/crypto-random-string).
 
 ### `log()`
 
@@ -207,7 +207,7 @@ A proposal to include immutable objects (Records) and immutable arrays (Tuples) 
 
 It includes a [polyfill](https://github.com/bloomberg/record-tuple-polyfill) which works very similarly to `intern()` but requires different functions for different data types.
 
-**[`collections-deep-equal`](https://npm.im/collections-deep-equal)**
+**[`collections-deep-equal`](https://www.npmjs.com/package/collections-deep-equal)**
 
 A previous solution to this problem which took a different approach: Instead of interning the values and allowing you to use JavaScript’s `Map`s and `Set`s, `collections-deep-equal` extends `Map`s and `Set`s with a different notion of equality.
 
@@ -217,21 +217,21 @@ A previous solution to this problem which took a different approach: Instead of 
 
 `collections-deep-equal` has different intern pools for each `Map` and `Set` instead of `intern()`’s single global intern pool, which may be advantageous because smaller pools may be faster to traverse.
 
-**[Immutable.js](https://npm.im/immutable), [`collections`](https://npm.im/collections), [`mori`](https://npm.im/mori), [TypeScript Collections](https://npm.im/typescript-collections), [`prelude-ts`](https://npm.im/prelude-ts), [`collectable`](https://npm.im/collectable), and so forth**
+**[Immutable.js](https://www.npmjs.com/package/immutable), [`collections`](https://www.npmjs.com/package/collections), [`mori`](https://www.npmjs.com/package/mori), [TypeScript Collections](https://www.npmjs.com/package/typescript-collections), [`prelude-ts`](https://www.npmjs.com/package/prelude-ts), [`collectable`](https://www.npmjs.com/package/collectable), and so forth**
 
 Similar to `collections-deep-equal`, these libraries implement their own data structures instead of relying on JavaScript’s `Map`s and `Set`s. Some of them go a step further and add their own notions of objects and arrays, which requires you to convert your values back and forth, may not show up nicely in the JavaScript inspector, may be less ergonomic to use with TypeScript, and so forth.
 
 The advantage of these libraries over interning is that they may be faster.
 
-**[`immer`](https://npm.im/immer) and [`icepick`](https://npm.im/icepick)**
+**[`immer`](https://www.npmjs.com/package/immer) and [`icepick`](https://www.npmjs.com/package/icepick)**
 
 Introduce a new way to create values based on existing values.
 
-**[`seamless-immutable`](https://npm.im/seamless-immutable)**
+**[`seamless-immutable`](https://www.npmjs.com/package/seamless-immutable)**
 
 Modifies existing values more profoundly than freezing.
 
-**[`es6-array-map`](https://npm.im/es6-array-map), [`valuecollection`](https://npm.im/valuecollection), [`@strong-roots-capital/map-objects`](https://npm.im/@strong-roots-capital/map-objects), and so forth**
+**[`es6-array-map`](https://www.npmjs.com/package/es6-array-map), [`valuecollection`](https://www.npmjs.com/package/valuecollection), [`@strong-roots-capital/map-objects`](https://www.npmjs.com/package/@strong-roots-capital/map-objects), and so forth**
 
 Similar to `collections-deep-equal` but either incomplete, or lacking type definitions, and so forth.
 
