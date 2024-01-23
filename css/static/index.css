@@ -4,22 +4,6 @@
 /*
 This CSS reset covers more than other CSS resets and normalizers, for example, it resets styles for headings, links, lists, form elements, `<details>`, and so forth. The idea is to guide you to use the design system instead of relying on browser defaults.
 
-It is also an example of the CSS coding style, which typically goes in the following order:
-
-1. Font and text properties.
-2. Colors, from foreground to background.
-3. Box model, from the inside out (for example, `width` before `margin`).
-4. Positioning of element with respect to container (for example, `position`).
-5. Positioning of children (for example, `display: flex;`).
-6. Interactions (for example, `cursor`).
-7. Transformations.
-8. Animations.
-9. States (for example, `:hover`).
-10. Variations (for example, breakpoints and dark mode).
-11. Children, including `::before` and `::after`.
-
-> **Note**: This stylesheet uses modern CSS features that may need to be transpiled, for example, CSS Nesting, and properties that need prefixing. We recommend [`@radically-straightforward/build`](https://npm.im/@radically-straightforward/build).
-
 **References**
 
 - <https://necolas.github.io/normalize.css/8.0.1/normalize.css>
@@ -77,7 +61,7 @@ It is also an example of the CSS coding style, which typically goes in the follo
 /* DESIGN SYSTEM */
 
 /*
-The design system is defined as CSS variables and is largely a port of [Tailwind](https://tailwindcss.com/)’s design system.
+The design system is defined as CSS variables and is largely converted from [Tailwind](https://tailwindcss.com/)’s design system.
 
 **References**
 
@@ -432,6 +416,7 @@ The design system is defined as CSS variables and is largely a port of [Tailwind
   --opacity--95: 0.95;
   --opacity--100: 1;
 
+  /* Useful for properties including `width`, `height`, `padding`, `margin`, `gap` and so forth. */
   --space--0: 0px;
   --space--px: 1px;
   --space---px: -1px;
@@ -525,6 +510,7 @@ The design system is defined as CSS variables and is largely a port of [Tailwind
   --aspect-ratio--square: 1 / 1;
   --aspect-ratio--video: 16 / 9;
 
+  /* Useful for properties including `outline`, `stroke`, and so forth. */
   --border-width--0: 0px;
   --border-width--1: 1px;
   --border-width--2: 2px;

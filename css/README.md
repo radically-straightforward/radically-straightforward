@@ -1,14 +1,7 @@
 <!--
 
 
-<meta
-          name="viewport"
-          content="width=device-width, initial-scale=1, maximum-scale=1"
-        />
-AND OTHER META STUFF FROM LAYOUTS.MTS IN COURSELORE
 
-
-https://www.refactoringui.com/
 
 https://html-first.com/
 
@@ -634,3 +627,53 @@ To use this framework:
    @import "@radically-straightforward/css/static/index.css";
    /* ... */
    ```
+
+3. (Optional but recommended) Transpile and bundle your CSS. This stylesheet uses modern CSS features, for example, CSS Nesting and properties that need prefixing for broader browser support. We recommend [`@radically-straightforward/build`](https://npm.im/@radically-straightforward/build).
+
+4. Learn about the framework, particularly the design system, by reading the [the source](./static/index.css).
+
+TODO:
+
+It is also an example of the CSS coding style, which typically goes in the following order:
+
+1. Font and text properties.
+2. Colors, from foreground to background.
+3. Box model, from the inside out (for example, `width` before `margin`).
+4. Positioning of element with respect to container (for example, `position`).
+5. Positioning of children (for example, `display: flex;`).
+6. Interactions (for example, `cursor`).
+7. Transformations.
+8. Animations.
+9. States (for example, `:hover`).
+10. Variations (for example, breakpoints and dark mode).
+11. Children, including `::before` and `::after`.
+
+## Related Work
+
+### [Tailwind](https://tailwindcss.com/)
+
+`@radically-straightforward/css` follows some of the ideas popularized by Tailwind:
+
+- Colocating HTML and its corresponding CSS.
+
+- Including minimal opinions on style, so that every design looks unique.
+
+- Including a design system with a selection of spaces, colors, fonts, and so forth.
+
+  > **Note**: To learn more about design and how to use a design system, we recommend [Refactoring UI](https://www.refactoringui.com/) and [Practical Typography](https://practicaltypography.com/).
+
+But `@radically-straightforward/css` is different from Tailwind in how it solves [some issues](https://tailwindcss.com/docs/utility-first#why-not-just-use-inline-styles):
+
+- **Designing with constraints.** The design systems in Tailwind and `@radically-straightforward/css` are largely the same, because we ported Tailwind’s design system. But Tailwind presents its design system as classes, and `@radically-straightforward/css` presents its design system as CSS variables.
+
+  The class names in Tailwind are an extra layer of indirection that you need to learn about, because you need to know how the CSS you find in [MDN](https://developer.mozilla.org/en-US/docs/Web/CSS), blog posts, and so forth, map to Tailwind class names. Copying-and-pasting doesn’t work anymore—you must translate from CSS into Tailwind classes.
+
+  In some cases the difference in small, for example, the class `.float-right` corresponds to the CSS `float: right;`. In these cases the class names don’t add much to the CSS.
+
+  In other cases, the class names are abbreviated, for example, the class `.m-2` corresponds to the CSS `margin: 0.5rem;`. Abbreviations can be confusing, especially to beginners, and especially when they pile up. In Tailwind’s defense, the abbreviations are only used on the most common properties, and they’re for the most part tasteful. But they’re still one extra layer of indirection, instead of being Radically Straightforward.
+
+  In addition, customizing the design system involves learning about Tailwind’s customization system.
+
+  The CSS variables in `@radically-straightforward/css`, on the other hand, integrate seamlessly with the CSS you already write. Copying-and-pasting snippets from the internet just works and goes well with the rest of the style in the codebase. And customizing is a matter of setting new CSS variables.
+
+- **Responsive design.** Media queries, pseudo-elements, children, and so forth, are supported in the coding style encouraged by `@radically-straightforward/css`. They
