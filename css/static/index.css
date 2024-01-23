@@ -1,8 +1,7 @@
-/******************************************************************************/
-/* RESET */
-
 /*
-This CSS reset covers more than other CSS resets and normalizers, for example, it resets styles for headings, links, lists, form elements, `<details>`, and so forth. The idea is to guide you to use the design system instead of relying on browser defaults.
+## Reset
+
+This CSS reset covers more than other CSS resets and normalizers, for example, it resets styles for headings, links, lists, form elements, `<details>`, and so forth. The idea is to give you a clean slate on which to use the design system, instead of relying on browser defaults.
 
 **References**
 
@@ -52,21 +51,27 @@ This CSS reset covers more than other CSS resets and normalizers, for example, i
   display: none;
 }
 
-/* Ensure that HTML elements with the `hidden` attribute really are hidden. */
+/* Ensure that HTML elements with the `hidden` attribute are hidden. */
 [hidden] {
   display: none !important;
 }
 
-/******************************************************************************/
-/* DESIGN SYSTEM */
-
 /*
+## Design System
+
 The design system is defined as CSS variables and is largely converted from [Tailwind](https://tailwindcss.com/)’s design system.
+
+**Example**
+
+```css
+font-family: var(--font-family--sans-serif);
+```
 
 **References**
 
 - <https://github.com/tailwindlabs/tailwindcss/blob/3971f2a23ec18bfd4fee41ab3766477ba38f6774/stubs/config.full.js>
 - <https://github.com/tailwindlabs/tailwindcss/blob/3971f2a23ec18bfd4fee41ab3766477ba38f6774/src/public/colors.js>
+- <https://tailwindcss.com/docs/aspect-ratio> and onward.
 */
 :root {
   --font-family--sans-serif: ui-sans-serif, system-ui, sans-serif,
@@ -722,11 +727,10 @@ The design system is defined as CSS variables and is largely converted from [Tai
   }
 }
 
-/******************************************************************************/
-/* HELPERS */
-
 /*
-Make an element hidden from the visual version of the website, but visible to screen readers.
+## Helpers
+
+The `.visually-hidden` class makes an element hidden from the visual version of the website, but readable by screen readers.
 
 Also useful for form elements that should be focusable, but not visible, for example:
 
