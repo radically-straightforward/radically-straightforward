@@ -15,8 +15,10 @@
 ## Installation
 
 ```console
-$ npm install @radically-straightforward/css
+$ npm install --save-dev @radically-straightforward/css
 ```
+
+> **Note:** We recommend installing `@radically-straightforward/css` as a development dependency because `@radically-straightforward/build` can build the `` css`___` `` tagged templates away on the server and bundle the CSS framework on the browser.
 
 > **Note:** We recommend the following tools:
 >
