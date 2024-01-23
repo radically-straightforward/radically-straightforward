@@ -207,3 +207,13 @@
   | `--transition-timing-function--in`     | `--transition-timing-function--ease-in`        |
   | `--transition-timing-function--out`    | `--transition-timing-function--ease-out`       |
   | `--transition-timing-function--in-out` | `--transition-timing-function--ease-in-out`    |
+
+  > **Note:** Since `@leafac/css@0.9.6` we introduced colors of darkness `950`. You may want to convert some background colors of `900` to `950`. And we also renamed the grays:
+  >
+  > | `@leafac/css@0.9.6` | `@leafac/css@0.10.0` |
+  > | ------------------- | -------------------- |
+  > | `gray--blue`        | `slate`              |
+  > | `gray--cool`        | `gray`               |
+  > | `gray--medium`      | `zinc`               |
+  > | `gray--true`        | `neutral`            |
+  > | `gray--warm`        | `stone`              |
