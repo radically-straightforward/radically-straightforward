@@ -601,3 +601,35 @@ css`
 ```
 
 <!-- DOCUMENTATION END: ./source/index.mts -->
+
+### CSS Framework
+
+Beyond the tagged template to define CSS in JavaScript, `@radically-straightforward/css` also includes a CSS framework featuring a CSS reset, a design system, and helper classes.
+
+To use this framework:
+
+1. Use HTML 5 and include a `<meta name="viewport" />` meta tag:
+
+   ```html
+   <!doctype html>
+   <html lang="en">
+     <head>
+       <meta
+         name="viewport"
+         content="width=device-width, initial-scale=1, maximum-scale=1"
+       />
+       <!-- ... -->
+     </head>
+     <body>
+       <!-- ... -->
+     </body>
+   </html>
+   ```
+
+   > **Note:** The scale is set to `1` to prevent iOS from zooming into the viewport when a form field is active. This is **not** an accessibility issue because it does **not** prevent users from zooming in with a pinch gesture, despite what most people say on the internet.
+
+2. Include [`@radically-straightforward/css/static/index.css`](./static/index.css) at the top of your CSS:
+
+   ```css
+   @import "@radically-straightforward/css/static/index.css";
+   ```
