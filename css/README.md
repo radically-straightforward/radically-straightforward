@@ -626,10 +626,11 @@ To use this framework:
    </html>
    ```
 
-   > **Note:** The scale is set to `1` to prevent iOS from zooming into the viewport when a form field is active. This is **not** an accessibility issue because it does **not** prevent users from zooming in with a pinch gesture, despite what most people say on the internet.
+   > **Note:** The scale is set to `1` to prevent iOS from zooming into the viewport when a form field is active. Many people on the internet have written that this could be an accessibility issue because it would prevent users from zooming in with a pinch gesture, but our tests reveal that this is not the case.
 
 2. Include [`@radically-straightforward/css/static/index.css`](./static/index.css) at the top of your CSS:
 
    ```css
    @import "@radically-straightforward/css/static/index.css";
+   /* ... */
    ```

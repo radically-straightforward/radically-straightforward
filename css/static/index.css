@@ -2,17 +2,37 @@
 /* RESET */
 
 /*
-  https://necolas.github.io/normalize.css/8.0.1/normalize.css
-  https://meyerweb.com/eric/tools/css/reset/
-  https://github.com/twbs/bootstrap/blob/649c2bb0bf326db36cbbf7e72c0541b19749a70e/dist/css/bootstrap-reboot.css
-  https://github.com/sindresorhus/modern-normalize/blob/1fc6b5a86676b7ac8abc62d04d6080f92debc70f/modern-normalize.css
-  https://github.com/suitcss/base/blob/50d5ad1e0d6790eb3df29b705db3684a9909894f/lib/base.css
-  https://github.com/tailwindlabs/tailwindcss/blob/b442c912e2d052ad026fd2e3d31bc450f620a784/src/plugins/css/preflight.css
-  https://github.com/jensimmons/cssremedy/blob/468e31a7eda599eea2003ed7983c190828ffb5fd/css/remedy.css
-  https://github.com/csstools/sanitize.css/tree/776bd4d72654ddb54aa5071b2cd10bb1957f7f97
-  https://unpkg.com/browse/@tailwindcss/forms@0.3.2/dist/forms.css
-  https://chriscoyier.net/2023/10/03/being-picky-about-a-css-reset-for-fun-pleasure/
-  https://piccalil.li/blog/a-more-modern-css-reset/
+This CSS reset covers more than other CSS resets and normalizers, for example, it resets styles for headings, links, lists, form elements, `<details>`, and so forth. The idea is to guide you to use the design system instead of relying on browser defaults.
+
+It is also an example of the CSS coding style, which typically goes in the following order:
+
+1. Font and text properties.
+2. Colors, from foreground to background.
+3. Box model, from the inside out (for example, `width` before `margin`).
+4. Positioning of element with respect to container (for example, `position`).
+5. Positioning of children (for example, `display: flex;`).
+6. Interactions (for example, `cursor`).
+7. Transformations.
+8. Animations.
+9. States (for example, `:hover`).
+10. Variations (for example, breakpoints and dark mode).
+11. Children, including `::before` and `::after`.
+
+> **Note**: This stylesheet uses modern CSS features that may need to be transpiled, for example, CSS Nesting, and properties that need prefixing. We recommend [`@radically-straightforward/build`](https://npm.im/@radically-straightforward/build).
+
+**References**
+
+- <https://necolas.github.io/normalize.css/8.0.1/normalize.css>
+- <https://meyerweb.com/eric/tools/css/reset/>
+- <https://github.com/twbs/bootstrap/blob/649c2bb0bf326db36cbbf7e72c0541b19749a70e/dist/css/bootstrap-reboot.css>
+- <https://github.com/sindresorhus/modern-normalize/blob/1fc6b5a86676b7ac8abc62d04d6080f92debc70f/modern-normalize.css>
+- <https://github.com/suitcss/base/blob/50d5ad1e0d6790eb3df29b705db3684a9909894f/lib/base.css>
+- <https://github.com/tailwindlabs/tailwindcss/blob/b442c912e2d052ad026fd2e3d31bc450f620a784/src/plugins/css/preflight.css>
+- <https://github.com/jensimmons/cssremedy/blob/468e31a7eda599eea2003ed7983c190828ffb5fd/css/remedy.css>
+- <https://github.com/csstools/sanitize.css/tree/776bd4d72654ddb54aa5071b2cd10bb1957f7f97>
+- <https://unpkg.com/browse/@tailwindcss/forms@0.3.2/dist/forms.css>
+- <https://chriscoyier.net/2023/10/03/being-picky-about-a-css-reset-for-fun-pleasure/>
+- <https://piccalil.li/blog/a-more-modern-css-reset/>
 */
 
 *,
@@ -20,7 +40,9 @@
 ::after {
   font: inherit;
   text-decoration: inherit;
+  /* Prevent iOS from making text bigger in landscape orientation. */
   text-size-adjust: 100%;
+  /* Prevent macOS and iOS from blurring glyphs. */
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   color: inherit;
@@ -31,17 +53,22 @@
   border: 0;
   margin: 0;
   outline: 0;
+  /* Prevent long words, for example, URLs, from breaking out of the container. */
   overflow-wrap: break-word;
+  /* Reset default styles of form elements. */
   appearance: none;
   list-style: none;
+  /* Prevent `<textarea>` from being resizable by default. */
   resize: none;
   cursor: inherit;
 }
 
+/* Reset default style from `<details>`. */
 ::-webkit-details-marker {
   display: none;
 }
 
+/* Ensure that HTML elements with the `hidden` attribute really are hidden. */
 [hidden] {
   display: none !important;
 }
@@ -50,8 +77,12 @@
 /* DESIGN SYSTEM */
 
 /*
-  https://github.com/tailwindlabs/tailwindcss/blob/3971f2a23ec18bfd4fee41ab3766477ba38f6774/stubs/config.full.js
-  https://github.com/tailwindlabs/tailwindcss/blob/3971f2a23ec18bfd4fee41ab3766477ba38f6774/src/public/colors.js
+The design system is defined as CSS variables and is largely a port of [Tailwind](https://tailwindcss.com/)’s design system.
+
+**References**
+
+- <https://github.com/tailwindlabs/tailwindcss/blob/3971f2a23ec18bfd4fee41ab3766477ba38f6774/stubs/config.full.js>
+- <https://github.com/tailwindlabs/tailwindcss/blob/3971f2a23ec18bfd4fee41ab3766477ba38f6774/src/public/colors.js>
 */
 :root {
   --font-family--sans-serif: ui-sans-serif, system-ui, sans-serif,
@@ -61,6 +92,14 @@
   --font-family--monospace: ui-monospace, SFMono-Regular, Menlo, Monaco,
     Consolas, "Liberation Mono", "Courier New", monospace;
 
+  /*
+  Set `font-size` and `line-height` together, for example:
+
+  ```css
+  font-size: var(--font-size--3);
+  line-height: var(--font-size--3--line-height);
+  ```
+  */
   --font-size--2-5: 0.625rem;
   --font-size--2-5--line-height: 0.875rem;
   --font-size--3: 0.75rem;
@@ -701,13 +740,27 @@
 /* HELPERS */
 
 /*
-  https://github.com/twbs/bootstrap/blob/7d9adb702d96f9eb4706afb12cd73c9654979575/scss/mixins/_visually-hidden.scss
-  https://tailwindcss.com/docs/screen-readers
-  https://www.a11yproject.com/posts/2013-01-11-how-to-hide-content/
-  https://hugogiraudel.com/2016/10/13/css-hide-and-seek/
-  https://github.com/twbs/bootstrap/issues/25686
-  https://accessibility.18f.gov/hidden-content/
-  https://stackoverflow.com/questions/8570050/page-jumps-to-the-top-when-checkbox-is-clicked
+Make an element hidden from the visual version of the website, but visible to screen readers.
+
+Also useful for form elements that should be focusable, but not visible, for example:
+
+```html
+<label>
+  <input type="radio" class="visually-hidden" />
+  Example
+</label>
+```
+
+The `.visually-hidden--interactive` variation makes the element visible when in focus, which is useful, for example, for “Skip to Content” links at the start of the page.
+
+**References**
+- <https://github.com/twbs/bootstrap/blob/7d9adb702d96f9eb4706afb12cd73c9654979575/scss/mixins/_visually-hidden.scss>
+- <https://tailwindcss.com/docs/screen-readers>
+- <https://www.a11yproject.com/posts/2013-01-11-how-to-hide-content/>
+- <https://hugogiraudel.com/2016/10/13/css-hide-and-seek/>
+- <https://github.com/twbs/bootstrap/issues/25686>
+- <https://accessibility.18f.gov/hidden-content/>
+- <https://stackoverflow.com/questions/8570050/page-jumps-to-the-top-when-checkbox-is-clicked>
 */
 
 .visually-hidden,
