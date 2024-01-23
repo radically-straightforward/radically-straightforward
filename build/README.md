@@ -46,6 +46,12 @@
 
 ## Related Work
 
+### Other CSS-in-JS Tools
+
+- https://vanilla-extract.style
+- https://www.npmjs.com/package/csjs
+- https://www.npmjs.com/package/radium
+
 ### Fast Non-Cryptographic Hashes
 
 - Algorithms

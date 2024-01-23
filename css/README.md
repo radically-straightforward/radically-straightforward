@@ -1,12 +1,4 @@
 <!--
-    - [ ] https://www.npmjs.com/package/csjs
-    - [ ] https://www.npmjs.com/package/radium
-
-
-
-    https://vanilla-extract.style
-    Type checking & autocomplete. I’m totally stealing that idea! Instead of writing:
-
 color: var(--color--green--200);
 
 You’ll write something like:
