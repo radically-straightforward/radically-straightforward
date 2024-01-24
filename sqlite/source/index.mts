@@ -1,4 +1,3 @@
-import assert from "node:assert/strict";
 import BetterSqlite3Database from "better-sqlite3";
 
 export type Options = {
@@ -31,13 +30,13 @@ export default function sql(
         !Array.isArray(substitution.sourceParts) ||
         substitution.sourceParts.length === 0 ||
         substitution.sourceParts.some(
-          (substitutionPart: any) => typeof substitutionPart !== "string"
+          (substitutionPart: any) => typeof substitutionPart !== "string",
         ) ||
         !Array.isArray(substitution.parameters) ||
         substitution.sourceParts.length !== substitution.parameters.length + 1
       )
         throw new Error(
-          `Failed to interpolate raw query ‘${substitution}’ because it wasn’t created with the sql\`\` tagged template`
+          `Failed to interpolate raw query ‘${substitution}’ because it wasn’t created with the sql\`\` tagged template`,
         );
       const substitutionQuery = substitution as Query;
       if (substitutionQuery.sourceParts.length === 1)
@@ -47,13 +46,12 @@ export default function sql(
       else {
         sourceParts.push(
           `${templatePart}${substitutionQuery.sourceParts[0]}`,
-          ...substitutionQuery.sourceParts.slice(1, -1)
+          ...substitutionQuery.sourceParts.slice(1, -1),
         );
-        templateParts[
-          substitutionsIndex + 1
-        ] = `${substitutionQuery.sourceParts.at(-1)}${
-          templateParts[substitutionsIndex + 1]
-        }`;
+        templateParts[substitutionsIndex + 1] =
+          `${substitutionQuery.sourceParts.at(-1)}${
+            templateParts[substitutionsIndex + 1]
+          }`;
         parameters.push(...substitutionQuery.parameters);
       }
     } else if (Array.isArray(substitution)) {
@@ -64,7 +62,7 @@ export default function sql(
       else {
         sourceParts.push(
           `${templatePart}(`,
-          ...new Array(substitution.length - 1).fill(",")
+          ...new Array(substitution.length - 1).fill(","),
         );
         templateParts[substitutionsIndex + 1] = `)${
           templateParts[substitutionsIndex + 1]
@@ -78,91 +76,6 @@ export default function sql(
   }
   sourceParts.push(templateParts.at(-1)!);
   return { sourceParts, parameters };
-}
-
-if (process.env.TEST === "@leafac/sqlite") {
-  assert.deepEqual(
-    sql`CREATE TABLE "users" ("id" INTEGER PRIMARY KEY AUTOINCREMENT, "name" TEXT)`,
-    {
-      sourceParts: [
-        `CREATE TABLE "users" ("id" INTEGER PRIMARY KEY AUTOINCREMENT, "name" TEXT)`,
-      ],
-      parameters: [],
-    }
-  );
-  assert.deepEqual(
-    sql`INSERT INTO "users" ("name") VALUES (${"Leandro Facchinetti"})`,
-    {
-      sourceParts: [`INSERT INTO "users" ("name") VALUES (`, `)`],
-      parameters: ["Leandro Facchinetti"],
-    }
-  );
-  assert.deepEqual(
-    sql`SELECT "id", "name" FROM "users" WHERE "name" IN ${[]}`,
-    {
-      sourceParts: [`SELECT "id", "name" FROM "users" WHERE "name" IN ()`],
-      parameters: [],
-    }
-  );
-  assert.deepEqual(
-    sql`SELECT "id", "name" FROM "users" WHERE "name" IN ${[
-      "Leandro Facchinetti",
-      "David Adler",
-    ]}`,
-    {
-      sourceParts: [
-        `SELECT "id", "name" FROM "users" WHERE "name" IN (`,
-        `,`,
-        `)`,
-      ],
-      parameters: ["Leandro Facchinetti", "David Adler"],
-    }
-  );
-  assert.deepEqual(
-    sql`SELECT "id", "name" FROM "users" WHERE "name" IN ${new Set([])}`,
-    {
-      sourceParts: [`SELECT "id", "name" FROM "users" WHERE "name" IN ()`],
-      parameters: [],
-    }
-  );
-  assert.deepEqual(
-    sql`SELECT "id", "name" FROM "users" WHERE "name" IN ${new Set([
-      "Leandro Facchinetti",
-      "David Adler",
-    ])}`,
-    {
-      sourceParts: [
-        `SELECT "id", "name" FROM "users" WHERE "name" IN (`,
-        `,`,
-        `)`,
-      ],
-      parameters: ["Leandro Facchinetti", "David Adler"],
-    }
-  );
-  assert.deepEqual(
-    sql`SELECT "id", "name" FROM "users" WHERE name = ${"Leandro Facchinetti"}$${sql` AND "age" IS NOT NULL`}`,
-    {
-      sourceParts: [
-        `SELECT "id", "name" FROM "users" WHERE name = `,
-        ` AND "age" IS NOT NULL`,
-      ],
-      parameters: ["Leandro Facchinetti"],
-    }
-  );
-  assert.deepEqual(
-    sql`SELECT "id", "name" FROM "users" WHERE name = ${"Leandro Facchinetti"}$${sql` AND "age" = ${31}`}`,
-    {
-      sourceParts: [
-        `SELECT "id", "name" FROM "users" WHERE name = `,
-        ` AND "age" = `,
-        ``,
-      ],
-      parameters: ["Leandro Facchinetti", 31],
-    }
-  );
-  assert.throws(() => {
-    sql`SELECT "id", "name" FROM "users" WHERE name = ${"Leandro Facchinetti"}$${` AND "age" = ${31}`}`;
-  });
 }
 
 // FIXME: Use BetterSqlite3Database generics: https://github.com/DefinitelyTyped/DefinitelyTyped/issues/50794
@@ -183,7 +96,7 @@ export class Database extends BetterSqlite3Database {
         this.get<{ parameter: string }>(
           sql`
             SELECT quote(${query.parameters[parametersIndex]}) AS "parameter"
-          `
+          `,
         )!.parameter;
     source += query.sourceParts.at(-1);
     return this.exec(source);
@@ -196,11 +109,11 @@ export class Database extends BetterSqlite3Database {
         sql`
           CREATE TABLE "users" ("id" INTEGER PRIMARY KEY AUTOINCREMENT, "name" TEXT);
           INSERT INTO "users" ("name") VALUES (${"Eliot Smith"});
-        `
+        `,
       );
       assert.equal(
         database.get<{ name: string }>(sql`SELECT * FROM "users"`)!.name,
-        "Eliot Smith"
+        "Eliot Smith",
       );
       database.close();
     }
@@ -214,13 +127,13 @@ export class Database extends BetterSqlite3Database {
     if (process.env.TEST === "@leafac/sqlite") {
       const database = new Database(":memory:");
       database.execute(
-        sql`CREATE TABLE "users" ("id" INTEGER PRIMARY KEY AUTOINCREMENT, "name" TEXT);`
+        sql`CREATE TABLE "users" ("id" INTEGER PRIMARY KEY AUTOINCREMENT, "name" TEXT);`,
       );
       assert.deepEqual(
         database.run(
-          sql`INSERT INTO "users" ("name") VALUES (${"Leandro Facchinetti"})`
+          sql`INSERT INTO "users" ("name") VALUES (${"Leandro Facchinetti"})`,
         ),
-        { changes: 1, lastInsertRowid: 1 }
+        { changes: 1, lastInsertRowid: 1 },
       );
       database.close();
     }
@@ -234,7 +147,7 @@ export class Database extends BetterSqlite3Database {
     if (process.env.TEST === "@leafac/sqlite") {
       const database = new Database(":memory:");
       database.execute(
-        sql`CREATE TABLE "users" ("id" INTEGER PRIMARY KEY AUTOINCREMENT, "name" TEXT);`
+        sql`CREATE TABLE "users" ("id" INTEGER PRIMARY KEY AUTOINCREMENT, "name" TEXT);`,
       );
       assert.deepEqual(
         database.get<{ id: number; name: string }>(
@@ -242,18 +155,18 @@ export class Database extends BetterSqlite3Database {
             INSERT INTO "users" ("name")
             VALUES (${"Leandro Facchinetti"})
             RETURNING *
-          `
+          `,
         ),
-        { id: 1, name: "Leandro Facchinetti" }
+        { id: 1, name: "Leandro Facchinetti" },
       );
       assert.deepEqual(
         database.get<{ id: number; name: string }>(
-          sql`SELECT "id", "name" FROM "users"`
+          sql`SELECT "id", "name" FROM "users"`,
         ),
         {
           id: 1,
           name: "Leandro Facchinetti",
-        }
+        },
       );
       database.close();
     }
@@ -267,24 +180,24 @@ export class Database extends BetterSqlite3Database {
     if (process.env.TEST === "@leafac/sqlite") {
       const database = new Database(":memory:");
       database.execute(
-        sql`CREATE TABLE "users" ("id" INTEGER PRIMARY KEY AUTOINCREMENT, "name" TEXT);`
+        sql`CREATE TABLE "users" ("id" INTEGER PRIMARY KEY AUTOINCREMENT, "name" TEXT);`,
       );
       database.run(
-        sql`INSERT INTO "users" ("name") VALUES (${"Leandro Facchinetti"})`
+        sql`INSERT INTO "users" ("name") VALUES (${"Leandro Facchinetti"})`,
       );
       database.run(
-        sql`INSERT INTO "users" ("name") VALUES (${"Linda Renner"})`
+        sql`INSERT INTO "users" ("name") VALUES (${"Linda Renner"})`,
       );
       database.run(
         sql`
           INSERT INTO "users" ("name") VALUES (${"David Adler"})
-        `
+        `,
       );
       assert.deepEqual(
         database.all<{ name: string }>(
           sql`
             SELECT "id", "name" FROM "users"
-          `
+          `,
         ),
         [
           {
@@ -299,20 +212,20 @@ export class Database extends BetterSqlite3Database {
             id: 3,
             name: "David Adler",
           },
-        ]
+        ],
       );
       assert.deepEqual(
         database.all<{ name: string }>(
-          sql`SELECT "id", "name" FROM "users" WHERE "name" IN ${[]}`
+          sql`SELECT "id", "name" FROM "users" WHERE "name" IN ${[]}`,
         ),
-        []
+        [],
       );
       assert.deepEqual(
         database.all<{ name: string }>(
           sql`SELECT "id", "name" FROM "users" WHERE "name" IN ${[
             "Leandro Facchinetti",
             "David Adler",
-          ]}`
+          ]}`,
         ),
         [
           {
@@ -323,14 +236,14 @@ export class Database extends BetterSqlite3Database {
             id: 3,
             name: "David Adler",
           },
-        ]
+        ],
       );
       assert.deepEqual(
         database.all<{ name: string }>(
           sql`SELECT "id", "name" FROM "users" WHERE "name" IN ${new Set([
             "Leandro Facchinetti",
             "David Adler",
-          ])}`
+          ])}`,
         ),
         [
           {
@@ -341,7 +254,7 @@ export class Database extends BetterSqlite3Database {
             id: 3,
             name: "David Adler",
           },
-        ]
+        ],
       );
       database.close();
     }
@@ -355,18 +268,18 @@ export class Database extends BetterSqlite3Database {
     if (process.env.TEST === "@leafac/sqlite") {
       const database = new Database(":memory:");
       database.execute(
-        sql`CREATE TABLE "users" ("id" INTEGER PRIMARY KEY AUTOINCREMENT, "name" TEXT);`
+        sql`CREATE TABLE "users" ("id" INTEGER PRIMARY KEY AUTOINCREMENT, "name" TEXT);`,
       );
       database.run(
-        sql`INSERT INTO "users" ("name") VALUES (${"Leandro Facchinetti"})`
+        sql`INSERT INTO "users" ("name") VALUES (${"Leandro Facchinetti"})`,
       );
       database.run(
-        sql`INSERT INTO "users" ("name") VALUES (${"Linda Renner"})`
+        sql`INSERT INTO "users" ("name") VALUES (${"Linda Renner"})`,
       );
       assert.deepEqual(
         [
           ...database.iterate<{ name: string }>(
-            sql`SELECT "id", "name" FROM "users"`
+            sql`SELECT "id", "name" FROM "users"`,
           ),
         ],
         [
@@ -378,7 +291,7 @@ export class Database extends BetterSqlite3Database {
             id: 2,
             name: "Linda Renner",
           },
-        ]
+        ],
       );
       database.close();
     }
@@ -392,12 +305,12 @@ export class Database extends BetterSqlite3Database {
     if (process.env.TEST === "@leafac/sqlite") {
       const database = new Database(":memory:");
       database.execute(
-        sql`CREATE TABLE "users" ("id" INTEGER PRIMARY KEY AUTOINCREMENT, "name" TEXT);`
+        sql`CREATE TABLE "users" ("id" INTEGER PRIMARY KEY AUTOINCREMENT, "name" TEXT);`,
       );
       assert.throws(() => {
         database.executeTransaction(() => {
           database.run(
-            sql`INSERT INTO "users" ("name") VALUES (${"Leandro Facchinetti"})`
+            sql`INSERT INTO "users" ("name") VALUES (${"Leandro Facchinetti"})`,
           );
           throw new Error("Rollback");
         });
@@ -406,33 +319,33 @@ export class Database extends BetterSqlite3Database {
         database.all<{ name: string }>(
           sql`
             SELECT "id", "name" FROM "users"
-          `
+          `,
         ),
-        []
+        [],
       );
       assert.deepEqual(
         database.executeTransaction(() => {
           return database.run(
-            sql`INSERT INTO "users" ("name") VALUES (${"Leandro Facchinetti"})`
+            sql`INSERT INTO "users" ("name") VALUES (${"Leandro Facchinetti"})`,
           );
         }),
         {
           changes: 1,
           lastInsertRowid: 1,
-        }
+        },
       );
       assert.deepEqual(
         database.all<{ name: string }>(
           sql`
             SELECT "id", "name" FROM "users"
-          `
+          `,
         ),
         [
           {
             id: 1,
             name: "Leandro Facchinetti",
           },
-        ]
+        ],
       );
       database.close();
     }
@@ -446,12 +359,12 @@ export class Database extends BetterSqlite3Database {
     if (process.env.TEST === "@leafac/sqlite") {
       const database = new Database(":memory:");
       database.execute(
-        sql`CREATE TABLE "users" ("id" INTEGER PRIMARY KEY AUTOINCREMENT, "name" TEXT);`
+        sql`CREATE TABLE "users" ("id" INTEGER PRIMARY KEY AUTOINCREMENT, "name" TEXT);`,
       );
       assert.throws(() => {
         database.executeTransactionImmediate(() => {
           database.run(
-            sql`INSERT INTO "users" ("name") VALUES (${"Leandro Facchinetti"})`
+            sql`INSERT INTO "users" ("name") VALUES (${"Leandro Facchinetti"})`,
           );
           throw new Error("Rollback");
         });
@@ -460,33 +373,33 @@ export class Database extends BetterSqlite3Database {
         database.all<{ name: string }>(
           sql`
             SELECT "id", "name" FROM "users"
-          `
+          `,
         ),
-        []
+        [],
       );
       assert.deepEqual(
         database.executeTransactionImmediate(() => {
           return database.run(
-            sql`INSERT INTO "users" ("name") VALUES (${"Leandro Facchinetti"})`
+            sql`INSERT INTO "users" ("name") VALUES (${"Leandro Facchinetti"})`,
           );
         }),
         {
           changes: 1,
           lastInsertRowid: 1,
-        }
+        },
       );
       assert.deepEqual(
         database.all<{ name: string }>(
           sql`
             SELECT "id", "name" FROM "users"
-          `
+          `,
         ),
         [
           {
             id: 1,
             name: "Leandro Facchinetti",
           },
-        ]
+        ],
       );
       database.close();
     }
@@ -500,12 +413,12 @@ export class Database extends BetterSqlite3Database {
     if (process.env.TEST === "@leafac/sqlite") {
       const database = new Database(":memory:");
       database.execute(
-        sql`CREATE TABLE "users" ("id" INTEGER PRIMARY KEY AUTOINCREMENT, "name" TEXT);`
+        sql`CREATE TABLE "users" ("id" INTEGER PRIMARY KEY AUTOINCREMENT, "name" TEXT);`,
       );
       assert.throws(() => {
         database.executeTransactionExclusive(() => {
           database.run(
-            sql`INSERT INTO "users" ("name") VALUES (${"Leandro Facchinetti"})`
+            sql`INSERT INTO "users" ("name") VALUES (${"Leandro Facchinetti"})`,
           );
           throw new Error("Rollback");
         });
@@ -514,33 +427,33 @@ export class Database extends BetterSqlite3Database {
         database.all<{ name: string }>(
           sql`
             SELECT "id", "name" FROM "users"
-          `
+          `,
         ),
-        []
+        [],
       );
       assert.deepEqual(
         database.executeTransactionExclusive(() => {
           return database.run(
-            sql`INSERT INTO "users" ("name") VALUES (${"Leandro Facchinetti"})`
+            sql`INSERT INTO "users" ("name") VALUES (${"Leandro Facchinetti"})`,
           );
         }),
         {
           changes: 1,
           lastInsertRowid: 1,
-        }
+        },
       );
       assert.deepEqual(
         database.all<{ name: string }>(
           sql`
             SELECT "id", "name" FROM "users"
-          `
+          `,
         ),
         [
           {
             id: 1,
             name: "Leandro Facchinetti",
           },
-        ]
+        ],
       );
       database.close();
     }
@@ -562,7 +475,7 @@ export class Database extends BetterSqlite3Database {
           this.execute(
             sql`
               BEGIN;
-            `
+            `,
           );
           const migration = migrations[migrationIndex];
           if (typeof migration === "function") await migration(this);
@@ -574,21 +487,21 @@ export class Database extends BetterSqlite3Database {
                 `Foreign key violations in migration:\n${JSON.stringify(
                   foreignKeyViolations,
                   undefined,
-                  2
-                )}`
+                  2,
+                )}`,
               );
           }
           this.pragma(`user_version = ${migrationIndex + 1}`);
           this.execute(
             sql`
               COMMIT;
-            `
+            `,
           );
         } catch (error) {
           this.execute(
             sql`
               ROLLBACK;
-            `
+            `,
           );
           throw error;
         }
@@ -606,14 +519,14 @@ export class Database extends BetterSqlite3Database {
           sql`CREATE TABLE "users" ("id" INTEGER PRIMARY KEY AUTOINCREMENT, "name" TEXT);`,
           () => {
             counter++;
-          }
+          },
         );
         assert.equal(counter, 1);
         await database.migrate(
           sql`CREATE TABLE "users" ("id" INTEGER PRIMARY KEY AUTOINCREMENT, "name" TEXT);`,
           () => {
             counter++;
-          }
+          },
         );
         assert.equal(counter, 1);
         await database.migrate(
@@ -623,7 +536,7 @@ export class Database extends BetterSqlite3Database {
           },
           () => {
             counter++;
-          }
+          },
         );
         assert.equal(counter, 2);
         await assert.rejects(async () => {
@@ -637,23 +550,23 @@ export class Database extends BetterSqlite3Database {
             },
             (database) => {
               database.run(
-                sql`INSERT INTO "users" ("name") VALUES (${"Leandro Facchinetti"})`
+                sql`INSERT INTO "users" ("name") VALUES (${"Leandro Facchinetti"})`,
               );
             },
             () => {
               throw new Error(
-                "The previous migration should succeed, but this migration should fail"
+                "The previous migration should succeed, but this migration should fail",
               );
-            }
+            },
           );
         });
         assert.deepEqual(
           database.all<{ name: string }>(
             sql`
               SELECT "id", "name" FROM "users"
-            `
+            `,
           ),
-          [{ id: 1, name: "Leandro Facchinetti" }]
+          [{ id: 1, name: "Leandro Facchinetti" }],
         );
         assert(database.pragma("foreign_keys", { simple: true }) === 1);
         await assert.rejects(async () => {
@@ -667,7 +580,7 @@ export class Database extends BetterSqlite3Database {
             },
             (database) => {
               database.run(
-                sql`INSERT INTO "users" ("name") VALUES (${"Leandro Facchinetti"})`
+                sql`INSERT INTO "users" ("name") VALUES (${"Leandro Facchinetti"})`,
               );
             },
             sql`
@@ -685,7 +598,7 @@ export class Database extends BetterSqlite3Database {
                 'We turn off foreign keys so that migrations can alter the schema of existing tables, but we check foreign keys before we complete the migration.',
                 999999
               );
-            `
+            `,
           );
         });
         await assert.rejects(async () => {
@@ -699,7 +612,7 @@ export class Database extends BetterSqlite3Database {
             },
             (database) => {
               database.run(
-                sql`INSERT INTO "users" ("name") VALUES (${"Leandro Facchinetti"})`
+                sql`INSERT INTO "users" ("name") VALUES (${"Leandro Facchinetti"})`,
               );
             },
             sql`
@@ -712,25 +625,25 @@ export class Database extends BetterSqlite3Database {
             `,
             async (database) => {
               database.execute(
-                sql`INSERT INTO "users" ("name") VALUES (${"Linda Renner"})`
+                sql`INSERT INTO "users" ("name") VALUES (${"Linda Renner"})`,
               );
               await Promise.resolve();
               throw new Error("Should rollback across ticks of the event loop");
-            }
+            },
           );
         });
         assert.deepEqual(
           database.all<{ name: string }>(
             sql`
               SELECT "id", "name" FROM "users"
-            `
+            `,
           ),
           [
             {
               id: 1,
               name: "Leandro Facchinetti",
             },
-          ]
+          ],
         );
         database.close();
       })();
@@ -738,7 +651,7 @@ export class Database extends BetterSqlite3Database {
 
   getStatement(
     query: Query,
-    options: Options = {}
+    options: Options = {},
   ): BetterSqlite3Database.Statement {
     const source = query.sourceParts.join("?");
     let statement = this.#statements.get(source);
@@ -755,45 +668,45 @@ export class Database extends BetterSqlite3Database {
     if (process.env.TEST === "@leafac/sqlite") {
       const database = new Database(":memory:");
       database.execute(
-        sql`CREATE TABLE "users" ("id" INTEGER PRIMARY KEY AUTOINCREMENT, "name" TEXT);`
+        sql`CREATE TABLE "users" ("id" INTEGER PRIMARY KEY AUTOINCREMENT, "name" TEXT);`,
       );
       assert.deepEqual(
         database.run(
-          sql`INSERT INTO "users" ("name") VALUES (${"Leandro Facchinetti"})`
+          sql`INSERT INTO "users" ("name") VALUES (${"Leandro Facchinetti"})`,
         ),
         {
           changes: 1,
           lastInsertRowid: 1,
-        }
+        },
       );
       assert.deepEqual(
         database.run(
           sql`INSERT INTO "users" ("name") VALUES (${"Linda Renner"})`,
-          { safeIntegers: true }
+          { safeIntegers: true },
         ),
         {
           changes: 1,
           lastInsertRowid: 2n,
-        }
+        },
       );
       assert.deepEqual(
         database.run(
-          sql`INSERT INTO "users" ("name") VALUES (${"Louie Renner"})`
+          sql`INSERT INTO "users" ("name") VALUES (${"Louie Renner"})`,
         ),
         {
           changes: 1,
           lastInsertRowid: 3n,
-        }
+        },
       );
       assert.deepEqual(
         database.run(
           sql`INSERT INTO "users" ("name") VALUES (${"Cadeau Renner"})`,
-          { safeIntegers: false }
+          { safeIntegers: false },
         ),
         {
           changes: 1,
           lastInsertRowid: 4,
-        }
+        },
       );
       assert.deepEqual(
         database.get<{ name: string }>(
@@ -802,12 +715,12 @@ export class Database extends BetterSqlite3Database {
           `,
           {
             safeIntegers: true,
-          }
+          },
         ),
         {
           id: 1n,
           name: "Leandro Facchinetti",
-        }
+        },
       );
       assert.deepEqual(
         database.all<{ name: string }>(
@@ -816,7 +729,7 @@ export class Database extends BetterSqlite3Database {
           `,
           {
             safeIntegers: true,
-          }
+          },
         ),
         [
           {
@@ -835,7 +748,7 @@ export class Database extends BetterSqlite3Database {
             id: 4n,
             name: "Cadeau Renner",
           },
-        ]
+        ],
       );
       assert.deepEqual(
         [
@@ -843,7 +756,7 @@ export class Database extends BetterSqlite3Database {
             sql`SELECT "id", "name" FROM "users"`,
             {
               safeIntegers: true,
-            }
+            },
           ),
         ],
         [
@@ -863,7 +776,7 @@ export class Database extends BetterSqlite3Database {
             id: 4n,
             name: "Cadeau Renner",
           },
-        ]
+        ],
       );
       database.close();
     }
