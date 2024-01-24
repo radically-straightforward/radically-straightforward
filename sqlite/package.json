@@ -1,0 +1,43 @@
+{
+  "name": "@radically-straightforward/sqlite",
+  "version": "1.0.0",
+  "description": "🗃️ SQLite with tagged templates and migrations",
+  "keywords": [
+    "sqlite",
+    "tagged template",
+    "migration",
+    "better-sqlite3"
+  ],
+  "homepage": "https://github.com/leafac/radically-straightforward",
+  "repository": "https://github.com/leafac/radically-straightforward",
+  "bugs": "https://github.com/leafac/radically-straightforward/issues",
+  "funding": [
+    "https://patreon.com/leafac",
+    "https://github.com/sponsors/leafac",
+    "https://paypal.me/LeandroFacchinettiEU",
+    "https://btc.com/34KJBgtaFYMtDqpSgMayw9qiKWg2GQXA9M"
+  ],
+  "author": "Leandro Facchinetti <radically-straightforward@leafac.com> (https://leafac.com)",
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  },
+  "exports": "./build/index.mjs",
+  "types": "./build/index.d.mts",
+  "scripts": {
+    "prepare": "tsc && documentation",
+    "test": "npm run prepare && node --test && prettier --check \"./README.md\" --check \"./CHANGELOG.md\" --check \"./package.json\" --check \"./tsconfig.json\" --check \"./source/**/*.mts\""
+  },
+  "dependencies": {
+    "@types/better-sqlite3": "^7.6.8",
+    "better-sqlite3": "^9.3.0"
+  },
+  "devDependencies": {
+    "@radically-straightforward/documentation": "^1.0.1",
+    "@radically-straightforward/tsconfig": "^1.0.0",
+    "@types/node": "^20.11.6",
+    "prettier": "^3.2.4",
+    "typescript": "^5.3.3"
+  },
+  "prettier": {}
+}
