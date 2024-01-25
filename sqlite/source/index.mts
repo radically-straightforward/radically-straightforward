@@ -127,10 +127,10 @@ export type Query = {
 };
 
 export default function sql(
-  template: TemplateStringsArray,
+  templateStrings: TemplateStringsArray,
   ...substitutions: any[]
 ): Query {
-  const templateParts = [...template];
+  const templateParts = [...templateStrings];
   const sourceParts: string[] = [];
   const parameters: any[] = [];
   for (
