@@ -21,8 +21,8 @@ export class Database extends BetterSqlite3Database {
         try {
           this.execute(
             sql`
-                BEGIN;
-              `,
+              BEGIN;
+            `,
           );
           const migration = migrations[migrationIndex];
           if (typeof migration === "function") await migration(this);
@@ -31,14 +31,14 @@ export class Database extends BetterSqlite3Database {
           this.pragma<void>(`user_version = ${migrationIndex + 1}`);
           this.execute(
             sql`
-                COMMIT;
-              `,
+              COMMIT;
+            `,
           );
         } catch (error) {
           this.execute(
             sql`
-                ROLLBACK;
-              `,
+              ROLLBACK;
+            `,
           );
           throw error;
         }
