@@ -26,20 +26,20 @@ export class Database extends BetterSqlite3Database {
   }
 
   run(query: Query): BetterSqlite3Database.RunResult {
-    return this.getStatement(query).run(query.parameters);
+    return this.getStatement(query).run(...query.parameters);
   }
 
   get<T>(query: Query): T | undefined {
-    return this.getStatement(query).get(query.parameters) as T | undefined;
+    return this.getStatement(query).get(...query.parameters) as T | undefined;
   }
 
   all<T>(query: Query): T[] {
-    return this.getStatement(query).all(query.parameters) as T[];
+    return this.getStatement(query).all(...query.parameters) as T[];
   }
 
   iterate<T>(query: Query): IterableIterator<T> {
     return this.getStatement(query).iterate(
-      query.parameters,
+      ...query.parameters,
     ) as IterableIterator<T>;
   }
 
@@ -80,7 +80,7 @@ export class Database extends BetterSqlite3Database {
           if (typeof migration === "function") await migration(this);
           else this.execute(migration);
           if (foreignKeys) this.pragma<void>("foreign_key_check");
-          this.pragma(`user_version = ${migrationIndex + 1}`);
+          this.pragma<void>(`user_version = ${migrationIndex + 1}`);
           this.execute(
             sql`
               COMMIT;
@@ -95,7 +95,7 @@ export class Database extends BetterSqlite3Database {
           throw error;
         }
     } finally {
-      if (foreignKeys) this.pragma("foreign_keys = ON");
+      if (foreignKeys) this.pragma<void>("foreign_keys = ON");
     }
   }
 
