@@ -3,6 +3,50 @@ import BetterSqlite3Database from "better-sqlite3";
 export class Database extends BetterSqlite3Database {
   #statements = new Map<string, BetterSqlite3Database.Statement>();
 
+  // https://www.sqlite.org/lang_altertable.html#making_other_kinds_of_table_schema_changes
+  async migrate(
+    ...migrations: (Query | ((database: this) => void | Promise<void>))[]
+  ): Promise<void> {
+    const foreignKeys =
+      this.pragma<number>("foreign_keys", { simple: true }) === 1;
+    if (foreignKeys) this.pragma<void>("foreign_keys = OFF");
+    try {
+      for (
+        let migrationIndex = this.pragma<number>("user_version", {
+          simple: true,
+        });
+        migrationIndex < migrations.length;
+        migrationIndex++
+      )
+        try {
+          this.execute(
+            sql`
+                BEGIN;
+              `,
+          );
+          const migration = migrations[migrationIndex];
+          if (typeof migration === "function") await migration(this);
+          else this.execute(migration);
+          if (foreignKeys) this.pragma<void>("foreign_key_check");
+          this.pragma<void>(`user_version = ${migrationIndex + 1}`);
+          this.execute(
+            sql`
+                COMMIT;
+              `,
+          );
+        } catch (error) {
+          this.execute(
+            sql`
+                ROLLBACK;
+              `,
+          );
+          throw error;
+        }
+    } finally {
+      if (foreignKeys) this.pragma<void>("foreign_keys = ON");
+    }
+  }
+
   execute(query: Query): this {
     let source = "";
     for (
@@ -19,10 +63,6 @@ export class Database extends BetterSqlite3Database {
         )!.parameter;
     source += query.sourceParts.at(-1);
     return this.exec(source);
-  }
-
-  pragma<T>(source: string, options?: BetterSqlite3Database.PragmaOptions): T {
-    return super.pragma(source, options) as T;
   }
 
   run(query: Query): BetterSqlite3Database.RunResult {
@@ -43,6 +83,10 @@ export class Database extends BetterSqlite3Database {
     ) as IterableIterator<T>;
   }
 
+  pragma<T>(source: string, options?: BetterSqlite3Database.PragmaOptions): T {
+    return super.pragma(source, options) as T;
+  }
+
   executeTransaction<T>(fn: () => T): T {
     return this.transaction(fn)();
   }
@@ -53,50 +97,6 @@ export class Database extends BetterSqlite3Database {
 
   executeTransactionExclusive<T>(fn: () => T): T {
     return this.transaction(fn).exclusive();
-  }
-
-  // https://www.sqlite.org/lang_altertable.html#making_other_kinds_of_table_schema_changes
-  async migrate(
-    ...migrations: (Query | ((database: this) => void | Promise<void>))[]
-  ): Promise<void> {
-    const foreignKeys =
-      this.pragma<number>("foreign_keys", { simple: true }) === 1;
-    if (foreignKeys) this.pragma<void>("foreign_keys = OFF");
-    try {
-      for (
-        let migrationIndex = this.pragma<number>("user_version", {
-          simple: true,
-        });
-        migrationIndex < migrations.length;
-        migrationIndex++
-      )
-        try {
-          this.execute(
-            sql`
-              BEGIN;
-            `,
-          );
-          const migration = migrations[migrationIndex];
-          if (typeof migration === "function") await migration(this);
-          else this.execute(migration);
-          if (foreignKeys) this.pragma<void>("foreign_key_check");
-          this.pragma<void>(`user_version = ${migrationIndex + 1}`);
-          this.execute(
-            sql`
-              COMMIT;
-            `,
-          );
-        } catch (error) {
-          this.execute(
-            sql`
-              ROLLBACK;
-            `,
-          );
-          throw error;
-        }
-    } finally {
-      if (foreignKeys) this.pragma<void>("foreign_keys = ON");
-    }
   }
 
   getStatement(query: Query): BetterSqlite3Database.Statement {
