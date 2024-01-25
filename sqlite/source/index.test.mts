@@ -1,5 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
+import timers from "node:timers/promises";
 import sql, { Database, Query } from "./index.mjs";
 
 test(async () => {
@@ -40,9 +41,7 @@ test(async () => {
   assert.deepEqual(
     database.get<{ id: number; name: string }>(
       sql`
-        INSERT INTO "users" ("name")
-        VALUES (${"Louie Renner"})
-        RETURNING *
+        INSERT INTO "users" ("name") VALUES (${"Louie Renner"}) RETURNING *
       `,
     ),
     { id: 3, name: "Louie Renner" },
@@ -81,46 +80,40 @@ test(async () => {
 
   assert.deepEqual(
     database.all<{ id: number; name: string }>(
-      sql`SELECT "id", "name" FROM "users" WHERE "name" IN ${[]}`,
+      sql`
+        SELECT "id", "name" FROM "users" WHERE "name" IN ${[]}
+      `,
     ),
     [],
   );
 
   assert.deepEqual(
     database.all<{ id: number; name: string }>(
-      sql`SELECT "id", "name" FROM "users" WHERE "name" IN ${[
-        "Leandro Facchinetti",
-        "David Adler",
-      ]}`,
+      sql`
+        SELECT "id", "name" FROM "users" WHERE "name" IN ${[
+          "Leandro Facchinetti",
+          "David Adler",
+        ]}
+      `,
     ),
     [
-      {
-        id: 1,
-        name: "Leandro Facchinetti",
-      },
-      {
-        id: 2,
-        name: "David Adler",
-      },
+      { id: 1, name: "Leandro Facchinetti" },
+      { id: 2, name: "David Adler" },
     ],
   );
 
   assert.deepEqual(
     database.all<{ id: number; name: string }>(
-      sql`SELECT "id", "name" FROM "users" WHERE "name" IN ${new Set([
-        "Leandro Facchinetti",
-        "David Adler",
-      ])}`,
+      sql`
+        SELECT "id", "name" FROM "users" WHERE "name" IN ${new Set([
+          "Leandro Facchinetti",
+          "David Adler",
+        ])}
+      `,
     ),
     [
-      {
-        id: 1,
-        name: "Leandro Facchinetti",
-      },
-      {
-        id: 2,
-        name: "David Adler",
-      },
+      { id: 1, name: "Leandro Facchinetti" },
+      { id: 2, name: "David Adler" },
     ],
   );
 
@@ -167,10 +160,7 @@ test(async () => {
         `,
       );
     }),
-    {
-      changes: 1,
-      lastInsertRowid: 4,
-    },
+    { changes: 1, lastInsertRowid: 4 },
   );
   assert.deepEqual(
     database.all<{ id: number; name: string }>(
@@ -178,12 +168,7 @@ test(async () => {
         SELECT "id", "name" FROM "users" WHERE "name" = ${"Abigail Wall"}
       `,
     ),
-    [
-      {
-        id: 4,
-        name: "Abigail Wall",
-      },
-    ],
+    [{ id: 4, name: "Abigail Wall" }],
   );
 
   assert.throws(() => {
@@ -212,10 +197,7 @@ test(async () => {
         `,
       );
     }),
-    {
-      changes: 1,
-      lastInsertRowid: 5,
-    },
+    { changes: 1, lastInsertRowid: 5 },
   );
   assert.deepEqual(
     database.all<{ id: number; name: string }>(
@@ -223,12 +205,7 @@ test(async () => {
         SELECT "id", "name" FROM "users" WHERE "name" = ${"Eliot Smith"}
       `,
     ),
-    [
-      {
-        id: 5,
-        name: "Eliot Smith",
-      },
-    ],
+    [{ id: 5, name: "Eliot Smith" }],
   );
 
   assert.throws(() => {
@@ -257,10 +234,7 @@ test(async () => {
         `,
       );
     }),
-    {
-      changes: 1,
-      lastInsertRowid: 6,
-    },
+    { changes: 1, lastInsertRowid: 6 },
   );
   assert.deepEqual(
     database.all<{ id: number; name: string }>(
@@ -268,12 +242,7 @@ test(async () => {
         SELECT "id", "name" FROM "users" WHERE "name" = ${"Aline"}
       `,
     ),
-    [
-      {
-        id: 6,
-        name: "Aline",
-      },
-    ],
+    [{ id: 6, name: "Aline" }],
   );
 
   let runsToCompletion = 0;
@@ -290,23 +259,20 @@ test(async () => {
       ...migrations,
       sql`
         INSERT INTO "posts" ("content", "author")
-        VALUES (
-          ${"We turn off foreign keys because migrations may alter the schema of existing tables, but we check foreign keys before we complete the migration, so the non-existent author below causes the migration to fail."},
-          999999
-        );
+        VALUES (${"Nonexistent author."}, 999999);
       `,
     );
   });
 
   await assert.rejects(async () => {
-    await database.migrate(...migrations, async (database) => {
+    await database.migrate(...migrations, async () => {
       database.execute(
         sql`
           INSERT INTO "users" ("name") VALUES (${"Jeppe"})
         `,
       );
-      await Promise.resolve();
-      throw new Error("Should rollback across ticks of the event loop");
+      await timers.setTimeout();
+      throw new Error("Rollback across ticks of the event loop.");
     });
   });
   assert.equal(
@@ -389,17 +355,17 @@ test(async () => {
     },
   );
   assert.deepEqual(
-    sql`SELECT "id", "name" FROM "users" WHERE name = ${"Leandro Facchinetti"}$${sql` AND "age" = ${31}`}`,
+    sql`SELECT "id", "name" FROM "users" WHERE name = ${"Leandro Facchinetti"}$${sql` AND "age" = ${33}`}`,
     {
       sourceParts: [
         `SELECT "id", "name" FROM "users" WHERE name = `,
         ` AND "age" = `,
         ``,
       ],
-      parameters: ["Leandro Facchinetti", 31],
+      parameters: ["Leandro Facchinetti", 33],
     },
   );
   assert.throws(() => {
-    sql`SELECT "id", "name" FROM "users" WHERE name = ${"Leandro Facchinetti"}$${` AND "age" = ${31}`}`;
+    sql`SELECT "id", "name" FROM "users" WHERE name = ${"Leandro Facchinetti"}$${` AND "age" = ${33}`}`;
   });
 });
