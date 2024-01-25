@@ -1,12 +1,5 @@
 import BetterSqlite3Database from "better-sqlite3";
 
-export type Options = {
-  safeIntegers?: boolean;
-};
-
-// FIXME: Use BetterSqlite3Database generics: https://github.com/DefinitelyTyped/DefinitelyTyped/issues/50794
-// FIXME: In BetterSqlite3Database types, make ‘filename’ optional, in which case a temporary database is created (see https://www.sqlite.org/inmemorydb.html § Temporary Databases)
-// FIXME: In BetterSqlite3Database types, make BindParameters more specific than ‘any’
 export class Database extends BetterSqlite3Database {
   #statements = new Map<string, BetterSqlite3Database.Statement>();
 
@@ -28,20 +21,26 @@ export class Database extends BetterSqlite3Database {
     return this.exec(source);
   }
 
-  run(query: Query, options: Options = {}): BetterSqlite3Database.RunResult {
-    return this.getStatement(query, options).run(query.parameters);
+  pragma<T>(source: string, options?: BetterSqlite3Database.PragmaOptions): T {
+    return super.pragma(source, options) as T;
   }
 
-  get<T>(query: Query, options: Options = {}): T | undefined {
-    return this.getStatement(query, options).get(query.parameters);
+  run(query: Query): BetterSqlite3Database.RunResult {
+    return this.getStatement(query).run(query.parameters);
   }
 
-  all<T>(query: Query, options: Options = {}): T[] {
-    return this.getStatement(query, options).all(query.parameters);
+  get<T>(query: Query): T | undefined {
+    return this.getStatement(query).get(query.parameters) as T | undefined;
   }
 
-  iterate<T>(query: Query, options: Options = {}): IterableIterator<T> {
-    return this.getStatement(query, options).iterate(query.parameters);
+  all<T>(query: Query): T[] {
+    return this.getStatement(query).all(query.parameters) as T[];
+  }
+
+  iterate<T>(query: Query): IterableIterator<T> {
+    return this.getStatement(query).iterate(
+      query.parameters,
+    ) as IterableIterator<T>;
   }
 
   executeTransaction<T>(fn: () => T): T {
@@ -60,11 +59,14 @@ export class Database extends BetterSqlite3Database {
   async migrate(
     ...migrations: (Query | ((database: this) => void | Promise<void>))[]
   ): Promise<void> {
-    const foreignKeys = this.pragma("foreign_keys", { simple: true }) === 1;
-    if (foreignKeys) this.pragma("foreign_keys = OFF");
+    const foreignKeys =
+      this.pragma<number>("foreign_keys", { simple: true }) === 1;
+    if (foreignKeys) this.pragma<void>("foreign_keys = OFF");
     try {
       for (
-        let migrationIndex = this.pragma("user_version", { simple: true });
+        let migrationIndex = this.pragma<number>("user_version", {
+          simple: true,
+        });
         migrationIndex < migrations.length;
         migrationIndex++
       )
@@ -77,17 +79,7 @@ export class Database extends BetterSqlite3Database {
           const migration = migrations[migrationIndex];
           if (typeof migration === "function") await migration(this);
           else this.execute(migration);
-          if (foreignKeys) {
-            const foreignKeyViolations = this.pragma("foreign_key_check");
-            if (foreignKeyViolations.length !== 0)
-              throw new Error(
-                `Foreign key violations in migration:\n${JSON.stringify(
-                  foreignKeyViolations,
-                  undefined,
-                  2,
-                )}`,
-              );
-          }
+          if (foreignKeys) this.pragma<void>("foreign_key_check");
           this.pragma(`user_version = ${migrationIndex + 1}`);
           this.execute(
             sql`
@@ -107,18 +99,13 @@ export class Database extends BetterSqlite3Database {
     }
   }
 
-  getStatement(
-    query: Query,
-    options: Options = {},
-  ): BetterSqlite3Database.Statement {
+  getStatement(query: Query): BetterSqlite3Database.Statement {
     const source = query.sourceParts.join("?");
     let statement = this.#statements.get(source);
     if (statement === undefined) {
       statement = this.prepare(source);
       this.#statements.set(source, statement);
     }
-    if (typeof options.safeIntegers === "boolean")
-      statement.safeIntegers(options.safeIntegers);
     return statement;
   }
 }
