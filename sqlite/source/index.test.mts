@@ -1,106 +1,93 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import sql, { Database } from "./index.mjs";
+import sql, { Database, Query } from "./index.mjs";
 
-test("Database.execute()", () => {
+test(async () => {
   const database = new Database(":memory:");
-  database.execute(
+
+  const migrations: (Query | (() => void | Promise<void>))[] = [
     sql`
-      CREATE TABLE "users" ("id" INTEGER PRIMARY KEY AUTOINCREMENT, "name" TEXT);
-      INSERT INTO "users" ("name") VALUES (${"Leandro Facchinetti"});
+      CREATE TABLE "users" (
+        "id" INTEGER PRIMARY KEY AUTOINCREMENT,
+        "name" TEXT
+      );
+      CREATE TABLE "posts" (
+        "id" INTEGER PRIMARY KEY AUTOINCREMENT,
+        "content" TEXT,
+        "author" INTEGER NOT NULL REFERENCES "users" ON DELETE CASCADE
+      );
     `,
-  );
-  assert.equal(
-    database.get<{ name: string }>(sql`SELECT * FROM "users"`)!.name,
-    "Leandro Facchinetti",
-  );
-  database.close();
-});
 
-test("Database.run()", () => {
-  const database = new Database(":memory:");
-  database.execute(
-    sql`CREATE TABLE "users" ("id" INTEGER PRIMARY KEY AUTOINCREMENT, "name" TEXT);`,
-  );
+    async () => {
+      database.execute(
+        sql`
+          INSERT INTO "users" ("name") VALUES (${"Leandro Facchinetti"});
+        `,
+      );
+    },
+  ];
+  await database.migrate(...migrations);
+
   assert.deepEqual(
     database.run(
-      sql`INSERT INTO "users" ("name") VALUES (${"Leandro Facchinetti"})`,
+      sql`
+        INSERT INTO "users" ("name") VALUES (${"David Adler"})
+      `,
     ),
-    { changes: 1, lastInsertRowid: 1 },
+    { changes: 1, lastInsertRowid: 2 },
   );
-  database.close();
-});
 
-test("Database.get()", () => {
-  const database = new Database(":memory:");
-  database.execute(
-    sql`CREATE TABLE "users" ("id" INTEGER PRIMARY KEY AUTOINCREMENT, "name" TEXT);`,
-  );
   assert.deepEqual(
     database.get<{ id: number; name: string }>(
       sql`
         INSERT INTO "users" ("name")
-        VALUES (${"Leandro Facchinetti"})
+        VALUES (${"Louie Renner"})
         RETURNING *
+      `,
+    ),
+    { id: 3, name: "Louie Renner" },
+  );
+
+  assert.deepEqual(
+    database.get<{ id: number; name: string }>(
+      sql`
+        SELECT "id", "name" FROM "users" WHERE "id" = 1
       `,
     ),
     { id: 1, name: "Leandro Facchinetti" },
   );
-  assert.deepEqual(
-    database.get<{ id: number; name: string }>(
-      sql`SELECT "id", "name" FROM "users"`,
-    ),
-    {
-      id: 1,
-      name: "Leandro Facchinetti",
-    },
-  );
-  database.close();
-});
 
-test("Database.all()", () => {
-  const database = new Database(":memory:");
-  database.execute(
-    sql`CREATE TABLE "users" ("id" INTEGER PRIMARY KEY AUTOINCREMENT, "name" TEXT);`,
-  );
-  database.run(
-    sql`INSERT INTO "users" ("name") VALUES (${"Leandro Facchinetti"})`,
-  );
-  database.run(sql`INSERT INTO "users" ("name") VALUES (${"Abigail Wall"})`);
-  database.run(
-    sql`
-      INSERT INTO "users" ("name") VALUES (${"David Adler"})
-    `,
-  );
-  assert.deepEqual(
-    database.all<{ name: string }>(
+  assert.equal(
+    database.get<{ id: number; name: string }>(
       sql`
-        SELECT "id", "name" FROM "users"
+        SELECT "id", "name" FROM "users" WHERE "id" = 500
+      `,
+    ),
+    undefined,
+  );
+
+  assert.deepEqual(
+    database.all<{ id: number; name: string }>(
+      sql`
+        SELECT "id", "name" FROM "users" ORDER BY "id" ASC
       `,
     ),
     [
-      {
-        id: 1,
-        name: "Leandro Facchinetti",
-      },
-      {
-        id: 2,
-        name: "Abigail Wall",
-      },
-      {
-        id: 3,
-        name: "David Adler",
-      },
+      { id: 1, name: "Leandro Facchinetti" },
+      { id: 2, name: "David Adler" },
+      { id: 3, name: "Louie Renner" },
     ],
   );
+
   assert.deepEqual(
-    database.all<{ name: string }>(
+    database.all<{ id: number; name: string }>(
       sql`SELECT "id", "name" FROM "users" WHERE "name" IN ${[]}`,
     ),
     [],
   );
+
   assert.deepEqual(
-    database.all<{ name: string }>(
+    database.all<{ id: number; name: string }>(
       sql`SELECT "id", "name" FROM "users" WHERE "name" IN ${[
         "Leandro Facchinetti",
         "David Adler",
@@ -112,13 +99,14 @@ test("Database.all()", () => {
         name: "Leandro Facchinetti",
       },
       {
-        id: 3,
+        id: 2,
         name: "David Adler",
       },
     ],
   );
+
   assert.deepEqual(
-    database.all<{ name: string }>(
+    database.all<{ id: number; name: string }>(
       sql`SELECT "id", "name" FROM "users" WHERE "name" IN ${new Set([
         "Leandro Facchinetti",
         "David Adler",
@@ -130,356 +118,54 @@ test("Database.all()", () => {
         name: "Leandro Facchinetti",
       },
       {
-        id: 3,
+        id: 2,
         name: "David Adler",
       },
     ],
   );
-  database.close();
-});
 
-test("Database.iterate()", () => {
-  const database = new Database(":memory:");
-  database.execute(
-    sql`CREATE TABLE "users" ("id" INTEGER PRIMARY KEY AUTOINCREMENT, "name" TEXT);`,
-  );
-  database.run(
-    sql`INSERT INTO "users" ("name") VALUES (${"Leandro Facchinetti"})`,
-  );
-  database.run(sql`INSERT INTO "users" ("name") VALUES (${"Abigail Wall"})`);
   assert.deepEqual(
     [
-      ...database.iterate<{ name: string }>(
-        sql`SELECT "id", "name" FROM "users"`,
+      ...database.iterate<{ id: number; name: string }>(
+        sql`
+          SELECT "id", "name" FROM "users" ORDER BY "id" ASC
+        `,
       ),
     ],
     [
-      {
-        id: 1,
-        name: "Leandro Facchinetti",
-      },
-      {
-        id: 2,
-        name: "Abigail Wall",
-      },
+      { id: 1, name: "Leandro Facchinetti" },
+      { id: 2, name: "David Adler" },
+      { id: 3, name: "Louie Renner" },
     ],
   );
-  database.close();
-});
 
-test("Database.executeTransaction()", () => {
-  const database = new Database(":memory:");
-  database.execute(
-    sql`CREATE TABLE "users" ("id" INTEGER PRIMARY KEY AUTOINCREMENT, "name" TEXT);`,
-  );
+  assert.equal(database.pragma<number>("foreign_keys", { simple: true }), 1);
+
   assert.throws(() => {
-    database.executeTransaction(() => {
+    database.executeTransaction<void>(() => {
       database.run(
-        sql`INSERT INTO "users" ("name") VALUES (${"Leandro Facchinetti"})`,
+        sql`
+          INSERT INTO "users" ("name") VALUES (${"Abigail Wall"})
+        `,
       );
-      throw new Error("Rollback");
+      throw new Error();
     });
   });
-  assert.deepEqual(
-    database.all<{ name: string }>(
+  assert.equal(
+    database.get<{ id: number; name: string }>(
       sql`
-        SELECT "id", "name" FROM "users"
+        SELECT "id", "name" FROM "users" WHERE "name" = ${"Abigail Wall"}
       `,
     ),
-    [],
+    undefined,
   );
   assert.deepEqual(
-    database.executeTransaction(() => {
+    database.executeTransaction<ReturnType<Database["run"]>>(() => {
       return database.run(
-        sql`INSERT INTO "users" ("name") VALUES (${"Leandro Facchinetti"})`,
+        sql`
+          INSERT INTO "users" ("name") VALUES (${"Abigail Wall"})
+        `,
       );
-    }),
-    {
-      changes: 1,
-      lastInsertRowid: 1,
-    },
-  );
-  assert.deepEqual(
-    database.all<{ name: string }>(
-      sql`
-        SELECT "id", "name" FROM "users"
-      `,
-    ),
-    [
-      {
-        id: 1,
-        name: "Leandro Facchinetti",
-      },
-    ],
-  );
-  database.close();
-});
-
-test("Database.executeTransactionImmediate()", () => {
-  const database = new Database(":memory:");
-  database.execute(
-    sql`CREATE TABLE "users" ("id" INTEGER PRIMARY KEY AUTOINCREMENT, "name" TEXT);`,
-  );
-  assert.throws(() => {
-    database.executeTransactionImmediate(() => {
-      database.run(
-        sql`INSERT INTO "users" ("name") VALUES (${"Leandro Facchinetti"})`,
-      );
-      throw new Error("Rollback");
-    });
-  });
-  assert.deepEqual(
-    database.all<{ name: string }>(
-      sql`
-        SELECT "id", "name" FROM "users"
-      `,
-    ),
-    [],
-  );
-  assert.deepEqual(
-    database.executeTransactionImmediate(() => {
-      return database.run(
-        sql`INSERT INTO "users" ("name") VALUES (${"Leandro Facchinetti"})`,
-      );
-    }),
-    {
-      changes: 1,
-      lastInsertRowid: 1,
-    },
-  );
-  assert.deepEqual(
-    database.all<{ name: string }>(
-      sql`
-        SELECT "id", "name" FROM "users"
-      `,
-    ),
-    [
-      {
-        id: 1,
-        name: "Leandro Facchinetti",
-      },
-    ],
-  );
-  database.close();
-});
-
-test("Database.executeTransactionExclusive()", () => {
-  const database = new Database(":memory:");
-  database.execute(
-    sql`CREATE TABLE "users" ("id" INTEGER PRIMARY KEY AUTOINCREMENT, "name" TEXT);`,
-  );
-  assert.throws(() => {
-    database.executeTransactionExclusive(() => {
-      database.run(
-        sql`INSERT INTO "users" ("name") VALUES (${"Leandro Facchinetti"})`,
-      );
-      throw new Error("Rollback");
-    });
-  });
-  assert.deepEqual(
-    database.all<{ name: string }>(
-      sql`
-        SELECT "id", "name" FROM "users"
-      `,
-    ),
-    [],
-  );
-  assert.deepEqual(
-    database.executeTransactionExclusive(() => {
-      return database.run(
-        sql`INSERT INTO "users" ("name") VALUES (${"Leandro Facchinetti"})`,
-      );
-    }),
-    {
-      changes: 1,
-      lastInsertRowid: 1,
-    },
-  );
-  assert.deepEqual(
-    database.all<{ name: string }>(
-      sql`
-        SELECT "id", "name" FROM "users"
-      `,
-    ),
-    [
-      {
-        id: 1,
-        name: "Leandro Facchinetti",
-      },
-    ],
-  );
-  database.close();
-});
-
-test("Database.migrate()", async () => {
-  const database = new Database(":memory:");
-  let counter = 0;
-  await database.migrate(
-    sql`CREATE TABLE "users" ("id" INTEGER PRIMARY KEY AUTOINCREMENT, "name" TEXT);`,
-    () => {
-      counter++;
-    },
-  );
-  assert.equal(counter, 1);
-  await database.migrate(
-    sql`CREATE TABLE "users" ("id" INTEGER PRIMARY KEY AUTOINCREMENT, "name" TEXT);`,
-    () => {
-      counter++;
-    },
-  );
-  assert.equal(counter, 1);
-  await database.migrate(
-    sql`CREATE TABLE "users" ("id" INTEGER PRIMARY KEY AUTOINCREMENT, "name" TEXT);`,
-    () => {
-      counter++;
-    },
-    () => {
-      counter++;
-    },
-  );
-  assert.equal(counter, 2);
-  await assert.rejects(async () => {
-    await database.migrate(
-      sql`CREATE TABLE "users" ("id" INTEGER PRIMARY KEY AUTOINCREMENT, "name" TEXT);`,
-      () => {
-        counter++;
-      },
-      () => {
-        counter++;
-      },
-      (database) => {
-        database.run(
-          sql`INSERT INTO "users" ("name") VALUES (${"Leandro Facchinetti"})`,
-        );
-      },
-      () => {
-        throw new Error(
-          "The previous migration should succeed, but this migration should fail",
-        );
-      },
-    );
-  });
-  assert.deepEqual(
-    database.all<{ name: string }>(
-      sql`
-        SELECT "id", "name" FROM "users"
-      `,
-    ),
-    [{ id: 1, name: "Leandro Facchinetti" }],
-  );
-  assert(database.pragma("foreign_keys", { simple: true }) === 1);
-  await assert.rejects(async () => {
-    await database.migrate(
-      sql`CREATE TABLE "users" ("id" INTEGER PRIMARY KEY AUTOINCREMENT, "name" TEXT);`,
-      () => {
-        counter++;
-      },
-      () => {
-        counter++;
-      },
-      (database) => {
-        database.run(
-          sql`INSERT INTO "users" ("name") VALUES (${"Leandro Facchinetti"})`,
-        );
-      },
-      sql`
-        CREATE TABLE "posts" (
-          "id" INTEGER PRIMARY KEY AUTOINCREMENT,
-          "title" TEXT,
-          "content" TEXT,
-          "author" REFERENCES "users" ("id") ON DELETE SET NULL
-        );
-      `,
-      sql`
-        INSERT INTO "posts" ("title", "content", "author")
-        VALUES (
-          'The Non-Existing Author Should Cause the Migration to Fail',
-          'We turn off foreign keys so that migrations can alter the schema of existing tables, but we check foreign keys before we complete the migration.',
-          999999
-        );
-      `,
-    );
-  });
-  await assert.rejects(async () => {
-    await database.migrate(
-      sql`CREATE TABLE "users" ("id" INTEGER PRIMARY KEY AUTOINCREMENT, "name" TEXT);`,
-      () => {
-        counter++;
-      },
-      () => {
-        counter++;
-      },
-      (database) => {
-        database.run(
-          sql`INSERT INTO "users" ("name") VALUES (${"Leandro Facchinetti"})`,
-        );
-      },
-      sql`
-        CREATE TABLE "posts" (
-          "id" INTEGER PRIMARY KEY AUTOINCREMENT,
-          "title" TEXT,
-          "content" TEXT,
-          "author" REFERENCES "users" ("id") ON DELETE SET NULL
-        );
-      `,
-      async (database) => {
-        database.execute(
-          sql`INSERT INTO "users" ("name") VALUES (${"Abigail Wall"})`,
-        );
-        await Promise.resolve();
-        throw new Error("Should rollback across ticks of the event loop");
-      },
-    );
-  });
-  assert.deepEqual(
-    database.all<{ name: string }>(
-      sql`
-        SELECT "id", "name" FROM "users"
-      `,
-    ),
-    [
-      {
-        id: 1,
-        name: "Leandro Facchinetti",
-      },
-    ],
-  );
-  database.close();
-});
-
-test("Database.getStatement()", () => {
-  const database = new Database(":memory:");
-  database.execute(
-    sql`CREATE TABLE "users" ("id" INTEGER PRIMARY KEY AUTOINCREMENT, "name" TEXT);`,
-  );
-  assert.deepEqual(
-    database.run(
-      sql`INSERT INTO "users" ("name") VALUES (${"Leandro Facchinetti"})`,
-    ),
-    {
-      changes: 1,
-      lastInsertRowid: 1,
-    },
-  );
-  assert.deepEqual(
-    database.run(sql`INSERT INTO "users" ("name") VALUES (${"Abigail Wall"})`, {
-      safeIntegers: true,
-    }),
-    {
-      changes: 1,
-      lastInsertRowid: 2n,
-    },
-  );
-  assert.deepEqual(
-    database.run(sql`INSERT INTO "users" ("name") VALUES (${"Louie Renner"})`),
-    {
-      changes: 1,
-      lastInsertRowid: 3n,
-    },
-  );
-  assert.deepEqual(
-    database.run(sql`INSERT INTO "users" ("name") VALUES (${"Eliot Smith"})`, {
-      safeIntegers: false,
     }),
     {
       changes: 1,
@@ -487,79 +173,153 @@ test("Database.getStatement()", () => {
     },
   );
   assert.deepEqual(
-    database.get<{ name: string }>(
+    database.all<{ id: number; name: string }>(
       sql`
-        SELECT "id", "name" FROM "users"
+        SELECT "id", "name" FROM "users" WHERE "name" = ${"Abigail Wall"}
       `,
-      {
-        safeIntegers: true,
-      },
     ),
+    [
+      {
+        id: 4,
+        name: "Abigail Wall",
+      },
+    ],
+  );
+
+  assert.throws(() => {
+    database.executeTransactionImmediate<void>(() => {
+      database.run(
+        sql`
+          INSERT INTO "users" ("name") VALUES (${"Eliot Smith"})
+        `,
+      );
+      throw new Error();
+    });
+  });
+  assert.equal(
+    database.get<{ id: number; name: string }>(
+      sql`
+        SELECT "id", "name" FROM "users" WHERE "name" = ${"Eliot Smith"}
+      `,
+    ),
+    undefined,
+  );
+  assert.deepEqual(
+    database.executeTransactionImmediate<ReturnType<Database["run"]>>(() => {
+      return database.run(
+        sql`
+          INSERT INTO "users" ("name") VALUES (${"Eliot Smith"})
+        `,
+      );
+    }),
     {
-      id: 1n,
-      name: "Leandro Facchinetti",
+      changes: 1,
+      lastInsertRowid: 5,
     },
   );
   assert.deepEqual(
-    database.all<{ name: string }>(
+    database.all<{ id: number; name: string }>(
       sql`
-        SELECT "id", "name" FROM "users"
+        SELECT "id", "name" FROM "users" WHERE "name" = ${"Eliot Smith"}
       `,
-      {
-        safeIntegers: true,
-      },
     ),
     [
       {
-        id: 1n,
-        name: "Leandro Facchinetti",
-      },
-      {
-        id: 2n,
-        name: "Abigail Wall",
-      },
-      {
-        id: 3n,
-        name: "Louie Renner",
-      },
-      {
-        id: 4n,
+        id: 5,
         name: "Eliot Smith",
       },
     ],
+  );
+
+  assert.throws(() => {
+    database.executeTransactionExclusive<void>(() => {
+      database.run(
+        sql`
+          INSERT INTO "users" ("name") VALUES (${"Aline"})
+        `,
+      );
+      throw new Error();
+    });
+  });
+  assert.equal(
+    database.get<{ id: number; name: string }>(
+      sql`
+        SELECT "id", "name" FROM "users" WHERE "name" = ${"Aline"}
+      `,
+    ),
+    undefined,
   );
   assert.deepEqual(
+    database.executeTransactionExclusive<ReturnType<Database["run"]>>(() => {
+      return database.run(
+        sql`
+          INSERT INTO "users" ("name") VALUES (${"Aline"})
+        `,
+      );
+    }),
+    {
+      changes: 1,
+      lastInsertRowid: 6,
+    },
+  );
+  assert.deepEqual(
+    database.all<{ id: number; name: string }>(
+      sql`
+        SELECT "id", "name" FROM "users" WHERE "name" = ${"Aline"}
+      `,
+    ),
     [
-      ...database.iterate<{ name: string }>(
-        sql`SELECT "id", "name" FROM "users"`,
-        {
-          safeIntegers: true,
-        },
-      ),
-    ],
-    [
       {
-        id: 1n,
-        name: "Leandro Facchinetti",
-      },
-      {
-        id: 2n,
-        name: "Abigail Wall",
-      },
-      {
-        id: 3n,
-        name: "Louie Renner",
-      },
-      {
-        id: 4n,
-        name: "Eliot Smith",
+        id: 6,
+        name: "Aline",
       },
     ],
   );
-  database.close();
-});
 
-test("sql`___`", () => {
+  let runsToCompletion = 0;
+  migrations.push(() => {
+    runsToCompletion++;
+  });
+  for (let iteration = 0; iteration < 5; iteration++) {
+    await database.migrate(...migrations);
+    assert.equal(runsToCompletion, 1);
+  }
+
+  await assert.rejects(async () => {
+    await database.migrate(
+      ...migrations,
+      sql`
+        INSERT INTO "posts" ("content", "author")
+        VALUES (
+          ${"We turn off foreign keys because migrations may alter the schema of existing tables, but we check foreign keys before we complete the migration, so the non-existent author below causes the migration to fail."},
+          999999
+        );
+      `,
+    );
+  });
+
+  await assert.rejects(async () => {
+    await database.migrate(...migrations, async (database) => {
+      database.execute(
+        sql`
+          INSERT INTO "users" ("name") VALUES (${"Jeppe"})
+        `,
+      );
+      await Promise.resolve();
+      throw new Error("Should rollback across ticks of the event loop");
+    });
+  });
+  assert.equal(
+    database.get<{ id: number; name: string }>(
+      sql`
+        SELECT "id", "name" FROM "users" WHERE "name" = ${"Jeppe"}
+      `,
+    ),
+    undefined,
+  );
+
+  database.close();
+
   assert.deepEqual(
     sql`CREATE TABLE "users" ("id" INTEGER PRIMARY KEY AUTOINCREMENT, "name" TEXT)`,
     {

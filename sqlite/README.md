@@ -1,4 +1,12 @@
 <!--
+- Style
+  - Use `"` around table and column names
+  - Use `RETURNING *`
+  - Use `ORDER BY` if using `.all()`
+  - Don’t put `` sql`___` `` on the same line as anything else (because of Visual Studio Code extension)
+  - Include `"id" INTEGER PRIMARY KEY AUTOINCREMENT,` in every table
+
+
   - Use SQLite as queue:
     - https://github.com/collectiveidea/delayed_job/tree/11e0212fb112c5e11e4555ef1e24510819a66347#gory-details
     - https://sqlite.org/forum/info/b047f5ef5b76edff
