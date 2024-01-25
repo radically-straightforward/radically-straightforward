@@ -131,8 +131,7 @@ export default function sql(
   ...substitutions: any[]
 ): Query {
   const templateParts = [...templateStrings];
-  const sourceParts: string[] = [];
-  const parameters: any[] = [];
+  const query: Query = { sourceParts: [], parameters: [] };
   for (
     let substitutionsIndex = 0;
     substitutionsIndex < substitutions.length;
@@ -161,7 +160,7 @@ export default function sql(
           substitutionQuery.sourceParts[0]
         }${templateParts[substitutionsIndex + 1]}`;
       else {
-        sourceParts.push(
+        query.sourceParts.push(
           `${templatePart}${substitutionQuery.sourceParts[0]}`,
           ...substitutionQuery.sourceParts.slice(1, -1),
         );
@@ -169,7 +168,7 @@ export default function sql(
           `${substitutionQuery.sourceParts.at(-1)}${
             templateParts[substitutionsIndex + 1]
           }`;
-        parameters.push(...substitutionQuery.parameters);
+        query.parameters.push(...substitutionQuery.parameters);
       }
     } else if (Array.isArray(substitution)) {
       if (substitution.length === 0)
@@ -177,20 +176,20 @@ export default function sql(
           templateParts[substitutionsIndex + 1]
         }`;
       else {
-        sourceParts.push(
+        query.sourceParts.push(
           `${templatePart}(`,
           ...new Array(substitution.length - 1).fill(","),
         );
         templateParts[substitutionsIndex + 1] = `)${
           templateParts[substitutionsIndex + 1]
         }`;
-        parameters.push(...substitution);
+        query.parameters.push(...substitution);
       }
     } else {
-      sourceParts.push(templatePart);
-      parameters.push(substitution);
+      query.sourceParts.push(templatePart);
+      query.parameters.push(substitution);
     }
   }
-  sourceParts.push(templateParts.at(-1)!);
-  return { sourceParts, parameters };
+  query.sourceParts.push(templateParts.at(-1)!);
+  return query;
 }
