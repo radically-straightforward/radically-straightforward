@@ -295,6 +295,7 @@ test(async () => {
       parameters: [],
     },
   );
+
   assert.deepEqual(
     sql`INSERT INTO "users" ("name") VALUES (${"Leandro Facchinetti"})`,
     {
@@ -302,6 +303,7 @@ test(async () => {
       parameters: ["Leandro Facchinetti"],
     },
   );
+
   assert.deepEqual(
     sql`SELECT "id", "name" FROM "users" WHERE "name" IN ${[]}`,
     {
@@ -309,6 +311,7 @@ test(async () => {
       parameters: [],
     },
   );
+
   assert.deepEqual(
     sql`SELECT "id", "name" FROM "users" WHERE "name" IN ${[
       "Leandro Facchinetti",
@@ -323,6 +326,7 @@ test(async () => {
       parameters: ["Leandro Facchinetti", "David Adler"],
     },
   );
+
   assert.deepEqual(
     sql`SELECT "id", "name" FROM "users" WHERE "name" IN ${new Set([])}`,
     {
@@ -330,6 +334,7 @@ test(async () => {
       parameters: [],
     },
   );
+
   assert.deepEqual(
     sql`SELECT "id", "name" FROM "users" WHERE "name" IN ${new Set([
       "Leandro Facchinetti",
@@ -344,6 +349,7 @@ test(async () => {
       parameters: ["Leandro Facchinetti", "David Adler"],
     },
   );
+
   assert.deepEqual(
     sql`SELECT "id", "name" FROM "users" WHERE name = ${"Leandro Facchinetti"}$${sql` AND "age" IS NOT NULL`}`,
     {
@@ -354,6 +360,7 @@ test(async () => {
       parameters: ["Leandro Facchinetti"],
     },
   );
+
   assert.deepEqual(
     sql`SELECT "id", "name" FROM "users" WHERE name = ${"Leandro Facchinetti"}$${sql` AND "age" = ${33}`}`,
     {
@@ -365,7 +372,8 @@ test(async () => {
       parameters: ["Leandro Facchinetti", 33],
     },
   );
+
   assert.throws(() => {
-    sql`SELECT "id", "name" FROM "users" WHERE name = ${"Leandro Facchinetti"}$${` AND "age" = ${33}`}`;
+    sql`SELECT "id", "name" FROM "users" WHERE name = ${"Leandro Facchinetti"}$${` AND "age" IS NOT NULL`}`;
   });
 });

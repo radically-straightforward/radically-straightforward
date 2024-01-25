@@ -146,13 +146,13 @@ export default function sql(
         !Array.isArray(substitution.sourceParts) ||
         substitution.sourceParts.length === 0 ||
         substitution.sourceParts.some(
-          (substitutionPart: any) => typeof substitutionPart !== "string",
+          (sourcePart: any) => typeof sourcePart !== "string",
         ) ||
         !Array.isArray(substitution.parameters) ||
         substitution.sourceParts.length !== substitution.parameters.length + 1
       )
         throw new Error(
-          `Failed to interpolate raw query ‘${substitution}’ because it wasn’t created with the sql\`\` tagged template`,
+          `Failed to interpolate raw query ‘${substitution}’ because it wasn’t created with the sql\`___\` tagged template.`,
         );
       const substitutionQuery = substitution as Query;
       if (substitutionQuery.sourceParts.length === 1)
