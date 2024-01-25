@@ -7,12 +7,12 @@ test("Database.execute()", () => {
   database.execute(
     sql`
       CREATE TABLE "users" ("id" INTEGER PRIMARY KEY AUTOINCREMENT, "name" TEXT);
-      INSERT INTO "users" ("name") VALUES (${"Eliot Smith"});
+      INSERT INTO "users" ("name") VALUES (${"Leandro Facchinetti"});
     `,
   );
   assert.equal(
     database.get<{ name: string }>(sql`SELECT * FROM "users"`)!.name,
-    "Eliot Smith",
+    "Leandro Facchinetti",
   );
   database.close();
 });
@@ -66,7 +66,7 @@ test("Database.all()", () => {
   database.run(
     sql`INSERT INTO "users" ("name") VALUES (${"Leandro Facchinetti"})`,
   );
-  database.run(sql`INSERT INTO "users" ("name") VALUES (${"Linda Renner"})`);
+  database.run(sql`INSERT INTO "users" ("name") VALUES (${"Abigail Wall"})`);
   database.run(
     sql`
       INSERT INTO "users" ("name") VALUES (${"David Adler"})
@@ -85,7 +85,7 @@ test("Database.all()", () => {
       },
       {
         id: 2,
-        name: "Linda Renner",
+        name: "Abigail Wall",
       },
       {
         id: 3,
@@ -146,7 +146,7 @@ test("Database.iterate()", () => {
   database.run(
     sql`INSERT INTO "users" ("name") VALUES (${"Leandro Facchinetti"})`,
   );
-  database.run(sql`INSERT INTO "users" ("name") VALUES (${"Linda Renner"})`);
+  database.run(sql`INSERT INTO "users" ("name") VALUES (${"Abigail Wall"})`);
   assert.deepEqual(
     [
       ...database.iterate<{ name: string }>(
@@ -160,7 +160,7 @@ test("Database.iterate()", () => {
       },
       {
         id: 2,
-        name: "Linda Renner",
+        name: "Abigail Wall",
       },
     ],
   );
@@ -424,7 +424,7 @@ test("Database.migrate()", async () => {
       `,
       async (database) => {
         database.execute(
-          sql`INSERT INTO "users" ("name") VALUES (${"Linda Renner"})`,
+          sql`INSERT INTO "users" ("name") VALUES (${"Abigail Wall"})`,
         );
         await Promise.resolve();
         throw new Error("Should rollback across ticks of the event loop");
@@ -462,7 +462,7 @@ test("Database.getStatement()", () => {
     },
   );
   assert.deepEqual(
-    database.run(sql`INSERT INTO "users" ("name") VALUES (${"Linda Renner"})`, {
+    database.run(sql`INSERT INTO "users" ("name") VALUES (${"Abigail Wall"})`, {
       safeIntegers: true,
     }),
     {
@@ -478,10 +478,9 @@ test("Database.getStatement()", () => {
     },
   );
   assert.deepEqual(
-    database.run(
-      sql`INSERT INTO "users" ("name") VALUES (${"Cadeau Renner"})`,
-      { safeIntegers: false },
-    ),
+    database.run(sql`INSERT INTO "users" ("name") VALUES (${"Eliot Smith"})`, {
+      safeIntegers: false,
+    }),
     {
       changes: 1,
       lastInsertRowid: 4,
@@ -517,7 +516,7 @@ test("Database.getStatement()", () => {
       },
       {
         id: 2n,
-        name: "Linda Renner",
+        name: "Abigail Wall",
       },
       {
         id: 3n,
@@ -525,7 +524,7 @@ test("Database.getStatement()", () => {
       },
       {
         id: 4n,
-        name: "Cadeau Renner",
+        name: "Eliot Smith",
       },
     ],
   );
@@ -545,7 +544,7 @@ test("Database.getStatement()", () => {
       },
       {
         id: 2n,
-        name: "Linda Renner",
+        name: "Abigail Wall",
       },
       {
         id: 3n,
@@ -553,7 +552,7 @@ test("Database.getStatement()", () => {
       },
       {
         id: 4n,
-        name: "Cadeau Renner",
+        name: "Eliot Smith",
       },
     ],
   );
