@@ -380,4 +380,5 @@ import sql, { Database } from "@radically-straightforward/sqlite";
 ```
 
 <!-- DOCUMENTATION START: ./source/index.mts -->
+
 <!-- DOCUMENTATION END: ./source/index.mts -->

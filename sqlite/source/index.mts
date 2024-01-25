@@ -27,7 +27,18 @@ export class Database extends BetterSqlite3Database {
           const migration = migrations[migrationIndex];
           if (typeof migration === "function") await migration(this);
           else this.execute(migration);
-          if (foreignKeys) this.pragma<void>("foreign_key_check");
+          if (foreignKeys) {
+            const foreignKeyViolations =
+              this.pragma<unknown[]>("foreign_key_check");
+            if (foreignKeyViolations.length !== 0)
+              throw new Error(
+                `Foreign key violations in migration:\n${JSON.stringify(
+                  foreignKeyViolations,
+                  undefined,
+                  2,
+                )}`,
+              );
+          }
           this.pragma<void>(`user_version = ${migrationIndex + 1}`);
           this.execute(
             sql`
