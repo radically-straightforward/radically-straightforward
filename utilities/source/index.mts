@@ -257,14 +257,12 @@ export function intern<
   for (const innerValue of Object.values(value))
     if (
       !(
-        [
-          "string",
-          "number",
-          "bigint",
-          "boolean",
-          "symbol",
-          "undefined",
-        ].includes(typeof innerValue) ||
+        typeof innerValue === "string" ||
+        typeof innerValue === "number" ||
+        typeof innerValue === "bigint" ||
+        typeof innerValue === "boolean" ||
+        typeof innerValue === "symbol" ||
+        innerValue === undefined ||
         innerValue === null ||
         (innerValue as any)[internSymbol] === true
       )
