@@ -351,10 +351,10 @@ test(async () => {
   );
 
   assert.deepEqual(
-    sql`SELECT "id", "name" FROM "users" WHERE name = ${"Leandro Facchinetti"}$${sql` AND "age" IS NOT NULL`}`,
+    sql`SELECT "id", "name" FROM "users" WHERE "name" = ${"Leandro Facchinetti"}$${sql` AND "age" IS NOT NULL`}`,
     {
       sourceParts: [
-        `SELECT "id", "name" FROM "users" WHERE name = `,
+        `SELECT "id", "name" FROM "users" WHERE "name" = `,
         ` AND "age" IS NOT NULL`,
       ],
       parameters: ["Leandro Facchinetti"],
@@ -362,10 +362,10 @@ test(async () => {
   );
 
   assert.deepEqual(
-    sql`SELECT "id", "name" FROM "users" WHERE name = ${"Leandro Facchinetti"}$${sql` AND "age" = ${33}`}`,
+    sql`SELECT "id", "name" FROM "users" WHERE "name" = ${"Leandro Facchinetti"}$${sql` AND "age" = ${33}`}`,
     {
       sourceParts: [
-        `SELECT "id", "name" FROM "users" WHERE name = `,
+        `SELECT "id", "name" FROM "users" WHERE "name" = `,
         ` AND "age" = `,
         ``,
       ],
@@ -374,6 +374,6 @@ test(async () => {
   );
 
   assert.throws(() => {
-    sql`SELECT "id", "name" FROM "users" WHERE name = ${"Leandro Facchinetti"}$${` AND "age" IS NOT NULL`}`;
+    sql`SELECT "id", "name" FROM "users" WHERE "name" = ${"Leandro Facchinetti"}$${` AND "age" IS NOT NULL`}`;
   });
 });

@@ -381,4 +381,90 @@ import sql, { Database } from "@radically-straightforward/sqlite";
 
 <!-- DOCUMENTATION START: ./source/index.mts -->
 
+### `Database`
+
+```typescript
+export class Database extends BetterSqlite3Database;
+```
+
+An extension of [better-sqlite3](https://www.npmjs.com/package/better-sqlite3)’s `Database` which includes:
+
+1. A simpler way to run queries using tagged templates instead of managing prepared statements by hand.
+
+2. A migration system.
+
+To appreciate the difference in ergonomics between better-sqlite3 and @radically-straightforward/sqlite, consider the following example:
+
+**better-sqlite3**
+
+```typescript
+import Database from "better-sqlite3";
+
+const database = new Database("example.db");
+
+database.exec(
+  `
+    CREATE TABLE "users" (
+      "id" INTEGER PRIMARY KEY AUTOINCREMENT,
+      "name" TEXT
+    );
+  `,
+);
+
+const insertStatement = database.prepare(
+  `INSERT INTO "users" ("name") VALUES (?)`,
+);
+insertStatement.run("Leandro Facchinetti");
+
+const selectStatement = database.prepare(
+  `SELECT "id", "name" FROM "users" WHERE "name" = ?`,
+);
+console.log(selectStatement.get("Leandro Facchinetti")); // => { id: 1, name: 'Leandro Facchinetti' }
+```
+
+1. You must manage the prepared statements yourself, making sure to reuse them as much as possible. You could choose to not do that and create a new prepared statement every time instead, but that would be much slower.
+
+2. The queries and their corresponding values are specified separately. In this simple example they’re just one line apart, but in general they could be far from each other, which makes the program more difficult to maintain.
+
+3. When you run the program above for the second time, it fails because the `users` table already exists. In this simple example you could work around that by using `CREATE TABLE IF NOT EXISTS`, but for anything more complicated you need a migration system.
+
+**@radically-straightforward/sqlite**
+
+```typescript
+import sql, { Database } from "@radically-straightforward/sqlite";
+
+const database = new Database("example.db");
+
+database.migrate(
+  sql`
+    CREATE TABLE "users" (
+      "id" INTEGER PRIMARY KEY AUTOINCREMENT,
+      "name" TEXT
+    );
+  `,
+);
+
+database.run(
+  sql`
+    INSERT INTO "users" ("name") VALUES (${"Leandro Facchinetti"})
+  `,
+);
+
+console.log(
+  database.get<{ id: number; name: string }>(
+    sql`
+      SELECT "id", "name" FROM "users" WHERE "name" = ${"Leandro Facchinetti"}
+    `,
+  ),
+); // => { id: 1, name: 'Leandro Facchinetti' }
+```
+
+1. @radically-straightforward/sqlite manages the prepared statements for you, and makes sure to reuse them as much as possible.
+
+2. The queries and their corresponding values are specified together, using interpolation in the `` sql`___` `` tagged template.
+
+   > **Note:** @radically-straightforward/sqlite does **not** do simple string interpolation, which would lead to SQL injection vulnerabilities—it uses bind parameters similar to the better-sqlite3 example.
+
+3. You may run the program above many times and it will not fail, because it’s using @radically-straightforward/sqlite’s migration system.
+
 <!-- DOCUMENTATION END: ./source/index.mts -->
