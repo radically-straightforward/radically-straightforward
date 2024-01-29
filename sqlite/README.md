@@ -373,6 +373,8 @@ import sql, { Database } from "@leafac/sqlite";
 $ npm install @radically-straightforward/sqlite
 ```
 
+> **Note:** We recommend the **[es6-string-html](https://marketplace.visualstudio.com/items?itemName=Tobermory.es6-string-html)** Visual Studio Code extension to syntax highlight SQL in tagged templates.
+
 ## Usage
 
 ```typescript
@@ -384,7 +386,7 @@ import sql, { Database } from "@radically-straightforward/sqlite";
 ### `Database`
 
 ```typescript
-export class Database extends BetterSqlite3Database;
+export class Database extends BetterSQLite3Database;
 ```
 
 An extension of [better-sqlite3](https://www.npmjs.com/package/better-sqlite3)’s `Database` which includes:
@@ -451,7 +453,7 @@ database.run(
 );
 
 console.log(
-  database.get<{ id: number; name: string }>(
+  database.get(
     sql`
       SELECT "id", "name" FROM "users" WHERE "name" = ${"Leandro Facchinetti"}
     `,
@@ -463,8 +465,49 @@ console.log(
 
 2. The queries and their corresponding values are specified together, using interpolation in the `` sql`___` `` tagged template.
 
-   > **Note:** @radically-straightforward/sqlite does **not** do simple string interpolation, which would lead to SQL injection vulnerabilities—it uses bind parameters similar to the better-sqlite3 example.
+   > **Note:** @radically-straightforward/sqlite does **not** do simple string interpolation, which would lead to SQL injection vulnerabilities. Under the hood @radically-straightforward/sqlite uses bind parameters similar to the better-sqlite3 example.
+
+   > **Note:** The `` sql`___` `` tagged template makes the **[es6-string-html](https://marketplace.visualstudio.com/items?itemName=Tobermory.es6-string-html)** Visual Studio Code extension syntax highlight SQL in tagged templates.
 
 3. You may run the program above many times and it will not fail, because it’s using @radically-straightforward/sqlite’s migration system.
+
+#### `Database.migrate()`
+
+```typescript
+async migrate(
+    ...migrations: (Query | ((database: this) => void | Promise<void>))[]
+  ): Promise<void>;
+```
+
+A migration system.
+
+A migration may be:
+
+1. A SQL query, for example:
+
+   ```javascript
+   sql`
+     CREATE TABLE "users" (
+       "id" INTEGER PRIMARY KEY AUTOINCREMENT,
+       "name" TEXT
+     );
+   `;
+   ```
+
+2. A function, which may be asynchronous:
+
+   ```javascript
+   async () => {
+     database.execute(
+       sql`
+         INSERT INTO "users" ("name") VALUES (${"Leandro Facchinetti"});
+       `,
+     );
+   };
+   ```
+
+   > **Note:** For convenience, a migration function receives the database as a parameter. This can be useful if you must define migrations in separate files.
+
+<https://www.sqlite.org/lang_altertable.html#making_other_kinds_of_table_schema_changes>
 
 <!-- DOCUMENTATION END: ./source/index.mts -->

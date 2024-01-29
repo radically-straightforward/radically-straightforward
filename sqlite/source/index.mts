@@ -1,4 +1,4 @@
-import BetterSqlite3Database from "better-sqlite3";
+import BetterSQLite3Database from "better-sqlite3";
 
 /**
  * An extension of [better-sqlite3](https://www.npmjs.com/package/better-sqlite3)’s `Database` which includes:
@@ -77,14 +77,57 @@ import BetterSqlite3Database from "better-sqlite3";
  *
  * 2. The queries and their corresponding values are specified together, using interpolation in the `` sql`___` `` tagged template.
  *
- *    > **Note:** @radically-straightforward/sqlite does **not** do simple string interpolation, which would lead to SQL injection vulnerabilities—it uses bind parameters similar to the better-sqlite3 example.
+ *    > **Note:** @radically-straightforward/sqlite does **not** do simple string interpolation, which would lead to SQL injection vulnerabilities. Under the hood @radically-straightforward/sqlite uses bind parameters similar to the better-sqlite3 example.
+ *
+ *    > **Note:** The `` sql`___` `` tagged template makes the **[es6-string-html](https://marketplace.visualstudio.com/items?itemName=Tobermory.es6-string-html)** Visual Studio Code extension syntax highlight SQL in tagged templates.
  *
  * 3. You may run the program above many times and it will not fail, because it’s using @radically-straightforward/sqlite’s migration system.
  */
-export class Database extends BetterSqlite3Database {
-  #statements = new Map<string, BetterSqlite3Database.Statement>();
+export class Database extends BetterSQLite3Database {
+  #statements = new Map<string, BetterSQLite3Database.Statement>();
 
-  // https://www.sqlite.org/lang_altertable.html#making_other_kinds_of_table_schema_changes
+  /**
+   * A migration system based on [the steps for general schema changes in SQLite](https://www.sqlite.org/lang_altertable.html#making_other_kinds_of_table_schema_changes). The migration system implements steps 1, 2, 10, 11, and 12, while you are expected to implement steps 3–9 in the migrations that you define.
+   *
+   * A migration may be:
+   *
+   * 1. A SQL query, for example:
+   *
+   *    ```javascript
+   *    sql`
+   *      CREATE TABLE "users" (
+   *        "id" INTEGER PRIMARY KEY AUTOINCREMENT,
+   *        "name" TEXT
+   *      );
+   *    `;
+   *    ```
+   *
+   * 2. A function, which may be asynchronous:
+   *
+   *    ```javascript
+   *    async () => {
+   *      database.execute(
+   *        sql`
+   *          INSERT INTO "users" ("name") VALUES (${"Leandro Facchinetti"});
+   *        `,
+   *      );
+   *    };
+   *    ```
+   *
+   *    > **Note:** For convenience, a migration function receives the database as a parameter. This can be useful if you want to define migrations in separate files.
+   *
+   * In your source code, you must always append migrations as your system evolves, but never delete existing migrations from a call to `migrate()`. Think of that function call as the story of your database schema over time.
+   *
+   * You should call `migrate()` every time your application starts.
+   *
+   * You must call `migrate()` only once on your code base.
+   *
+   * The migration system guarantees that each migration will run successfully at most once.
+   *
+   * The migration system doesn’t include a concept of rollback
+   *
+   * where is the version stored
+   */
   async migrate(
     ...migrations: (Query | ((database: this) => void | Promise<void>))[]
   ): Promise<void> {
@@ -157,7 +200,7 @@ export class Database extends BetterSqlite3Database {
     return this.exec(source);
   }
 
-  run(query: Query): BetterSqlite3Database.RunResult {
+  run(query: Query): BetterSQLite3Database.RunResult {
     return this.getStatement(query).run(...query.parameters);
   }
 
@@ -175,7 +218,7 @@ export class Database extends BetterSqlite3Database {
     ) as IterableIterator<T>;
   }
 
-  pragma<T>(source: string, options?: BetterSqlite3Database.PragmaOptions): T {
+  pragma<T>(source: string, options?: BetterSQLite3Database.PragmaOptions): T {
     return super.pragma(source, options) as T;
   }
 
@@ -191,7 +234,7 @@ export class Database extends BetterSqlite3Database {
     return this.transaction(fn).exclusive();
   }
 
-  getStatement(query: Query): BetterSqlite3Database.Statement {
+  getStatement(query: Query): BetterSQLite3Database.Statement {
     const source = query.sourceParts.join("?");
     let statement = this.#statements.get(source);
     if (statement === undefined) {
