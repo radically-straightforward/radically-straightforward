@@ -49,7 +49,7 @@ import BetterSQLite3Database from "better-sqlite3";
  *
  * const database = new Database("example.db");
  *
- * database.migrate(
+ * await database.migrate(
  *   sql`
  *     CREATE TABLE "users" (
  *       "id" INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -118,17 +118,23 @@ export class Database extends BetterSQLite3Database {
    *
    * **Guidelines**
    *
-   * 1. As your application evolves, append migrations to the call to `migrate()` but don’t edit or remove existing migrations. Think of the call to `migrate()` as a record of the history of your database schema.
+   * 1. As your application evolves, append migrations to the call to `migrate()` but don’t edit or remove existing migrations. Think of the call to `migrate()` as an immutable record of the history of your database schema.
    *
-   * 2. Place the call to `migrate()`
+   * 2. Run `migrate()` as your application starts, so that the database schema is always up-to-date.
    *
-   * You must call `migrate()` only once on your code base.
+   * 3. Don’t call `migrate()` multiple times in your application.
    *
-   * The migration system guarantees that each migration will run successfully at most once.
+   * 4. The migration system guarantees that each migration will run successfully at most once. A migration is run in a transaction, and if it fails (for example, if it throws an exception), then the transaction is rolled back.
    *
-   * The migration system doesn’t include a concept of rollback
+   *    > **Note:** A migration that fails to run in the middle may still have had side-effects up to the point of failure, for example, having written a file to the filesystem, and that could cause issues. Make migrations as free of side-effects as possible.
    *
-   * where is the version stored
+   * 5. The migration system doesn’t include a way to roll back a migration that has already run successfully. Instead, when necessary, you must create a new migration that undoes the work of the problematic migration.
+   *
+   *    > **Why?** This makes managing migrations more obviously correct, and in any non-trivial case rollback is impossible anyway, for example, if a migration involves dropping a table, then rolling it back would involve bringing back data that has been deleted.
+   *
+   * 6. The migration system sets the `journal_mode` to WAL. See <https://github.com/WiseLibs/better-sqlite3/blob/bd55c76c1520c7796aa9d904fe65b3fb4fe7aac0/docs/performance.md> and <https://www.sqlite.org/wal.html>.
+   *
+   * 7. You may consult the status of your database schema with the pragma `user_version`, which holds the number of migrations that have been run successfully.
    */
   async migrate(
     ...migrations: (Query | ((database: this) => void | Promise<void>))[]
@@ -186,6 +192,9 @@ export class Database extends BetterSQLite3Database {
     return this;
   }
 
+  /**
+   * Execute DDL statements, for example, `CREATE TABLE`, `DROP INDEX`, and so forth. Multiple statements may be included in the same query.
+   */
   execute(query: Query): this {
     let source = "";
     for (
@@ -204,18 +213,36 @@ export class Database extends BetterSQLite3Database {
     return this.exec(source);
   }
 
+  /**
+   * Run a DML statement, for example, `INSERT`, `UPDATE`, `DELETE`, and so forth.
+   */
   run(query: Query): BetterSQLite3Database.RunResult {
     return this.getStatement(query).run(...query.parameters);
   }
 
+  /**
+   * Run a `SELECT` statement that returns a single result.
+   *
+   * > **Note:** If the `SELECT` statement returns multiple results, only the first result is returned, so it’s better to write statements that return a single result, for example, using `ORDER BY` and `LIMIT`.
+   *
+   * > **Note:** You may also use `get()` to run an [`INSERT ... RETURNING *` statement](https://www.sqlite.org/lang_returning.html).
+   *
+   * > **Note:** The type parameter
+   */
   get<T>(query: Query): T | undefined {
     return this.getStatement(query).get(...query.parameters) as T | undefined;
   }
 
+  /**
+   * Run a `SELECT` statement that returns multiple results as a list.
+   */
   all<T>(query: Query): T[] {
     return this.getStatement(query).all(...query.parameters) as T[];
   }
 
+  /**
+   * Run a `SELECT` statement that returns multiple results as an iterator.
+   */
   iterate<T>(query: Query): IterableIterator<T> {
     return this.getStatement(query).iterate(
       ...query.parameters,

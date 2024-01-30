@@ -1,6 +1,4 @@
 <!--
-- Force the use of WAL?
-- Add migration to constructor?
 - Style
   - Use `"` around table and column names
   - Use `RETURNING *`
@@ -439,7 +437,7 @@ import sql, { Database } from "@radically-straightforward/sqlite";
 
 const database = new Database("example.db");
 
-database.migrate(
+await database.migrate(
   sql`
     CREATE TABLE "users" (
       "id" INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -478,10 +476,10 @@ console.log(
 ```typescript
 async migrate(
     ...migrations: (Query | ((database: this) => void | Promise<void>))[]
-  ): Promise<void>;
+  ): Promise<this>;
 ```
 
-A migration system based on [the steps for general schema changes in SQLite](https://www.sqlite.org/lang_altertable.html#making_other_kinds_of_table_schema_changes). The migration system implements steps 1, 2, 10, 11, and 12, while you are expected to implement steps 3–9 in the migrations that you define.
+A migration system based on [the steps for general schema changes in SQLite](https://www.sqlite.org/lang_altertable.html#making_other_kinds_of_table_schema_changes). The migration system implements steps 1–2, 10–12, and you must implement steps 3–9 in the migrations that you define.
 
 A migration may be:
 
@@ -510,16 +508,24 @@ A migration may be:
 
    > **Note:** For convenience, a migration function receives the database as a parameter. This can be useful if you want to define migrations in separate files.
 
-In your source code, you must always append migrations as your system evolves, but never delete existing migrations from a call to `migrate()`. Think of that function call as the story of your database schema over time.
+**Guidelines**
 
-You should call `migrate()` every time your application starts.
+1. As your application evolves, append migrations to the call to `migrate()` but don’t edit or remove existing migrations. Think of the call to `migrate()` as an immutable record of the history of your database schema.
 
-You must call `migrate()` only once on your code base.
+2. Run `migrate()` as your application starts, so that the database schema is always up-to-date.
 
-The migration system guarantees that each migration will run successfully at most once.
+3. Don’t call `migrate()` multiple times in your application.
 
-The migration system doesn’t include a concept of rollback
+4. The migration system guarantees that each migration will run successfully at most once. A migration is run in a transaction, and if it fails (for example, if it throws an exception), then the transaction is rolled back.
 
-where is the version stored
+   > **Note:** A migration that fails to run in the middle may still have had side-effects up to the point of failure, for example, having written a file to the filesystem, and that could cause issues. Make migrations as free of side-effects as possible.
+
+5. The migration system doesn’t include a way to roll back a migration that has already run successfully. Instead, when necessary, you must create a new migration that undoes the work of the problematic migration.
+
+   > **Why?** This makes managing migrations more obviously correct, and in any non-trivial case rollback is impossible anyway, for example, if a migration involves dropping a table, then rolling it back would involve bringing back data that has been deleted.
+
+6. The migration system sets the `journal_mode` to WAL. See <https://github.com/WiseLibs/better-sqlite3/blob/bd55c76c1520c7796aa9d904fe65b3fb4fe7aac0/docs/performance.md> and <https://www.sqlite.org/wal.html>.
+
+7. You may consult the status of your database schema with the pragma `user_version`, which holds the number of migrations that have been run successfully.
 
 <!-- DOCUMENTATION END: ./source/index.mts -->
