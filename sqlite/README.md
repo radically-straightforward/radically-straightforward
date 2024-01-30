@@ -518,14 +518,127 @@ A migration may be:
 
 4. The migration system guarantees that each migration will run successfully at most once. A migration is run in a transaction, and if it fails (for example, if it throws an exception), then the transaction is rolled back.
 
-   > **Note:** A migration that fails to run in the middle may still have had side-effects up to the point of failure, for example, having written a file to the filesystem, and that could cause issues. Make migrations as free of side-effects as possible.
+   > **Note:** A migration that fails in the middle may still have had side-effects up to the point of failure (for example, having had written a file to the filesystem), and that could cause issues. Make migrations as free of side-effects as possible.
 
 5. The migration system doesn’t include a way to roll back a migration that has already run successfully. Instead, when necessary, you must create a new migration that undoes the work of the problematic migration.
 
-   > **Why?** This makes managing migrations more obviously correct, and in any non-trivial case rollback is impossible anyway, for example, if a migration involves dropping a table, then rolling it back would involve bringing back data that has been deleted.
+   > **Why?** This makes managing migrations more straightforward, and in any non-trivial case rollback is impossible anyway (for example, if a migration involves dropping a table, then rolling it back would involve bringing back data that has been deleted).
 
 6. The migration system sets the `journal_mode` to WAL. See <https://github.com/WiseLibs/better-sqlite3/blob/bd55c76c1520c7796aa9d904fe65b3fb4fe7aac0/docs/performance.md> and <https://www.sqlite.org/wal.html>.
 
 7. You may consult the status of your database schema with the pragma `user_version`, which holds the number of migrations that have been run successfully.
+
+#### `Database.execute()`
+
+```typescript
+execute(query: Query): this;
+```
+
+Execute DDL statements, for example, `CREATE TABLE`, `DROP INDEX`, and so forth. Multiple statements may be included in the same query.
+
+#### `Database.run()`
+
+```typescript
+run(query: Query): BetterSQLite3Database.RunResult;
+```
+
+Run a DML statement, for example, `INSERT`, `UPDATE`, `DELETE`, and so forth.
+
+#### `Database.get()`
+
+```typescript
+get<Type>(query: Query): Type | undefined;
+```
+
+Run a `SELECT` statement that returns a single result.
+
+> **Note:** If the `SELECT` statement returns multiple results, only the first result is returned, so it’s better to write statements that return a single result (for example, using `LIMIT`).
+
+> **Note:** You may also use `get()` to run an [`INSERT ... RETURNING *` statement](https://www.sqlite.org/lang_returning.html).
+
+> **Note:** The `Type` parameter is a coercion. If you’d like to make sure that the values returned from the database are of a certain type, you must implement a runtime check instead.
+
+#### `Database.all()`
+
+```typescript
+all<Type>(query: Query): Type[];
+```
+
+Run a `SELECT` statement that returns multiple results as a list.
+
+> **Note:** We recommend including an explicit `ORDER BY` clause to specify the order of the results.
+
+#### `Database.iterate()`
+
+```typescript
+iterate<Type>(query: Query): IterableIterator<Type>;
+```
+
+Run a `SELECT` statement that returns multiple results as an iterator.
+
+#### `Database.pragma()`
+
+```typescript
+pragma<Type>(
+    source: string,
+    options?: BetterSQLite3Database.PragmaOptions,
+  ): Type;
+```
+
+Run a `PRAGMA`. Similar to `better-sqlite3`’s `pragma()`, but includes the `Type` coercion similar to other methods.
+
+#### `Database.executeTransaction()`
+
+```typescript
+executeTransaction<Type>(fn: () => Type): Type;
+```
+
+Execute a function in a transaction. All the [caveats](https://github.com/WiseLibs/better-sqlite3/blob/bd55c76c1520c7796aa9d904fe65b3fb4fe7aac0/docs/api.md#caveats) about `better-sqlite3`’s transactions still apply. The type of transaction isn’t specified, so it defaults to `DEFERRED`.
+
+#### `Database.executeTransactionImmediate()`
+
+```typescript
+executeTransactionImmediate<Type>(fn: () => Type): Type;
+```
+
+Execute a function in an `IMMEDIATE` transaction.
+
+#### `Database.executeTransactionExclusive()`
+
+```typescript
+executeTransactionExclusive<Type>(fn: () => Type): Type;
+```
+
+Execute a function in an `EXCLUSIVE` transaction.
+
+#### `Database.getStatement()`
+
+```typescript
+getStatement(query: Query): BetterSQLite3Database.Statement;
+```
+
+An internal method that returns a `better-sqlite3` prepared statement for a given query. Normally you don’t have to use this, but it’s available for advanced use-cases in which you’d like to manipulate a prepared statement, for example, to set [`safeIntegers()`](https://github.com/WiseLibs/better-sqlite3/blob/bd55c76c1520c7796aa9d904fe65b3fb4fe7aac0/docs/integer.md#getting-bigints-from-the-database).
+
+### `Query`
+
+```typescript
+export type Query = {
+  sourceParts: string[];
+  parameters: any[];
+};
+```
+
+An auxiliary type that represents a database query. This is what’s generated by the `` sql`___` `` tagged template.
+
+### `sql()`
+
+```typescript
+export default function sql(
+  templateStrings: TemplateStringsArray,
+  ...substitutions: any[]
+): Query;
+```
+
+A tagged template to generate database queries.
 
 <!-- DOCUMENTATION END: ./source/index.mts -->
