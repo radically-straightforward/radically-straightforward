@@ -87,7 +87,7 @@ export class Database extends BetterSQLite3Database {
   #statements = new Map<string, BetterSQLite3Database.Statement>();
 
   /**
-   * A migration system based on [the steps for general schema changes in SQLite](https://www.sqlite.org/lang_altertable.html#making_other_kinds_of_table_schema_changes). The migration system implements steps 1, 2, 10, 11, and 12, while you are expected to implement steps 3–9 in the migrations that you define.
+   * A migration system based on [the steps for general schema changes in SQLite](https://www.sqlite.org/lang_altertable.html#making_other_kinds_of_table_schema_changes). The migration system implements steps 1–2, 10–12, and you must implement steps 3–9 in the migrations that you define.
    *
    * A migration may be:
    *
@@ -116,9 +116,11 @@ export class Database extends BetterSQLite3Database {
    *
    *    > **Note:** For convenience, a migration function receives the database as a parameter. This can be useful if you want to define migrations in separate files.
    *
-   * In your source code, you must always append migrations as your system evolves, but never delete existing migrations from a call to `migrate()`. Think of that function call as the story of your database schema over time.
+   * **Guidelines**
    *
-   * You should call `migrate()` every time your application starts.
+   * 1. As your application evolves, append migrations to the call to `migrate()` but don’t edit or remove existing migrations. Think of the call to `migrate()` as a record of the history of your database schema.
+   *
+   * 2. Place the call to `migrate()`
    *
    * You must call `migrate()` only once on your code base.
    *
