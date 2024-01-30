@@ -479,7 +479,7 @@ async migrate(
   ): Promise<void>;
 ```
 
-A migration system.
+A migration system based on [the steps for general schema changes in SQLite](https://www.sqlite.org/lang_altertable.html#making_other_kinds_of_table_schema_changes). The migration system implements steps 1, 2, 10, 11, and 12, while you are expected to implement steps 3–9 in the migrations that you define.
 
 A migration may be:
 
@@ -506,8 +506,18 @@ A migration may be:
    };
    ```
 
-   > **Note:** For convenience, a migration function receives the database as a parameter. This can be useful if you must define migrations in separate files.
+   > **Note:** For convenience, a migration function receives the database as a parameter. This can be useful if you want to define migrations in separate files.
 
-<https://www.sqlite.org/lang_altertable.html#making_other_kinds_of_table_schema_changes>
+In your source code, you must always append migrations as your system evolves, but never delete existing migrations from a call to `migrate()`. Think of that function call as the story of your database schema over time.
+
+You should call `migrate()` every time your application starts.
+
+You must call `migrate()` only once on your code base.
+
+The migration system guarantees that each migration will run successfully at most once.
+
+The migration system doesn’t include a concept of rollback
+
+where is the version stored
 
 <!-- DOCUMENTATION END: ./source/index.mts -->
