@@ -79,7 +79,7 @@ import BetterSQLite3Database from "better-sqlite3";
  *
  *    > **Note:** `@radically-straightforward/sqlite` does **not** do simple string interpolation, which would lead to SQL injection vulnerabilities. Under the hood `@radically-straightforward/sqlite` uses bind parameters similar to the `better-sqlite3` example.
  *
- *    > **Note:** The `` sql`___` `` tagged template makes the **[es6-string-html](https://marketplace.visualstudio.com/items?itemName=Tobermory.es6-string-html)** Visual Studio Code extension syntax highlight SQL in tagged templates.
+ *    > **Note:** In Visual Studio Code you may install the **[es6-string-html](https://marketplace.visualstudio.com/items?itemName=Tobermory.es6-string-html)** extension to add syntax highlighting to `` sql`___` `` tagged templates.
  *
  * 3. You may run the program above many times and it will not fail, because it’s using `@radically-straightforward/sqlite`’s migration system.
  */
@@ -114,7 +114,7 @@ export class Database extends BetterSQLite3Database {
    *    };
    *    ```
    *
-   *    > **Note:** For convenience, a migration function receives the database as a parameter. This can be useful if you want to define migrations in separate files.
+   *    > **Note:** For convenience, a migration function may receive the database as a parameter. This can be useful if you want to define migrations in separate files.
    *
    * **Guidelines**
    *
@@ -124,7 +124,7 @@ export class Database extends BetterSQLite3Database {
    *
    * 3. Don’t call `migrate()` multiple times in your application.
    *
-   * 4. The migration system guarantees that each migration will run successfully at most once. A migration is run in a transaction, and if it fails (for example, if it throws an exception), then the transaction is rolled back.
+   * 4. The migration system guarantees that each migration will run successfully at most once. A migration is run in a database transaction, and if it fails (for example, if it throws an exception), then the transaction is rolled back.
    *
    *    > **Note:** A migration that fails in the middle may still have had side-effects up to the point of failure (for example, having had written a file to the filesystem), and that could cause issues. Make migrations as free of side-effects as possible.
    *
@@ -227,7 +227,7 @@ export class Database extends BetterSQLite3Database {
    *
    * > **Note:** You may also use `get()` to run an [`INSERT ... RETURNING *` statement](https://www.sqlite.org/lang_returning.html).
    *
-   * > **Note:** The `Type` parameter is a coercion. If you’d like to make sure that the values returned from the database are of a certain type, you must implement a runtime check instead.
+   * > **Note:** The `Type` parameter is [an assertion](https://www.typescriptlang.org/docs/handbook/2/everyday-types.html#type-assertions). If you’d like to make sure that the values returned from the database are of a certain type, you must implement a runtime check instead.
    */
   get<Type>(query: Query): Type | undefined {
     return this.getStatement(query).get(...query.parameters) as
@@ -240,7 +240,7 @@ export class Database extends BetterSQLite3Database {
    *
    * > **Note:** We recommend including an explicit `ORDER BY` clause to specify the order of the results.
    *
-   * > **Note:** If the result Array is big and you don’t want to load it all at once, then use `iterate()` instead.
+   * > **Note:** If the results are big and you don’t want to load them all at once, then use `iterate()` instead.
    */
   all<Type>(query: Query): Type[] {
     return this.getStatement(query).all(...query.parameters) as Type[];
@@ -249,7 +249,7 @@ export class Database extends BetterSQLite3Database {
   /**
    * Run a `SELECT` statement that returns multiple results as an iterator.
    *
-   * > **Note:** If the result Array is small and you may load it all at once, then use `all()` instead.
+   * > **Note:** If the results are small and you may load them all at once, then use `all()` instead.
    */
   iterate<Type>(query: Query): IterableIterator<Type> {
     return this.getStatement(query).iterate(
@@ -258,7 +258,7 @@ export class Database extends BetterSQLite3Database {
   }
 
   /**
-   * Run a `PRAGMA`. Similar to `better-sqlite3`’s `pragma()`, but includes the `Type` coercion similar to other methods.
+   * Run a `PRAGMA`. Similar to `better-sqlite3`’s `pragma()`, but includes the `Type` assertion similar to other methods.
    */
   pragma<Type>(
     source: string,
@@ -289,7 +289,7 @@ export class Database extends BetterSQLite3Database {
   }
 
   /**
-   * An internal method that returns a `better-sqlite3` prepared statement for a given query. Normally you don’t have to use this, but it’s available for advanced use-cases in which you’d like to manipulate a prepared statement, for example, to set [`safeIntegers()`](https://github.com/WiseLibs/better-sqlite3/blob/bd55c76c1520c7796aa9d904fe65b3fb4fe7aac0/docs/integer.md#getting-bigints-from-the-database).
+   * An internal method that returns a `better-sqlite3` prepared statement for a given query. Normally you don’t have to use this, but it’s available for advanced use-cases in which you’d like to manipulate a prepared statement (for example, to set [`safeIntegers()`](https://github.com/WiseLibs/better-sqlite3/blob/bd55c76c1520c7796aa9d904fe65b3fb4fe7aac0/docs/integer.md#getting-bigints-from-the-database)).
    */
   getStatement(query: Query): BetterSQLite3Database.Statement {
     const source = query.sourceParts.join("?");
@@ -311,7 +311,7 @@ export type Query = {
 };
 
 /**
- * A tagged template to generate database queries.
+ * A tagged template to generate a database query.
  */
 export default function sql(
   templateStrings: TemplateStringsArray,
