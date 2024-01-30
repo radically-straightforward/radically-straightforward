@@ -177,15 +177,15 @@ sanitize.replacement = "";
  *
  *   The following are some details on how this implementation is made faster:
  *
- *   - The relatively new string function `.replaceAll()` when used with a string parameter is faster than `.replace()` with a regular expression.
+ *   - The relatively new string function `replaceAll()` when used with a string parameter is faster than `replace()` with a regular expression.
  *
- *   - Perhaps surprisingly, calling `.replaceAll()` multiple times is faster than using a single regular expression of the kind `/[&<>"']/g`.
+ *   - Perhaps surprisingly, calling `replaceAll()` multiple times is faster than using a single regular expression of the kind `/[&<>"']/g`.
  *
  *   - And even if we were to use a single regular expression, using `switch/case` would have been faster than the lookup tables that most other implementations use.
  *
  *   - And also if we were to use regular expressions, using the flag `v` incurs on a very small but consistent performance penalty.
  *
- *   - And also if we were to use regular expressions, `.replace()` is marginally but consistently faster than `.replaceAll()`.
+ *   - And also if we were to use regular expressions, `replace()` is marginally but consistently faster than `replaceAll()`.
  *
  *   - Measurements performed in Node.js 21.2.0.
  *

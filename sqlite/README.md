@@ -2,7 +2,7 @@
 - Style
   - Use `"` around table and column names
   - Use `RETURNING *`
-  - Use `ORDER BY` if using `.all()`
+  - Use `ORDER BY` if using `all()`
   - Don’t put `` sql`___` `` on the same line as anything else (because of Visual Studio Code extension)
   - Include `"id" INTEGER PRIMARY KEY AUTOINCREMENT,` in every table
 
@@ -179,7 +179,7 @@ database.executeTransaction(() => {
 });
 ```
 
-The function passed to the better-sqlite3 `.transaction()` method may have parameters, which will correspond to the arguments passed when executing the transaction. The function passed to the @leafac/sqlite `.executeTransaction()` method must not have any parameters.
+The function passed to the better-sqlite3 `transaction()` method may have parameters, which will correspond to the arguments passed when executing the transaction. The function passed to the @leafac/sqlite `executeTransaction()` method must not have any parameters.
 
 #### Native TypeScript Support
 
@@ -207,11 +207,11 @@ database.migrate(
 );
 ```
 
-The `.migrate()` method receives as parameters `` sql`...` `` queries and arbitrary functions. Only the parameters that have not been run before are executed to bring the database up to the most recent version, so you should call `.migrate()` at your application startup. Migrations are run on a transaction, so if one of them fails everything rolls back (if your arbitrary functions have side-effects you’ll have to manage them yourself).
+The `migrate()` method receives as parameters `` sql`...` `` queries and arbitrary functions. Only the parameters that have not been run before are executed to bring the database up to the most recent version, so you should call `migrate()` at your application startup. Migrations are run on a transaction, so if one of them fails everything rolls back (if your arbitrary functions have side-effects you’ll have to manage them yourself).
 
 ##### No Down Migrations
 
-Most migration systems provide a way to **undo** migrations; something called **down** migrations. `.migrate()` doesn’t provide a down migration mechanism.
+Most migration systems provide a way to **undo** migrations; something called **down** migrations. `migrate()` doesn’t provide a down migration mechanism.
 
 I believe that down migrations are more trouble to maintain (they can be a lot of work!) than they’re worth, particularly in small applications. Why? Because down migrations have two main selling points:
 
@@ -223,11 +223,11 @@ But I don’t think these selling points hold up:
 1. You may recreate the database from scratch whenever you need in development.
 2. You almost never want to run a down migration in production because that would make you lose data.
 
-In case something goes wrong, `.migrate()` requires you to write a new migration that undoes the troublesome previous migration. The only way through is forward!
+In case something goes wrong, `migrate()` requires you to write a new migration that undoes the troublesome previous migration. The only way through is forward!
 
 ##### Don’t Change Migrations That Already Run
 
-`.migrate()` doesn’t run migrations that it ran in the past, so if you change an existing migration, it won’t take effect. `.migrate()` has no mechanism to detect and warn about this kind of issue (it can’t, because arbitrary functions don’t lend themselves to this kind of inspection).
+`migrate()` doesn’t run migrations that it ran in the past, so if you change an existing migration, it won’t take effect. `migrate()` has no mechanism to detect and warn about this kind of issue (it can’t, because arbitrary functions don’t lend themselves to this kind of inspection).
 
 ### API
 
@@ -255,9 +255,9 @@ The `Database` class introduces the following new methods:
      ); // => { id: 1, name: 'Leandro Facchinetti' }
      ```
 
-- `.execute<T>(query)`: Equivalent to [better-sqlite3’s `.exec()`](https://github.com/JoshuaWise/better-sqlite3/blob/master/docs/api.md#execstring---this), but adapted to work with the queries generated with the `sql` tagged template.
+- `.execute<T>(query)`: Equivalent to [better-sqlite3’s `exec()`](https://github.com/JoshuaWise/better-sqlite3/blob/master/docs/api.md#execstring---this), but adapted to work with the queries generated with the `sql` tagged template.
 
-- `.executeTransaction<T>(fn)`, `.executeTransactionImmediate<T>(fn)`, and `.executeTransactionExclusive<T>(fn)`: Equivalent to [better-sqlite3’s `.transaction()`, `.transaction().immediate()`, and `.transaction().exclusive()`](https://github.com/JoshuaWise/better-sqlite3/blob/master/docs/api.md#transactionfunction---function), but execute the transaction immediately (see [§ Convenience Methods for Transactions](#convenience-methods-for-transactions)).
+- `.executeTransaction<T>(fn)`, `.executeTransactionImmediate<T>(fn)`, and `.executeTransactionExclusive<T>(fn)`: Equivalent to [better-sqlite3’s `transaction()`, `.transaction().immediate()`, and `.transaction().exclusive()`](https://github.com/JoshuaWise/better-sqlite3/blob/master/docs/api.md#transactionfunction---function), but execute the transaction immediately (see [§ Convenience Methods for Transactions](#convenience-methods-for-transactions)).
 
 ### How It Works
 
@@ -282,11 +282,11 @@ The `Database` keeps a map from query sources to better-sqlite3 prepared stateme
 
 There’s no cache eviction policy in @leafac/sqlite. The prepared statements for every query ever run hang around in memory for as long as the database object is alive (the statements aren’t eligible for garbage collection because they’re in the map). In most cases, that’s fine because there are only a limited number of queries; it’s the parameters that change. If that becomes a problem for you, you may access the cache under the `statements` property and implement your own cache eviction policy.
 
-You may also use the low-level `.getStatement(query: Query, options: Options)` method to get a hold of the underlying prepared statement in the cache (for example, to use [`.pluck()`](https://github.com/JoshuaWise/better-sqlite3/blob/master/docs/api.md#plucktogglestate---this), [`.expand()`](https://github.com/JoshuaWise/better-sqlite3/blob/master/docs/api.md#expandtogglestate---this), [`.raw()`](https://github.com/JoshuaWise/better-sqlite3/blob/master/docs/api.md#rawtogglestate---this), [`.columns()`](https://github.com/JoshuaWise/better-sqlite3/blob/master/docs/api.md#columns---array-of-objects), and [`.bind()`](https://github.com/JoshuaWise/better-sqlite3/blob/master/docs/api.md#bindbindparameters---this)—though `.bind()` will probably render the prepared statement unusable by @leafac/sqlite).
+You may also use the low-level `.getStatement(query: Query, options: Options)` method to get a hold of the underlying prepared statement in the cache (for example, to use [`pluck()`](https://github.com/JoshuaWise/better-sqlite3/blob/master/docs/api.md#plucktogglestate---this), [`expand()`](https://github.com/JoshuaWise/better-sqlite3/blob/master/docs/api.md#expandtogglestate---this), [`raw()`](https://github.com/JoshuaWise/better-sqlite3/blob/master/docs/api.md#rawtogglestate---this), [`columns()`](https://github.com/JoshuaWise/better-sqlite3/blob/master/docs/api.md#columns---array-of-objects), and [`bind()`](https://github.com/JoshuaWise/better-sqlite3/blob/master/docs/api.md#bindbindparameters---this)—though `bind()` will probably render the prepared statement unusable by @leafac/sqlite).
 
 #### Migration System
 
-`.migrate()` uses the [`user_version` SQLite PRAGMA](https://www.sqlite.org/pragma.html#pragma_user_version) to store the number of migrations it ran in the past, and consults this number to avoid re-running migrations.
+`migrate()` uses the [`user_version` SQLite PRAGMA](https://www.sqlite.org/pragma.html#pragma_user_version) to store the number of migrations it ran in the past, and consults this number to avoid re-running migrations.
 
 ### Related Projects
 
@@ -298,8 +298,8 @@ You may also use the low-level `.getStatement(query: Query, options: Options)` m
 - <https://npm.im/sql-template-strings>: This was the inspiration for using tagged templates in this way. Unfortunately, sql-template-strings is incompatible with better-sqlite3, thus @leafac/sqlite.
 - <https://npm.im/html-template-tag>: I love (and stole) the idea of using `$${...}` to mark safe interpolation from html-template-tag.
 - <https://npm.im/package/pg-lit>, <https://npm.im/package/slonik>: These packages also feature tagged templates for SQL, but they’re for [PostgreSQL](https://www.postgresql.org/) instead of SQLite.
-- <https://npm.im/sqlite>, and <https://npm.im/better-sqlite3-helper>: These packages include lightweight migration systems. `.migrate()` is even more lightweight: It doesn’t support **down** migrations and it requires the migrations to be passed as an array, as opposed to, for example, being stored in SQL files. (But you can come up with this array in any way you want, including, for example, reading from a bunch of SQL files.)
-- <https://github.com/trevyn/turbosql>: After having published `.migrate()` the author of Turbosql [reached out](https://github.com/leafac/sqlite-migration/issues/1) to say that they independently arrived at a similar design, but in the Rust ecosystem instead of Node.js. It’s great to have company!
+- <https://npm.im/sqlite>, and <https://npm.im/better-sqlite3-helper>: These packages include lightweight migration systems. `migrate()` is even more lightweight: It doesn’t support **down** migrations and it requires the migrations to be passed as an array, as opposed to, for example, being stored in SQL files. (But you can come up with this array in any way you want, including, for example, reading from a bunch of SQL files.)
+- <https://github.com/trevyn/turbosql>: After having published `migrate()` the author of Turbosql [reached out](https://github.com/leafac/sqlite-migration/issues/1) to say that they independently arrived at a similar design, but in the Rust ecosystem instead of Node.js. It’s great to have company!
 
 ### Changelog
 
@@ -335,19 +335,19 @@ import sql, { Database } from "@leafac/sqlite";
 
 #### 3.2.0
 
-- Added support for asynchronous migration functions in `.migrate()`. Asynchronous migrations can be useful, for example, if need to ask the user for some input to add initial data to new columns in existing tables.
+- Added support for asynchronous migration functions in `migrate()`. Asynchronous migrations can be useful, for example, if need to ask the user for some input to add initial data to new columns in existing tables.
 
-  **Note:** Now `.migrate()` itself is asynchronous, remember to `await` on it.
+  **Note:** Now `migrate()` itself is asynchronous, remember to `await` on it.
 
   **Technical Sidenote:** Migration functions run in a transaction, and generally speaking [transactions shouldn’t persist across ticks of the event loop](https://github.com/WiseLibs/better-sqlite3/blob/f52b3b00cf03090619787a20fb263fec553593ff/docs/api.md#transactionfunction---function), but migrations are a special case: They run at most once, and typically at the application startup, while it’s the only transaction.
 
 #### 3.1.0
 
-- Changed `.migrate()` to conform to <https://www.sqlite.org/lang_altertable.html#making_other_kinds_of_table_schema_changes>.
+- Changed `migrate()` to conform to <https://www.sqlite.org/lang_altertable.html#making_other_kinds_of_table_schema_changes>.
 
 #### 3.0.0
 
-- Added support for interpolation of parameters into queries passed to `.execute()`, for example:
+- Added support for interpolation of parameters into queries passed to `execute()`, for example:
 
   ```typescript
   database.execute(
