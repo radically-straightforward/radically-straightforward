@@ -312,6 +312,29 @@ export type Query = {
 
 /**
  * A tagged template to generate a database query.
+ *
+ * Interpolation is turned into binding parameters to protect from SQL injection, for example:
+ *
+ * ```javascript
+ * sql`INSERT INTO "users" ("name") VALUES (${"Leandro Facchinetti"})`;
+ * ```
+ *
+ * Arrays and Sets may be interpolated for `IN` clauses, for example:
+ *
+ * ```javascript
+ * sql`SELECT "id", "name" FROM "users" WHERE "name" IN ${[
+ *   "Leandro Facchinetti",
+ *   "David Adler",
+ * ]}`;
+ * ```
+ *
+ * You may use the pattern `$${___}` (note the two `$`) to interpolate a clause within a query, for example:
+ *
+ * ```javascript
+ * sql`SELECT "id", "name" FROM "users" WHERE "name" = ${"Leandro Facchinetti"}$${sql` AND "age" = ${33}`}`;
+ * ```
+ *
+ * > **Note:** This is useful, for example, to build queries for advanced search forms by conditionally including clauses for fields that have been filled in.
  */
 export default function sql(
   templateStrings: TemplateStringsArray,
