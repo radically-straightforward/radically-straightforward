@@ -132,7 +132,8 @@ export class Database extends BetterSQLite3Database {
    */
   async migrate(
     ...migrations: (Query | ((database: this) => void | Promise<void>))[]
-  ): Promise<void> {
+  ): Promise<this> {
+    this.pragma<void>(`journal_mode = WAL`);
     const foreignKeys =
       this.pragma<number>("foreign_keys", { simple: true }) === 1;
     if (foreignKeys) this.pragma<void>("foreign_keys = OFF");
@@ -182,6 +183,7 @@ export class Database extends BetterSQLite3Database {
     } finally {
       if (foreignKeys) this.pragma<void>("foreign_keys = ON");
     }
+    return this;
   }
 
   execute(query: Query): this {
