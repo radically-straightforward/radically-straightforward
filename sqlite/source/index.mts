@@ -1,17 +1,17 @@
 import BetterSQLite3Database from "better-sqlite3";
 
 /**
- * An extension of [better-sqlite3](https://www.npmjs.com/package/better-sqlite3)’s `Database` which includes:
+ * An extension of [`better-sqlite3`](https://www.npmjs.com/package/better-sqlite3)’s `Database` which includes:
  *
  * 1. A simpler way to run queries using tagged templates instead of managing prepared statements by hand.
  *
  * 2. A migration system.
  *
- * To appreciate the difference in ergonomics between better-sqlite3 and @radically-straightforward/sqlite, consider the following example:
+ * To appreciate the difference in ergonomics between `better-sqlite3` and `@radically-straightforward/sqlite`, consider the following example:
  *
- * **better-sqlite3**
+ * **`better-sqlite3`**
  *
- * ```typescript
+ * ```javascript
  * import Database from "better-sqlite3";
  *
  * const database = new Database("example.db");
@@ -38,13 +38,13 @@ import BetterSQLite3Database from "better-sqlite3";
  *
  * 1. You must manage the prepared statements yourself, making sure to reuse them as much as possible. You could choose to not do that and create a new prepared statement every time instead, but that would be much slower.
  *
- * 2. The queries and their corresponding values are specified separately. In this simple example they’re just one line apart, but in general they could be far from each other, which makes the program more difficult to maintain.
+ * 2. The queries and their corresponding binding parameters are specified separately. In this simple example they’re just one line apart, but in general they could be far from each other, which makes the program more difficult to maintain.
  *
  * 3. When you run the program above for the second time, it fails because the `users` table already exists. In this simple example you could work around that by using `CREATE TABLE IF NOT EXISTS`, but for anything more complicated you need a migration system.
  *
- * **@radically-straightforward/sqlite**
+ * **`@radically-straightforward/sqlite`**
  *
- * ```typescript
+ * ```javascript
  * import sql, { Database } from "@radically-straightforward/sqlite";
  *
  * const database = new Database("example.db");
@@ -73,15 +73,15 @@ import BetterSQLite3Database from "better-sqlite3";
  * ); // => { id: 1, name: 'Leandro Facchinetti' }
  * ```
  *
- * 1. @radically-straightforward/sqlite manages the prepared statements for you, and makes sure to reuse them as much as possible.
+ * 1. `@radically-straightforward/sqlite` manages the prepared statements for you, and makes sure to reuse them as much as possible.
  *
- * 2. The queries and their corresponding values are specified together, using interpolation in the `` sql`___` `` tagged template.
+ * 2. The queries and their corresponding binding parameters are specified together, using interpolation in the `` sql`___` `` tagged template.
  *
- *    > **Note:** @radically-straightforward/sqlite does **not** do simple string interpolation, which would lead to SQL injection vulnerabilities. Under the hood @radically-straightforward/sqlite uses bind parameters similar to the better-sqlite3 example.
+ *    > **Note:** `@radically-straightforward/sqlite` does **not** do simple string interpolation, which would lead to SQL injection vulnerabilities. Under the hood `@radically-straightforward/sqlite` uses bind parameters similar to the `better-sqlite3` example.
  *
  *    > **Note:** The `` sql`___` `` tagged template makes the **[es6-string-html](https://marketplace.visualstudio.com/items?itemName=Tobermory.es6-string-html)** Visual Studio Code extension syntax highlight SQL in tagged templates.
  *
- * 3. You may run the program above many times and it will not fail, because it’s using @radically-straightforward/sqlite’s migration system.
+ * 3. You may run the program above many times and it will not fail, because it’s using `@radically-straightforward/sqlite`’s migration system.
  */
 export class Database extends BetterSQLite3Database {
   #statements = new Map<string, BetterSQLite3Database.Statement>();
