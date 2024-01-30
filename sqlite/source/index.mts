@@ -34,6 +34,8 @@ import BetterSQLite3Database from "better-sqlite3";
  *   `SELECT "id", "name" FROM "users" WHERE "name" = ?`,
  * );
  * console.log(selectStatement.get("Leandro Facchinetti")); // => { id: 1, name: 'Leandro Facchinetti' }
+ *
+ * database.close();
  * ```
  *
  * 1. You must manage the prepared statements yourself, making sure to reuse them as much as possible. You could choose to not do that and create a new prepared statement every time instead, but that would be much slower.
@@ -71,6 +73,8 @@ import BetterSQLite3Database from "better-sqlite3";
  *     `,
  *   ),
  * ); // => { id: 1, name: 'Leandro Facchinetti' }
+ *
+ * database.close();
  * ```
  *
  * 1. `@radically-straightforward/sqlite` manages the prepared statements for you, and makes sure to reuse them as much as possible.
@@ -335,6 +339,12 @@ export type Query = {
  * ```
  *
  * > **Note:** This is useful, for example, to build queries for advanced search forms by conditionally including clauses for fields that have been filled in.
+ *
+ * **SQL Style Guide**
+ *
+ * - Include `"id" INTEGER PRIMARY KEY AUTOINCREMENT` in every table.
+ * - Quote table and column names (for example, `"users"."name"`), to avoid conflicts with SQL reserved keywords and to help with syntax highlighting.
+ * - Put `` sql`___` `` on its own line because of a glitch in the syntax highlighting.
  */
 export default function sql(
   templateStrings: TemplateStringsArray,

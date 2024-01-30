@@ -1,5 +1,5 @@
 <!--
-- Present CSS variables as JavaScript variables, for example, replace `color: var(--color--green--200);` with `color: ${css.color.green[200]};`.
+- Present CSS variables as JavaScript variables, for example, replace `color: var(--color--green--200);` with `color: ${css.color.green[200]};`?
   - Advantages:
     - Autocomplete.
     - Type checking.
