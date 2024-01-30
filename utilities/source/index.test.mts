@@ -100,17 +100,19 @@ test("intern()", () => {
     $([1])[0] = 2;
   });
 
-  const iterations = 1000;
-  console.time("intern()");
-  const objects = [];
-  for (let iteration = 0; iteration < iterations; iteration++) {
-    const entries = [];
-    for (let key = 0; key < Math.floor(Math.random() * 15); key++) {
-      entries.push([`key${key + Math.floor(Math.random() * 15)}`, 1]);
+  {
+    const iterations = 1000;
+    console.time("intern()");
+    const objects = [];
+    for (let iteration = 0; iteration < iterations; iteration++) {
+      const entries = [];
+      for (let key = 0; key < Math.floor(Math.random() * 15); key++) {
+        entries.push([String(key + Math.floor(Math.random() * 15)), true]);
+      }
+      objects.push($(Object.fromEntries(entries)));
+      objects.push($(entries.flat()));
     }
-    objects.push($(Object.fromEntries(entries)));
-    objects.push($(entries.flat()));
+    // console.log($.pool.record.size);
+    console.timeEnd("intern()");
   }
-  console.log($.pool.record.size);
-  console.timeEnd("intern()");
 });
