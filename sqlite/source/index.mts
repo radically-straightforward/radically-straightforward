@@ -229,39 +229,44 @@ export class Database extends BetterSQLite3Database {
    *
    * > **Note:** The type parameter
    */
-  get<T>(query: Query): T | undefined {
-    return this.getStatement(query).get(...query.parameters) as T | undefined;
+  get<Type>(query: Query): Type | undefined {
+    return this.getStatement(query).get(...query.parameters) as
+      | Type
+      | undefined;
   }
 
   /**
    * Run a `SELECT` statement that returns multiple results as a list.
    */
-  all<T>(query: Query): T[] {
-    return this.getStatement(query).all(...query.parameters) as T[];
+  all<Type>(query: Query): Type[] {
+    return this.getStatement(query).all(...query.parameters) as Type[];
   }
 
   /**
    * Run a `SELECT` statement that returns multiple results as an iterator.
    */
-  iterate<T>(query: Query): IterableIterator<T> {
+  iterate<Type>(query: Query): IterableIterator<Type> {
     return this.getStatement(query).iterate(
       ...query.parameters,
-    ) as IterableIterator<T>;
+    ) as IterableIterator<Type>;
   }
 
-  pragma<T>(source: string, options?: BetterSQLite3Database.PragmaOptions): T {
-    return super.pragma(source, options) as T;
+  pragma<Type>(
+    source: string,
+    options?: BetterSQLite3Database.PragmaOptions,
+  ): Type {
+    return super.pragma(source, options) as Type;
   }
 
-  executeTransaction<T>(fn: () => T): T {
+  executeTransaction<Type>(fn: () => Type): Type {
     return this.transaction(fn)();
   }
 
-  executeTransactionImmediate<T>(fn: () => T): T {
+  executeTransactionImmediate<Type>(fn: () => Type): Type {
     return this.transaction(fn).immediate();
   }
 
-  executeTransactionExclusive<T>(fn: () => T): T {
+  executeTransactionExclusive<Type>(fn: () => Type): Type {
     return this.transaction(fn).exclusive();
   }
 

@@ -234,8 +234,8 @@ export type InternInnerValue =
  * - <https://gist.github.com/modernserf/c000e62d40f678cf395e3f360b9b0e43>
  */
 export function intern<
-  T extends Array<InternInnerValue> | { [key: string]: InternInnerValue },
->(value: T): Intern<T> {
+  Type extends Array<InternInnerValue> | { [key: string]: InternInnerValue },
+>(value: Type): Intern<Type> {
   const type = Array.isArray(value)
     ? "tuple"
     : typeof value === "object" && value !== null
