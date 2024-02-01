@@ -2,6 +2,16 @@ import assert from "node:assert/strict";
 import express from "express";
 import expressServeStaticCore from "express-serve-static-core";
 
+/**
+ * Won’t be necessary in Express 5.
+ * **Related Work**
+ * 
+ * - <https://www.npmjs.com/package/express-async-handler>
+ * - <https://www.npmjs.com/package/express-async-wrap>
+ * - <https://www.npmjs.com/package/express-better-async-wrap>
+ * - <https://github.com/reactjs/server-components-demo/blob/2d9fb948b7073f5f07e22d71350422ee9e1cc7f3/server/api.server.js#L44-L52>
+ */
+
 export function asyncHandler<
   P = expressServeStaticCore.ParamsDictionary,
   ResBody = any,
