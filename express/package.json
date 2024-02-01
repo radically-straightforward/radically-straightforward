@@ -1,0 +1,40 @@
+{
+  "name": "@radically-straightforward/node",
+  "version": "2.0.1",
+  "description": "🔨 Utilities for Node.js",
+  "keywords": [
+    "node",
+    "utilities"
+  ],
+  "homepage": "https://github.com/leafac/radically-straightforward",
+  "repository": "https://github.com/leafac/radically-straightforward",
+  "bugs": "https://github.com/leafac/radically-straightforward/issues",
+  "funding": [
+    "https://patreon.com/leafac",
+    "https://github.com/sponsors/leafac",
+    "https://paypal.me/LeandroFacchinettiEU",
+    "https://btc.com/34KJBgtaFYMtDqpSgMayw9qiKWg2GQXA9M"
+  ],
+  "author": "Leandro Facchinetti <radically-straightforward@leafac.com> (https://leafac.com)",
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  },
+  "exports": "./build/index.mjs",
+  "types": "./build/index.d.mts",
+  "scripts": {
+    "prepare": "tsc && documentation",
+    "test": "npm run prepare && node --test && prettier --check \"./README.md\" --check \"./CHANGELOG.md\" --check \"./package.json\" --check \"./tsconfig.json\" --check \"./source/**/*.mts\""
+  },
+  "devDependencies": {
+    "@radically-straightforward/documentation": "^1.0.1",
+    "@radically-straightforward/tsconfig": "^1.0.0",
+    "@radically-straightforward/utilities": "^1.0.0",
+    "@types/express": "^4.17.21",
+    "@types/node": "^20.9.3",
+    "express": "^4.18.2",
+    "prettier": "^3.1.0",
+    "typescript": "^5.3.2"
+  },
+  "prettier": {}
+}
