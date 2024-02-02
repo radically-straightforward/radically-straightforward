@@ -1,8 +1,5 @@
 ## Requirements
 
-- Basic Node.js server:
-  - Read documentation.
-  - Headers?
 - Parse request:
   - Path parameters (`decodeURIComponent`).
   - Query parameters (<https://www.npmjs.com/package/qs>).
