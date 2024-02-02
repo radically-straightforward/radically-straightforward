@@ -1,11 +1,15 @@
 ## Requirements
 
+- Handlers infrastructure.
+  - Koa.
+  - Register functions to run after.
+  - Use control-flow of a function call to determine how to handle response.
 - Parse request:
   - Path parameters (`decodeURIComponent`).
   - Query parameters (`URLSearchParams`) (<https://www.npmjs.com/package/qs>).
   - Cookies.
   - Body.
-    - Form (`application/x-www-form-urlencoded`).
+    - Form (`application/x-www-form-urlencoded`) (`URLSearchParams`).
     - Attachments (`multipart/form-data`).
 - Response helpers:
   - Cookies.
