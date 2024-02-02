@@ -135,9 +135,9 @@ export type InternInnerValue =
 type InternCacheNode = {
   /** A weak reference to the final Tuple or Record we have interned */
   internedObject?: WeakRef<Interned<any>>;
-  /** The intermediary key for this node ie `node.innerKey = node.parent.get(node.innerKey).get(node.innerValue).innerKey` */
+  /** The intermediary key for this node ie `node.innerKey === node.parent.get(node.innerKey).get(node.innerValue).innerKey` */
   innerKey?: InternInnerKey;
-  /** The intermediary value for this node ie `node.innerValue = node.parent.get(node.innerKey).get(node.innerValue).innerValue` */
+  /** The intermediary value for this node ie `node.innerValue === node.parent.get(node.innerKey).get(node.innerValue).innerValue` */
   innerValue?: InternInnerValue;
   parent?: InternCacheNode;
   children?: Map<InternInnerKey, Map<InternInnerValue, InternCacheNode>>;
