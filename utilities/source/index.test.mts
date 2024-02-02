@@ -51,7 +51,7 @@ test("randomString()", () => {
 
 test("intern()", async () => {
   const getPoolSize = () => {
-    const openList = [$._recordPoolRoot, $._tuplePoolRoot];
+    const openList = [$._pool.tuples, $._pool.records];
     let size = 0;
     while (openList.length) {
       const node = openList.pop();
@@ -80,7 +80,7 @@ test("intern()", async () => {
   // await new Promise((r) => void setTimeout(r, 5000));
   // console.log('Pool size now', getPoolSize())
 
-  const node = $._tuplePoolRoot.children?.get(0)?.get(1);
+  const node = $._pool.tuples.children?.get(0)?.get(1);
   assert(!!node?.internedObject?.deref());
   node!.internedObject = { deref: () => undefined } as any;
   $._finalizationRegistryCallback(node!);

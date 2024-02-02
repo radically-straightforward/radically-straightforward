@@ -271,7 +271,7 @@ export function intern<
     : Object.entries(value).sort(([aKey], [bKey]) => aKey.localeCompare(bKey));
 
   // Find leaf node, creating intermediary nodes as necessary
-  let node = isTuple ? intern._tuplePoolRoot : intern._recordPoolRoot;
+  let node = isTuple ? intern._pool.tuples : intern._pool.records;
   for (const [key, innerValue] of entries) {
     if (node.children === undefined) node.children = new Map();
     if (!node.children.has(key)) node.children.set(key, new Map());
@@ -308,8 +308,10 @@ intern._markInterned = (value: any) => {
 intern.isInterned = (value: any): boolean =>
   (value as any)[internSymbol] === true;
 
-intern._tuplePoolRoot = {} as InternCacheNode;
-intern._recordPoolRoot = {} as InternCacheNode;
+intern._pool = {
+  tuples: {} as InternCacheNode,
+  records: {} as InternCacheNode,
+};
 
 intern._finalizationRegistryCallback = (node: InternCacheNode) => {
   // Value has been garbage collected prune the tree
