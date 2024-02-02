@@ -246,7 +246,9 @@ type InternCacheNode = {
  * - <https://gist.github.com/modernserf/c000e62d40f678cf395e3f360b9b0e43>
  */
 export function intern<
-  Type extends Array<InternInnerValue> | { [key: string]: InternInnerValue },
+  Type extends
+    | Array<InternInnerValue>
+    | { [key: string | symbol]: InternInnerValue },
 >(value: Type): Interned<Type> {
   for (const innerValue of Object.values(value))
     if (

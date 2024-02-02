@@ -139,7 +139,7 @@ export function intern<
   Type extends
     | Array<InternInnerValue>
     | {
-        [key: string]: InternInnerValue;
+        [key: string | symbol]: InternInnerValue;
       },
 >(value: Type): Interned<Type>;
 ```
