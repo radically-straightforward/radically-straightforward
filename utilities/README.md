@@ -104,10 +104,10 @@ export function log(...messageParts: string[]): void;
 
 Tab-separated logging.
 
-### `Intern`
+### `Interned`
 
 ```typescript
-export type Intern<Type> = Readonly<
+export type Interned<Type> = Readonly<
   Type & {
     [internSymbol]: true;
   }
@@ -127,7 +127,7 @@ export type InternInnerValue =
   | symbol
   | undefined
   | null
-  | Intern<unknown>;
+  | Interned<unknown>;
 ```
 
 Utility type for `intern()`.
@@ -141,7 +141,7 @@ export function intern<
     | {
         [key: string]: InternInnerValue;
       },
->(value: T): Intern<T>;
+>(value: T): Interned<T>;
 ```
 
 [Interning](<https://en.wikipedia.org/wiki/Interning_(computer_science)>) a value makes it unique across the program, which is useful for checking equality with `===` (reference equality), using it as a key in a `Map`, adding it to a `Set`, and so forth:

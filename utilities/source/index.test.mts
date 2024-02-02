@@ -49,7 +49,43 @@ test("randomString()", () => {
   utilities.log("EXAMPLE", "OF", "TAB-SEPARATED LOGGING");
 });
 
-test("intern()", () => {
+test("intern()", async () => {
+  const getPoolSize = () => {
+    const openList = [$._recordPoolRoot, $._tuplePoolRoot];
+    let size = 0;
+    while (openList.length) {
+      const node = openList.pop();
+      size++;
+      for (const innerValueMap of node?.children?.values() || []) {
+        for (const x of innerValueMap?.values()) {
+          openList.push(x);
+        }
+      }
+    }
+    return size;
+  };
+
+  // 2 root nodes for records and tuples
+  const initialPoolSize = 2;
+
+  assert.equal(getPoolSize(), initialPoolSize);
+
+  {
+    $([1]);
+  }
+
+  assert.equal(getPoolSize(), initialPoolSize + 1);
+
+  // Manually: Call "Collect Garbage" in the memory tab to see the finalization registry being called
+  // await new Promise((r) => void setTimeout(r, 5000));
+  // console.log('Pool size now', getPoolSize())
+
+  const node = $._tuplePoolRoot.children?.get(0)?.get(1);
+  assert(!!node?.internedObject?.deref());
+  node!.internedObject = { deref: () => undefined } as any;
+  $._finalizationRegistryCallback(node!);
+  assert.equal(getPoolSize(), initialPoolSize);
+
   // @ts-expect-error
   assert(([1] === [1]) === false);
   assert($([1]) === $([1]));
@@ -90,7 +126,6 @@ test("intern()", () => {
   }
 
   {
-    console.log("1");
     assert.throws(() => {
       // @ts-expect-error
       $([1, {}]);

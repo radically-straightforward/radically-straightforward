@@ -118,6 +118,7 @@ export function log(...messageParts: string[]): void {
  */
 export type Interned<Type> = Readonly<Type & { [internSymbol]: true }>;
 
+type InternInnerKey = number | symbol | string;
 /**
  * Utility type for `intern()`.
  */
@@ -130,6 +131,18 @@ export type InternInnerValue =
   | undefined
   | null
   | Interned<unknown>;
+
+type InternNode = {
+  /** The final Tuple or Record we have interned */
+  internedObject?: WeakRef<Interned<any>>;
+  /** The intermediary key for this node ie `node.innerKey = node.parent.get(node.innerKey).get(node.innerValue).innerKey` */
+  innerKey?: InternInnerKey;
+  /** The intermediary value for this node ie `node.innerValue = node.parent.get(node.innerKey).get(node.innerValue).innerValue` */
+  innerValue?: InternInnerValue;
+  children?: InternCache;
+  parent?: InternNode;
+};
+type InternCache = Map<InternInnerKey, Map<InternInnerValue, InternNode>>;
 
 /**
  * [Interning](<https://en.wikipedia.org/wiki/Interning_(computer_science)>) a value makes it unique across the program, which is useful for checking equality with `===` (reference equality), using it as a key in a `Map`, adding it to a `Set`, and so forth:
@@ -255,32 +268,33 @@ export function intern<
         `Failed to intern value because of non-interned inner value.`,
       );
 
-  const entries = Array.isArray(value)
+  const isTuple = Array.isArray(value);
+  const entries = isTuple
     ? value.entries()
     : Object.entries(value).sort(([aKey], [bKey]) => aKey.localeCompare(bKey));
 
   // Find leaf node, creating intermediary nodes as necessary
-  let node = intern._rootInternNode;
+  let node = isTuple ? intern._tuplePoolRoot : intern._recordPoolRoot;
   for (const [key, innerValue] of entries) {
     if (node.children === undefined) node.children = new Map();
     if (!node.children.has(key)) node.children.set(key, new Map());
     const valueMap = node.children.get(key)!;
     if (!valueMap.has(innerValue))
-      valueMap.set(innerValue, { parent: node, key: key, value: innerValue });
+      valueMap.set(innerValue, {
+        parent: node,
+        innerKey: key,
+        innerValue: innerValue,
+      });
     node = valueMap.get(innerValue)!;
   }
 
-  // Special case empty object
-  if (node.root) {
-    return (Array.isArray(value) ? nullTuple : nullRecord) as any;
-  }
-
   // If we already have a value, return it
-  if (node.internedValue !== undefined) return node.internedValue.deref()!;
+  const existingValue = node.internedObject?.deref();
+  if (existingValue !== undefined) return existingValue;
 
   // Otherwise intern the value and cache it
   intern._markInterned(value);
-  node.internedValue = new WeakRef(value);
+  node.internedObject = new WeakRef(value);
   intern._finalizationRegistry.register(value, node);
   return value as Interned<T>;
 }
@@ -297,43 +311,26 @@ intern._markInterned = (value: any) => {
 intern.isInterned = (value: any): boolean =>
   (value as any)[internSymbol] === true;
 
-const nullTuple: any[] = [];
-intern._markInterned(nullTuple);
-const nullRecord = {};
-intern._markInterned(nullRecord);
+intern._tuplePoolRoot = {} as InternNode;
+intern._recordPoolRoot = {} as InternNode;
 
-type InternNode =
-  | {
-      /** The intermediary key for this node ie `node.key = node.parent.get(node.key).get(node.value).key` */
-      key: InternInnerKey;
-      /** The intermediary value for this node ie `node.value = node.parent.get(node.key).get(node.value).value` */
-      value: InternInnerValue;
-      /** The final Tuple or Record we have interned */
-      internedValue?: WeakRef<Interned<any>>;
-      children?: InternCache;
-      parent: InternNode;
-      root?: false;
-    }
-  | { root: true; children?: InternCache; parent?: undefined };
-type InternCache = Map<InternInnerKey, Map<InternInnerValue, InternNode>>;
-type InternInnerKey = any;
-
-intern._rootInternNode = { root: true } as InternNode;
-
-intern._finalizationRegistry = new FinalizationRegistry<InternNode>((node) => {
+intern._finalizationRegistryCallback = (node: InternNode) => {
   // Value has been garbage collected prune the tree
   let currentNode: InternNode | undefined = node;
-  while (currentNode?.parent) {
+  while (currentNode?.parent && currentNode.innerKey !== undefined) {
     // If the current node has no children and no final value, delete it
-    if (!currentNode.children?.size && !currentNode.internedValue) {
+    if (!currentNode.children?.size && !currentNode.internedObject?.deref()) {
       currentNode.parent.children
-        ?.get(currentNode.key)
-        ?.delete(currentNode.value);
+        ?.get(currentNode.innerKey)
+        ?.delete(currentNode.innerValue);
 
-      if (currentNode.parent.children?.get(currentNode.key)?.size === 0)
-        currentNode.parent.children.delete(currentNode.key);
+      if (currentNode.parent.children?.get(currentNode.innerKey)?.size === 0)
+        currentNode.parent.children.delete(currentNode.innerKey);
     }
 
     currentNode = currentNode.parent;
   }
-});
+};
+intern._finalizationRegistry = new FinalizationRegistry<InternNode>(
+  intern._finalizationRegistryCallback,
+);
