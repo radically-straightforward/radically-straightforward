@@ -134,7 +134,7 @@ export type InternInnerValue =
 
 type InternCacheNode = {
   /** A weak reference to the final Tuple or Record we have interned */
-  internedObject?: WeakRef<Interned<any>>;
+  internedObject?: WeakRef<Interned<unknown>>;
   /** The intermediary key for this node ie `node.innerKey === node.parent.get(node.innerKey).get(node.innerValue).innerKey` */
   innerKey?: InternInnerKey;
   /** The intermediary value for this node ie `node.innerValue === node.parent.get(node.innerKey).get(node.innerValue).innerValue` */
@@ -285,17 +285,23 @@ export function intern<
 
   // If we already have a value, return it
   const existingValue = node.internedObject?.deref();
-  if (existingValue !== undefined) return existingValue;
+  if (existingValue !== undefined) return existingValue as Interned<Type>;
 
   // Otherwise intern the value and cache it
   intern._markInterned(value);
   node.internedObject = new WeakRef(value);
   intern._finalizationRegistry.register(value, node);
-  return value as Interned<Type>;
+  return value;
 }
 
 const internSymbol = Symbol("intern");
-intern._markInterned = (value: any) => {
+intern._markInterned = <
+  T extends
+    | Array<InternInnerValue>
+    | { [key: string | symbol]: InternInnerValue },
+>(
+  value: T,
+): asserts value is Interned<T> => {
   Object.defineProperty(value, internSymbol, {
     enumerable: false,
     value: true,
