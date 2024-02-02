@@ -274,16 +274,12 @@ export function intern<
 
   // Find leaf node, creating intermediary nodes as necessary
   let node = isTuple ? intern._pool.tuples : intern._pool.records;
-  for (const [key, innerValue] of entries) {
+  for (const [innerKey, innerValue] of entries) {
     if (node.children === undefined) node.children = new Map();
-    if (!node.children.has(key)) node.children.set(key, new Map());
-    const valueMap = node.children.get(key)!;
+    if (!node.children.has(innerKey)) node.children.set(innerKey, new Map());
+    const valueMap = node.children.get(innerKey)!;
     if (!valueMap.has(innerValue))
-      valueMap.set(innerValue, {
-        parent: node,
-        innerKey: key,
-        innerValue: innerValue,
-      });
+      valueMap.set(innerValue, { parent: node, innerKey, innerValue });
     node = valueMap.get(innerValue)!;
   }
 
