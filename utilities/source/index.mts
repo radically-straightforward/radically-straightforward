@@ -247,8 +247,8 @@ type InternCache = Map<InternInnerKey, Map<InternInnerValue, InternNode>>;
  * - <https://gist.github.com/modernserf/c000e62d40f678cf395e3f360b9b0e43>
  */
 export function intern<
-  T extends Array<InternInnerValue> | { [key: string]: InternInnerValue },
->(value: T): Interned<T> {
+  Type extends Array<InternInnerValue> | { [key: string]: InternInnerValue },
+>(value: Type): Interned<Type> {
   for (const innerValue of Object.values(value))
     if (
       !(
@@ -294,7 +294,7 @@ export function intern<
   intern._markInterned(value);
   node.internedObject = new WeakRef(value);
   intern._finalizationRegistry.register(value, node);
-  return value as Interned<T>;
+  return value as Interned<Type>;
 }
 
 const internSymbol = Symbol("intern");
