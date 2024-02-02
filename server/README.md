@@ -1,9 +1,8 @@
 ## Requirements
 
 - Handlers infrastructure.
-  - Koa.
+  - `next` (Koa).
   - Register functions to run after.
-  - Use control-flow of a function call to determine how to handle response.
 - Parse request:
   - Path parameters (`decodeURIComponent`).
   - Query parameters (`URLSearchParams`) (<https://www.npmjs.com/package/qs>).
@@ -12,6 +11,7 @@
     - Form (`application/x-www-form-urlencoded`) (`URLSearchParams`).
     - Attachments (`multipart/form-data`).
 - Response helpers:
+  - Use data returned by handler to control response.
   - Cookies.
   - Set headers.
   - Redirect.
