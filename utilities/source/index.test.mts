@@ -50,46 +50,46 @@ test("randomString()", () => {
 });
 
 test("intern()", async () => {
-  const getPoolSize = () => {
-    const openList = [$._pool.tuples, $._pool.records];
-    let size = 0;
-    while (openList.length) {
-      const node = openList.pop();
-      size++;
-      for (const innerValueMap of node?.children?.values() || []) {
-        for (const x of innerValueMap?.values()) {
-          openList.push(x);
+  {
+    // Test Garbage Collection
+    const getPoolSize = () => {
+      const openList = [$._pool.tuples, $._pool.records];
+      let size = 0;
+      while (openList.length) {
+        const node = openList.pop();
+        size++;
+        for (const innerValueMap of node?.children?.values() || []) {
+          for (const x of innerValueMap?.values()) {
+            openList.push(x);
+          }
         }
       }
+      return size;
+    };
+
+    // 2 root nodes for records and tuples
+    const initialPoolSize = 2;
+    assert.equal(getPoolSize(), initialPoolSize);
+    {
+      $([1]);
+      assert.equal(getPoolSize(), initialPoolSize + 1);
     }
-    return size;
-  };
 
-  // 2 root nodes for records and tuples
-  const initialPoolSize = 2;
+    // NOTE: You can test real garbage collection at this moment by adding the
+    // `--inspect` param to the node process manually calling "Collect Garbage"
+    // in the memory tab of chrome. `--expose-gc` + `global.gc()` is not enough
+    // to trigger the finalization registry for the intern cache.
+    // This sleep is to give you enough time to find that button and press it!
+    // await new Promise((r) => void setTimeout(r, 5000));
+    // console.log('Pool size now', getPoolSize())
 
-  assert.equal(getPoolSize(), initialPoolSize);
-
-  {
-    $([1]);
+    // Simulate garbage collection
+    const node = $._pool.tuples.children?.get(0)?.get(1);
+    assert(!!node?.internedObject?.deref());
+    node!.internedObject = { deref: () => undefined } as any;
+    $._finalizationRegistryCallback(node!);
+    assert.equal(getPoolSize(), initialPoolSize);
   }
-
-  assert.equal(getPoolSize(), initialPoolSize + 1);
-
-  // NOTE: You can test real garbage collection at this moment by adding the
-  // `--inspect` param to the node process manually calling "Collect Garbage"
-  // in the memory tab of chrome. `--expose-gc` + `global.gc()` is not enough
-  // to trigger the finalization registry for the intern cache.
-  // This sleep is to give you enough time to find that button and press it!
-  // await new Promise((r) => void setTimeout(r, 5000));
-  // console.log('Pool size now', getPoolSize())
-
-  // Simulate garbage collection
-  const node = $._pool.tuples.children?.get(0)?.get(1);
-  assert(!!node?.internedObject?.deref());
-  node!.internedObject = { deref: () => undefined } as any;
-  $._finalizationRegistryCallback(node!);
-  assert.equal(getPoolSize(), initialPoolSize);
 
   // @ts-expect-error
   assert(([1] === [1]) === false);
