@@ -2,7 +2,7 @@
 
 - Parse request:
   - Path parameters (`decodeURIComponent`).
-  - Query parameters (<https://www.npmjs.com/package/qs>).
+  - Query parameters (`URLSearchParams`) (<https://www.npmjs.com/package/qs>).
   - Cookies.
   - Body.
     - Form (`application/x-www-form-urlencoded`).
