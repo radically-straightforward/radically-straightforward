@@ -183,7 +183,7 @@ sanitize.replacement = "�";
 
 > **Note:** The `` html`___` `` tagged template already calls `sanitize()`, so you must **not** call `sanitize()` yourself or the sanitization would happen twice.
 
-> **Note:** The sanitization to which we refer here is at the character level, not cleaning up certain tags while preserving others. For that, we recommend [`rehype-sanitize`](https://npm.im/rehype-sanitize).
+> **Note:** The sanitization to which we refer here is at the character level, not cleaning up certain tags while preserving others. For that, we recommend [`rehype-sanitize`](https://www.npmjs.com/package/rehype-sanitize).
 
 > **Note:** Even this sanitization isn’t enough in certain contexts, for example, HTML attributes without quotes (`<a href=${sanitize(___)}>`) could still lead to XSS attacks.
 
@@ -203,15 +203,15 @@ What sets this implementation apart from existing ones are the following:
 
   The following are some details on how this implementation is made faster:
 
-  - The relatively new string function `.replaceAll()` when used with a string parameter is faster than `.replace()` with a regular expression.
+  - The relatively new string function `replaceAll()` when used with a string parameter is faster than `replace()` with a regular expression.
 
-  - Perhaps surprisingly, calling `.replaceAll()` multiple times is faster than using a single regular expression of the kind `/[&<>"']/g`.
+  - Perhaps surprisingly, calling `replaceAll()` multiple times is faster than using a single regular expression of the kind `/[&<>"']/g`.
 
   - And even if we were to use a single regular expression, using `switch/case` would have been faster than the lookup tables that most other implementations use.
 
   - And also if we were to use regular expressions, using the flag `v` incurs on a very small but consistent performance penalty.
 
-  - And also if we were to use regular expressions, `.replace()` is marginally but consistently faster than `.replaceAll()`.
+  - And also if we were to use regular expressions, `replace()` is marginally but consistently faster than `replaceAll()`.
 
   - Measurements performed in Node.js 21.2.0.
 
@@ -270,20 +270,20 @@ someUserInput.match(invalidXMLCharacters); // Detect whether there are invalid X
 
 ## Related Work
 
-### [`html-template-tag`](https://npm.im/html-template-tag)
+### [`html-template-tag`](https://www.npmjs.com/package/html-template-tag)
 
 - Was a major inspiration for this. Its design is simple and great. In particular, I love (and stole) the idea of using `$${___}` for opting out of sanitization.
 - [Doesn’t encode arrays by default](https://github.com/AntonioVdlC/html-template-tag/issues/10).
 
-### [`common-tags`](https://npm.im/common-tags)
+### [`common-tags`](https://www.npmjs.com/package/common-tags)
 
 - Doesn’t encode interpolated values by default.
 - Uses the `safeHtml` tag, which isn’t recognized by Prettier or the Visual Studio Code extension es6-string-html extension.
 
-### [`escape-html-template-tag`](https://npm.im/escape-html-template-tag)
+### [`escape-html-template-tag`](https://www.npmjs.com/package/escape-html-template-tag)
 
 - Less ergonomic API with `escapeHtml.safe()` and `escapeHtml.join()` instead of the `$${}` trick.
 
-### [`lit-html`](https://npm.im/lit-html), [`nanohtml`](https://npm.im/nanohtml), [`htm`](https://npm.im/htm), and [`viperhtml`](https://npm.im/viperhtml)
+### [`lit-html`](https://www.npmjs.com/package/lit-html), [`nanohtml`](https://www.npmjs.com/package/nanohtml), [`htm`](https://www.npmjs.com/package/htm), and [`viperhtml`](https://www.npmjs.com/package/viperhtml)
 
 - Have the notion of virtual DOM instead of simple string concatenation.

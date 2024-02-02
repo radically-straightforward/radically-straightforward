@@ -46,7 +46,7 @@ $ npx caddy
 
 ## Related Work
 
-### [`caddy-npm`](https://npm.im/caddy-npm)
+### [`caddy-npm`](https://www.npmjs.com/package/caddy-npm)
 
 Only supports specific versions of Caddy and requires an update to the package itself when a new version of Caddy is released. At the time of this writing (2023-11-14) the latest supported version is Caddy 2.1.1 from 2020-06-20 (more than three years old).
 

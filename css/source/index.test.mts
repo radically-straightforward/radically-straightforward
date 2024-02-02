@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import css, { CSS } from "./index.mjs";
+import css from "./index.mjs";
 import prettier from "prettier";
 
 test(async () => {

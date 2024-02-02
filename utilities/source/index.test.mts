@@ -131,10 +131,26 @@ test("intern()", async () => {
       $([1, {}]);
     });
     assert($([1, $({})]) === $([1, $({})]));
+  }
 
-    assert.throws(() => {
-      // @ts-expect-error
-      $([1])[0] = 2;
-    });
+  assert.throws(() => {
+    // @ts-expect-error
+    $([1])[0] = 2;
+  });
+
+  {
+    const iterations = 1000;
+    console.time("intern()");
+    const objects = [];
+    for (let iteration = 0; iteration < iterations; iteration++) {
+      const entries = [];
+      for (let key = 0; key < Math.floor(Math.random() * 15); key++) {
+        entries.push([String(key + Math.floor(Math.random() * 15)), true]);
+      }
+      objects.push($(Object.fromEntries(entries)));
+      objects.push($(entries.flat()));
+    }
+    // console.log($.pool.record.size);
+    console.timeEnd("intern()");
   }
 });

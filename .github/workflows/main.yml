@@ -5,6 +5,8 @@ jobs:
       matrix:
         package:
           - html
+          - css
+          - sqlite
           - utilities
           - node
           - tsconfig

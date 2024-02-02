@@ -14,7 +14,7 @@ export type CSS = string;
  * `;
  * ```
  *
- * > **Note:** CSS is represented as strings and this tagged template works by performing string interpolation. This is conceptually simple and fast. To process the generated CSS, find issues automatically, and so forth, refer to [`@radically-straightforward/build`](https://npm.im/@radically-straightforward/build).
+ * > **Note:** CSS is represented as strings and this tagged template works by performing string interpolation. This is conceptually simple and fast. To process the generated CSS, find issues automatically, and so forth, refer to [`@radically-straightforward/build`](https://www.npmjs.com/package/@radically-straightforward/build).
  *
  * Interpolated arrays are joined:
  *
