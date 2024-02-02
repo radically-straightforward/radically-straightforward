@@ -141,11 +141,7 @@ export function intern<
     | {
         [key: string]: InternInnerValue;
       },
-<<<<<<< HEAD
 >(value: T): Interned<T>;
-=======
->(value: Type): Intern<Type>;
->>>>>>> 0cd9530f21825f67ac4d5620b741cc6ad905145b
 ```
 
 [Interning](<https://en.wikipedia.org/wiki/Interning_(computer_science)>) a value makes it unique across the program, which is useful for checking equality with `===` (reference equality), using it as a key in a `Map`, adding it to a `Set`, and so forth:
