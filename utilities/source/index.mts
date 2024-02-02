@@ -295,13 +295,7 @@ export function intern<
 }
 
 const internSymbol = Symbol("intern");
-intern._markInterned = <
-  T extends
-    | Array<InternInnerValue>
-    | { [key: string | symbol]: InternInnerValue },
->(
-  value: T,
-): asserts value is Interned<T> => {
+intern._markInterned = <T,>(value: T): asserts value is Interned<T> => {
   Object.defineProperty(value, internSymbol, {
     enumerable: false,
     value: true,
