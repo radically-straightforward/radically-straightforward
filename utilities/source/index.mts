@@ -133,16 +133,15 @@ export type InternInnerValue =
   | Interned<unknown>;
 
 type InternNode = {
-  /** The final Tuple or Record we have interned */
+  /** A weak reference to the final Tuple or Record we have interned */
   internedObject?: WeakRef<Interned<any>>;
   /** The intermediary key for this node ie `node.innerKey = node.parent.get(node.innerKey).get(node.innerValue).innerKey` */
   innerKey?: InternInnerKey;
   /** The intermediary value for this node ie `node.innerValue = node.parent.get(node.innerKey).get(node.innerValue).innerValue` */
   innerValue?: InternInnerValue;
-  children?: InternCache;
   parent?: InternNode;
+  children?: Map<InternInnerKey, Map<InternInnerValue, InternNode>>;
 };
-type InternCache = Map<InternInnerKey, Map<InternInnerValue, InternNode>>;
 
 /**
  * [Interning](<https://en.wikipedia.org/wiki/Interning_(computer_science)>) a value makes it unique across the program, which is useful for checking equality with `===` (reference equality), using it as a key in a `Map`, adding it to a `Set`, and so forth:
