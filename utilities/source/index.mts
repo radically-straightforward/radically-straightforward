@@ -132,15 +132,15 @@ export type InternInnerValue =
   | null
   | Interned<unknown>;
 
-type InternNode = {
+type InternCacheNode = {
   /** A weak reference to the final Tuple or Record we have interned */
   internedObject?: WeakRef<Interned<any>>;
   /** The intermediary key for this node ie `node.innerKey = node.parent.get(node.innerKey).get(node.innerValue).innerKey` */
   innerKey?: InternInnerKey;
   /** The intermediary value for this node ie `node.innerValue = node.parent.get(node.innerKey).get(node.innerValue).innerValue` */
   innerValue?: InternInnerValue;
-  parent?: InternNode;
-  children?: Map<InternInnerKey, Map<InternInnerValue, InternNode>>;
+  parent?: InternCacheNode;
+  children?: Map<InternInnerKey, Map<InternInnerValue, InternCacheNode>>;
 };
 
 /**
@@ -308,12 +308,12 @@ intern._markInterned = (value: any) => {
 intern.isInterned = (value: any): boolean =>
   (value as any)[internSymbol] === true;
 
-intern._tuplePoolRoot = {} as InternNode;
-intern._recordPoolRoot = {} as InternNode;
+intern._tuplePoolRoot = {} as InternCacheNode;
+intern._recordPoolRoot = {} as InternCacheNode;
 
-intern._finalizationRegistryCallback = (node: InternNode) => {
+intern._finalizationRegistryCallback = (node: InternCacheNode) => {
   // Value has been garbage collected prune the tree
-  let currentNode: InternNode | undefined = node;
+  let currentNode: InternCacheNode | undefined = node;
   while (currentNode?.parent && currentNode.innerKey !== undefined) {
     // If the current node has no children and no final value, delete it
     if (!currentNode.children?.size && !currentNode.internedObject?.deref()) {
@@ -328,6 +328,6 @@ intern._finalizationRegistryCallback = (node: InternNode) => {
     currentNode = currentNode.parent;
   }
 };
-intern._finalizationRegistry = new FinalizationRegistry<InternNode>(
+intern._finalizationRegistry = new FinalizationRegistry<InternCacheNode>(
   intern._finalizationRegistryCallback,
 );
