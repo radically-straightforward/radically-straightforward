@@ -193,9 +193,11 @@ $([1]) === $([1]); // => true
 
 > **Note:** You must not mutate an interned value. Interned values are [frozen](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/freeze) to prevent mutation.
 
-> **Note:** Interned objects may not preserve the order of the attributes.
+> **Note:** Interned objects do not preserve the order of the attributes: `$({ a: 1, b: 2 }) === $({ b: 2, a: 1 })`.
 
 > **Note:** The pool of interned values is available as `intern._pool`. The interned values are kept with `WeakRef`s to allow them to be garbage collected when they aren’t referenced anywhere else anymore. There’s a `FinalizationRegistry` at `intern._finalizationRegistry` that cleans up interned values that have been garbage collected.
+
+> **Note:** `+0` and `-0` are not necessarily preserved. ie `Object.is($([+0])[0], $([-0])[0])` returns `true`
 
 **Related Work**
 
@@ -218,8 +220,6 @@ A previous solution to this problem which took a different approach: Instead of 
 **[Immutable.js](https://www.npmjs.com/package/immutable), [`collections`](https://www.npmjs.com/package/collections), [`mori`](https://www.npmjs.com/package/mori), [TypeScript Collections](https://www.npmjs.com/package/typescript-collections), [`prelude-ts`](https://www.npmjs.com/package/prelude-ts), [`collectable`](https://www.npmjs.com/package/collectable), and so forth**
 
 Similar to `collections-deep-equal`, these libraries implement their own data structures instead of relying on JavaScript’s `Map`s and `Set`s. Some of them go a step further and add their own notions of objects and arrays, which requires you to convert your values back and forth, may not show up nicely in the JavaScript inspector, may be less ergonomic to use with TypeScript, and so forth.
-
-The advantage of these libraries over interning is that they may be faster.
 
 **[`immer`](https://www.npmjs.com/package/immer) and [`icepick`](https://www.npmjs.com/package/icepick)**
 

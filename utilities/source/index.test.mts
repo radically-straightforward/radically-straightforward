@@ -142,6 +142,9 @@ test("intern()", () => {
     $([1])[0] = 2;
   });
 
+  // If these tests start failing, that's a good thing, delete them and update the README
+  assert(Object.is($([+0])[0], $([-0])[0]));
+
   {
     const iterations = 1000;
     console.time("intern()");
