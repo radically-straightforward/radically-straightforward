@@ -9,8 +9,13 @@ http
       /^\/users\/(?<userId>\d+)\/messages$/
     ).groups;
     request.query = Object.fromEntries(request.url.searchParams);
+    request.cookies = Object.fromEntries(
+      request.headers.cookie.split(";").map((cookie) => cookie.split("="))
+    );
     request.rawBody = await streamConsumers.text(request);
-    request.body = Object.fromEntries(new URLSearchParams(request.rawBody));
+    console.log(request.rawBody);
+    // request.body = Object.fromEntries(new URLSearchParams(request.rawBody));
+
     response.end();
   })
   .listen(8000);
