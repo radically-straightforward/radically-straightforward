@@ -10,7 +10,12 @@ http
     ).groups;
     request.query = Object.fromEntries(request.url.searchParams);
     request.cookies = Object.fromEntries(
-      request.headers.cookie.split(";").map((cookie) => cookie.split("="))
+      request.headers.cookie.split(";").map((cookie) =>
+        cookie
+          .trim()
+          .split("=")
+          .map((part) => decodeURIComponent(part.trim()))
+      )
     );
     request.rawBody = await streamConsumers.text(request);
     console.log(request.rawBody);
