@@ -4,12 +4,29 @@
   - `next` (Koa).
   - Register functions to run after.
 - Parse request:
-  - Path parameters (`decodeURIComponent`).
-  - Query parameters (`URLSearchParams`) (<https://www.npmjs.com/package/qs>).
+  - Path parameters
+    - `decodeURIComponent`.
+  - Query parameters
+    - `URLSearchParams`
+    - <https://www.npmjs.com/package/qs>.
   - Cookies.
+    - <https://github.com/jshttp/cookie>.
+  - `Content-Type`
   - Body.
-    - Form (`application/x-www-form-urlencoded`) (`URLSearchParams`).
-    - Attachments (`multipart/form-data`).
+    - `application/x-www-form-urlencoded`
+      - `URLSearchParams`
+      - <https://github.com/expressjs/body-parser>.
+    - `multipart/form-data`
+      - <https://github.com/mscdex/busboy>.
+        - <https://github.com/expressjs/multer>.
+        - <https://github.com/richardgirges/express-fileupload>.
+      - <https://github.com/node-formidable/formidable>.
+      - <https://github.com/pillarjs/multiparty>.
+        - <https://github.com/expressjs/connect-multiparty>.
+      - <https://github.com/hapijs/pez>.
+    - Edge cases
+      - Different charsets?
+      - `Content-Encoding` (for example, compression)
 - Response helpers:
   - Use data returned by handler to control response.
   - Cookies.
