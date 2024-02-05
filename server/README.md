@@ -35,6 +35,7 @@
 - Response helpers:
   - Use data returned by handler to control response.
   - Cookies.
+    - `encodeURIComponent`
   - Set headers.
   - Redirect.
   - Body.

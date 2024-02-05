@@ -1,4 +1,6 @@
 import http from "node:http";
+import streamConsumers from "node:stream/consumers";
+import busboy from "busboy";
 
 http
   .createServer(async (request, response) => {
@@ -16,19 +18,42 @@ http
           .map((part) => decodeURIComponent(part.trim()))
       )
     );
-    request.rawBody = "";
-    for await (const rawBodyPart of request) {
-      console.log(rawBodyPart instanceof Buffer);
-      request.rawBody += rawBodyPart;
-      if (request.rawBody.length > 10 * 1024 * 1024) {
-        response.statusCode = 413;
-        response.end();
-        return;
-      }
-    }
-    // console.log(request.rawBody);
-    // request.body = Object.fromEntries(new URLSearchParams(request.rawBody));
-
+    request.body = {};
+    // FIXME: Use `Promise.withResolvers()` when it becomes available in Node.js.
+    let bodyPromiseResolve, bodyPromiseReject;
+    const bodyPromises = [
+      new Promise((resolve, reject) => {
+        bodyPromiseResolve = resolve;
+        bodyPromiseReject = reject;
+      }),
+    ];
+    request.pipe(
+      // TODO: `busboy` options.
+      // TODO: `error` event.
+      busboy({ headers: request.headers })
+        .on("file", async (name, file, information) => {
+          // TODO: Verify this use of `streamConsumers`.
+          const filePromise = streamConsumers.buffer(file);
+          bodyPromises.push(filePromise);
+          request.body[name] = {
+            file: await filePromise,
+            ...information,
+          };
+        })
+        .on("field", (name, value, information) => {
+          // TODO: Reject on `information.nameTruncated` or `information.valueTruncated`.
+          request.body[name] = value;
+        })
+        .on("close", () => {
+          bodyPromiseResolve();
+        })
+        // TODO: `partsLimit`, `filesLimit`, `fieldsLimit`.
+        .on("error", (error) => {
+          bodyPromiseReject(error);
+        })
+    );
+    await Promise.all(bodyPromises);
+    console.log(request.body);
     response.end();
   })
   .listen(8000);
