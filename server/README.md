@@ -13,6 +13,8 @@
     - <https://github.com/jshttp/cookie>.
   - `Content-Type`
   - Body.
+    - Concerns
+      - Size limits (HTTP status 413)
     - `application/x-www-form-urlencoded`
       - `URLSearchParams`
       - <https://github.com/expressjs/body-parser>.
@@ -21,9 +23,12 @@
         - <https://github.com/expressjs/multer>.
         - <https://github.com/richardgirges/express-fileupload>.
       - <https://github.com/node-formidable/formidable>.
+        - Does too much (plugins, and so forth).
       - <https://github.com/pillarjs/multiparty>.
+        - They recommend using `busboy`.
         - <https://github.com/expressjs/connect-multiparty>.
       - <https://github.com/hapijs/pez>.
+        - No documentation.
     - Edge cases
       - Different charsets?
       - `Content-Encoding` (for example, compression)

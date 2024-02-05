@@ -1,5 +1,4 @@
 import http from "node:http";
-import streamConsumers from "node:stream/consumers";
 
 http
   .createServer(async (request, response) => {
@@ -17,8 +16,17 @@ http
           .map((part) => decodeURIComponent(part.trim()))
       )
     );
-    request.rawBody = await streamConsumers.text(request);
-    console.log(request.rawBody);
+    request.rawBody = "";
+    for await (const rawBodyPart of request) {
+      console.log(rawBodyPart instanceof Buffer);
+      request.rawBody += rawBodyPart;
+      if (request.rawBody.length > 10 * 1024 * 1024) {
+        response.statusCode = 413;
+        response.end();
+        return;
+      }
+    }
+    // console.log(request.rawBody);
     // request.body = Object.fromEntries(new URLSearchParams(request.rawBody));
 
     response.end();
