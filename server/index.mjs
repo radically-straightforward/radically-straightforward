@@ -15,6 +15,7 @@ http
         cookie
           .trim()
           .split("=")
+          // TODO: Throw if there are more than two parts?
           .map((part) => decodeURIComponent(part.trim()))
       )
     );
