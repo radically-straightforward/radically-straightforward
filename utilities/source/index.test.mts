@@ -161,3 +161,20 @@ test("intern()", () => {
     console.timeEnd("intern()");
   }
 });
+
+test("internRecursive()", () => {
+  const a = { a: 1, b: { c: 2 } };
+  const b = { b: { c: 2 }, a: 1 };
+  assert(utilities.internRecursive(a) === utilities.internRecursive(b));
+  assert(
+    utilities.internRecursive(a) !==
+      utilities.internRecursive({ a: 1, b: { c: 3 } }),
+  );
+
+  const c = { a: 1 };
+  // @ts-expect-error
+  c.b = c;
+  assert.throws(() => {
+    utilities.internRecursive(c);
+  });
+});

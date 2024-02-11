@@ -1,3 +1,5 @@
+import { constants } from "node:fs";
+
 /**
  * Start a background job that runs every `interval`.
  *
@@ -329,3 +331,41 @@ intern._finalizationRegistryCallback = (node: InternCacheNode) => {
 intern._finalizationRegistry = new FinalizationRegistry<InternCacheNode>(
   intern._finalizationRegistryCallback,
 );
+
+export function internRecursive<Type extends {}>(value: Type): Interned<Type> {
+  const seen = new Set();
+  return internRecursiveInner(value, seen);
+}
+
+function internRecursiveInner<Type extends {}>(
+  object: Type,
+  seen: Set<any>,
+): Interned<Type> {
+  if (seen.has(object))
+    throw new Error("Failed to intern value because of circular reference.");
+  seen.add(object);
+  const isTuple = Array.isArray(object);
+  const entries = isTuple
+    ? object.entries()
+    : Object.entries(object).sort(([aKey], [bKey]) => aKey.localeCompare(bKey));
+
+  for (const [innerKey, innerValue] of entries)
+    if (
+      typeof innerValue === "object" &&
+      innerValue !== null &&
+      !intern.isInterned(innerValue)
+    ) {
+      // Make sure we can write to this key of the object
+      if (
+        !isTuple &&
+        !Object.getOwnPropertyDescriptor(object, innerKey)?.writable
+      )
+        throw new Error(
+          `Failed to intern value because of non-writable inner value.`,
+        );
+      // @ts-expect-error
+      object[innerKey] = internRecursiveInner(innerValue, seen);
+    }
+
+  return intern(object);
+}
