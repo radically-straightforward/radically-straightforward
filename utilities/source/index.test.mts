@@ -163,18 +163,28 @@ test("intern()", () => {
 });
 
 test("internRecursive()", () => {
-  const a = { a: 1, b: { c: 2 } };
-  const b = { b: { c: 2 }, a: 1 };
-  assert(utilities.internRecursive(a) === utilities.internRecursive(b));
   assert(
-    utilities.internRecursive(a) !==
+    utilities.internRecursive({ a: 1, b: { c: 2 } }) ===
+      utilities.internRecursive({ b: { c: 2 }, a: 1 }),
+  );
+  assert(
+    utilities.internRecursive({ a: 1, b: { c: 2 } }) !==
       utilities.internRecursive({ a: 1, b: { c: 3 } }),
   );
 
-  const c = { a: 1 };
+  assert(
+    utilities.internRecursive([1, [1, 2]]) ===
+      utilities.internRecursive([1, [1, 2]]),
+  );
+  assert(
+    utilities.internRecursive([1, [1, 2]]) !==
+      utilities.internRecursive([1, [2, 1]]),
+  );
+
+  const foo = { a: 1 };
   // @ts-expect-error
-  c.b = c;
+  foo.b = foo;
   assert.throws(() => {
-    utilities.internRecursive(c);
+    utilities.internRecursive(foo);
   });
 });
