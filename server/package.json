@@ -1,6 +1,5 @@
 {
   "dependencies": {
-    "busboy": "^1.6.0",
-    "cookie": "^0.6.0"
+    "busboy": "^1.6.0"
   }
 }
