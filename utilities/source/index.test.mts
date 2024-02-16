@@ -45,8 +45,48 @@ test("randomString()", () => {
   assert.match(randomString, /^[0-9a-z]+$/);
 });
 
-test("randomString()", () => {
+test("log()", () => {
   utilities.log("EXAMPLE", "OF", "TAB-SEPARATED LOGGING");
+});
+
+test("intern() Garbage Collection", async () => {
+  const getPoolSize = () => {
+    const openList = [$._pool.tuples, $._pool.records];
+    let size = 0;
+    while (openList.length) {
+      const node = openList.pop();
+      size++;
+      for (const innerValueMap of node?.children?.values() || []) {
+        for (const x of innerValueMap?.values()) {
+          openList.push(x);
+        }
+      }
+    }
+    return size;
+  };
+
+  // 2 root nodes for records and tuples
+  const initialPoolSize = 2;
+  assert.equal(getPoolSize(), initialPoolSize);
+  {
+    $([1]);
+    assert.equal(getPoolSize(), initialPoolSize + 1);
+  }
+
+  // NOTE: You can test real garbage collection at this moment by adding the
+  // `--inspect` param to the node process manually calling "Collect Garbage"
+  // in the memory tab of chrome. `--expose-gc` + `global.gc()` is not enough
+  // to trigger the finalization registry for the intern cache.
+  // This sleep is to give you enough time to find that button and press it!
+  // await new Promise((r) => void setTimeout(r, 5000));
+  // console.log('Pool size now', getPoolSize())
+
+  // Simulate garbage collection
+  const node = $._pool.tuples.children?.get(0)?.get(1);
+  assert(!!node?.internedObject?.deref());
+  node!.internedObject = { deref: () => undefined } as any;
+  $._finalizationRegistryCallback(node!);
+  assert.equal(getPoolSize(), initialPoolSize);
 });
 
 test("intern()", () => {
@@ -66,7 +106,7 @@ test("intern()", () => {
   }
 
   {
-    const map = new Map<utilities.Intern<number[]>, number>();
+    const map = new Map<utilities.Interned<number[]>, number>();
     map.set($([1]), 1);
     map.set($([1]), 2);
     assert.equal(map.size, 1);
@@ -82,23 +122,28 @@ test("intern()", () => {
   }
 
   {
-    const set = new Set<utilities.Intern<number[]>>();
+    const set = new Set<utilities.Interned<number[]>>();
     set.add($([1]));
     set.add($([1]));
     assert.equal(set.size, 1);
     assert(set.has($([1])));
   }
 
-  assert.throws(() => {
-    // @ts-expect-error
-    $([1, {}]);
-  });
-  assert($([1, $({})]) === $([1, $({})]));
+  {
+    assert.throws(() => {
+      // @ts-expect-error
+      $([1, {}]);
+    });
+    assert($([1, $({})]) === $([1, $({})]));
+  }
 
   assert.throws(() => {
     // @ts-expect-error
     $([1])[0] = 2;
   });
+
+  // If these tests start failing, that's a good thing, delete them and update the README
+  assert(Object.is($([+0])[0], $([-0])[0]));
 
   {
     const iterations = 1000;
@@ -115,4 +160,31 @@ test("intern()", () => {
     // console.log($.pool.record.size);
     console.timeEnd("intern()");
   }
+});
+
+test("internRecursive()", () => {
+  assert(
+    utilities.internRecursive({ a: 1, b: { c: 2 } }) ===
+      utilities.internRecursive({ b: { c: 2 }, a: 1 }),
+  );
+  assert(
+    utilities.internRecursive({ a: 1, b: { c: 2 } }) !==
+      utilities.internRecursive({ a: 1, b: { c: 3 } }),
+  );
+
+  assert(
+    utilities.internRecursive([1, [1, 2]]) ===
+      utilities.internRecursive([1, [1, 2]]),
+  );
+  assert(
+    utilities.internRecursive([1, [1, 2]]) !==
+      utilities.internRecursive([1, [2, 1]]),
+  );
+
+  const foo = { a: 1 };
+  // @ts-expect-error
+  foo.b = foo;
+  assert.throws(() => {
+    utilities.internRecursive(foo);
+  });
 });
