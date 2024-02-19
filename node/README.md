@@ -20,15 +20,7 @@ import * as node from "@radically-straightforward/node";
 
 ```typescript
 export function shouldTerminate({
-  events = [
-    "exit",
-    "SIGHUP",
-    "SIGINT",
-    "SIGQUIT",
-    "SIGTERM",
-    "SIGUSR2",
-    "SIGBREAK",
-  ],
+  events = ["SIGHUP", "SIGINT", "SIGQUIT", "SIGTERM", "SIGUSR2", "SIGBREAK"],
   timeout = 10 * 1000,
   forcefulTerminationExitCode = 1,
 }: {
@@ -45,8 +37,6 @@ Graceful termination. `await` for this function between the code that starts the
 > **Note:** What determines that the application should terminate are the `events`, which by default include operating system signals, for example, `SIGINT` sent by `⌃C`, `SIGTERM` sent by `kill`, `SIGUSR2` sent by [`nodemon`](https://www.npmjs.com/package/nodemon), `exit` send by Node.js in the case of an uncaught exception, and so forth.
 
 > **Note:** Some signals, for example, `SIGKILL` sent by `kill -9`, cannot be handled and cause the process to terminate immediately without the opportunity to run any more code.
-
-> **Note:** Some of the events put the process in a state that cannot handle asynchronous functions, so the code that terminates the application should be synchronous.
 
 **Example**
 
