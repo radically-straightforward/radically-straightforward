@@ -28,7 +28,7 @@ utilities.backgroundJob({ interval: 5 * 60 * 1000 }, async () => {
 
     try {
       const response = await fetch(resource, {
-        signal: AbortSignal.timeout(30 * 1000),
+        signal: AbortSignal.timeout(60 * 1000),
       });
       if (!response.ok) throw new Error(`Response status ‘${response.status}’`);
       alerts.delete(resource);
