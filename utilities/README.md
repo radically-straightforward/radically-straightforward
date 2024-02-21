@@ -52,15 +52,16 @@ This is different from `setInterval()` in the following ways:
 
 2. We introduce a random `intervalVariance` to avoid many background jobs from starting at the same time and overloading the machine.
 
-3. You may use `backgroundJob.run()` to force the background job to run right away. If the background job is already running, calling `backgroundJob.run()` schedules it to run again as soon as possible (not waiting the interval).
+3. You may use `backgroundJob.run()` to force the background job to run right away. If the background job is already running, calling `backgroundJob.run()` schedules it to run again as soon as possible (with a wait interval of 0).
 
 4. You may use `backgroundJob.stop()` to stop the background job. If the background job is running, it will finish but it will not be scheduled to run again. This is similar to how an HTTP server may terminate gracefully by stopping accepting new requests but finishing responding to existing requests. After a job has been stopped, you may not `backgroundJob.run()` it again (calling `backgroundJob.run()` has no effect).
+
+5. In Node.js the background job is stopped on [`"gracefulTermination"`](https://github.com/radically-straightforward/radically-straightforward/tree/main/node#graceful-termination).
 
 **Example**
 
 ```javascript
 import * as utilities from "@radically-straightforward/utilities";
-import * as node from "@radically-straightforward/node";
 
 const backgroundJob = utilities.backgroundJob(
   { interval: 3 * 1000 },
@@ -70,14 +71,12 @@ const backgroundJob = utilities.backgroundJob(
     console.log("backgroundJob(): ...finished running background job.");
   },
 );
-console.log(
-  "backgroundJob(): Press ⌃Z to force background job to run and ⌃C to continue...",
-);
 process.on("SIGTSTP", () => {
   backgroundJob.run();
 });
-await node.shouldTerminate();
-backgroundJob.stop();
+console.log(
+  "backgroundJob(): Press ⌃Z to force background job to run and ⌃C to continue...",
+);
 ```
 
 ### `sleep()`
