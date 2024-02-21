@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.1.0 · 2024-02-21
+
+- Changed `backgroundJob()` so that in Node.js it terminates gracefully.
+
 ## 1.0.1 · 2024-01-09
 
 - Added `log()`.
