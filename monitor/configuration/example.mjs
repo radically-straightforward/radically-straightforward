@@ -1,7 +1,7 @@
 export default {
-  // See ‘https://github.com/sindresorhus/got/blob/main/documentation/2-options.md’.
-  targets: [
-    { url: "https://example.com" },
+  // See ‘https://developer.mozilla.org/en-US/docs/Web/API/fetch#resource’.
+  resources: [
+    "https://example.com",
     // ...
   ],
 
@@ -19,7 +19,4 @@ export default {
       to: "System Administrator <system-administrator@example.com>",
     },
   },
-
-  // [OPTIONAL] The interval between checks in milliseconds.
-  // interval: 5 * 60 * 1000,
 };

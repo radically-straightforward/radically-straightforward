@@ -4,12 +4,11 @@ import * as utilities from "@radically-straightforward/utilities";
 import html from "@radically-straightforward/html";
 
 const configuration: {
-  resources: string[];
+  resources: Parameters<typeof fetch>[0][];
   email: {
     options: any;
     defaults: nodemailer.SendMailOptions;
   };
-  interval: number;
 } = (await import(url.pathToFileURL(process.argv[2]).href)).default;
 
 utilities.log(

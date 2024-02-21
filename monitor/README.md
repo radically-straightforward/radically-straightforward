@@ -16,7 +16,7 @@ Call monitor from the command line passing the configuration file as a parameter
 $ ./monitor/monitor ./configuration.mjs
 ```
 
-`monitor` requests the `targets` every `interval` and sends an email alert in case of an error.
+`monitor` requests the `resources` every 5 minutes with a timeout of 30 seconds and, if there’s an error, it sends an email alert.
 
 For `monitor` to start on boot and to restart in case of failure, use the operating system’s process manager, for example, in Ubuntu use systemd, create `/etc/systemd/system/monitor.service` based on [`monitor.service`](./configuration/monitor.service), then start and enable the service:
 

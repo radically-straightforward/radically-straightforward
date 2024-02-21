@@ -1,8 +1,5 @@
 export default {
-  targets: [
-    { url: "https://leafac.com" },
-    { url: "https://non-existent.leafac.com" },
-  ],
+  resources: ["https://leafac.com", "https://non-existent.leafac.com"],
   email: {
     options: {
       host: "localhost",
