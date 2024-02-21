@@ -1,10 +1,10 @@
 import test from "node:test";
-import express from "express";
+import http from "node:http";
 import * as utilities from "@radically-straightforward/utilities";
-import * as node from "./index.mjs";
+import * as node from "@radically-straightforward/node";
 
 test(
-  "shouldTerminate()",
+  "gracefulTermination",
   {
     ...(!process.stdin.isTTY
       ? {
@@ -13,22 +13,33 @@ test(
       : {}),
   },
   async () => {
-    const application = express();
-    application.get("/", (request, response) => {
-      response.send("Hello world");
+    const server = http
+      .createServer((request, response) => {
+        response.end("gracefulTermination");
+      })
+      .listen(8000);
+    process.once("gracefulTermination", () => {
+      // If you comment the line below the application remains running for 10 seconds and then it is forcefully terminated.
+      server.close();
     });
-    const server = application.listen(3000);
+
     const backgroundJob = utilities.backgroundJob(
       { interval: 3 * 1000 },
       async () => {
         console.log("Background job.");
       },
     );
-    console.log("shouldTerminate(): Press ⌃C to gracefully terminate...");
-    await node.shouldTerminate();
-    console.log("shouldTerminate(): Starting graceful termination...");
-    // If you comment one of the lines below the application remains running for 10 seconds, when ‘shouldTerminate()’ terminates it forcefully.
-    server.close();
-    backgroundJob.stop();
+    process.once("gracefulTermination", () => {
+      // If you comment the line below the application remains running for 10 seconds and then it is forcefully terminated.
+      backgroundJob.stop();
+    });
+
+    console.log("gracefulTermination: Press ⌃C to gracefully terminate...");
+    process.once("gracefulTermination", () => {
+      console.log("gracefulTermination: Starting graceful termination...");
+    });
+    process.once("beforeExit", () => {
+      console.log("gracefulTermination: Succeeded.");
+    });
   },
 );
