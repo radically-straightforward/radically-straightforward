@@ -111,7 +111,7 @@ export function randomString(): string {
  * Tab-separated logging.
  */
 export function log(...messageParts: string[]): void {
-  console.log(messageParts.join(" \t"));
+  console.log([new Date().toISOString(), ...messageParts].join(" \t"));
 }
 
 /**
