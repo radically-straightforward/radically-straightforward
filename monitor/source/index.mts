@@ -3,11 +3,6 @@ import nodemailer from "nodemailer";
 import * as utilities from "@radically-straightforward/utilities";
 import html from "@radically-straightforward/html";
 
-if (typeof process.argv[2] !== "string" || process.argv[2].trim() === "") {
-  console.error("Missing configuration file.");
-  process.exit(1);
-}
-
 const configuration: {
   resources: string[];
   email: {
@@ -33,21 +28,16 @@ utilities.backgroundJob({ interval: 5 * 60 * 1000 }, async () => {
     log("STARTING...");
 
     try {
-      const abortController = new AbortController();
-      setTimeout(() => {
-        abortController.abort();
-      }, 30 * 1000);
       const response = await fetch(resource, {
-        signal: abortController.signal,
+        signal: AbortSignal.timeout(30 * 1000),
       });
+      if (!response.ok) throw new Error(`Response status ‘${response.status}’`);
       alerts.delete(resource);
       log("SUCCESS", String(response.status));
     } catch (error: any) {
       log("ERROR", String(error), error?.stack);
       if (alerts.has(resource))
-        log(
-          "SKIPPING SENDING ALERT BECAUSE PREVIOUS ERROR HASN’T BEEN RESOLVED YET...",
-        );
+        log("SKIPPING ALERT BECAUSE PREVIOUS ALERT HASN’T BEEN CLEARED YET...");
       else
         try {
           const sentMessageInfo = await nodemailer
