@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.1.1 · 2024-02-21
+
+- Added date to `log()`.
+
 ## 1.1.0 · 2024-02-21
 
 - Changed `backgroundJob()` so that in Node.js it terminates gracefully.
