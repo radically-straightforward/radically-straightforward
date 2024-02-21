@@ -12,10 +12,10 @@ test(
   },
   async () => {
     const backgroundJob = utilities.backgroundJob(
-      { interval: 1000 },
+      { interval: 3 * 1000 },
       async () => {
         console.log("backgroundJob(): Running background job...");
-        await utilities.sleep(1000);
+        await utilities.sleep(3 * 1000);
         console.log("backgroundJob(): ...finished running background job.");
       },
     );
