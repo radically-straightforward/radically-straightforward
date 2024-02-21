@@ -12,6 +12,7 @@
   - Cookies.
     - <https://github.com/jshttp/cookie>.
   - `Content-Type`
+    - `node:util`’s `MIMEType`
   - Body.
     - Concerns
       - Size limits (HTTP status 413)
@@ -40,6 +41,7 @@
   - Redirect.
   - Body.
     - `Content-Type`
+      - `node:util`’s `MIMEType`
     - `Content-Length`?
   - Stream.
   - Locals to build response over multiple handlers.
@@ -53,6 +55,7 @@
 - Logging:
   - `X-Forwarded-Host`
 - Live updates.
+- `listen()`, including graceful termination
 - Missing stuff from:
   - Koa
   - Express
