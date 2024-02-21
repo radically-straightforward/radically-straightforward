@@ -11,41 +11,62 @@ $ npm install @radically-straightforward/node
 ## Usage
 
 ```typescript
-import * as node from "@radically-straightforward/node";
+import "@radically-straightforward/node";
 ```
 
----
+### Graceful Termination
 
-Graceful termination. `await` for this function between the code that starts the application and the code that gracefully terminates it. If the code that gracefully terminates the application takes longer than `timeout` to complete, then the application terminates forcefully.
+Importing `@radically-straightforward/node` enables graceful termination, which gives your application the opportunity to clean up resources before exiting.
 
-> **Note:** This function must be called at most once in your application.
+Graceful termination works by listening to the following signals:
 
-> **Note:** What determines that the application should terminate are the `signals`, which by default include operating system signals, for example, `SIGINT` sent by `⌃C`, `SIGTERM` sent by `kill`, `SIGUSR2` sent by [`nodemon`](https://www.npmjs.com/package/nodemon), `exit` send by Node.js in the case of an uncaught exception, and so forth.
+- `SIGINT`: Emitted by pressing `⌃C` on the terminal.
+- `SIGQUIT`: Emitted by pressing `⌃\` on the terminal.
+- `SIGBREAK`: Emitted by pressing `Ctrl+Break` on the terminal **on Windows**.
+- `SIGHUP`: Emitted when the terminal is closed while the application is still running.
+- `SIGTERM`: Emitted by process managers that wish to terminate the application, for example, `systemd`, `kill`, and so forth.
+- `SIGUSR2`: Emitted by [nodemon](https://www.npmjs.com/package/nodemon) to indicate that the application should restart.
 
-> **Note:** Some signals, for example, `SIGKILL` sent by `kill -9`, cannot be handled and cause the process to terminate immediately without the opportunity to run any more code.
+> **Note:** Some signals, for example, `SIGKILL`, which may be sent by `kill -9`, cannot be handled and cause the process to terminate immediately without the opportunity to clean up resources.
+
+When one of these signals is received, the `process.once("gracefulTermination", () => { ___ })` event is emitted, and your application should handle it to [close HTTP servers](https://nodejs.org/dist/latest/docs/api/http.html#serverclosecallback), [clear timers](https://nodejs.org/dist/latest/docs/api/timers.html#clearimmediateimmediate), and so forth. The goal is to leave the Node.js event loop empty so that the process may terminate naturally.
+
+> **Note:** The `"gracefulTermination"` signal is emitted only once.
+
+As one last step before termination, you may handle [Node.js’s `process.once("beforeExit", () => { ___ })` event](https://nodejs.org/dist/latest/docs/api/process.html#event-beforeexit), which is emitted after the Node.js event loop is empty, but before the application terminates. This is useful, for example, to close a database connection, to log that the application terminated gracefully, and so forth.
+
+> **Note:** You may wish to close a database connection on `"beforeExit"` instead of `"gracefulTermination"` because during `"gracefulTermination"` an HTTP server may still need the database connection while it’s responding to the last undergoing requests before closing.
+
+> **Note:** According to Node.js’s documentation you may use `"beforeExit"` to add more work to the event loop and prevent the process from terminating, but we advise against using it that way.
+
+> **Note:** Use the `"beforeExit"` event instead of the [`"exit"` event](https://nodejs.org/dist/latest/docs/api/process.html#event-exit) for the following reasons:
+>
+> 1. The `"exit"` event handler runs in a constrained environment that only allows for synchronous operations, but your cleanup may need to be asynchronous.
+> 2. The `"exit"` event is emitted even when the process is terminating in abnormal conditions, for example, because of an uncaught exception, and under these abnormal conditions graceful termination isn’t appropriate.
+
+After the `"gracefulTermination"` event is emitted, if the application doesn’t terminate in 10 seconds, then it’s terminated forcefully with `process.exit(1)`.
 
 **Example**
 
-```javascript
-import express from "express";
-import * as utilities from "@radically-straightforward/utilities";
-import * as node from "@radically-straightforward/node";
+```typescript
+import http from "node:http";
+import "@radically-straightforward/node";
 
-const application = express();
-application.get("/", (request, response) => {
-  response.send("Hello world");
+const server = http
+  .createServer((request, response) => {
+    response.end("gracefulTermination");
+  })
+  .listen(8000);
+process.once("gracefulTermination", () => {
+  // If you comment the line below the application remains running for 10 seconds and then it is forcefully terminated.
+  server.close();
 });
-const server = application.listen(3000);
-const backgroundJob = utilities.backgroundJob(
-  { interval: 3 * 1000 },
-  async () => {
-    console.log("Background job.");
-  },
-);
-console.log("shouldTerminate(): Press ⌃C to gracefully terminate...");
-await node.shouldTerminate();
-console.log("shouldTerminate(): Starting graceful termination...");
-// If you comment one of the lines below the application remains running for 10 seconds, when ‘shouldTerminate()’ terminates it forcefully.
-server.close();
-backgroundJob.stop();
+
+console.log("gracefulTermination: Press ⌃C to gracefully terminate...");
+process.once("gracefulTermination", () => {
+  console.log("gracefulTermination: Starting graceful termination...");
+});
+process.once("beforeExit", () => {
+  console.log("gracefulTermination: Succeeded.");
+});
 ```

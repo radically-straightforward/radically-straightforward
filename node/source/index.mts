@@ -1,11 +1,11 @@
 let gracefulTerminationEmitted = false;
 for (const signal of [
-  "SIGINT", // ⌃C
-  "SIGQUIT", // ⌃\
-  "SIGBREAK", // Windows / Ctrl+Break
-  "SIGHUP", // Terminal closed
-  "SIGTERM", // ‘kill’
-  "SIGUSR2", // https://www.npmjs.com/package/nodemon
+  "SIGINT",
+  "SIGQUIT",
+  "SIGBREAK",
+  "SIGHUP",
+  "SIGTERM",
+  "SIGUSR2",
 ])
   process.on(signal, () => {
     if (gracefulTerminationEmitted) return;
