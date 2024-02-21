@@ -1,6 +1,4 @@
-try {
-  await import("@radically-straightforward/node");
-} catch {}
+if (process !== undefined) await import("@radically-straightforward/node");
 
 /**
  * Start a background job that runs every `interval`.
@@ -77,11 +75,7 @@ export function backgroundJob(
     }
   }
   run();
-  if (process !== undefined)
-    process.on("gracefulTermination", () => {
-      // TODO: Stop
-    });
-  return {
+  const scheduler = {
     run: () => {
       switch (state) {
         case "sleeping":
@@ -98,6 +92,11 @@ export function backgroundJob(
       state = "stopped";
     },
   };
+  if (process !== undefined)
+    process.once("gracefulTermination", () => {
+      scheduler.stop();
+    });
+  return scheduler;
 }
 
 /**

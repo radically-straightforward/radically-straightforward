@@ -1,8 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import * as node from "@radically-straightforward/node";
-import * as utilities from "./index.mjs";
-import { intern as $ } from "./index.mjs";
+import * as utilities from "@radically-straightforward/utilities";
+import { intern as $ } from "@radically-straightforward/utilities";
 
 test(
   "backgroundJob()",
@@ -13,21 +12,19 @@ test(
   },
   async () => {
     const backgroundJob = utilities.backgroundJob(
-      { interval: 3 * 1000 },
+      { interval: 1000 },
       async () => {
         console.log("backgroundJob(): Running background job...");
-        await utilities.sleep(3 * 1000);
+        await utilities.sleep(1000);
         console.log("backgroundJob(): ...finished running background job.");
       },
-    );
-    console.log(
-      "backgroundJob(): Press ⌃Z to force background job to run and ⌃C to continue...",
     );
     process.on("SIGTSTP", () => {
       backgroundJob.run();
     });
-    await node.shouldTerminate();
-    backgroundJob.stop();
+    console.log(
+      "backgroundJob(): Press ⌃Z to force background job to run and ⌃C to gracefully terminate...",
+    );
   },
 );
 
