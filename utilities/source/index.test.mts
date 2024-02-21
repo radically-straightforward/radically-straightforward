@@ -7,11 +7,9 @@ import { intern as $ } from "./index.mjs";
 test(
   "backgroundJob()",
   {
-    ...(!process.stdin.isTTY
-      ? {
-          skip: "Run interactive test with ‘node ./build/index.test.mjs’.",
-        }
-      : {}),
+    skip: process.stdin.isTTY
+      ? false
+      : "Run interactive test with ‘node ./build/index.test.mjs’.",
   },
   async () => {
     const backgroundJob = utilities.backgroundJob(
