@@ -54,33 +54,27 @@ export function backgroundJob(
   }: { interval: number; intervalVariance?: number },
   job: () => void | Promise<void>,
 ): { run: () => void; stop: () => void } {
-  let state:
-    | "initial"
-    | "running"
-    | "runningAndMarkedForRerun"
-    | "sleeping"
-    | "stopped" = "initial";
+  let state: "sleeping" | "running" | "runningAndMarkedForRerun" | "stopped" =
+    "sleeping";
   let timeout: any = undefined;
-  async function run() {
-    state = "running";
-    await job();
-    if (state === "running" || state === "runningAndMarkedForRerun") {
-      timeout = setTimeout(
-        run,
-        (state as any) === "runningAndMarkedForRerun"
-          ? 0
-          : interval + interval * intervalVariance * Math.random(),
-      );
-      state = "sleeping";
-    }
-  }
-  run();
   const scheduler = {
-    run: () => {
+    run: async () => {
       switch (state) {
         case "sleeping":
           clearTimeout(timeout);
-          run();
+          state = "running";
+          await job();
+          if (state === "running" || state === "runningAndMarkedForRerun") {
+            timeout = setTimeout(
+              () => {
+                scheduler.run();
+              },
+              (state as any) === "runningAndMarkedForRerun"
+                ? 0
+                : interval + interval * intervalVariance * Math.random(),
+            );
+            state = "sleeping";
+          }
           break;
         case "running":
           state = "runningAndMarkedForRerun";
@@ -88,10 +82,11 @@ export function backgroundJob(
       }
     },
     stop: () => {
-      if (state === "sleeping") clearTimeout(timeout);
+      clearTimeout(timeout);
       state = "stopped";
     },
   };
+  scheduler.run();
   if (process !== undefined)
     process.once("gracefulTermination", () => {
       scheduler.stop();
