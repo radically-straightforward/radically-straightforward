@@ -6,7 +6,7 @@
   },
   "dependencies": {
     "@radically-straightforward/html": "^1.0.0",
-    "@radically-straightforward/utilities": "^1.1.0",
+    "@radically-straightforward/utilities": "^1.1.1",
     "nodemailer": "^6.9.9"
   },
   "devDependencies": {
