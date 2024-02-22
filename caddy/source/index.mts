@@ -32,6 +32,8 @@ export default function caddyfile(
  *
  * **`(common)` [snippet](https://caddyserver.com/docs/caddyfile/concepts#snippets)**
  *
+ * Enables compression for better performance and sets the following headers:
+ *
  * - `Strict-Transport-Security`: Tells the browser that moving forward it should only attempt to load this origin with HTTPS (not HTTP). The `hstsPreload` parameter controls whether to set the [`preload` directive](https://hstspreload.org/)—by default it’s `false`, but it’s recommended that you opt into preloading by setting `hstsPreload: true`.
  *
  * - `Cache-Control`: Turns off HTTP caching. This is the best setting for the dynamic parts of the application: in the best case the cache may be stale, and in the worst case the cache may include private information that could leak even after signing out. For static files, we recommend that you overwrite this header to enable caching, for example, `header Cache-Control "public, max-age=31536000, immutable"`.
@@ -58,7 +60,11 @@ export default function caddyfile(
  *
  * - `Server` and `X-Powered-By`: Removed, because they identify the server in which the application is running.
  *
- * - Compression enabled for better performance.
+ * **References**
+ *
+ * - <https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP> and other articles under **HTTP security**.
+ * - <https://owasp.org/www-project-secure-headers/>
+ * - <https://helmetjs.github.io/>
  */
 export function application({
   email = undefined,
@@ -74,6 +80,8 @@ export function application({
     }
 
     (common) {
+      encode zstd gzip
+
       header Strict-Transport-Security "max-age=31536000; includeSubDomains${
         hstsPreload ? `; preload` : ``
       }"
@@ -92,7 +100,6 @@ export function application({
       header Referrer-Policy no-referrer
       header -Server
       header -X-Powered-By
-      encode zstd gzip
     }
   `;
 }
