@@ -54,6 +54,8 @@ export default function caddyfile(
  *
  *   - Removing the `Server` and `X-Powered-By`, which identify what server the application is running.
  *
+ *   - The `X-XSS-Protection` header, which disables XSS filtering [because it is flawed](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-XSS-Protection#vulnerabilities_caused_by_xss_filtering).
+ *
  *   - The `Permissions-Policy` header, which opts the application out of [FLoC](https://web.dev/articles/floc).
  *
  *   - Enabling compression for better performance.
@@ -101,24 +103,24 @@ export function header({
     }
 
     (common) {
+      header Strict-Transport-Security "max-age=31536000; includeSubDomains${
+        hstsPreload ? `; preload` : ``
+      }"
       header Cache-Control no-store
+      header X-Content-Type-Options nosniff
+      header X-XSS-Protection 0
+      header Permissions-Policy "interest-cohort=()"
+      header Origin-Agent-Cluster "?1"
       header Content-Security-Policy "default-src 'self'; style-src 'self' 'unsafe-inline'; object-src 'none'; form-action 'self'; frame-ancestors 'none'"
       header Cross-Origin-Embedder-Policy require-corp
       header Cross-Origin-Opener-Policy same-origin
       header Cross-Origin-Resource-Policy same-origin
-      header Referrer-Policy no-referrer
-      header Strict-Transport-Security "max-age=31536000; includeSubDomains${
-        hstsPreload ? `; preload` : ``
-      }"
-      header X-Content-Type-Options nosniff
-      header Origin-Agent-Cluster "?1"
-      header X-DNS-Prefetch-Control off
       header X-Frame-Options DENY
       header X-Permitted-Cross-Domain-Policies none
+      header X-DNS-Prefetch-Control off
+      header Referrer-Policy no-referrer
       header -Server
       header -X-Powered-By
-      header X-XSS-Protection 0
-      header Permissions-Policy "interest-cohort=()"
       encode zstd gzip
     }
   `;
