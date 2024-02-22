@@ -68,8 +68,8 @@ export default function caddyfile(
  */
 export function application({
   hostname = "localhost",
-  staticFilesPaths = [path.join(process.cwd(), "static/")],
-  userGeneratedFilesPaths = [path.join(process.cwd(), "data/")],
+  staticFilesPaths = ["static/"],
+  userGeneratedFilesPaths = ["data/"],
   reverseProxyPorts = ["8000"],
   email = undefined,
   hstsPreload = false,

@@ -79,8 +79,8 @@ A [tagged template](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Refe
 ```typescript
 export function application({
   hostname = "localhost",
-  staticFilesPaths = [path.join(process.cwd(), "static/")],
-  userGeneratedFilesPaths = [path.join(process.cwd(), "data/")],
+  staticFilesPaths = ["static/"],
+  userGeneratedFilesPaths = ["data/"],
   reverseProxyPorts = ["8000"],
   email = undefined,
   hstsPreload = false,
