@@ -24,7 +24,7 @@
   "bin": "node_modules/caddy/caddy",
   "scripts": {
     "postinstall": "node ./postinstall.mjs",
-    "test": "node --test && prettier --check \"./README.md\" --check \"./CHANGELOG.md\" --check \"./package.json\" --check \"./postinstall.mjs\" --check \"./test.mjs\""
+    "test": "node --test && prettier --check \"./README.md\" --check \"./CHANGELOG.md\" --check \"./package.json\" --check \"./postinstall.mjs\" --check \"./postinstall.test.mjs\""
   },
   "devDependencies": {
     "prettier": "^3.1.0"
