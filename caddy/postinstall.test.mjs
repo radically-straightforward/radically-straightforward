@@ -17,9 +17,11 @@ test(async () => {
     ["install", process.cwd()],
     { cwd: directory },
   );
-  console.log(
-    await util.promisify(childProcess.execFile)("npx", ["caddy", "version"], {
-      cwd: directory,
-    }),
+  assert(
+    (
+      await util.promisify(childProcess.execFile)("npx", ["caddy", "version"], {
+        cwd: directory,
+      })
+    ).stdout.startsWith("v"),
   );
 });
