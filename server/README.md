@@ -59,6 +59,8 @@
 - Missing stuff from:
   - Koa
   - Express
+- Content proxy (we already have one in Courselore using Got—try to develop one using `fetch`)
+  - Link in documentation for `@radically-straightforward/caddy`’s `header()`.
 
 ## Related Work
 

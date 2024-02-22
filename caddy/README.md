@@ -44,6 +44,137 @@ $ npx caddy
 > > .\node_modules\.bin\caddy
 > ```
 
+---
+
+Besides the Caddy binary, `@radically-straightforward/caddy` also comes with helpers to define a [Caddyfile](https://caddyserver.com/docs/quick-starts/caddyfile).
+
+```typescript
+import caddyfile from "@radically-straightforward/caddy";
+import * as caddy from "@radically-straightforward/caddy";
+```
+
+<!-- DOCUMENTATION START: ./source/index.mts -->
+
+### `Caddyfile`
+
+```typescript
+export type Caddyfile = string;
+```
+
+A type alias to make your type annotations more specific.
+
+### `caddyfile()`
+
+```typescript
+export default function caddyfile(
+  templateStrings: TemplateStringsArray,
+  ...substitutions: Caddyfile[]
+): Caddyfile;
+```
+
+A [tagged template](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_literals#tagged_templates) for [Caddyfile](https://caddyserver.com/docs/quick-starts/caddyfile).
+
+### `header()`
+
+```typescript
+export function header({
+  email = undefined,
+  hstsPreload = false,
+}: {
+  email?: string;
+  hstsPreload?: boolean;
+} = {}): Caddyfile;
+```
+
+A Caddyfile header that defines:
+
+- [Global options](https://caddyserver.com/docs/caddyfile/options) that:
+
+  - Turn off administrative interface.
+
+  - Set an `email` to the system administrator, which is used for contacting about certificates. If an `email` isn’t provided, then the server is run in development mode with local self-signed certificates.
+
+- A [snippet](https://caddyserver.com/docs/caddyfile/concepts#snippets) named `(common)` including:
+
+  - The `Cache-Control no-store` header. Turns off HTTP caching. This is the best setting for dynamic parts of the application: in the best case the cache may be stale, and in the worst case the cache may include private information that could outlive signing out. For static files, we recommend that you overwrite this header to enable caching, for example, `header Cache-Control "public, max-age=31536000, immutable"`.
+
+  - The `Content-Security-Policy` header. We set strict rules which allow retrieving resources only from `self`. Inline styles are allowed. Objects and frames are disabled. If you need to serve images from third-party websites (for example, which may have been included as part of user-generated content), we recommend setting up a content proxy (it also solves the issue of [mixed content](https://developer.mozilla.org/en-US/docs/Web/Security/Mixed_content)).
+
+  - The `Cross-Origin` headers are set to only allow the same origin to load content from the application. For files that you wish to allow embedding in other origins, set the `header Cross-Origin-Resource-Policy cross-origin` header.
+
+  - The `Referrer-Policy no-referrer` header, which tells the browser to not send the `Referer` request header. This makes the application more secure because external links don’t leak information about the URL that the user was on.
+
+  - The `Strict-Transport-Security` header, which tells the browser that in the future it should only attempt to load this origin with HTTPS (not HTTP). The `hstsPreload` parameter controls whether to set the [`preload` option](https://hstspreload.org/)—by default it’s `false`, but it’s recommended that you opt into preloading by setting `hstsPreload: true`.
+
+  - The `Origin-Agent-Cluster` header, which tells the browser to try and isolate the process running your application.
+
+  - The `X-Content-Type-Options` header, which turns off content-type sniffing. Make sure to set the `Content-Type` header appropriately.
+
+  - The `X-DNS-Prefetch-Control` header, which disables DNS prefetching, because it could leak information about the application to potentially untrusted DNS servers.
+
+  - The `X-Frame-Options` header, which disallows the application being embedded in an iframe by another page.
+
+  - The `X-Permitted-Cross-Domain-Policies` header, which disallows things like PDF documents from embedding the application.
+
+  - Removing the `Server` and `X-Powered-By`, which identify what server the application is running.
+
+  - The `Permissions-Policy` header, which opts the application out of [FLoC](https://web.dev/articles/floc).
+
+  - Compression for better performance.
+
+An example of using the (`common`) snippet, including a server that tries to serve a static file if it exists, and failing that, reverse proxies to the dynamic part of the application:
+
+```caddyfile
+${caddy.header()}
+
+https://localhost {
+  import common
+
+  route {
+    root * ./static/
+    @file_exists file
+    route @file_exists {
+      header Cache-Control "public, max-age=31536000, immutable"
+      file_server
+    }
+  }
+
+  reverse_proxy http://localhost:8000 http://localhost:8001 {
+    lb_retries 1
+  }
+
+  handle_errors {
+    import common
+  }
+}
+
+${caddy.httpRedirect("localhost")}
+```
+
+### `redirect()`
+
+```typescript
+export function redirect(
+  fromHostname: string,
+  toHostname: string,
+  type: "temporary" | "permanent" = "temporary",
+): Caddyfile;
+```
+
+Set an HTTP redirect. Useful, for example, for redirecting alternative hostnames to the main hostname of the application.
+
+### `httpRedirect()`
+
+```typescript
+export function httpRedirect(hostnames: string | string[]): Caddyfile;
+```
+
+Redirect HTTP → HTTPS.
+
+> **Note:** Caddy can set this up automatically, but it doesn’t include the security headers in `(common)`.
+
+<!-- DOCUMENTATION END: ./source/index.mts -->
+
 ## Related Work
 
 ### [`caddy-npm`](https://www.npmjs.com/package/caddy-npm)

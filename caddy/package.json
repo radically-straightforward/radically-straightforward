@@ -22,12 +22,18 @@
     "access": "public"
   },
   "bin": "node_modules/@radically-straightforward/caddy/caddy",
+  "exports": "./build/index.mjs",
+  "types": "./build/index.d.ts",
   "scripts": {
     "preinstall": "node ./preinstall.mjs",
-    "test": "node --test && prettier --check \"./README.md\" --check \"./CHANGELOG.md\" --check \"./package.json\" --check \"./preinstall.mjs\" --check \"./preinstall.test.mjs\""
+    "prepare": "tsc && documentation",
+    "test": "npm run prepare && node --test && prettier --check \"./README.md\" --check \"./CHANGELOG.md\" --check \"./package.json\" --check \"./preinstall.mjs\" --check \"./preinstall.test.mjs\" --check \"./tsconfig.json\" --check \"./source/**/*.mts\""
   },
   "devDependencies": {
-    "prettier": "^3.1.0"
+    "@radically-straightforward/documentation": "^1.0.1",
+    "@radically-straightforward/tsconfig": "^1.0.0",
+    "prettier": "^3.1.0",
+    "typescript": "^5.3.3"
   },
   "prettier": {}
 }
