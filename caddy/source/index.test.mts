@@ -10,7 +10,7 @@ import * as utilities from "@radically-straightforward/utilities";
 // TODO: Remove:
 // - ‘only’ from this test.
 // - ‘--test-only’ from  ‘package.json’
-test.only(async () => {
+test.only({ timeout: 30 * 1000 }, async () => {
   const server = http
     .createServer((request, response) => {
       response.end("Application response.");
@@ -39,6 +39,15 @@ test.only(async () => {
     assert.equal(response.headers.get("Location"), "https://localhost/");
   }
 
-  reverseProxy.kill();
   server.close();
+
+  await utilities.sleep(2 * 1000);
+
+  {
+    const response = await fetch("https://localhost/");
+    assert.equal(response.status, 502);
+    assert.equal(response.headers.get("Cache-Control"), "no-store");
+  }
+
+  reverseProxy.kill();
 });
