@@ -21,14 +21,10 @@
   "publishConfig": {
     "access": "public"
   },
-  "bin": "caddy",
+  "bin": "node_modules/caddy/caddy",
   "scripts": {
-    "postinstall": "node ./scripts.mjs postinstall",
-    "preuninstall": "node ./scripts.mjs preuninstall",
-    "test": "node --test && prettier --check \"./README.md\" --check \"./CHANGELOG.md\" --check \"./package.json\" --check \"./scripts.mjs\" --check \"./scripts.test.mjs\""
-  },
-  "dependencies": {
-    "download": "^8.0.0"
+    "postinstall": "node ./postinstall.mjs",
+    "test": "node --test && prettier --check \"./README.md\" --check \"./CHANGELOG.md\" --check \"./package.json\" --check \"./postinstall.mjs\""
   },
   "devDependencies": {
     "prettier": "^3.1.0"
