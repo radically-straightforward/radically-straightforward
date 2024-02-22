@@ -69,9 +69,11 @@ export default function caddyfile(
 export function application({
   email = undefined,
   hstsPreload = false,
+  tunnel = false,
 }: {
   email?: string;
   hstsPreload?: boolean;
+  tunnel?: boolean;
 } = {}): Caddyfile {
   return caddyfile`
     {
@@ -101,27 +103,124 @@ export function application({
       header -Server
       header -X-Powered-By
     }
-  `;
-}
 
-/**
- * Set an HTTP redirect. Useful, for example, for redirecting alternative hostnames to the main hostname of the application.
- */
-export function redirect(
-  fromHostname: string,
-  toHostname: string,
-  type: "temporary" | "permanent" = "temporary",
-): Caddyfile {
-  return caddyfile`
-    https://${fromHostname} {
-      import common
-      redir https://${toHostname}{uri} ${
-        { temporary: "307", permanent: "308" }[type]
+    http${application.configuration.tunnel ? `` : `s`}://${
+      application.configuration.hostname
+    } {
+      route {
+        import common
+        ${[
+          url.fileURLToPath(new URL("./static/", import.meta.url)),
+          ...application.configuration.staticPaths,
+        ]
+          .map(
+            (staticPath) => caddyfile`
+            route {
+                root * ${JSON.stringify(path.resolve(staticPath))}
+              @file_exists file
+              route @file_exists {
+                header Cache-Control "public, max-age=31536000, immutable"
+                file_server
+              }
+            }
+          `,
+          )
+          .join("\n\n")}
+        route /files/* {
+          root * ${JSON.stringify(
+            path.resolve(application.configuration.dataDirectory),
+          )}
+          @file_exists file
+          route @file_exists {
+            header Cache-Control "private, max-age=31536000, immutable"
+            @must_be_downloaded not path *.webp *.webm *.png *.jpg *.jpeg *.gif *.mp3 *.mp4 *.m4v *.ogg *.mov *.mpeg *.avi *.pdf *.txt
+            header @must_be_downloaded Content-Disposition attachment
+            @may_be_embedded_in_other_sites path *.webp *.webm *.png *.jpg *.jpeg *.gif *.mp3 *.mp4 *.m4v *.ogg *.mov *.mpeg *.avi *.pdf
+            header @may_be_embedded_in_other_sites Cross-Origin-Resource-Policy cross-origin
+            file_server
+          }
+        }
+        reverse_proxy ${application.ports.web
+          .map((port) => `http://localhost:${port}`)
+          .join(" ")} {
+          lb_retries 1
+        }
       }
       handle_errors {
         import common
       }
     }
+
+    http://localhost:${application.ports.webEventsAny} {
+      bind localhost
+      reverse_proxy ${application.ports.webEvents
+        .map((port) => `http://localhost:${port}`)
+        .join(" ")} {
+        lb_retries 1
+      }
+    }
+
+    http://localhost:${application.ports.workerEventsAny} {
+      bind localhost
+      reverse_proxy ${application.ports.workerEvents
+        .map((port) => `http://localhost:${port}`)
+        .join(" ")} {
+        lb_retries 1
+      }
+    }
+
+    ${
+      application.configuration.demonstration
+        ? caddyfile`
+            https://${application.configuration.hostname}:8000 {
+              reverse_proxy http://localhost:8001 {
+                lb_retries 1
+              }
+            }
+
+            https://${application.configuration.hostname}:8003 {
+              reverse_proxy http://localhost:8004 {
+                lb_retries 1
+              }
+            }
+          `
+        : caddyfile``
+    }
+
+    ${[
+      ...(application.configuration.tunnel
+        ? []
+        : [application.configuration.hostname]),
+      ...application.configuration.alternativeHostnames,
+    ]
+      .map(
+        (hostname) => caddyfile`
+          http://${hostname} {
+            import common
+            redir https://${hostname}{uri} 308
+            handle_errors {
+              import common
+            }
+          }
+        `,
+      )
+      .join("\n\n")}
+
+    ${application.configuration.alternativeHostnames
+      .map(
+        (hostname) => caddyfile`
+          https://${hostname} {
+            import common
+            redir https://${application.configuration.hostname}{uri} 307
+            handle_errors {
+              import common
+            }
+          }
+        `,
+      )
+      .join("\n\n")}
+
+    ${application.configuration.caddy}
   `;
 }
 
