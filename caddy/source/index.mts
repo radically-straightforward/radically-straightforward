@@ -89,7 +89,7 @@ export default function caddyfile(
  * ${caddy.httpRedirect("localhost")}
  * ```
  */
-export function header({
+export function application({
   email = undefined,
   hstsPreload = false,
 }: {
