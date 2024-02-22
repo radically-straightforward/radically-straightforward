@@ -1,7 +1,7 @@
 {
   "name": "@radically-straightforward/caddy",
   "version": "1.0.0",
-  "description": "🔒 Install Caddy as an npm package",
+  "description": "☁️ Install Caddy as an npm package",
   "keywords": [
     "caddy",
     "reverse proxy",
