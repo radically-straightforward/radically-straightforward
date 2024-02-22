@@ -28,11 +28,9 @@
     "test": "node --test && prettier --check \"./README.md\" --check \"./CHANGELOG.md\" --check \"./package.json\" --check \"./scripts.mjs\" --check \"./scripts.test.mjs\""
   },
   "dependencies": {
-    "download": "^8.0.0",
-    "got": "^13.0.0"
+    "download": "^8.0.0"
   },
   "devDependencies": {
-    "execa": "^8.0.1",
     "prettier": "^3.1.0"
   },
   "prettier": {}
