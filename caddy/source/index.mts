@@ -59,37 +59,6 @@ export default function caddyfile(
  * - `Server` and `X-Powered-By`: Removed, because they identify the server in which the application is running.
  *
  * - Compression enabled for better performance.
- *
- * ---
- *
- * An example of using the (`common`) snippet, including a server that tries to serve a static file if it exists, and failing that, reverse proxies to the dynamic part of the application:
- *
- * ```caddyfile
- * ${caddy.header()}
- *
- * https://localhost {
- *   import common
- *
- *   route {
- *     root * ./static/
- *     @file_exists file
- *     route @file_exists {
- *       header Cache-Control "public, max-age=31536000, immutable"
- *       file_server
- *     }
- *   }
- *
- *   reverse_proxy http://localhost:8000 http://localhost:8001 {
- *     lb_retries 1
- *   }
- *
- *   handle_errors {
- *     import common
- *   }
- * }
- *
- * ${caddy.httpRedirect("localhost")}
- * ```
  */
 export function application({
   email = undefined,
