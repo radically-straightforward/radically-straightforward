@@ -4,8 +4,8 @@
   "description": "🔒 Install Caddy as an npm package",
   "keywords": [
     "caddy",
-    "file server",
-    "reverse proxy"
+    "reverse proxy",
+    "file server"
   ],
   "homepage": "https://github.com/leafac/radically-straightforward",
   "repository": "https://github.com/leafac/radically-straightforward",
