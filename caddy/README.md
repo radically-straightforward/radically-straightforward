@@ -78,9 +78,17 @@ A [tagged template](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Refe
 
 ```typescript
 export function application({
+  hostname = "localhost",
+  staticFilesPaths = [path.join(process.cwd(), "static/")],
+  userGeneratedFilesPaths = [path.join(process.cwd(), "data/")],
+  reverseProxyPorts = ["8000"],
   email = undefined,
   hstsPreload = false,
 }: {
+  hostname?: string;
+  staticFilesPaths?: string[];
+  userGeneratedFilesPaths?: string[];
+  reverseProxyPorts?: string[];
   email?: string;
   hstsPreload?: boolean;
 } = {}): Caddyfile;
@@ -95,6 +103,8 @@ A Caddyfile template for an application.
 - Set an `email` to the system administrator, which is used for contacting about certificates. If an `email` isn’t provided, then the server is run in development mode with local self-signed certificates.
 
 **`(common)` [snippet](https://caddyserver.com/docs/caddyfile/concepts#snippets)**
+
+Enables compression for better performance and sets the following headers:
 
 - `Strict-Transport-Security`: Tells the browser that moving forward it should only attempt to load this origin with HTTPS (not HTTP). The `hstsPreload` parameter controls whether to set the [`preload` directive](https://hstspreload.org/)—by default it’s `false`, but it’s recommended that you opt into preloading by setting `hstsPreload: true`.
 
@@ -120,31 +130,11 @@ A Caddyfile template for an application.
 
 - `Referrer-Policy`: Tells the browser to not send the `Referer` request header. This makes the application more secure because external links don’t leak information about the URL that the user was on.
 
-- `Server` and `X-Powered-By`: Removed, because they identify the server in which the application is running.
+**References**
 
-- Compression enabled for better performance.
-
-### `redirect()`
-
-```typescript
-export function redirect(
-  fromHostname: string,
-  toHostname: string,
-  type: "temporary" | "permanent" = "temporary",
-): Caddyfile;
-```
-
-Set an HTTP redirect. Useful, for example, for redirecting alternative hostnames to the main hostname of the application.
-
-### `httpRedirect()`
-
-```typescript
-export function httpRedirect(hostnames: string | string[]): Caddyfile;
-```
-
-Redirect HTTP → HTTPS.
-
-> **Note:** Caddy can set this up automatically, but it doesn’t include the security headers in `(common)`.
+- <https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP> and other articles under **HTTP security**.
+- <https://owasp.org/www-project-secure-headers/>
+- <https://helmetjs.github.io/>
 
 <!-- DOCUMENTATION END: ./source/index.mts -->
 

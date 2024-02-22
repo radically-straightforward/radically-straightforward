@@ -55,7 +55,10 @@
 - Logging:
   - `X-Forwarded-Host`
 - Live updates.
-- `listen()`, including graceful termination
+- `listen()`
+  - Graceful termination.
+  - Only on `localhost`.
+  - Return promise.
 - Missing stuff from:
   - Koa
   - Express
