@@ -1,0 +1,30 @@
+{
+  admin off
+  local_certs
+}
+
+(common) {
+  encode zstd gzip
+
+  header Strict-Transport-Security "max-age=31536000; includeSubDomains"
+  header Cache-Control no-store
+  header X-Content-Type-Options nosniff
+  header X-XSS-Protection 0
+  header Permissions-Policy "interest-cohort=()"
+  header Origin-Agent-Cluster "?1"
+  header Content-Security-Policy "default-src 'self'; style-src 'self' 'unsafe-inline'; frame-src 'none'; object-src 'none'; form-action 'self'; frame-ancestors 'none'"
+  header Cross-Origin-Resource-Policy same-origin
+  header Cross-Origin-Embedder-Policy require-corp
+  header Cross-Origin-Opener-Policy same-origin
+  header X-Frame-Options DENY
+  header X-Permitted-Cross-Domain-Policies none
+  header X-DNS-Prefetch-Control off
+  header Referrer-Policy no-referrer
+  header -Server
+  header -X-Powered-By
+}
+
+localhost {
+  import common
+  reverse_proxy http://localhost:8000
+}

@@ -1,3 +1,5 @@
+import path from "node:path";
+
 /**
  * A type alias to make your type annotations more specific.
  */
@@ -58,8 +60,6 @@ export default function caddyfile(
  *
  * - `Referrer-Policy`: Tells the browser to not send the `Referer` request header. This makes the application more secure because external links don’t leak information about the URL that the user was on.
  *
- * - `Server` and `X-Powered-By`: Removed, because they identify the server in which the application is running.
- *
  * **References**
  *
  * - <https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP> and other articles under **HTTP security**.
@@ -67,13 +67,19 @@ export default function caddyfile(
  * - <https://helmetjs.github.io/>
  */
 export function application({
+  hostname = "localhost",
+  staticFilesPaths = [path.join(process.cwd(), "static/")],
+  userGeneratedFilesPaths = [path.join(process.cwd(), "data/")],
+  reverseProxyPorts = ["8000"],
   email = undefined,
   hstsPreload = false,
-  tunnel = false,
 }: {
+  hostname?: string;
+  staticFilesPaths?: string[];
+  userGeneratedFilesPaths?: string[];
+  reverseProxyPorts?: string[];
   email?: string;
   hstsPreload?: boolean;
-  tunnel?: boolean;
 } = {}): Caddyfile {
   return caddyfile`
     {
@@ -81,7 +87,7 @@ export function application({
       ${email !== undefined ? `email ${email}` : `local_certs`}
     }
 
-    (common) {
+    ${hostname} {
       encode zstd gzip
 
       header Strict-Transport-Security "max-age=31536000; includeSubDomains${
@@ -100,150 +106,45 @@ export function application({
       header X-Permitted-Cross-Domain-Policies none
       header X-DNS-Prefetch-Control off
       header Referrer-Policy no-referrer
-      header -Server
-      header -X-Powered-By
-    }
 
-    http${application.configuration.tunnel ? `` : `s`}://${
-      application.configuration.hostname
-    } {
       route {
-        import common
-        ${[
-          url.fileURLToPath(new URL("./static/", import.meta.url)),
-          ...application.configuration.staticPaths,
-        ]
+        ${staticFilesPaths
           .map(
-            (staticPath) => caddyfile`
-            route {
-                root * ${JSON.stringify(path.resolve(staticPath))}
-              @file_exists file
-              route @file_exists {
-                header Cache-Control "public, max-age=31536000, immutable"
-                file_server
+            (staticFilesPath) => caddyfile`
+              route {
+                root * "${path.resolve(staticFilesPath)}"
+                @file_exists file
+                route @file_exists {
+                  header Cache-Control "public, max-age=31536000, immutable"
+                  file_server
+                }
               }
-            }
-          `,
+            `,
           )
           .join("\n\n")}
-        route /files/* {
-          root * ${JSON.stringify(
-            path.resolve(application.configuration.dataDirectory),
-          )}
-          @file_exists file
-          route @file_exists {
-            header Cache-Control "private, max-age=31536000, immutable"
-            @must_be_downloaded not path *.webp *.webm *.png *.jpg *.jpeg *.gif *.mp3 *.mp4 *.m4v *.ogg *.mov *.mpeg *.avi *.pdf *.txt
-            header @must_be_downloaded Content-Disposition attachment
-            @may_be_embedded_in_other_sites path *.webp *.webm *.png *.jpg *.jpeg *.gif *.mp3 *.mp4 *.m4v *.ogg *.mov *.mpeg *.avi *.pdf
-            header @may_be_embedded_in_other_sites Cross-Origin-Resource-Policy cross-origin
-            file_server
-          }
-        }
-        reverse_proxy ${application.ports.web
-          .map((port) => `http://localhost:${port}`)
-          .join(" ")} {
-          lb_retries 1
-        }
-      }
-      handle_errors {
-        import common
-      }
-    }
 
-    http://localhost:${application.ports.webEventsAny} {
-      bind localhost
-      reverse_proxy ${application.ports.webEvents
-        .map((port) => `http://localhost:${port}`)
-        .join(" ")} {
-        lb_retries 1
-      }
-    }
-
-    http://localhost:${application.ports.workerEventsAny} {
-      bind localhost
-      reverse_proxy ${application.ports.workerEvents
-        .map((port) => `http://localhost:${port}`)
-        .join(" ")} {
-        lb_retries 1
-      }
-    }
-
-    ${
-      application.configuration.demonstration
-        ? caddyfile`
-            https://${application.configuration.hostname}:8000 {
-              reverse_proxy http://localhost:8001 {
-                lb_retries 1
+        ${userGeneratedFilesPaths
+          .map(
+            (userGeneratedFilesPath) => caddyfile`
+              route {
+                root * "${path.resolve(userGeneratedFilesPath)}"
+                @file_exists file
+                route @file_exists {
+                  header Cache-Control "private, max-age=31536000, immutable"
+                  @safe path *.webp *.webm *.png *.jpg *.jpeg *.gif *.mp3 *.mp4 *.m4v *.ogg *.mov *.mpeg *.avi *.pdf *.txt
+                  header @safe Cross-Origin-Resource-Policy cross-origin
+                  header not @safe Content-Disposition attachment
+                  file_server
+                }
               }
-            }
+            `,
+          )
+          .join("\n\n")}
 
-            https://${application.configuration.hostname}:8003 {
-              reverse_proxy http://localhost:8004 {
-                lb_retries 1
-              }
-            }
-          `
-        : caddyfile``
+        reverse_proxy ${reverseProxyPorts
+          .map((applicationPort) => `http://localhost:${applicationPort}`)
+          .join(" ")}
+      }
     }
-
-    ${[
-      ...(application.configuration.tunnel
-        ? []
-        : [application.configuration.hostname]),
-      ...application.configuration.alternativeHostnames,
-    ]
-      .map(
-        (hostname) => caddyfile`
-          http://${hostname} {
-            import common
-            redir https://${hostname}{uri} 308
-            handle_errors {
-              import common
-            }
-          }
-        `,
-      )
-      .join("\n\n")}
-
-    ${application.configuration.alternativeHostnames
-      .map(
-        (hostname) => caddyfile`
-          https://${hostname} {
-            import common
-            redir https://${application.configuration.hostname}{uri} 307
-            handle_errors {
-              import common
-            }
-          }
-        `,
-      )
-      .join("\n\n")}
-
-    ${application.configuration.caddy}
-  `;
-}
-
-/**
- * Redirect HTTP → HTTPS.
- *
- * > **Note:** Caddy can set this up automatically, but it doesn’t include the security headers in `(common)`.
- */
-export function httpRedirect(hostnames: string | string[]): Caddyfile {
-  if (typeof hostnames === "string") hostnames = [hostnames];
-  return caddyfile`
-    ${hostnames
-      .map(
-        (hostname) => caddyfile`
-          http://${hostname} {
-            import common
-            redir https://${hostname}{uri} 308
-            handle_errors {
-              import common
-            }
-          }
-        `,
-      )
-      .join("\n\n")}
   `;
 }
