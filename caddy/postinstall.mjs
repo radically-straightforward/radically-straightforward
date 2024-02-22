@@ -24,6 +24,7 @@ if (version === undefined)
     ).json()
   ).tag_name.slice(1);
 
+await fs.rm("node_modules/caddy/", {recursive: true, force: true});
 await fs.mkdir("node_modules/caddy/", { recursive: true });
 await fs.writeFile(
   `node_modules/caddy/caddy.${process.platform === "win32" ? "zip" : "tar.gz"}`,
