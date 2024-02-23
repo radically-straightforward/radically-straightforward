@@ -76,14 +76,14 @@ A [tagged template](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Refe
 
 ```typescript
 export function application({
-  hostname = "localhost",
+  address = "localhost",
   trustedStaticFilesRoots = ["* static/"],
   untrustedStaticFilesRoots = ["/files/* data/"],
   dynamicServerPorts = ["18000"],
   email = undefined,
   hstsPreload = false,
 }: {
-  hostname?: string;
+  address?: string;
   trustedStaticFilesRoots?: string[];
   untrustedStaticFilesRoots?: string[];
   dynamicServerPorts?: string[];
@@ -96,7 +96,7 @@ A Caddyfile template for an application.
 
 **Parameters**
 
-- `hostname`: The [`hostname`](https://nodejs.org/dist/latest/docs/api/url.html#url-strings-and-url-objects) part of the application’s URL, for example, `example.com`. Notably, it doesn’t include neither the protocol nor the port.
+- `address`: The [`address` of the site block](https://caddyserver.com/docs/caddyfile/concepts#addresses). Usually the `address` is the [`hostname`](https://nodejs.org/dist/latest/docs/api/url.html#url-strings-and-url-objects) part of the application’s URL, for example, `example.com` (notably, the `hostname` doesn’t include neither the protocol nor the port).
 
 - `trustedStaticFilesRoots`: [Caddy `root` directives](https://caddyserver.com/docs/caddyfile/directives/root) for **immutable** static files that are **trusted** by the application, for example, the application’s CSS and browser JavaScript.
 
