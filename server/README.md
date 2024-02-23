@@ -76,6 +76,7 @@ TODO
 
 - Always listen on `localhost`, because you should be using Caddy as reverse proxy.
 - Graceful termination.
+- Parse pathname parameters, query parameters, headers, and request body.
 
 ## Related Work
 
