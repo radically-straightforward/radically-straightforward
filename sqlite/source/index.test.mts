@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import timers from "node:timers/promises";
-import sql, { Database, Query } from "./index.mjs";
+import sql, { Database, Query } from "@radically-straightforward/sqlite";
 
 test(async () => {
   const database = new Database(":memory:");

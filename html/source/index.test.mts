@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import html, { HTML } from "./index.mjs";
-import * as htmlHelpers from "./index.mjs";
+import html, { HTML } from "@radically-straightforward/html";
+import * as htmlHelpers from "@radically-straightforward/html";
 
 test("html`___`", () => {
   assert.equal(html`<p>Leandro Facchinetti</p>`, `<p>Leandro Facchinetti</p>`);
