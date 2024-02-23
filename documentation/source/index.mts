@@ -16,7 +16,7 @@ for (const input of process.argv.length === 2
   let documentation = await fs.readFile(input, "utf-8");
   for (const match of [
     ...documentation.matchAll(
-      /<!-- DOCUMENTATION(?: START)?: (?<directive>.*?) -->(?:.*?<!-- DOCUMENTATION END: \k<directive> -->)?/gsv,
+      /<!-- DOCUMENTATION(?: START)?: (?<directive>.*?) -->(?:.*?<!-- DOCUMENTATION END: \k<directive> -->)?/gsu,
     ),
   ].reverse()) {
     if (match.groups === undefined || match.index === undefined) continue;
@@ -171,7 +171,7 @@ for (const input of process.argv.length === 2
                   .trim())(),
               ";\n```\n\n",
               path.node.leadingComments[0].value
-                .replace(/^\s*\* ?/gmv, "")
+                .replace(/^\s*\* ?/gmu, "")
                 .trim(),
               "\n\n",
             );
@@ -257,7 +257,7 @@ for (const input of process.argv.length === 2
                       .trim())(),
                   ";\n```\n\n",
                   classBodyNode.leadingComments[0].value
-                    .replace(/^\s*\* ?/gmv, "")
+                    .replace(/^\s*\* ?/gmu, "")
                     .trim(),
                   "\n\n",
                 );
