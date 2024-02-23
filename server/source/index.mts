@@ -1,6 +1,44 @@
+import http from "node:http";
 import "@radically-straightforward/node";
 
-// import http from "node:http";
+export default function server(port: number): any[] {
+  const handlers: any[] = [];
+  const httpServer = http
+    .createServer(async (request: any, response: any) => {
+      if (request.method === undefined || request.url === undefined) {
+        response.statusCode = 400;
+        response.end();
+        return;
+      }
+      request.URL = new URL(
+        request.url,
+        `${request.headers["x-forwarded-proto"] ?? "http"}://${
+          request.headers["x-forwarded-host"] ?? request.headers["host"]
+        }`,
+      );
+      request.searchParams = Object.fromEntries(request.URL.searchParams);
+      for (const handler of handlers) {
+        if (
+          handler.method !== undefined &&
+          request.method.match(handler.method) === null
+        )
+          continue;
+        if (handler.pathname === undefined) request.pathname = {};
+        else {
+          const match = request.URL.pathname.match(handler.pathname);
+          if (match === null) continue;
+          request.pathname = match.groups;
+        }
+        await handler.handler(request, response);
+      }
+    })
+    .listen(port, "localhost");
+  process.once("gracefulTermination", () => {
+    httpServer.close();
+  });
+  return handlers;
+}
+
 // import streamConsumers from "node:stream/consumers";
 // import busboy from "busboy";
 

@@ -18,11 +18,6 @@ TODO
   - `next` (Koa).
   - Register functions to run after.
 - Parse request:
-  - Path parameters
-    - `decodeURIComponent`.
-  - Query parameters
-    - `URLSearchParams`
-    - <https://www.npmjs.com/package/qs>.
   - Cookies.
     - <https://github.com/jshttp/cookie>.
   - `Content-Type`
@@ -69,15 +64,18 @@ TODO
 - Logging:
   - `X-Forwarded-Host`
 - Live updates.
-- `listen()`
-  - Graceful termination.
-  - Only on `localhost`.
-  - Return promise.
 - Missing stuff from:
   - Koa
   - Express
 - Content proxy (we already have one in Courselore using Got—try to develop one using `fetch`)
   - Link in documentation for `@radically-straightforward/caddy`’s `header()`.
+- Future:
+  - Pass `pathname` parameters through `decodeURIComponent`?
+
+## Features
+
+- Always listen on `localhost`, because you should be using Caddy as reverse proxy.
+- Graceful termination.
 
 ## Related Work
 
