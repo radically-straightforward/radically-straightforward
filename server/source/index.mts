@@ -13,7 +13,7 @@
 //     request.query = Object.fromEntries(request.urlParts.searchParams);
 //     request.cookies = Object.fromEntries(
 //       (request.headers["cookie"] ?? "").split(";").map((part) => {
-//         const parts = 
+//         const parts =
 //         part
 //           .trim()
 //           .split("=");

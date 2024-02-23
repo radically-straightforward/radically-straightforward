@@ -7,6 +7,7 @@
 ```console
 $ npm install @radically-straightforward/server
 ```
+
 ## Usage
 
 TODO
