@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.1.1 · 2024-02-23
+
+- Fixed package, which included the executable and a bunch of bundled dependencies by accident.
+
 ## 1.1.0 · 2024-02-23
 
 - Introduce a template with a Caddy configuration for applications.
