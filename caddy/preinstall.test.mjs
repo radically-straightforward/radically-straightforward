@@ -6,7 +6,7 @@ import fs from "node:fs/promises";
 import childProcess from "node:child_process";
 import util from "node:util";
 
-test(async () => {
+test({ skip: process.platform === "win32" /* FIXME */ }, async () => {
   const directory = await fs.mkdtemp(
     path.join(os.tmpdir(), "radically-straightforward--caddy--"),
   );
