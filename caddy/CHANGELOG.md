@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.1.2 · 2024-02-23
+
+- Added `bin` to try and fix `npx @radically-straightforward/caddy`.
+
 ## 1.1.1 · 2024-02-23
 
 - Fixed package, which included the executable and a bunch of bundled dependencies by accident.

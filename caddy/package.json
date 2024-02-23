@@ -21,6 +21,7 @@
   "publishConfig": {
     "access": "public"
   },
+  "bin": "caddy",
   "exports": "./build/index.mjs",
   "types": "./build/index.d.ts",
   "scripts": {
