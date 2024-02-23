@@ -66,15 +66,15 @@ export default function caddyfile(
  */
 export function application({
   hostname = "localhost",
-  staticFilesRoots = ["* static/"],
-  userGeneratedFilesRoots = ["/files/* data/"],
+  trustedStaticFilesRoots = ["* static/"],
+  userGeneratedStaticFilesRoots = ["/files/* data/"],
   reverseProxyPorts = ["18000"],
   email = undefined,
   hstsPreload = false,
 }: {
   hostname?: string;
-  staticFilesRoots?: string[];
-  userGeneratedFilesRoots?: string[];
+  trustedStaticFilesRoots?: string[];
+  userGeneratedStaticFilesRoots?: string[];
   reverseProxyPorts?: string[];
   email?: string;
   hstsPreload?: boolean;
@@ -106,11 +106,11 @@ export function application({
       header Referrer-Policy no-referrer
 
       route {
-        ${staticFilesRoots
+        ${trustedStaticFilesRoots
           .map(
-            (staticFilesRoot) => caddyfile`
+            (trustedStaticFilesRoot) => caddyfile`
               route {
-                root ${staticFilesRoot}
+                root ${trustedStaticFilesRoot}
                 @file_exists file
                 route @file_exists {
                   header Cache-Control "public, max-age=31536000, immutable"
@@ -121,11 +121,11 @@ export function application({
           )
           .join("\n\n")}
 
-        ${userGeneratedFilesRoots
+        ${userGeneratedStaticFilesRoots
           .map(
-            (userGeneratedFilesRoot) => caddyfile`
+            (userGeneratedStaticFilesRoot) => caddyfile`
               route {
-                root ${userGeneratedFilesRoot}
+                root ${userGeneratedStaticFilesRoot}
                 @file_exists file
                 route @file_exists {
                   header Cache-Control "private, max-age=31536000, immutable"
