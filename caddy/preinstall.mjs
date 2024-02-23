@@ -24,15 +24,15 @@ if (version === undefined)
     ).json()
   ).tag_name.slice(1);
 
-await fs.rm("node_modules/@radically-straightforward/caddy/", {
+await fs.rm("./node_modules/@radically-straightforward/caddy/", {
   recursive: true,
   force: true,
 });
-await fs.mkdir("node_modules/@radically-straightforward/caddy/", {
+await fs.mkdir("./node_modules/@radically-straightforward/caddy/", {
   recursive: true,
 });
 await fs.writeFile(
-  `node_modules/@radically-straightforward/caddy/caddy.${
+  `./node_modules/@radically-straightforward/caddy/caddy.${
     process.platform === "win32" ? "zip" : "tar.gz"
   }`,
   (
@@ -48,12 +48,10 @@ await fs.writeFile(
 await util.promisify(childProcess.execFile)(
   "tar",
   ["-xzf", `caddy.${process.platform === "win32" ? "zip" : "tar.gz"}`],
-  {
-    cwd: "node_modules/@radically-straightforward/caddy/",
-  },
+  { cwd: "./node_modules/@radically-straightforward/caddy/" },
 );
 await fs.rm(
-  `node_modules/@radically-straightforward/caddy/caddy.${
+  `./node_modules/@radically-straightforward/caddy/caddy.${
     process.platform === "win32" ? "zip" : "tar.gz"
   }`,
 );

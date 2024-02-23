@@ -10,7 +10,7 @@ test(async () => {
   const directory = await fs.mkdtemp(
     path.join(os.tmpdir(), "radically-straightforward--caddy--"),
   );
-  console.log(directory);
+  // console.log(directory);
   await fs.writeFile(path.join(directory, "package.json"), JSON.stringify({}));
   await util.promisify(childProcess.execFile)(
     "npm",
