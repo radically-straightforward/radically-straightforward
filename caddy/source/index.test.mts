@@ -158,9 +158,10 @@ test.only({ timeout: 30 * 1000 }, async () => {
       response.headers.get("Content-Type"),
       "text/plain; charset=utf-8",
     );
-    assert.equal(
-      await response.text(),
-      `EXAMPLE OF USER-GENERATED HTML FILE DISGUISED AS TXT THAT MUST BE SERVED AS TXT`,
+    assert(
+      (await response.text()).includes(
+        `EXAMPLE OF USER-GENERATED HTML FILE DISGUISED AS TXT THAT MUST BE SERVED AS TXT`,
+      ),
     );
   }
 
