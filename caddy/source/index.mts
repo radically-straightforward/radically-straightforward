@@ -130,8 +130,9 @@ export function application({
                 route @file_exists {
                   header Cache-Control "private, max-age=31536000, immutable"
                   @safe path *.webp *.webm *.png *.jpg *.jpeg *.gif *.mp3 *.mp4 *.m4v *.ogg *.mov *.mpeg *.avi *.pdf *.txt
+                  @not_safe not path *.webp *.webm *.png *.jpg *.jpeg *.gif *.mp3 *.mp4 *.m4v *.ogg *.mov *.mpeg *.avi *.pdf *.txt
                   header @safe Cross-Origin-Resource-Policy cross-origin
-                  header not @safe Content-Disposition attachment
+                  header @not_safe Content-Disposition attachment
                   file_server
                 }
               }
