@@ -16,7 +16,7 @@ test(
   },
   async () => {
     const directory = await fs.mkdtemp(
-      path.join(os.tmpdir(), "radically-straightforward--caddy--"),
+      path.join(os.tmpdir(), "radically-straightforward--caddy--test--"),
     );
 
     await fs.mkdir(path.join(directory, "static/"), { recursive: true });
