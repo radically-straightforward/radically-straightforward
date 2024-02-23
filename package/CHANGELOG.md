@@ -3,7 +3,7 @@
 ## Unreleased
 
 - Moved the documentation into the README.
-- Removed the dependency on `execa`.
+- Removed the dependency on `execa` and `commander`.
 
 ## 1.0.0 · 2023-11-21
 
