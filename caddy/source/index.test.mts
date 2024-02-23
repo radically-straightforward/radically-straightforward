@@ -37,30 +37,30 @@ test(
     await fs.writeFile(
       path.join(directory, "data/files/example.html"),
       `
-      <!DOCTYPE html>
-      <html lang="en">
-      <head>
-        <meta charset="UTF-8">
-      </head>
-      <body>
-        EXAMPLE OF USER-GENERATED HTML FILE THAT MUST BE DOWNLOADED
-      </body>
-      </html>
-    `,
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+          <meta charset="UTF-8">
+        </head>
+        <body>
+          EXAMPLE OF USER-GENERATED HTML FILE THAT MUST BE DOWNLOADED
+        </body>
+        </html>
+      `,
     );
     await fs.writeFile(
       path.join(directory, "data/files/example--html.txt"),
       `
-      <!DOCTYPE html>
-      <html lang="en">
-      <head>
-        <meta charset="UTF-8">
-      </head>
-      <body>
-        EXAMPLE OF USER-GENERATED HTML FILE DISGUISED AS TXT THAT MUST BE SERVED AS TXT
-      </body>
-      </html>
-    `,
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+          <meta charset="UTF-8">
+        </head>
+        <body>
+          EXAMPLE OF USER-GENERATED HTML FILE DISGUISED AS TXT THAT MUST BE SERVED AS TXT
+        </body>
+        </html>
+      `,
     );
 
     const dynamicServer = http
