@@ -27,7 +27,7 @@
   "scripts": {
     "preinstall": "node ./preinstall.mjs",
     "prepare": "tsc && documentation",
-    "test": "npm run prepare && node --test --test-only && prettier --check \"./README.md\" --check \"./CHANGELOG.md\" --check \"./package.json\" --check \"./preinstall.mjs\" --check \"./preinstall.test.mjs\" --check \"./tsconfig.json\" --check \"./source/**/*.mts\""
+    "test": "npm run prepare && node --test && prettier --check \"./README.md\" --check \"./CHANGELOG.md\" --check \"./package.json\" --check \"./preinstall.mjs\" --check \"./preinstall.test.mjs\" --check \"./tsconfig.json\" --check \"./source/**/*.mts\""
   },
   "devDependencies": {
     "@radically-straightforward/documentation": "^1.0.1",

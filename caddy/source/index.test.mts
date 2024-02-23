@@ -8,10 +8,7 @@ import childProcess from "node:child_process";
 import * as caddy from "@radically-straightforward/caddy";
 import * as utilities from "@radically-straightforward/utilities";
 
-// TODO: Remove:
-// - ‘only’ from this test.
-// - ‘--test-only’ from  ‘package.json’
-test.only({ timeout: 30 * 1000 }, async () => {
+test({ timeout: 30 * 1000 }, async () => {
   const directory = await fs.mkdtemp(
     path.join(os.tmpdir(), "radically-straightforward--caddy--"),
   );
