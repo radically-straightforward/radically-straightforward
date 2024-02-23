@@ -24,8 +24,8 @@ test.only({ timeout: 30 * 1000 }, async () => {
   );
   reverseProxy.stdin.end(
     caddy.application({
-      staticFilesPaths: ["./source/"],
-      userGeneratedFilesPaths: [
+      staticFilesRoots: ["./source/"],
+      userGeneratedFilesRoots: [
         "./node_modules/@radically-straightforward/caddy/",
       ],
     }),

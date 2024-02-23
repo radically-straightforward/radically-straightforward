@@ -1,5 +1,3 @@
-import path from "node:path";
-
 /**
  * A type alias to make your type annotations more specific.
  */
@@ -68,15 +66,15 @@ export default function caddyfile(
  */
 export function application({
   hostname = "localhost",
-  staticFilesPaths = ["static/"],
-  userGeneratedFilesPaths = ["data/"],
+  staticFilesRoots = ["* static/"],
+  userGeneratedFilesRoots = ["/files/* data/"],
   reverseProxyPorts = ["8000"],
   email = undefined,
   hstsPreload = false,
 }: {
   hostname?: string;
-  staticFilesPaths?: string[];
-  userGeneratedFilesPaths?: string[];
+  staticFilesRoots?: string[];
+  userGeneratedFilesRoots?: string[];
   reverseProxyPorts?: string[];
   email?: string;
   hstsPreload?: boolean;
@@ -108,11 +106,11 @@ export function application({
       header Referrer-Policy no-referrer
 
       route {
-        ${staticFilesPaths
+        ${staticFilesRoots
           .map(
-            (staticFilesPath) => caddyfile`
+            (staticFilesRoot) => caddyfile`
               route {
-                root * "${path.resolve(staticFilesPath)}"
+                root ${staticFilesRoot}
                 @file_exists file
                 route @file_exists {
                   header Cache-Control "public, max-age=31536000, immutable"
@@ -123,11 +121,11 @@ export function application({
           )
           .join("\n\n")}
 
-        ${userGeneratedFilesPaths
+        ${userGeneratedFilesRoots
           .map(
-            (userGeneratedFilesPath) => caddyfile`
+            (userGeneratedFilesRoot) => caddyfile`
               route {
-                root * "${path.resolve(userGeneratedFilesPath)}"
+                root ${userGeneratedFilesRoot}
                 @file_exists file
                 route @file_exists {
                   header Cache-Control "private, max-age=31536000, immutable"
