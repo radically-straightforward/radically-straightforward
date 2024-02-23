@@ -2,10 +2,11 @@
 
 import path from "node:path";
 import fs from "node:fs/promises";
+import childProcess from "node:child_process";
+import util from "node:util";
 import * as fsStream from "node:fs";
 import stream from "node:stream/promises";
 import * as commander from "commander";
-import { execa } from "execa";
 import archiver from "archiver";
 import batch from "dedent";
 import sh from "dedent";
@@ -29,10 +30,9 @@ await commander.program
   .action(async (command: string[], { input }: { input: string }) => {
     input = path.resolve(input);
 
-    await execa("npm", ["dedupe"], {
+    await util.promisify(childProcess.execFile)("npm", ["dedupe"], {
       cwd: input,
       env: { NODE_ENV: "production" },
-      stdio: "inherit",
     });
 
     await fs.mkdir(path.join(input, "node_modules/.bin"), { recursive: true });
