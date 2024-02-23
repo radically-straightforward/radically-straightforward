@@ -12,7 +12,7 @@ test(
   {
     skip: process.stdin.isTTY
       ? false
-      : "Install Caddy, make sure that the local certificate authority is working, and run interactive test with ‘node ./build/index.test.mjs’.",
+      : "Install Caddy, make sure that the local certificate authority is working, and run test with ‘node ./build/index.test.mjs’.",
   },
   async () => {
     const directory = await fs.mkdtemp(
