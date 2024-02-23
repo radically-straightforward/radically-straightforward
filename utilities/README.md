@@ -93,7 +93,7 @@ A promisified version of `setTimeout()`. Bare-bones: It doesn’t even offer a w
 export function randomString(): string;
 ```
 
-A fast random string generator. The generated strings are 10 or 11 characters in length. The generated strings include the characters `[0-9a-z]`. The generated strings are **not** cryptographically secure—if you need that, then use [`crypto-random-string`](https://www.npmjs.com/package/crypto-random-string).
+A fast random string generator. The generated strings vary in length, but are generally around 10 characters. The generated strings include the characters `[0-9a-z]`. The generated strings are **not** cryptographically secure—if you need that, then use [`crypto-random-string`](https://www.npmjs.com/package/crypto-random-string).
 
 ### `log()`
 
