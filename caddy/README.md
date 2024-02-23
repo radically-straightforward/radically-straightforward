@@ -79,15 +79,15 @@ A [tagged template](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Refe
 ```typescript
 export function application({
   hostname = "localhost",
-  staticFilesPaths = ["static/"],
-  userGeneratedFilesPaths = ["data/"],
-  reverseProxyPorts = ["8000"],
+  trustedStaticFilesRoots = ["* static/"],
+  userGeneratedStaticFilesRoots = ["/files/* data/"],
+  reverseProxyPorts = ["18000"],
   email = undefined,
   hstsPreload = false,
 }: {
   hostname?: string;
-  staticFilesPaths?: string[];
-  userGeneratedFilesPaths?: string[];
+  trustedStaticFilesRoots?: string[];
+  userGeneratedStaticFilesRoots?: string[];
   reverseProxyPorts?: string[];
   email?: string;
   hstsPreload?: boolean;

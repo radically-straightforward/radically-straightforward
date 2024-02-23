@@ -67,7 +67,7 @@ test.only({ timeout: 30 * 1000 }, async () => {
     .listen(18000, "localhost");
 
   const reverseProxy = childProcess.spawn(
-    "./node_modules/@radically-straightforward/caddy/caddy",
+    path.resolve("./node_modules/@radically-straightforward/caddy/caddy"),
     ["run", "--adapter", "caddyfile", "--config", "-"],
     { cwd: directory, stdio: [undefined, "ignore", "ignore"] },
   );
