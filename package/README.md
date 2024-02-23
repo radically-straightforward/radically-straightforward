@@ -21,8 +21,11 @@ $ npx package
 or:
 
 ```console
-$ npx package --input "path-to-project" -- "$PACKAGE/node_modules/.bin/node" "$PACKAGE/path-to-entrypoint.mjs"
+$ npx package --input "path-to-project" -- "$PACKAGE/node_modules/.bin/node" "$PACKAGE/build/index.mjs"
 ```
+
+- `--input`: The application directory. By default, `.`.
+- `-- command ...`: The command to start the application. By default, `"$PACKAGE/node_modules/.bin/node" "$PACKAGE/build/index.mjs"`. The `$PACKAGE` environment variable contains the path to the application directory. On Windows the `$PACKAGE` syntax is converted into `%PACKAGE%` automatically. The Node.js binary is available at `$PACKAGE/node_modules/.bin/node`, along with other binaries installed by npm.
 
 > **Note:** The process of packaging includes a call to `env NODE_ENV=production npm dedupe`, which removes development dependencies from the `node_modules/` directory.
 
@@ -41,35 +44,6 @@ Example of calling the binary:
 ```console
 $ ./example-application/example-application examples of some extra command-line arguments
 ```
-
-## `$ npx package --help`
-
-<!-- DOCUMENTATION START: $ node ./build/index.mjs --help -->
-
-```
-Usage: package [options] [command...]
-
-📦 Package a Node.js application
-
-Arguments:
-  command              The command to start the application. The ‘$PACKAGE’
-                       environment variable contains the path to the
-                       application directory. On Windows the ‘$PACKAGE’ syntax
-                       is converted into ‘%PACKAGE%’ automatically. The Node.js
-                       binary is available at
-                       ‘$PACKAGE/node_modules/.bin/node’, along with other
-                       binaries installed by npm. The default command expects
-                       the application entrypoint to be at
-                       ‘$PACKAGE/build/index.mjs’. (default:
-                       ["$PACKAGE/node_modules/.bin/node","$PACKAGE/build/index.mjs"])
-
-Options:
-  -i, --input <input>  The application directory. (default: ".")
-  -V, --version        output the version number
-  -h, --help           display help for command
-```
-
-<!-- DOCUMENTATION END: $ node ./build/index.mjs --help -->
 
 ## How It Works
 
