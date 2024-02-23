@@ -3,7 +3,7 @@ import assert from "node:assert";
 import childProcess from "node:child_process";
 import util from "node:util";
 
-test({ skip: process.platform === "win32" }, async () => {
+test(async () => {
   assert(
     (
       await util.promisify(childProcess.execFile)("./node_modules/.bin/caddy", [
