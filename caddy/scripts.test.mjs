@@ -3,7 +3,7 @@ import assert from "node:assert";
 import childProcess from "node:child_process";
 import util from "node:util";
 
-test(async () => {
+test({ skip: process.platform === "win32" }, async () => {
   assert(
     (
       await util.promisify(childProcess.execFile)("npx", ["caddy", "version"])
