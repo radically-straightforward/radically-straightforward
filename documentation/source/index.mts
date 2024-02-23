@@ -27,9 +27,7 @@ for (const input of process.argv.length === 2
         (
           await util.promisify(childProcess.exec)(
             match.groups.directive.slice(1),
-            {
-              cwd: path.dirname(input),
-            },
+            { cwd: path.dirname(input) },
           )
         ).stdout,
         "\n```\n\n",
