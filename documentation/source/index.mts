@@ -2,8 +2,9 @@
 
 import fs from "node:fs/promises";
 import path from "node:path";
+import childProcess from "node:child_process";
+import util from "node:util";
 import * as commander from "commander";
-import { execaCommand } from "execa";
 import * as babelParser from "@babel/parser";
 import babelTraverse from "@babel/traverse";
 import babelTypes from "@babel/types";
@@ -39,11 +40,13 @@ await commander.program
           matchReplacementParts.push(
             "```\n",
             (
-              await execaCommand(match.groups.directive.slice(1), {
-                cwd: path.dirname(input),
-                all: true,
-              })
-            ).all!,
+              await util.promisify(childProcess.exec)(
+                match.groups.directive.slice(1),
+                {
+                  cwd: path.dirname(input),
+                },
+              )
+            ).stdout,
             "\n```\n\n",
           );
         else

@@ -33,7 +33,6 @@
     "@babel/traverse": "^7.23.4",
     "@babel/types": "^7.23.4",
     "commander": "^11.1.0",
-    "execa": "^8.0.1",
     "prettier": "^3.1.0"
   },
   "devDependencies": {

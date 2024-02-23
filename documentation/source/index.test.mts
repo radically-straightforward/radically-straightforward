@@ -4,9 +4,10 @@ import os from "node:os";
 import path from "node:path";
 import fs from "node:fs/promises";
 import url from "node:url";
+import childProcess from "node:child_process";
+import util from "node:util";
 import markdown from "dedent";
 import typescript from "dedent";
-import { execa } from "execa";
 
 test(async () => {
   const directory = await fs.mkdtemp(
@@ -73,10 +74,10 @@ test(async () => {
       // Example of last line for command.
     `,
   );
-  await execa(
+  await util.promisify(childProcess.execFile)(
     "node",
     [url.fileURLToPath(new URL("./index.mjs", import.meta.url))],
-    { cwd: directory, stdio: "inherit" },
+    { cwd: directory },
   );
   // console.log(await fs.readFile(path.join(directory, "README.md"), "utf-8"));
   assert.equal(
@@ -168,10 +169,10 @@ test(async () => {
       // Example of modified last line for command.
     `,
   );
-  await execa(
+  await util.promisify(childProcess.execFile)(
     "node",
     [url.fileURLToPath(new URL("./index.mjs", import.meta.url))],
-    { cwd: directory, stdio: "inherit" },
+    { cwd: directory },
   );
   // console.log(await fs.readFile(path.join(directory, "README.md"), "utf-8"));
   assert.equal(
