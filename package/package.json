@@ -29,8 +29,7 @@
   "dependencies": {
     "archiver": "^6.0.1",
     "commander": "^11.1.0",
-    "dedent": "^1.5.1",
-    "execa": "^8.0.1"
+    "dedent": "^1.5.1"
   },
   "devDependencies": {
     "@radically-straightforward/documentation": "^1.0.1",

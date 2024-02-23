@@ -5,14 +5,17 @@ import path from "node:path";
 import fs from "node:fs/promises";
 import childProcess from "node:child_process";
 import util from "node:util";
+import url from "node:url";
 
 test(async () => {
   await util.promisify(childProcess.execFile)("npm", ["ci"], {
     cwd: "./example-application",
   });
-  await util.promisify(childProcess.execFile)("node", ["../build/index.mjs"], {
-    cwd: "./example-application",
-  });
+  await util.promisify(childProcess.execFile)(
+    "node",
+    [url.fileURLToPath(new URL("./index.mjs", import.meta.url))],
+    { cwd: "./example-application" },
+  );
   await fs.rm("./example-application/node_modules/", { recursive: true });
   const directory = await fs.mkdtemp(
     path.join(os.tmpdir(), "radically-straightforward--package--test--"),
@@ -34,9 +37,7 @@ test(async () => {
       { env: { ...process.env, EXAMPLE_PROGRAM: "true" } },
     )
     .catch((error) => error);
-  console.log(result); // TODO: REMOVE ME!!!!!!
-  process.exit(0);
-  assert.equal(result.exitCode, 1);
+  assert.equal(result.code, 1);
   const output = JSON.parse(result.stdout);
   assert.deepEqual(output.argv.slice(2), [
     "examples",
