@@ -27,7 +27,7 @@
     "postinstall": "node ./scripts.mjs postinstall",
     "preuninstall": "node ./scripts.mjs preuninstall",
     "prepare": "tsc && documentation",
-    "test": "npm run prepare && node --test && prettier --check \"./README.md\" --check \"./CHANGELOG.md\" --check \"./package.json\" --check \"./scripts.mjs\" --check \"./tsconfig.json\" --check \"./source/**/*.mts\""
+    "test": "npm run prepare && node --test && prettier --check \"./README.md\" --check \"./CHANGELOG.md\" --check \"./package.json\" --check \"./scripts.mjs\" --check \"./scripts.test.mjs\" --check \"./tsconfig.json\" --check \"./source/**/*.mts\""
   },
   "devDependencies": {
     "@radically-straightforward/documentation": "^1.0.1",
