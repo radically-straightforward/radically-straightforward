@@ -56,7 +56,7 @@ switch (process.argv[2]) {
     await fs.mkdir(path.join(installationDirectory, "node_modules/.bin/"), {
       recursive: true,
     });
-    await fs.rename(
+    await fs.copyFile(
       path.join(
         downloadDirectory,
         `caddy${process.platform === "win32" ? ".exe" : ""}`,
