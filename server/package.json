@@ -27,6 +27,7 @@
     "test": "npm run prepare && node --test && prettier --check \"./README.md\" --check \"./CHANGELOG.md\" --check \"./package.json\" --check \"./tsconfig.json\" --check \"./source/**/*.mts\""
   },
   "dependencies": {
+    "@radically-straightforward/node": "^3.0.0",
     "busboy": "^1.6.0"
   },
   "devDependencies": {
