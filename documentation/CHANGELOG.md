@@ -2,7 +2,7 @@
 
 ## Unreleased
 
-- Removed the dependency on `execa`.
+- Removed the dependency on `execa` and `commander`.
 
 ## 1.0.1 · 2023-11-28
 
