@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.2.0 · 2024-02-23
+
+- In `application()`, renamed `hostname` into `address`.
+
 ## 1.1.3 · 2024-02-23
 
 - Fixed issues with tests in previous release.
