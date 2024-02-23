@@ -21,7 +21,6 @@
   "publishConfig": {
     "access": "public"
   },
-  "bin": "./node_modules/@radically-straightforward/caddy/caddy",
   "exports": "./build/index.mjs",
   "types": "./build/index.d.ts",
   "scripts": {

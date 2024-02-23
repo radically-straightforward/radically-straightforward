@@ -70,7 +70,7 @@ test(
       .listen(18000, "localhost");
 
     const caddyServer = childProcess.spawn(
-      path.resolve("./node_modules/@radically-straightforward/caddy/caddy"),
+      path.resolve("./caddy/caddy"),
       ["run", "--adapter", "caddyfile", "--config", "-"],
       { cwd: directory, stdio: [undefined, "ignore", "ignore"] },
     );
