@@ -69,12 +69,12 @@ test(
       })
       .listen(18000, "localhost");
 
-    const reverseProxy = childProcess.spawn(
+    const caddyServer = childProcess.spawn(
       path.resolve("./node_modules/@radically-straightforward/caddy/caddy"),
       ["run", "--adapter", "caddyfile", "--config", "-"],
       { cwd: directory, stdio: [undefined, "ignore", "ignore"] },
     );
-    reverseProxy.stdin.end(caddy.application());
+    caddyServer.stdin.end(caddy.application());
 
     await utilities.sleep(2 * 1000);
 
@@ -192,6 +192,6 @@ test(
       assert.equal(response.headers.get("Cache-Control"), "no-store");
     }
 
-    reverseProxy.kill();
+    caddyServer.kill();
   },
 );
