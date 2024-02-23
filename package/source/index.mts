@@ -32,7 +32,7 @@ await commander.program
 
     await util.promisify(childProcess.execFile)("npm", ["dedupe"], {
       cwd: input,
-      env: { NODE_ENV: "production" },
+      env: { ...process.env, NODE_ENV: "production" },
     });
 
     await fs.mkdir(path.join(input, "node_modules/.bin"), { recursive: true });

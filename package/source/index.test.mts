@@ -31,7 +31,7 @@ test(async () => {
     .promisify(childProcess.execFile)(
       path.join(directory, "example-application", "example-application"),
       ["examples", "of", "some", "extra", "command-line", "arguments"],
-      { env: { EXAMPLE_PROGRAM: "true" } },
+      { env: { ...process.env, EXAMPLE_PROGRAM: "true" } },
     )
     .catch((error) => error);
   console.log(result); // TODO: REMOVE ME!!!!!!
