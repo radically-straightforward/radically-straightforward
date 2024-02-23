@@ -6,7 +6,9 @@ import util from "node:util";
 test({ skip: process.platform === "win32" }, async () => {
   assert(
     (
-      await util.promisify(childProcess.execFile)("npx", ["caddy", "version"])
+      await util.promisify(childProcess.execFile)("./node_modules/.bin/caddy", [
+        "version",
+      ])
     ).stdout.startsWith("v"),
   );
   await util.promisify(childProcess.execFile)("node", [
@@ -14,7 +16,9 @@ test({ skip: process.platform === "win32" }, async () => {
     "preuninstall",
   ]);
   await assert.rejects(async () => {
-    await util.promisify(childProcess.execFile)("npx", ["caddy", "version"]);
+    await util.promisify(childProcess.execFile)("./node_modules/.bin/caddy", [
+      "version",
+    ]);
   });
   await util.promisify(childProcess.execFile)("node", [
     "scripts.mjs",
@@ -22,7 +26,9 @@ test({ skip: process.platform === "win32" }, async () => {
   ]);
   assert(
     (
-      await util.promisify(childProcess.execFile)("npx", ["caddy", "version"])
+      await util.promisify(childProcess.execFile)("./node_modules/.bin/caddy", [
+        "version",
+      ])
     ).stdout.startsWith("v"),
   );
 });

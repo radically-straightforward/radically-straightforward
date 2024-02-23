@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.1.3 · 2024-02-23
+
+- Fixed issues with tests in previous release.
+
 ## 1.1.2 · 2024-02-23
 
 - Added `bin` to try and fix `npx @radically-straightforward/caddy`.
