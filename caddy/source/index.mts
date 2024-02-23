@@ -68,7 +68,7 @@ export function application({
   hostname = "localhost",
   staticFilesRoots = ["* static/"],
   userGeneratedFilesRoots = ["/files/* data/"],
-  reverseProxyPorts = ["8000"],
+  reverseProxyPorts = ["18000"],
   email = undefined,
   hstsPreload = false,
 }: {

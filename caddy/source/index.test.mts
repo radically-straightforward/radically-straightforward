@@ -2,8 +2,6 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import http from "node:http";
 import childProcess from "node:child_process";
-import stream from "node:stream";
-import caddyfile from "@radically-straightforward/caddy";
 import * as caddy from "@radically-straightforward/caddy";
 import * as utilities from "@radically-straightforward/utilities";
 
@@ -11,11 +9,11 @@ import * as utilities from "@radically-straightforward/utilities";
 // - ‘only’ from this test.
 // - ‘--test-only’ from  ‘package.json’
 test.only({ timeout: 30 * 1000 }, async () => {
-  const server = http
+  const dynamicServer = http
     .createServer((request, response) => {
-      response.end("Application response.");
+      response.end(`DYNAMIC RESPONSE: ${new Date().toISOString()}`);
     })
-    .listen(8000, "localhost");
+    .listen(18000, "localhost");
 
   const reverseProxy = childProcess.spawn(
     "./node_modules/@radically-straightforward/caddy/caddy",
@@ -47,7 +45,7 @@ test.only({ timeout: 30 * 1000 }, async () => {
     const response = await fetch("https://localhost/");
     assert.equal(response.status, 200);
     assert.equal(response.headers.get("Cache-Control"), "no-store");
-    assert.equal(await response.text(), "Application response.");
+    assert((await response.text()).startsWith("DYNAMIC RESPONSE"));
   }
 
   {
@@ -57,7 +55,7 @@ test.only({ timeout: 30 * 1000 }, async () => {
     assert.equal(response.headers.get("Location"), "https://localhost/");
   }
 
-  server.close();
+  dynamicServer.close();
 
   await utilities.sleep(2 * 1000);
 
