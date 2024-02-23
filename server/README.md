@@ -1,3 +1,16 @@
+# Radically Straightforward · Server
+
+**🦾 HTTP server in Node.js**
+
+## Installation
+
+```console
+$ npm install @radically-straightforward/server
+```
+## Usage
+
+TODO
+
 ## Requirements
 
 - Handlers infrastructure.
