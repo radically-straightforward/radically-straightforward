@@ -122,7 +122,10 @@ test(async () => {
       redirect: "manual",
     });
     assert.equal(response.status, 303);
-    assert.equal(response.headers.get("Location"), "http://localhost/redirect");
+    assert.equal(
+      response.headers.get("Location"),
+      "http://localhost:18000/redirect",
+    );
     assert.deepEqual(response.headers.getSetCookie(), [
       "__Host-example=abc; Max-Age=12960000; Domain=localhost; Path=/; Secure; HttpOnly; SameSite=Lax; Partitioned",
       "__Host-anotherExample=def; Max-Age=12960000; Domain=localhost; Path=/; Secure; HttpOnly; SameSite=Lax; Partitioned",

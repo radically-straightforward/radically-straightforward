@@ -117,7 +117,8 @@ export default function server(port: number): any[] {
             temporary: 307,
             permanent: 308,
           }[type];
-          response.setHeader("Location", new URL(path, request.URL.origin));
+          response.setHeader("Location", new URL(path, request.URL));
+          response.end();
           return response;
         };
       } catch (error) {
