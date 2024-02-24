@@ -15,8 +15,6 @@ TODO
 ## Requirements
 
 - Parse request:
-  - `Content-Type`
-    - `node:util`’s `MIMEType`
   - Body.
     - Concerns
       - Size limits (HTTP status 413)

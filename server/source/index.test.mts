@@ -8,7 +8,7 @@ test(async () => {
   let requestsCount = 0;
 
   application.push({
-    method: "GET",
+    method: "PATCH",
     pathname: /^\/conversations\/(?<conversationId>[0-9]+)$/,
     handler: (request: any, response: any) => {
       response.setHeader("Content-Type", "application/json");
@@ -29,6 +29,7 @@ test(async () => {
   assert.deepEqual(
     await (
       await fetch("http://localhost:18000/conversations/10?name=leandro", {
+        method: "PATCH",
         headers: {
           "A-Custom-Header": "Hello",
           Cookie: "session=abc; colorScheme=dark",
