@@ -28,8 +28,8 @@ TODO
   - Locals to build response over multiple handlers.
 - Handlers
   - Stop calling handlers once response is sent
-  - Error handlers.
-  - Detect 404.
+  - Detect 404
+  - Error handlers
 - Logging
 - Live updates.
 - Missing stuff from:
