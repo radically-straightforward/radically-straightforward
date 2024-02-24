@@ -39,62 +39,46 @@ export default function server(port: number): any[] {
 
         request.body = {};
         if (typeof request.headers["content-type"] === "string") {
-          // FIXME: Use `Promise.withResolvers()` when it becomes available in Node.js.
-          let bodyPromiseResolve: any;
-          let bodyPromiseReject: any;
-          const bodyPromises = [
-            new Promise((resolve, reject) => {
-              bodyPromiseResolve = resolve;
-              bodyPromiseReject = reject;
-            }),
-          ];
-          request.pipe(
-            // TODO: `busboy` options.
-            busboy({ headers: request.headers })
-              .on("file", async (name, file, information) => {
-                // FIXME: Use `Promise.withResolvers()` when it becomes available in Node.js.
-                let filePromiseResolve: any;
-                let filePromiseReject: any;
-                bodyPromises.push(
-                  new Promise((resolve, reject) => {
-                    filePromiseResolve = resolve;
-                    filePromiseReject = reject;
-                  }),
-                );
-                const filename =
-                  information.filename.trim() === ""
-                    ? "file"
-                    : information.filename
-                        .replace(/[^a-zA-Z0-9\.\-_]/gu, "-")
-                        .toLowerCase();
-                try {
-                  const directory = await fs.mkdtemp(
-                    path.join(os.tmpdir(), "server--file--"),
+          const filePromises: Promise<void>[] = [];
+          await new Promise<void>((resolve, reject) => {
+            request.pipe(
+              // TODO: `busboy` options.
+              busboy({ headers: request.headers })
+                .on("file", (name, file, information) => {
+                  filePromises.push(
+                    (async (): Promise<void> => {
+                      const filename =
+                        information.filename.trim() === ""
+                          ? "file"
+                          : information.filename
+                              .replace(/[^a-zA-Z0-9\.\-_]/gu, "-")
+                              .toLowerCase();
+                      const directory = await fs.mkdtemp(
+                        path.join(os.tmpdir(), "server--file--"),
+                      );
+                      await fs.writeFile(path.join(directory, filename), file);
+                      request.body[name] = {
+                        ...information,
+                        path: path.join(directory, filename),
+                      };
+                      // TODO: Cleanup ‘directory’
+                    })(),
                   );
-                  await fs.writeFile(path.join(directory, filename), file);
-                  request.body[name] = {
-                    ...information,
-                    path: path.join(directory, filename),
-                  };
-                  filePromiseResolve();
-                } catch (error) {
-                  filePromiseReject(error);
-                }
-                // TODO: Cleanup ‘directory’
-              })
-              .on("field", (name, value, information) => {
-                // TODO: Reject on `information.nameTruncated` or `information.valueTruncated`.
-                request.body[name] = value;
-              })
-              .on("close", () => {
-                bodyPromiseResolve();
-              })
-              // TODO: `partsLimit`, `filesLimit`, `fieldsLimit`.
-              .on("error", (error) => {
-                bodyPromiseReject(error);
-              }),
-          );
-          await Promise.all(bodyPromises);
+                })
+                .on("field", (name, value, information) => {
+                  // TODO: Reject on `information.nameTruncated` or `information.valueTruncated`.
+                  request.body[name] = value;
+                })
+                .on("close", () => {
+                  resolve();
+                })
+                // TODO: `partsLimit`, `filesLimit`, `fieldsLimit`.
+                .on("error", (error) => {
+                  reject(error);
+                }),
+            );
+          });
+          await Promise.all(filePromises);
         }
 
         response.setHeader("Content-Type", "text/html; charset=utf-8");
