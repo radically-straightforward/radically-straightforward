@@ -18,6 +18,7 @@ test(async () => {
           search: request.search,
           headers: { "a-custom-header": request.headers["a-custom-header"] },
           cookies: request.cookies,
+          body: request.body,
         }),
       );
       response.afters.push(() => {
@@ -34,6 +35,7 @@ test(async () => {
           "A-Custom-Header": "Hello",
           Cookie: "session=abc; colorScheme=dark",
         },
+        body: new URLSearchParams({ age: "33" }),
       })
     ).json(),
     {
@@ -41,6 +43,7 @@ test(async () => {
       search: { name: "leandro" },
       headers: { "a-custom-header": "Hello" },
       cookies: { session: "abc", colorScheme: "dark" },
+      body: { age: "33" },
     },
   );
   assert.equal(requestsCount, 1);
