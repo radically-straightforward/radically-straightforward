@@ -4,6 +4,7 @@ import fs from "node:fs/promises";
 import http from "node:http";
 import busboy from "busboy";
 import "@radically-straightforward/node";
+import * as utilities from "@radically-straightforward/utilities";
 
 export default function server(port: number): any[] {
   const handlers: any[] = [];
@@ -45,29 +46,38 @@ export default function server(port: number): any[] {
               // TODO: `busboy` options.
               busboy({ headers: request.headers })
                 .on("file", (name, file, information) => {
+                  const value = {
+                    ...information,
+                    path: path.join(
+                      os.tmpdir(),
+                      `server--file--${utilities.randomString()}`,
+                      information.filename.trim() === ""
+                        ? "file"
+                        : information.filename
+                            .replace(/[^a-zA-Z0-9\.\-_]/gu, "-")
+                            .toLowerCase(),
+                    ),
+                  };
+                  if (name.endsWith("[]"))
+                    (request.body[name.slice(0, -"[]".length)] ??= []).push(
+                      value,
+                    );
+                  else request.body[name] = value;
                   filePromises.push(
                     (async (): Promise<void> => {
-                      const filename =
-                        information.filename.trim() === ""
-                          ? "file"
-                          : information.filename
-                              .replace(/[^a-zA-Z0-9\.\-_]/gu, "-")
-                              .toLowerCase();
-                      const directory = await fs.mkdtemp(
-                        path.join(os.tmpdir(), "server--file--"),
-                      );
-                      await fs.writeFile(path.join(directory, filename), file);
-                      request.body[name] = {
-                        ...information,
-                        path: path.join(directory, filename),
-                      };
+                      await fs.mkdir(path.dirname(value.path));
+                      await fs.writeFile(value.path, file);
                       // TODO: Cleanup ‘directory’
                     })(),
                   );
                 })
                 .on("field", (name, value, information) => {
                   // TODO: Reject on `information.nameTruncated` or `information.valueTruncated`.
-                  request.body[name] = value;
+                  if (name.endsWith("[]"))
+                    (request.body[name.slice(0, -"[]".length)] ??= []).push(
+                      value,
+                    );
+                  else request.body[name] = value;
                 })
                 .on("close", () => {
                   resolve();
@@ -100,7 +110,7 @@ export default function server(port: number): any[] {
         else {
           const match = request.URL.pathname.match(handler.pathname);
           if (match === null) continue;
-          request.pathname = match.groups;
+          request.pathname = match.groups ?? {};
         }
 
         await handler.handler(request, response);
