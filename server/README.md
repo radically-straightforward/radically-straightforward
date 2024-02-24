@@ -15,7 +15,6 @@ TODO
 ## Requirements
 
 - Response helpers:
-  - Use data returned by handler to control response.
   - Cookies.
     - `encodeURIComponent`
   - Set headers.
@@ -27,16 +26,11 @@ TODO
       - `Buffer.byteLength()`
   - Stream.
   - Locals to build response over multiple handlers.
-- Route based on several aspects of request.
-- Allow multiple handlers to handle the same request.
-  - Have functions that run after the response.
-- Async handlers.
-- Error handlers.
-- Detect 404.
-- Terminate responses gracefully.
-  - Error in case response isn’t terminated.
-- Logging:
-  - `X-Forwarded-Host`
+- Handlers
+  - Stop calling handlers once response is sent
+  - Error handlers.
+  - Detect 404.
+- Logging
 - Live updates.
 - Missing stuff from:
   - Koa
@@ -60,6 +54,7 @@ TODO
       - Body
     - Different charsets?
     - `Content-Encoding` (for example, compression)
+  - Route based on other aspects of request, for example, `search`?
 
 ## Features
 
