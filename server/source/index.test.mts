@@ -33,7 +33,6 @@ test(async () => {
       search: { name: "leandro" },
     },
   );
-
   assert.equal(requestsCount, 1);
 
   process.kill(process.pid);
