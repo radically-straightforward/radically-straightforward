@@ -11,7 +11,7 @@ test(async () => {
     method: "PATCH",
     pathname: /^\/conversations\/(?<conversationId>[0-9]+)$/,
     handler: (request: any, response: any) => {
-      response.setHeader("Content-Type", "application/json");
+      response.setHeader("Content-Type", "application/json; charset=utf-8");
       response.end(
         JSON.stringify({
           pathname: request.pathname,
@@ -38,7 +38,10 @@ test(async () => {
       body: new URLSearchParams({ age: "33" }),
     },
   );
-  assert.equal(response.headers.get("Content-Type"), "application/json");
+  assert.equal(
+    response.headers.get("Content-Type"),
+    "application/json; charset=utf-8",
+  );
   assert.deepEqual(await response.json(), {
     pathname: { conversationId: "10" },
     search: { name: "leandro" },

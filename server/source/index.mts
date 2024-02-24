@@ -69,6 +69,8 @@ export default function server(port: number): any[] {
             }),
         );
         await Promise.all(bodyPromises);
+
+        response.setHeader("Content-Type", "text/html; charset=utf-8");
       } catch (error) {
         console.error(error);
         response.statusCode = 400;
