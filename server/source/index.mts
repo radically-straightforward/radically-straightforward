@@ -64,7 +64,9 @@ export default function server(port: number): any[] {
                 const filename =
                   information.filename.trim() === ""
                     ? "file"
-                    : information.filename.replace(/[^a-zA-Z0-9\.\-_]/gu, "-");
+                    : information.filename
+                        .replace(/[^a-zA-Z0-9\.\-_]/gu, "-")
+                        .toLowerCase();
                 try {
                   const directory = await fs.mkdtemp(
                     path.join(os.tmpdir(), "server--file--"),
