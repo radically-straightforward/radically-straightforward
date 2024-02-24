@@ -20,8 +20,14 @@ TODO
       - Multiple files under same field name
     - Concerns
       - Size limits (HTTP status 413)
+        - Number of headers
+        - Size of header
+        - Number of body fields
+        - Size of body field
       - Request timeout (HTTP status 408) (https://nodejs.org/dist/latest-v21.x/docs/api/http.html#serverrequesttimeout)
         - Deal with this in Caddy?
+        - Headers
+        - Body
     - `application/x-www-form-urlencoded`
       - `URLSearchParams`
       - <https://github.com/expressjs/body-parser>.
