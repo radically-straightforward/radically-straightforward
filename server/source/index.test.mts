@@ -5,7 +5,7 @@ import server from "@radically-straightforward/server";
 test(async () => {
   const application = server(18000);
 
-  let requestsCount = 0;
+  let counter = 0;
 
   application.push({
     method: "PATCH",
@@ -22,7 +22,7 @@ test(async () => {
         }),
       );
       response.afters.push(() => {
-        requestsCount++;
+        counter++;
       });
     },
   });
@@ -50,18 +50,28 @@ test(async () => {
       cookies: { session: "abc", colorScheme: "dark" },
       body: { age: "33" },
     });
-    assert.equal(requestsCount, 1);
+    assert.equal(counter, 1);
   }
 
   {
-    const body = new FormData();
-    body.append("avatar", new Blob([Buffer.from([33, 34, 3])]));
-    const response = await fetch(
-      "http://localhost:18000/conversations/10?name=leandro",
-      {
-        method: "PATCH",
-        body,
-      },
+    const requestBody = new FormData();
+    requestBody.append("age", "33");
+    requestBody.append("avatar", new Blob([Buffer.from([33, 34, 3])]));
+    const responseBody = (
+      await (
+        await fetch("http://localhost:18000/conversations/10?name=leandro", {
+          method: "PATCH",
+          body: requestBody,
+        })
+      ).json()
+    ).body;
+    assert.equal(responseBody.age, "33");
+    assert.equal(responseBody.avatar.encoding, "7bit");
+    assert.equal(responseBody.avatar.mimeType, "application/octet-stream");
+    assert.equal(responseBody.avatar.filename, "blob");
+    assert.match(
+      responseBody.avatar.path,
+      /\/server--file--[a-zA-Z0-9]+\/blob$/,
     );
   }
 

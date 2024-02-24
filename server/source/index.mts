@@ -1,3 +1,6 @@
+import os from "node:os";
+import path from "node:path";
+import fs from "node:fs/promises";
 import http from "node:http";
 import busboy from "busboy";
 import "@radically-straightforward/node";
@@ -47,17 +50,26 @@ export default function server(port: number): any[] {
           ];
           request.pipe(
             // TODO: `busboy` options.
-            // TODO: `error` event.
             busboy({ headers: request.headers })
-              // .on("file", async (name, file, information) => {
-              //   // TODO: Verify this use of `streamConsumers`.
-              //   const filePromise = streamConsumers.buffer(file);
-              //   bodyPromises.push(filePromise);
-              //   request.body[name] = {
-              //     file: await filePromise,
-              //     ...information,
-              //   };
-              // })
+              .on("file", async (name, file, information) => {
+                const filename =
+                  information.filename.trim() === ""
+                    ? "file"
+                    : information.filename.replace(/[^a-zA-Z0-9\.\-_]/gu, "-");
+                const directoryPromise = fs.mkdtemp(
+                  path.join(os.tmpdir(), "server--file--"),
+                );
+                bodyPromises.push(directoryPromise);
+                const directory = await directoryPromise;
+                bodyPromises.push(
+                  fs.writeFile(path.join(directory, filename), file),
+                );
+                request.body[name] = {
+                  ...information,
+                  path: path.join(directory, filename),
+                };
+                // TODO: Cleanup ‘directory’
+              })
               .on("field", (name, value, information) => {
                 // TODO: Reject on `information.nameTruncated` or `information.valueTruncated`.
                 request.body[name] = value;
