@@ -68,6 +68,9 @@ TODO
   - Express
 - Content proxy (we already have one in Courselore using Got—try to develop one using `fetch`)
   - Link in documentation for `@radically-straightforward/caddy`’s `header()`.
+- Types
+  - Request & response types
+  - Address all `any`s
 - Future:
   - Pass `pathname` parameters through `decodeURIComponent`?
 

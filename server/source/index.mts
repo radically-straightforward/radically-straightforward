@@ -52,22 +52,32 @@ export default function server(port: number): any[] {
             // TODO: `busboy` options.
             busboy({ headers: request.headers })
               .on("file", async (name, file, information) => {
+                // FIXME: Use `Promise.withResolvers()` when it becomes available in Node.js.
+                let filePromiseResolve: any;
+                let filePromiseReject: any;
+                bodyPromises.push(
+                  new Promise((resolve, reject) => {
+                    filePromiseResolve = resolve;
+                    filePromiseReject = reject;
+                  }),
+                );
                 const filename =
                   information.filename.trim() === ""
                     ? "file"
                     : information.filename.replace(/[^a-zA-Z0-9\.\-_]/gu, "-");
-                const directoryPromise = fs.mkdtemp(
-                  path.join(os.tmpdir(), "server--file--"),
-                );
-                bodyPromises.push(directoryPromise);
-                const directory = await directoryPromise;
-                bodyPromises.push(
-                  fs.writeFile(path.join(directory, filename), file),
-                );
-                request.body[name] = {
-                  ...information,
-                  path: path.join(directory, filename),
-                };
+                try {
+                  const directory = await fs.mkdtemp(
+                    path.join(os.tmpdir(), "server--file--"),
+                  );
+                  await fs.writeFile(path.join(directory, filename), file),
+                    (request.body[name] = {
+                      ...information,
+                      path: path.join(directory, filename),
+                    });
+                  filePromiseResolve();
+                } catch (error: any) {
+                  filePromiseReject(error);
+                }
                 // TODO: Cleanup ‘directory’
               })
               .on("field", (name, value, information) => {
