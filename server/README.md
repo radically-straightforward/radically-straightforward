@@ -16,8 +16,6 @@ TODO
 
 - Parse request:
   - Body.
-    - File
-      - Multiple files under same field name
     - Concerns
       - Size limits (HTTP status 413)
         - Number of headers
