@@ -40,7 +40,7 @@ export default function server(port: number): any[] {
 
         request.body = {};
         if (typeof request.headers["content-type"] === "string") {
-          const filePromises: Promise<void>[] = [];
+          const filePromises = new Array<Promise<void>>();
           await new Promise<void>((resolve, reject) => {
             request.pipe(
               // TODO: `busboy` options.
@@ -82,7 +82,7 @@ export default function server(port: number): any[] {
                 .on("close", () => {
                   resolve();
                 })
-                // TODO: `partsLimit`, `filesLimit`, `fieldsLimit`.
+                // TODO: `partsLimit`, `filesLimit`, `fieldsLimit`, and other busboy events.
                 .on("error", (error) => {
                   reject(error);
                 }),
