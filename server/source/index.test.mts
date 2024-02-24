@@ -63,10 +63,10 @@ test(async () => {
 
   {
     const requestBody = new FormData();
-    requestBody.append("age[]", "33");
-    requestBody.append("age[]", "34");
-    requestBody.append("avatar[]", new Blob([Buffer.from([33, 34, 3])]));
-    requestBody.append("avatar[]", new Blob([Buffer.from([133, 134, 13])]));
+    requestBody.append("ages[]", "33");
+    requestBody.append("ages[]", "34");
+    requestBody.append("avatars[]", new Blob([Buffer.from([33, 34, 3])]));
+    requestBody.append("avatars[]", new Blob([Buffer.from([133, 134, 13])]));
     assert.deepEqual(
       await (
         await fetch("http://localhost:18000/conversations/10", {
@@ -80,8 +80,8 @@ test(async () => {
         headers: {},
         cookies: {},
         body: {
-          age: ["33", "34"],
-          avatar: [
+          ages: ["33", "34"],
+          avatars: [
             {
               encoding: "7bit",
               mimeType: "application/octet-stream",
