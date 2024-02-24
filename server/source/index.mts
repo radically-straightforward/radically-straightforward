@@ -15,7 +15,7 @@ export default function server(port: number): any[] {
         response.afters = [];
 
         if (request.method === undefined || request.url === undefined)
-          throw new Error();
+          throw new Error("Missing request ‘method’ or ‘url’.");
 
         request.URL = new URL(
           request.url,
@@ -33,7 +33,7 @@ export default function server(port: number): any[] {
               .split("=")
               .map((part: any) => decodeURIComponent(part.trim()));
             if (parts.length !== 2 || parts.some((part: any) => part === ""))
-              throw new Error();
+              throw new Error("Malformed ‘Cookie’ header.");
             return [parts];
           }),
         );

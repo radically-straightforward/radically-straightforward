@@ -17,7 +17,6 @@ TODO
 - Response helpers:
   - Cookies.
     - `encodeURIComponent`
-  - Set headers.
   - Redirect.
   - Body.
     - `Content-Type`
