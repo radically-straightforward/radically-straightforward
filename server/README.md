@@ -14,9 +14,6 @@ TODO
 
 ## Requirements
 
-- Handlers infrastructure.
-  - `next` (Koa).
-  - Register functions to run after.
 - Parse request:
   - Cookies.
     - <https://github.com/jshttp/cookie>.
@@ -77,6 +74,10 @@ TODO
 - Always listen on `localhost`, because you should be using Caddy as reverse proxy.
 - Graceful termination.
 - Parse pathname parameters, query parameters, headers, and request body.
+- Trusts reverse proxy, because it’s meant to be used with Caddy.
+- Doesn’t serve static files, because it’s meant to be used with Caddy.
+- Handlers infrastructure:
+  - Register functions to run after.
 
 ## Related Work
 

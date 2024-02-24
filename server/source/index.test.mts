@@ -5,6 +5,8 @@ import server from "@radically-straightforward/server";
 test(async () => {
   const application = server(18000);
 
+  let requestsCount = 0;
+
   application.push({
     method: "GET",
     pathname: /^\/conversations\/(?<conversationId>[0-9]+)$/,
@@ -13,21 +15,26 @@ test(async () => {
       response.end(
         JSON.stringify({
           pathname: request.pathname,
-          searchParams: request.searchParams,
+          search: request.search,
         }),
       );
+      response.afters.push(() => {
+        requestsCount++;
+      });
     },
   });
 
   assert.deepEqual(
     await (
-      await fetch("http://localhost:18000/conversations/10?search=leandro")
+      await fetch("http://localhost:18000/conversations/10?name=leandro")
     ).json(),
     {
       pathname: { conversationId: "10" },
-      searchParams: { search: "leandro" },
+      search: { name: "leandro" },
     },
   );
+
+  assert.equal(requestsCount, 1);
 
   process.kill(process.pid);
 });

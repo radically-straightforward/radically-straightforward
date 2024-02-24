@@ -5,6 +5,7 @@ export default function server(port: number): any[] {
   const handlers: any[] = [];
   const httpServer = http
     .createServer(async (request: any, response: any) => {
+      response.afters = [];
       if (request.method === undefined || request.url === undefined) {
         response.statusCode = 400;
         response.end();
@@ -16,7 +17,7 @@ export default function server(port: number): any[] {
           request.headers["x-forwarded-host"] ?? request.headers["host"]
         }`,
       );
-      request.searchParams = Object.fromEntries(request.URL.searchParams);
+      request.search = Object.fromEntries(request.URL.searchParams);
       for (const handler of handlers) {
         if (
           handler.method !== undefined &&
@@ -31,6 +32,7 @@ export default function server(port: number): any[] {
         }
         await handler.handler(request, response);
       }
+      for (const after of response.afters) await after();
     })
     .listen(port, "localhost");
   process.once("gracefulTermination", () => {
