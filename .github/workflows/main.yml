@@ -4,6 +4,7 @@ jobs:
     strategy:
       matrix:
         package:
+          - server
           - html
           - css
           - sqlite
