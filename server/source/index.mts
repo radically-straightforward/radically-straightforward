@@ -109,7 +109,7 @@ export default function server(port: number): any[] {
         };
 
         response.redirect = (
-          path: string,
+          to: string,
           type: "see-other" | "temporary" | "permanent" = "see-other",
         ): typeof response => {
           response.statusCode = {
@@ -117,7 +117,7 @@ export default function server(port: number): any[] {
             temporary: 307,
             permanent: 308,
           }[type];
-          response.setHeader("Location", new URL(path, request.URL));
+          response.setHeader("Location", new URL(to, request.URL));
           response.end();
           return response;
         };
