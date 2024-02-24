@@ -14,8 +14,10 @@ test(async () => {
     handler: async (request: any, response: any) => {
       response.setHeader("Content-Type", "application/json; charset=utf-8");
       for (const value of Object.values<any>(request.body))
-        if (typeof value.path === "string")
+        if (typeof value.path === "string") {
           value.content = [...(await fs.readFile(value.path))];
+          delete value.path;
+        }
       response.end(
         JSON.stringify({
           pathname: request.pathname,
@@ -61,23 +63,25 @@ test(async () => {
     const requestBody = new FormData();
     requestBody.append("age", "33");
     requestBody.append("avatar", new Blob([Buffer.from([33, 34, 3])]));
-    const responseBody = (
-      await (
-        await fetch("http://localhost:18000/conversations/10?name=leandro", {
-          method: "PATCH",
-          body: requestBody,
-        })
-      ).json()
-    ).body;
-    assert.equal(responseBody.age, "33");
-    assert.equal(responseBody.avatar.encoding, "7bit");
-    assert.equal(responseBody.avatar.mimeType, "application/octet-stream");
-    assert.equal(responseBody.avatar.filename, "blob");
-    assert.match(
-      responseBody.avatar.path,
-      /\/server--file--[a-zA-Z0-9]+\/blob$/,
+    assert.deepEqual(
+      (
+        await (
+          await fetch("http://localhost:18000/conversations/10", {
+            method: "PATCH",
+            body: requestBody,
+          })
+        ).json()
+      ).body,
+      {
+        age: "33",
+        avatar: {
+          encoding: "7bit",
+          mimeType: "application/octet-stream",
+          filename: "blob",
+          content: [33, 34, 3],
+        },
+      },
     );
-    assert.deepEqual(responseBody.avatar.content, [33, 34, 3]);
   }
 
   process.kill(process.pid);
