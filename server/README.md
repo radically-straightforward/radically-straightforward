@@ -14,8 +14,6 @@ TODO
 
 ## Requirements
 
-- Response helpers:
-  - Locals to build response over multiple handlers.
 - Handlers
   - Stop calling handlers once response is sent
   - Detect 404

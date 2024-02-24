@@ -12,8 +12,6 @@ export default function server(port: number): any[] {
   const httpServer = http
     .createServer(async (request: any, response: any) => {
       try {
-        response.afters = [];
-
         if (request.method === undefined || request.url === undefined)
           throw new Error("Missing request ‘method’ or ‘url’.");
 
@@ -91,6 +89,9 @@ export default function server(port: number): any[] {
           });
           await Promise.all(filePromises);
         }
+
+        response.data = {};
+        response.afters = [];
 
         response.setHeader("Content-Type", "text/html; charset=utf-8");
 
