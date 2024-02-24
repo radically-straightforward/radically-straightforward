@@ -15,7 +15,6 @@ TODO
 ## Requirements
 
 - Response helpers:
-  - Redirect.
   - Body.
     - `Content-Type`
       - `node:util`’s `MIMEType`
