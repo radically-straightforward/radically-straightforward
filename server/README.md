@@ -15,11 +15,6 @@ TODO
 ## Requirements
 
 - Response helpers:
-  - Body.
-    - `Content-Type`
-      - `node:util`’s `MIMEType`
-    - `Content-Length`?
-      - `Buffer.byteLength()`
   - Locals to build response over multiple handlers.
 - Handlers
   - Stop calling handlers once response is sent
@@ -52,6 +47,8 @@ TODO
     - Different charsets?
     - `Content-Encoding` (for example, compression)
   - Route based on other aspects of request, for example, `search`?
+  - Response body `Content-Length`?
+    - `Buffer.byteLength()`
 
 ## Features
 
