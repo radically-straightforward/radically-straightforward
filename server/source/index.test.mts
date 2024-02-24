@@ -113,12 +113,16 @@ test(async () => {
       response.setCookie("example", "abc");
       response.setCookie("anotherExample", "def");
       assert.equal(request.cookies.example, "abc");
-      response.end();
+      response.redirect("/redirect");
     },
   });
 
   {
-    const response = await fetch("http://localhost:18000/response-helpers");
+    const response = await fetch("http://localhost:18000/response-helpers", {
+      redirect: "manual",
+    });
+    assert.equal(response.status, 303);
+    assert.equal(response.headers.get("Location"), "http://localhost/redirect");
     assert.deepEqual(response.headers.getSetCookie(), [
       "__Host-example=abc; Max-Age=12960000; Domain=localhost; Path=/; Secure; HttpOnly; SameSite=Lax; Partitioned",
       "__Host-anotherExample=def; Max-Age=12960000; Domain=localhost; Path=/; Secure; HttpOnly; SameSite=Lax; Partitioned",

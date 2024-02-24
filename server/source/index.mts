@@ -107,6 +107,19 @@ export default function server(port: number): any[] {
           response.setHeader("Set-Cookie", setCookies);
           return response;
         };
+
+        response.redirect = (
+          path: string,
+          type: "see-other" | "temporary" | "permanent" = "see-other",
+        ): typeof response => {
+          response.statusCode = {
+            "see-other": 303,
+            temporary: 307,
+            permanent: 308,
+          }[type];
+          response.setHeader("Location", new URL(path, request.URL.origin));
+          return response;
+        };
       } catch (error) {
         console.error(error);
         response.statusCode = 400;
