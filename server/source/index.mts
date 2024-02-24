@@ -69,13 +69,13 @@ export default function server(port: number): any[] {
                   const directory = await fs.mkdtemp(
                     path.join(os.tmpdir(), "server--file--"),
                   );
-                  await fs.writeFile(path.join(directory, filename), file),
-                    (request.body[name] = {
-                      ...information,
-                      path: path.join(directory, filename),
-                    });
+                  await fs.writeFile(path.join(directory, filename), file);
+                  request.body[name] = {
+                    ...information,
+                    path: path.join(directory, filename),
+                  };
                   filePromiseResolve();
-                } catch (error: any) {
+                } catch (error) {
                   filePromiseReject(error);
                 }
                 // TODO: Cleanup ‘directory’

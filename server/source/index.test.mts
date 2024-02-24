@@ -1,5 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
+import fs from "node:fs/promises";
 import server from "@radically-straightforward/server";
 
 test(async () => {
@@ -10,8 +11,11 @@ test(async () => {
   application.push({
     method: "PATCH",
     pathname: /^\/conversations\/(?<conversationId>[0-9]+)$/,
-    handler: (request: any, response: any) => {
+    handler: async (request: any, response: any) => {
       response.setHeader("Content-Type", "application/json; charset=utf-8");
+      for (const value of Object.values<any>(request.body))
+        if (typeof value.path === "string")
+          value.content = [...(await fs.readFile(value.path))];
       response.end(
         JSON.stringify({
           pathname: request.pathname,
@@ -73,6 +77,7 @@ test(async () => {
       responseBody.avatar.path,
       /\/server--file--[a-zA-Z0-9]+\/blob$/,
     );
+    assert.deepEqual(responseBody.avatar.content, [33, 34, 3]);
   }
 
   process.kill(process.pid);
