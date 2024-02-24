@@ -34,6 +34,7 @@ export default function server(port: number): any[] {
               .map((part: any) => decodeURIComponent(part.trim()));
             if (parts.length !== 2 || parts.some((part: any) => part === ""))
               throw new Error("Malformed ‘Cookie’ header.");
+            parts[0] = parts[0].replace(/^__Host-/, "");
             return [parts];
           }),
         );
@@ -92,6 +93,20 @@ export default function server(port: number): any[] {
         }
 
         response.setHeader("Content-Type", "text/html; charset=utf-8");
+
+        const setCookies = new Array<string>();
+        response.setCookie = (
+          key: string,
+          value: string,
+          maxAge: number = 150 * 24 * 60 * 60,
+        ): typeof response => {
+          request.cookies[key] = value;
+          setCookies.push(
+            `__Host-${encodeURIComponent(key)}=${encodeURIComponent(value)}; Max-Age=${maxAge}; Domain=${request.URL.hostname}; Path=/; Secure; HttpOnly; SameSite=Lax; Partitioned`,
+          );
+          response.setHeader("Set-Cookie", setCookies);
+          return response;
+        };
       } catch (error) {
         console.error(error);
         response.statusCode = 400;

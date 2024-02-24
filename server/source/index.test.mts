@@ -42,7 +42,7 @@ test(async () => {
         method: "PATCH",
         headers: {
           "Custom-Header": "Hello",
-          Cookie: "example=abc; anotherExample=def",
+          Cookie: "__Host-example=abc; __Host-anotherExample=def",
         },
         body: new URLSearchParams({ bodyField: "33" }),
       },
@@ -104,6 +104,25 @@ test(async () => {
         },
       },
     );
+  }
+
+  application.push({
+    method: "GET",
+    pathname: "/response-helpers",
+    handler: (request: any, response: any) => {
+      response.setCookie("example", "abc");
+      response.setCookie("anotherExample", "def");
+      assert.equal(request.cookies.example, "abc");
+      response.end();
+    },
+  });
+
+  {
+    const response = await fetch("http://localhost:18000/response-helpers");
+    assert.deepEqual(response.headers.getSetCookie(), [
+      "__Host-example=abc; Max-Age=12960000; Domain=localhost; Path=/; Secure; HttpOnly; SameSite=Lax; Partitioned",
+      "__Host-anotherExample=def; Max-Age=12960000; Domain=localhost; Path=/; Secure; HttpOnly; SameSite=Lax; Partitioned",
+    ]);
   }
 
   process.kill(process.pid);

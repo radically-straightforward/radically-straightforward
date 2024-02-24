@@ -15,8 +15,6 @@ TODO
 ## Requirements
 
 - Response helpers:
-  - Cookies.
-    - `encodeURIComponent`
   - Redirect.
   - Body.
     - `Content-Type`
