@@ -52,6 +52,7 @@ TODO
   - Have functions that run after the response.
 - Async handlers.
 - Error handlers.
+- Detect 404.
 - Terminate responses gracefully.
   - Error in case response isn’t terminated.
 - Logging:

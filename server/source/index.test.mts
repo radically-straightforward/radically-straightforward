@@ -27,25 +27,25 @@ test(async () => {
     },
   });
 
-  assert.deepEqual(
-    await (
-      await fetch("http://localhost:18000/conversations/10?name=leandro", {
-        method: "PATCH",
-        headers: {
-          "A-Custom-Header": "Hello",
-          Cookie: "session=abc; colorScheme=dark",
-        },
-        body: new URLSearchParams({ age: "33" }),
-      })
-    ).json(),
+  const response = await fetch(
+    "http://localhost:18000/conversations/10?name=leandro",
     {
-      pathname: { conversationId: "10" },
-      search: { name: "leandro" },
-      headers: { "a-custom-header": "Hello" },
-      cookies: { session: "abc", colorScheme: "dark" },
-      body: { age: "33" },
+      method: "PATCH",
+      headers: {
+        "A-Custom-Header": "Hello",
+        Cookie: "session=abc; colorScheme=dark",
+      },
+      body: new URLSearchParams({ age: "33" }),
     },
   );
+  assert.equal(response.headers.get("Content-Type"), "application/json");
+  assert.deepEqual(await response.json(), {
+    pathname: { conversationId: "10" },
+    search: { name: "leandro" },
+    headers: { "a-custom-header": "Hello" },
+    cookies: { session: "abc", colorScheme: "dark" },
+    body: { age: "33" },
+  });
   assert.equal(requestsCount, 1);
 
   process.kill(process.pid);
