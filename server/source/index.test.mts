@@ -12,14 +12,14 @@ test(async () => {
     method: "PATCH",
     pathname: /^\/conversations\/(?<conversationId>[0-9]+)$/,
     handler: async (request: any, response: any) => {
-      response.setHeader("Content-Type", "application/json; charset=utf-8");
-      for (const value of Object.values<any>(request.body))
-        if (Array.isArray(value))
-          for (const valueValue of value)
-            if (typeof valueValue.path === "string") {
-              valueValue.content = [...(await fs.readFile(valueValue.path))];
-              delete valueValue.path;
+      for (const values of Object.values<any>(request.body))
+        if (Array.isArray(values))
+          for (const value of values)
+            if (typeof value.path === "string") {
+              value.content = [...(await fs.readFile(value.path))];
+              delete value.path;
             }
+      response.setHeader("Content-Type", "application/json; charset=utf-8");
       response.end(
         JSON.stringify({
           pathname: request.pathname,
