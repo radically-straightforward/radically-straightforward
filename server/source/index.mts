@@ -23,52 +23,55 @@ export default function server(port: number): any[] {
         request.search = Object.fromEntries(request.URL.searchParams);
 
         request.cookies = Object.fromEntries(
-          (request.headers["cookie"] ?? "").split(";").map((pair: any) => {
+          (request.headers["cookie"] ?? "").split(";").flatMap((pair: any) => {
+            if (pair.trim() === "") return [];
             const parts = pair
               .split("=")
               .map((part: any) => decodeURIComponent(part.trim()));
             if (parts.length !== 2 || parts.some((part: any) => part === ""))
               throw new Error();
-            return parts;
+            return [parts];
           }),
         );
 
         request.body = {};
-        // FIXME: Use `Promise.withResolvers()` when it becomes available in Node.js.
-        let bodyPromiseResolve: any;
-        let bodyPromiseReject: any;
-        const bodyPromises = [
-          new Promise((resolve, reject) => {
-            bodyPromiseResolve = resolve;
-            bodyPromiseReject = reject;
-          }),
-        ];
-        request.pipe(
-          // TODO: `busboy` options.
-          // TODO: `error` event.
-          busboy({ headers: request.headers })
-            // .on("file", async (name, file, information) => {
-            //   // TODO: Verify this use of `streamConsumers`.
-            //   const filePromise = streamConsumers.buffer(file);
-            //   bodyPromises.push(filePromise);
-            //   request.body[name] = {
-            //     file: await filePromise,
-            //     ...information,
-            //   };
-            // })
-            .on("field", (name, value, information) => {
-              // TODO: Reject on `information.nameTruncated` or `information.valueTruncated`.
-              request.body[name] = value;
-            })
-            .on("close", () => {
-              bodyPromiseResolve();
-            })
-            // TODO: `partsLimit`, `filesLimit`, `fieldsLimit`.
-            .on("error", (error) => {
-              bodyPromiseReject(error);
+        if (typeof request.headers["content-type"] === "string") {
+          // FIXME: Use `Promise.withResolvers()` when it becomes available in Node.js.
+          let bodyPromiseResolve: any;
+          let bodyPromiseReject: any;
+          const bodyPromises = [
+            new Promise((resolve, reject) => {
+              bodyPromiseResolve = resolve;
+              bodyPromiseReject = reject;
             }),
-        );
-        await Promise.all(bodyPromises);
+          ];
+          request.pipe(
+            // TODO: `busboy` options.
+            // TODO: `error` event.
+            busboy({ headers: request.headers })
+              // .on("file", async (name, file, information) => {
+              //   // TODO: Verify this use of `streamConsumers`.
+              //   const filePromise = streamConsumers.buffer(file);
+              //   bodyPromises.push(filePromise);
+              //   request.body[name] = {
+              //     file: await filePromise,
+              //     ...information,
+              //   };
+              // })
+              .on("field", (name, value, information) => {
+                // TODO: Reject on `information.nameTruncated` or `information.valueTruncated`.
+                request.body[name] = value;
+              })
+              .on("close", () => {
+                bodyPromiseResolve();
+              })
+              // TODO: `partsLimit`, `filesLimit`, `fieldsLimit`.
+              .on("error", (error) => {
+                bodyPromiseReject(error);
+              }),
+          );
+          await Promise.all(bodyPromises);
+        }
 
         response.setHeader("Content-Type", "text/html; charset=utf-8");
       } catch (error) {
