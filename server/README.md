@@ -15,8 +15,6 @@ TODO
 ## Requirements
 
 - Parse request:
-  - Cookies.
-    - <https://github.com/jshttp/cookie>.
   - `Content-Type`
     - `node:util`’s `MIMEType`
   - Body.

@@ -16,6 +16,8 @@ test(async () => {
         JSON.stringify({
           pathname: request.pathname,
           search: request.search,
+          headers: { "a-custom-header": request.headers["a-custom-header"] },
+          cookies: request.cookies,
         }),
       );
       response.afters.push(() => {
@@ -26,11 +28,18 @@ test(async () => {
 
   assert.deepEqual(
     await (
-      await fetch("http://localhost:18000/conversations/10?name=leandro")
+      await fetch("http://localhost:18000/conversations/10?name=leandro", {
+        headers: {
+          "A-Custom-Header": "Hello",
+          Cookie: "session=abc; colorScheme=dark",
+        },
+      })
     ).json(),
     {
       pathname: { conversationId: "10" },
       search: { name: "leandro" },
+      headers: { "a-custom-header": "Hello" },
+      cookies: { session: "abc", colorScheme: "dark" },
     },
   );
   assert.equal(requestsCount, 1);

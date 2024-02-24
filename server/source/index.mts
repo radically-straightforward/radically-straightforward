@@ -5,19 +5,33 @@ export default function server(port: number): any[] {
   const handlers: any[] = [];
   const httpServer = http
     .createServer(async (request: any, response: any) => {
-      response.afters = [];
-      if (request.method === undefined || request.url === undefined) {
+      try {
+        response.afters = [];
+        if (request.method === undefined || request.url === undefined)
+          throw new Error();
+        request.URL = new URL(
+          request.url,
+          `${request.headers["x-forwarded-proto"] ?? "http"}://${
+            request.headers["x-forwarded-host"] ?? request.headers["host"]
+          }`,
+        );
+        request.search = Object.fromEntries(request.URL.searchParams);
+        request.cookies = Object.fromEntries(
+          (request.headers["cookie"] ?? "").split(";").map((pair: any) => {
+            const parts = pair
+              .split("=")
+              .map((part: any) => decodeURIComponent(part.trim()));
+            if (parts.length !== 2 || parts.some((part: any) => part === ""))
+              throw new Error();
+            return parts;
+          }),
+        );
+      } catch (error) {
+        console.error(error);
         response.statusCode = 400;
         response.end();
         return;
       }
-      request.URL = new URL(
-        request.url,
-        `${request.headers["x-forwarded-proto"] ?? "http"}://${
-          request.headers["x-forwarded-host"] ?? request.headers["host"]
-        }`,
-      );
-      request.search = Object.fromEntries(request.URL.searchParams);
       for (const handler of handlers) {
         if (
           handler.method !== undefined &&
@@ -46,24 +60,6 @@ export default function server(port: number): any[] {
 
 // http
 //   .createServer(async (request, response) => {
-//     request.urlParts = new URL(
-//       request.url,
-//       `${request.headers["x-forwarded-proto"] ?? "http"}://${
-//         request.headers["x-forwarded-host"] ?? request.headers["host"]
-//       }`
-//     );
-//     request.query = Object.fromEntries(request.urlParts.searchParams);
-//     request.cookies = Object.fromEntries(
-//       (request.headers["cookie"] ?? "").split(";").map((part) => {
-//         const parts =
-//         part
-//           .trim()
-//           .split("=");
-//           if (parts.length !== 2) throw new Error("TODO: Respond with 400 here")
-//           // TODO: Throw if there are more than two parts?
-//           parts.map((part) => decodeURIComponent(part.trim()));
-//       })
-//     );
 //     // request.body = {};
 //     // // FIXME: Use `Promise.withResolvers()` when it becomes available in Node.js.
 //     // let bodyPromiseResolve, bodyPromiseReject;
