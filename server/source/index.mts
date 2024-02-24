@@ -95,17 +95,16 @@ export default function server(port: number): any[] {
 
         response.setHeader("Content-Type", "text/html; charset=utf-8");
 
-        const setCookies = new Array<string>();
         response.setCookie = (
           key: string,
           value: string,
           maxAge: number = 150 * 24 * 60 * 60,
         ): typeof response => {
           request.cookies[key] = value;
-          setCookies.push(
+          response.setHeader("Set-Cookie", [
+            ...(response.getHeader("Set-Cookie") ?? []),
             `__Host-${encodeURIComponent(key)}=${encodeURIComponent(value)}; Max-Age=${maxAge}; Domain=${request.URL.hostname}; Path=/; Secure; HttpOnly; SameSite=Lax; Partitioned`,
-          );
-          response.setHeader("Set-Cookie", setCookies);
+          ]);
           return response;
         };
 
