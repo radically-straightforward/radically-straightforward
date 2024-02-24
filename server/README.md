@@ -14,35 +14,6 @@ TODO
 
 ## Requirements
 
-- Parse request:
-  - Body.
-    - Concerns
-      - Size limits (HTTP status 413)
-        - Number of headers
-        - Size of header
-        - Number of body fields
-        - Size of body field
-      - Request timeout (HTTP status 408) (https://nodejs.org/dist/latest-v21.x/docs/api/http.html#serverrequesttimeout)
-        - Deal with this in Caddy?
-        - Headers
-        - Body
-    - `application/x-www-form-urlencoded`
-      - `URLSearchParams`
-      - <https://github.com/expressjs/body-parser>.
-    - `multipart/form-data`
-      - <https://github.com/mscdex/busboy>.
-        - <https://github.com/expressjs/multer>.
-        - <https://github.com/richardgirges/express-fileupload>.
-      - <https://github.com/node-formidable/formidable>.
-        - Does too much (plugins, and so forth).
-      - <https://github.com/pillarjs/multiparty>.
-        - They recommend using `busboy`.
-        - <https://github.com/expressjs/connect-multiparty>.
-      - <https://github.com/hapijs/pez>.
-        - No documentation.
-    - Edge cases
-      - Different charsets?
-      - `Content-Encoding` (for example, compression)
 - Response helpers:
   - Use data returned by handler to control response.
   - Cookies.
@@ -77,6 +48,18 @@ TODO
   - Address all `any`s
 - Future:
   - Pass `pathname` parameters through `decodeURIComponent`?
+  - Request body edge cases
+    - Size limits (HTTP status 413)
+      - Number of headers
+      - Size of header
+      - Number of body fields
+      - Size of body field
+    - Request timeout (HTTP status 408) (https://nodejs.org/dist/latest-v21.x/docs/api/http.html#serverrequesttimeout)
+      - Deal with this in Caddy?
+      - Headers
+      - Body
+    - Different charsets?
+    - `Content-Encoding` (for example, compression)
 
 ## Features
 
