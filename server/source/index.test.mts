@@ -10,7 +10,7 @@ test(async () => {
 
   application.push({
     method: "PATCH",
-    pathname: /^\/conversations\/(?<conversationId>[0-9]+)$/,
+    pathname: /^\/request-parsing\/(?<pathnameParameter>[0-9]+)$/,
     handler: async (request: any, response: any) => {
       for (const values of Object.values<any>(request.body))
         if (Array.isArray(values))
@@ -24,7 +24,7 @@ test(async () => {
         JSON.stringify({
           pathname: request.pathname,
           search: request.search,
-          headers: { "a-custom-header": request.headers["a-custom-header"] },
+          headers: { "custom-header": request.headers["custom-header"] },
           cookies: request.cookies,
           body: request.body,
         }),
@@ -37,14 +37,14 @@ test(async () => {
 
   {
     const response = await fetch(
-      "http://localhost:18000/conversations/10?name=leandro",
+      "http://localhost:18000/request-parsing/10?searchParameter=20",
       {
         method: "PATCH",
         headers: {
-          "A-Custom-Header": "Hello",
-          Cookie: "session=abc; colorScheme=dark",
+          "Custom-Header": "Hello",
+          Cookie: "example=abc; anotherExample=def",
         },
-        body: new URLSearchParams({ age: "33" }),
+        body: new URLSearchParams({ bodyField: "33" }),
       },
     );
     assert.equal(
@@ -52,36 +52,42 @@ test(async () => {
       "application/json; charset=utf-8",
     );
     assert.deepEqual(await response.json(), {
-      pathname: { conversationId: "10" },
-      search: { name: "leandro" },
-      headers: { "a-custom-header": "Hello" },
-      cookies: { session: "abc", colorScheme: "dark" },
-      body: { age: "33" },
+      pathname: { pathnameParameter: "10" },
+      search: { searchParameter: "20" },
+      headers: { "custom-header": "Hello" },
+      cookies: { example: "abc", anotherExample: "def" },
+      body: { bodyField: "33" },
     });
     assert.equal(counter, 1);
   }
 
   {
     const requestBody = new FormData();
-    requestBody.append("ages[]", "33");
-    requestBody.append("ages[]", "34");
-    requestBody.append("avatars[]", new Blob([Buffer.from([33, 34, 3])]));
-    requestBody.append("avatars[]", new Blob([Buffer.from([133, 134, 13])]));
+    requestBody.append("bodyFields[]", "33");
+    requestBody.append("bodyFields[]", "34");
+    requestBody.append(
+      "bodyFileFields[]",
+      new Blob([Buffer.from([33, 34, 3])]),
+    );
+    requestBody.append(
+      "bodyFileFields[]",
+      new Blob([Buffer.from([133, 134, 13])]),
+    );
     assert.deepEqual(
       await (
-        await fetch("http://localhost:18000/conversations/10", {
+        await fetch("http://localhost:18000/request-parsing/10", {
           method: "PATCH",
           body: requestBody,
         })
       ).json(),
       {
-        pathname: { conversationId: "10" },
+        pathname: { pathnameParameter: "10" },
         search: {},
         headers: {},
         cookies: {},
         body: {
-          ages: ["33", "34"],
-          avatars: [
+          bodyFields: ["33", "34"],
+          bodyFileFields: [
             {
               encoding: "7bit",
               mimeType: "application/octet-stream",

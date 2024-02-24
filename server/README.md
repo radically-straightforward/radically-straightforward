@@ -23,21 +23,20 @@ TODO
       - `node:util`’s `MIMEType`
     - `Content-Length`?
       - `Buffer.byteLength()`
-  - Stream.
   - Locals to build response over multiple handlers.
 - Handlers
   - Stop calling handlers once response is sent
   - Detect 404
   - Error handlers
 - Extra features
-  - Logging
-  - Live updates.
-  - Content proxy (we already have one in Courselore using Got—try to develop one using `fetch`)
-    - Link in documentation for `@radically-straightforward/caddy`’s `header()`.
   - Missing stuff from:
     - Express
     - Koa
     - Fastify
+  - Logging
+  - Live updates.
+  - Content proxy (we already have one in Courselore using Got—try to develop one using `fetch`)
+    - Link in documentation for `@radically-straightforward/caddy`’s `header()`.
 - Types
   - Request & response types
   - Address all `any`s
