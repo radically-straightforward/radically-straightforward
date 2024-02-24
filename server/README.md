@@ -30,17 +30,19 @@ TODO
   - Stop calling handlers once response is sent
   - Detect 404
   - Error handlers
-- Logging
-- Live updates.
-- Missing stuff from:
-  - Koa
-  - Express
-- Content proxy (we already have one in Courselore using Got—try to develop one using `fetch`)
-  - Link in documentation for `@radically-straightforward/caddy`’s `header()`.
+- Extra features
+  - Logging
+  - Live updates.
+  - Content proxy (we already have one in Courselore using Got—try to develop one using `fetch`)
+    - Link in documentation for `@radically-straightforward/caddy`’s `header()`.
+  - Missing stuff from:
+    - Express
+    - Koa
+    - Fastify
 - Types
   - Request & response types
   - Address all `any`s
-- Future:
+- Future
   - Pass `pathname` parameters through `decodeURIComponent`?
   - Request body edge cases
     - Size limits (HTTP status 413)
