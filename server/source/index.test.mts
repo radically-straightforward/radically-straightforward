@@ -27,29 +27,43 @@ test(async () => {
     },
   });
 
-  const response = await fetch(
-    "http://localhost:18000/conversations/10?name=leandro",
-    {
-      method: "PATCH",
-      headers: {
-        "A-Custom-Header": "Hello",
-        Cookie: "session=abc; colorScheme=dark",
+  {
+    const response = await fetch(
+      "http://localhost:18000/conversations/10?name=leandro",
+      {
+        method: "PATCH",
+        headers: {
+          "A-Custom-Header": "Hello",
+          Cookie: "session=abc; colorScheme=dark",
+        },
+        body: new URLSearchParams({ age: "33" }),
       },
-      body: new URLSearchParams({ age: "33" }),
-    },
-  );
-  assert.equal(
-    response.headers.get("Content-Type"),
-    "application/json; charset=utf-8",
-  );
-  assert.deepEqual(await response.json(), {
-    pathname: { conversationId: "10" },
-    search: { name: "leandro" },
-    headers: { "a-custom-header": "Hello" },
-    cookies: { session: "abc", colorScheme: "dark" },
-    body: { age: "33" },
-  });
-  assert.equal(requestsCount, 1);
+    );
+    assert.equal(
+      response.headers.get("Content-Type"),
+      "application/json; charset=utf-8",
+    );
+    assert.deepEqual(await response.json(), {
+      pathname: { conversationId: "10" },
+      search: { name: "leandro" },
+      headers: { "a-custom-header": "Hello" },
+      cookies: { session: "abc", colorScheme: "dark" },
+      body: { age: "33" },
+    });
+    assert.equal(requestsCount, 1);
+  }
+
+  {
+    const body = new FormData();
+    body.append("avatar", new Blob([Buffer.from([33, 34, 3])]));
+    const response = await fetch(
+      "http://localhost:18000/conversations/10?name=leandro",
+      {
+        method: "PATCH",
+        body,
+      },
+    );
+  }
 
   process.kill(process.pid);
 });
