@@ -15,8 +15,6 @@ TODO
 ## Requirements
 
 - Parse request:
-  - Cookies
-    - Do clients (browsers and curl) send multiple `Cookie` headers?
   - Body.
     - Concerns
       - Size limits (HTTP status 413)
