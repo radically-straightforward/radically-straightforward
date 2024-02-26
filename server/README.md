@@ -15,7 +15,6 @@ TODO
 ## Requirements
 
 - Handlers
-  - Detect 404
   - Error handlers
 - Extra features
   - Interesting stuff from:

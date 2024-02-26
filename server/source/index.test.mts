@@ -155,5 +155,7 @@ test({ timeout: 30 * 1000 }, async () => {
     ]);
   }
 
+  assert.equal((await fetch("http://localhost:18000/unhandled")).status, 500);
+
   process.kill(process.pid);
 });

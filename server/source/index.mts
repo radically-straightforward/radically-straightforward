@@ -134,7 +134,7 @@ export default function server(port: number): any[] {
         // TODO: Improve this error logging.
         console.error(error);
         response.statusCode = 400;
-        response.end();
+        response.end("The server failed to parse the request.");
         return;
       }
 
@@ -154,6 +154,13 @@ export default function server(port: number): any[] {
 
         await handler.handler(request, response);
         if (response.writableEnded) break;
+      }
+
+      if (!response.writableEnded) {
+        // TODO: Log error
+        response.statusCode = 500;
+        response.end("The server doesn’t have a handler for this request.");
+        return;
       }
 
       for (const after of response.afters) await after();
