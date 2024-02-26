@@ -19,7 +19,7 @@ TODO
   - Detect 404
   - Error handlers
 - Extra features
-  - Missing stuff from:
+  - Interesting stuff from:
     - Express
     - Koa
     - Fastify
@@ -27,27 +27,28 @@ TODO
   - Live updates.
   - Content proxy (we already have one in Courselore using Got—try to develop one using `fetch`)
     - Link in documentation for `@radically-straightforward/caddy`’s `header()`.
+- Edge cases
+  - Request size limits (HTTP status 413)
+    - Number of headers
+    - Size of header
+    - Number of body fields
+    - Size of body field
+  - Request timeout (HTTP status 408) (https://nodejs.org/dist/latest-v21.x/docs/api/http.html#serverrequesttimeout)
+    - Deal with this in Caddy?
+    - Headers
+    - Body
+  - Different charsets?
+  - `Content-Encoding` (for example, compression)
 - Types
   - Request & response types
   - Address all `any`s
 - Future
-  - Pass `pathname` parameters through `decodeURIComponent`?
-  - Request body edge cases
-    - Size limits (HTTP status 413)
-      - Number of headers
-      - Size of header
-      - Number of body fields
-      - Size of body field
-    - Request timeout (HTTP status 408) (https://nodejs.org/dist/latest-v21.x/docs/api/http.html#serverrequesttimeout)
-      - Deal with this in Caddy?
-      - Headers
-      - Body
-    - Different charsets?
-    - `Content-Encoding` (for example, compression)
-  - Route based on other aspects of request, for example, `search`?
-  - Response body `Content-Length`?
-    - `Buffer.byteLength()`
   - Use Node.js `http.createServer()`’s options `IncomingMessage` and `ServerResponse` instead of ad-hoc extending the `request` and `response` objects?
+  - Route based on other aspects of request, for example, `search`?
+  - Pass `pathname` parameters through `decodeURIComponent`?
+  - Response body `Content-Length`?
+    - Node.js already sets `Content-Length` if you use `end()`. If you use `write()` Node.js sets chunked transfer.
+    - `Buffer.byteLength()`
 
 ## Features
 

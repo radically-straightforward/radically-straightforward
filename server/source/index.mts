@@ -131,6 +131,7 @@ export default function server(port: number): any[] {
           return response;
         };
       } catch (error) {
+        // TODO: Improve this error logging.
         console.error(error);
         response.statusCode = 400;
         response.end();
