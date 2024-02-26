@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import fs from "node:fs/promises";
 import server from "@radically-straightforward/server";
 
-test(async () => {
+test({ timeout: 30 * 1000 }, async () => {
   const application = server(18000);
 
   let counter = 0;
