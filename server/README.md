@@ -14,8 +14,6 @@ TODO
 
 ## Requirements
 
-- Handlers
-  - Error handlers
 - Extra features
   - Interesting stuff from:
     - Express

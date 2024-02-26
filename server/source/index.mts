@@ -139,6 +139,9 @@ export default function server(port: number): any[] {
 
       if (!response.writableEnded) {
         for (const handler of handlers) {
+          if ((response.error !== undefined) !== (handler.error ?? false))
+            continue;
+
           if (
             handler.method !== undefined &&
             request.method.match(handler.method) === null
@@ -152,7 +155,12 @@ export default function server(port: number): any[] {
             request.pathname = match.groups ?? {};
           }
 
-          await handler.handler(request, response);
+          try {
+            await handler.handler(request, response);
+          } catch (error) {
+            response.error = error;
+          }
+
           if (response.writableEnded) break;
         }
 

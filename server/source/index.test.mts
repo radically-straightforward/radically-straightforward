@@ -157,5 +157,45 @@ test({ timeout: 30 * 1000 }, async () => {
 
   assert.equal((await fetch("http://localhost:18000/unhandled")).status, 500);
 
+  const trace = new Array<string>();
+
+  application.push({
+    method: "GET",
+    pathname: "/error",
+    handler: (request: any, response: any) => {
+      trace.push("BEFORE ERROR");
+      throw new Error("ERROR");
+      trace.push("AFTER ERROR");
+    },
+  });
+
+  application.push({
+    method: "GET",
+    pathname: "/error",
+    handler: (request: any, response: any) => {
+      trace.push("UNREACHABLE HANDLER");
+    },
+  });
+
+  application.push({
+    error: true,
+    handler: (request: any, response: any) => {
+      trace.push("REACHABLE ERROR HANDLER");
+      trace.push(response.error.message);
+      response.statusCode = 422;
+      response.end();
+    },
+  });
+
+  application.push({
+    error: true,
+    handler: (request: any, response: any) => {
+      trace.push("UNREACHABLE ERROR HANDLER");
+    },
+  });
+
+  assert.equal((await fetch("http://localhost:18000/error")).status, 422);
+  assert.deepEqual(trace, ["BEFORE ERROR", "REACHABLE ERROR HANDLER", "ERROR"]);
+
   process.kill(process.pid);
 });
