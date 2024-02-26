@@ -131,6 +131,14 @@ test({ timeout: 30 * 1000 }, async () => {
     },
   });
 
+  application.push({
+    method: "GET",
+    pathname: "/response-helpers",
+    handler: (request: any, response: any) => {
+      assert.fail();
+    },
+  });
+
   {
     const response = await fetch("http://localhost:18000/response-helpers", {
       redirect: "manual",

@@ -153,6 +153,7 @@ export default function server(port: number): any[] {
         }
 
         await handler.handler(request, response);
+        if (response.writableEnded) break;
       }
 
       for (const after of response.afters) await after();

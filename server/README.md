@@ -15,7 +15,6 @@ TODO
 ## Requirements
 
 - Handlers
-  - Stop calling handlers once response is sent
   - Detect 404
   - Error handlers
 - Extra features
