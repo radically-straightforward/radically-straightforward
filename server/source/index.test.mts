@@ -1,11 +1,14 @@
 import test from "node:test";
 import assert from "node:assert/strict";
+import path from "node:path";
 import fs from "node:fs/promises";
+import timers from "node:timers/promises";
 import server from "@radically-straightforward/server";
 
 test({ timeout: 30 * 1000 }, async () => {
   const application = server(18000);
 
+  const directoriesThatShouldHaveBeenCleanedUp = new Array<string>();
   let counter = 0;
 
   application.push({
@@ -17,6 +20,9 @@ test({ timeout: 30 * 1000 }, async () => {
           for (const value of values)
             if (typeof value.path === "string") {
               value.content = [...(await fs.readFile(value.path))];
+              directoriesThatShouldHaveBeenCleanedUp.push(
+                path.dirname(value.path),
+              );
               delete value.path;
             }
       response.setHeader("Content-Type", "application/json; charset=utf-8");
@@ -104,6 +110,11 @@ test({ timeout: 30 * 1000 }, async () => {
         },
       },
     );
+    await timers.setTimeout(500);
+    for (const directoryThatShouldHaveBeenCleanedUp of directoriesThatShouldHaveBeenCleanedUp)
+      await assert.rejects(async () => {
+        await fs.access(directoryThatShouldHaveBeenCleanedUp);
+      });
   }
 
   application.push({

@@ -11,6 +11,7 @@ export default function server(port: number): any[] {
 
   const httpServer = http
     .createServer(async (request: any, response: any) => {
+      const directoriesToCleanup = new Array<string>();
       try {
         if (request.method === undefined || request.url === undefined)
           throw new Error("Missing request ‘method’ or ‘url’.");
@@ -66,7 +67,7 @@ export default function server(port: number): any[] {
                     (async (): Promise<void> => {
                       await fs.mkdir(path.dirname(value.path));
                       await fs.writeFile(value.path, file);
-                      // TODO: Cleanup ‘directory’
+                      directoriesToCleanup.push(path.dirname(value.path));
                     })(),
                   );
                 })
@@ -172,6 +173,9 @@ export default function server(port: number): any[] {
 
         for (const after of response.afters) await after();
       }
+
+      for (const directoryToCleanup of directoriesToCleanup)
+        await fs.rm(directoryToCleanup, { recursive: true, force: true });
     })
     .listen(port, "localhost");
 
