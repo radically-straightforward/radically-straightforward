@@ -91,7 +91,7 @@ export default function server(port: number): any[] {
           await Promise.all(filePromises);
         }
 
-        response.data = {};
+        response.state = {};
         response.afters = [];
 
         response.setHeader("Content-Type", "text/html; charset=utf-8");

@@ -121,7 +121,7 @@ test({ timeout: 30 * 1000 }, async () => {
     method: "GET",
     pathname: "/response-helpers",
     handler: (request: any, response: any) => {
-      response.data.example = "Hello";
+      response.state.example = "Hello";
     },
   });
 
@@ -129,7 +129,7 @@ test({ timeout: 30 * 1000 }, async () => {
     method: "GET",
     pathname: "/response-helpers",
     handler: (request: any, response: any) => {
-      assert.equal(response.data.example, "Hello");
+      assert.equal(response.state.example, "Hello");
       assert.equal(request.cookies.example, undefined);
       assert.equal(request.cookies.anotherExample, undefined);
       response.setCookie("example", "abc");

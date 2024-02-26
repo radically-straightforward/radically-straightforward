@@ -15,10 +15,6 @@ TODO
 ## Requirements
 
 - Extra features
-  - Interesting stuff from:
-    - Express
-    - Koa
-    - Fastify
   - Logging
   - Live updates.
   - Content proxy (we already have one in Courselore using Got—try to develop one using `fetch`)
@@ -59,9 +55,13 @@ TODO
   - `SameSite=None` for SAML to work, because the Identity Provider sends a `POST` request with the assertions back to the Service Provider, and anything other than `SameSite=None` would prevent cookies from being sent, and the server wouldn’t be able to ascertain whether a session already exists.
   - Expects the server to be available under a single `hostname`, which is fair, because it’s meant to be used with Caddy.
   - Don’t use the `Domain` option, because the default is to associate the cookie only with the current domain, and if you set the option, the cookie applies to subdomains as well.
+- Compared to Express.js
+  - No need for `next()`, no requests left unresponded.
+  - Async handlers 😅
 
 ## Related Work
 
+- <https://expressjs.com/>
 - <https://fastify.dev/>
 - <https://koajs.com/>
 - <https://hono.dev/>
