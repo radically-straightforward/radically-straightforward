@@ -159,7 +159,7 @@ export default function server(port: number): any[] {
         if (!response.writableEnded) {
           // TODO: Log error
           response.statusCode = 500;
-          response.end("The server didn’t finish handling this request.");
+          response.end("The application didn’t finish handling this request.");
         }
 
         for (const after of response.afters) await after();
