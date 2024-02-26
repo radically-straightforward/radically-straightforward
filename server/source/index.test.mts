@@ -125,6 +125,8 @@ test(async () => {
       response.setCookie("anotherExample", "def");
       assert.equal(request.cookies.example, "abc");
       assert.equal(request.cookies.anotherExample, "def");
+      response.deleteCookie("anotherExample");
+      assert.equal(request.cookies.anotherExample, undefined);
       response.redirect("/redirect");
     },
   });
@@ -139,8 +141,9 @@ test(async () => {
       "http://localhost:18000/redirect",
     );
     assert.deepEqual(response.headers.getSetCookie(), [
-      "__Host-example=abc; Max-Age=12960000; Domain=localhost; Path=/; Secure; HttpOnly; SameSite=Lax; Partitioned",
-      "__Host-anotherExample=def; Max-Age=12960000; Domain=localhost; Path=/; Secure; HttpOnly; SameSite=Lax; Partitioned",
+      "__Host-example=abc; Max-Age=12960000; Path=/; Secure; HttpOnly; SameSite=None",
+      "__Host-anotherExample=def; Max-Age=12960000; Path=/; Secure; HttpOnly; SameSite=None",
+      "__Host-anotherExample=; Max-Age=0; Path=/; Secure; HttpOnly; SameSite=None",
     ]);
   }
 
