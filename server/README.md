@@ -14,23 +14,26 @@ TODO
 
 ## Requirements
 
-- Extra features
-  - Logging
-  - Live updates.
-  - Content proxy (we already have one in Courselore using Got—try to develop one using `fetch`)
-    - Link in documentation for `@radically-straightforward/caddy`’s `header()`.
 - Edge cases
   - Request size limits (HTTP status 413)
     - Number of headers
     - Size of header
+    - Number of multipart body headers
+    - Size of multipart body headers
     - Number of body fields
-    - Size of body field
+    - Size of body field key
+    - Size of body field value
   - Request timeout (HTTP status 408) (https://nodejs.org/dist/latest-v21.x/docs/api/http.html#serverrequesttimeout)
     - Deal with this in Caddy?
     - Headers
     - Body
   - Different charsets?
   - `Content-Encoding` (for example, compression)
+- Extra features
+  - Logging
+  - Live updates.
+  - Content proxy (we already have one in Courselore using Got—try to develop one using `fetch`)
+    - Link in documentation for `@radically-straightforward/caddy`’s `header()`.
 - Types
   - Request & response types
   - Address all `any`s

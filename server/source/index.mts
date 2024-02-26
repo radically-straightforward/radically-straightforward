@@ -9,6 +9,11 @@ import * as utilities from "@radically-straightforward/utilities";
 export default function server(port: number): any[] {
   const handlers: any[] = [];
 
+  // TODO: ‘createServer’ options
+  // - headersTimeout
+  // - maxHeaderSize
+  //   - This applies to a single header, and there’s no limit on the number of headers, right?
+  // - requestTimeout
   const httpServer = http
     .createServer(async (request: any, response: any) => {
       const directoriesToCleanup = new Array<string>();
@@ -43,8 +48,27 @@ export default function server(port: number): any[] {
           const filePromises = new Array<Promise<void>>();
           await new Promise<void>((resolve, reject) => {
             request.pipe(
-              // TODO: `busboy` options.
-              busboy({ headers: request.headers })
+              busboy({
+                headers: request.headers,
+                preservePath: true,
+                limits: {
+                  fields: 300,
+                  fieldNameSize: 300,
+                  fieldSize: 2 ** 20,
+                  files: 100,
+                  headerPairs: 200,
+                  fileSize: 10 * 2 ** 20,
+                },
+              })
+                .on("field", (name, value, information) => {
+                  if (information.nameTruncated || information.valueTruncated)
+                    reject(new Error("Truncated field."));
+                  if (name.endsWith("[]"))
+                    (request.body[name.slice(0, -"[]".length)] ??= []).push(
+                      value,
+                    );
+                  else request.body[name] = value;
+                })
                 .on("file", (name, file, information) => {
                   const value = {
                     ...information,
@@ -68,21 +92,20 @@ export default function server(port: number): any[] {
                       await fs.mkdir(path.dirname(value.path));
                       await fs.writeFile(value.path, file);
                       directoriesToCleanup.push(path.dirname(value.path));
+                      if ((file as any).truncated)
+                        throw new Error("Truncated file.");
                     })(),
                   );
-                })
-                .on("field", (name, value, information) => {
-                  // TODO: Reject on `information.nameTruncated` or `information.valueTruncated`.
-                  if (name.endsWith("[]"))
-                    (request.body[name.slice(0, -"[]".length)] ??= []).push(
-                      value,
-                    );
-                  else request.body[name] = value;
                 })
                 .on("close", () => {
                   resolve();
                 })
-                // TODO: `partsLimit`, `filesLimit`, `fieldsLimit`, and other busboy events.
+                .on("fieldsLimit", () => {
+                  reject(new Error("Fields limit."));
+                })
+                .on("filesLimit", () => {
+                  reject(new Error("Files limit."));
+                })
                 .on("error", (error) => {
                   reject(error);
                 }),
