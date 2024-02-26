@@ -41,7 +41,7 @@ TODO
   - Request & response types
   - Address all `any`s
 - Future
-  - Use Node.js `http.createServer()`’s options `IncomingMessage` and `ServerResponse` instead of ad-hoc extending the `request` and `response` objects?
+  - Use Node.js `http.createServer()`’s options `IncomingMessage` and `ServerResponse` instead of ad-hoc extending the `request` and `response` objects? (https://stackoverflow.com/questions/70034891/extending-http-incomingmessage-and-http-serverresponse-providing-it-to-the-htt)
   - Route based on other aspects of request, for example, `search`?
   - Pass `pathname` parameters through `decodeURIComponent`?
   - Response body `Content-Length`?
