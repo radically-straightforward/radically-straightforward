@@ -6,7 +6,7 @@ import timers from "node:timers/promises";
 import server from "@radically-straightforward/server";
 
 test({ timeout: 30 * 1000 }, async () => {
-  const application = server(18000);
+  const application = server();
 
   const directoriesThatShouldHaveBeenCleanedUp = new Array<string>();
   let counter = 0;

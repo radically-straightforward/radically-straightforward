@@ -6,7 +6,9 @@ import busboy from "busboy";
 import "@radically-straightforward/node";
 import * as utilities from "@radically-straightforward/utilities";
 
-export default function server(port: number): any[] {
+export default function server({
+  port = 18000,
+}: { port?: number } = {}): any[] {
   const handlers: any[] = [];
 
   // TODO: ‘createServer’ options
