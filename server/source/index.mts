@@ -135,34 +135,35 @@ export default function server(port: number): any[] {
         console.error(error);
         response.statusCode = 400;
         response.end("The server failed to parse the request.");
-        return;
-      }
-
-      for (const handler of handlers) {
-        if (
-          handler.method !== undefined &&
-          request.method.match(handler.method) === null
-        )
-          continue;
-
-        if (handler.pathname === undefined) request.pathname = {};
-        else {
-          const match = request.URL.pathname.match(handler.pathname);
-          if (match === null) continue;
-          request.pathname = match.groups ?? {};
-        }
-
-        await handler.handler(request, response);
-        if (response.writableEnded) break;
       }
 
       if (!response.writableEnded) {
-        // TODO: Log error
-        response.statusCode = 500;
-        response.end("The server didn’t finish handling this request.");
-      }
+        for (const handler of handlers) {
+          if (
+            handler.method !== undefined &&
+            request.method.match(handler.method) === null
+          )
+            continue;
 
-      for (const after of response.afters) await after();
+          if (handler.pathname === undefined) request.pathname = {};
+          else {
+            const match = request.URL.pathname.match(handler.pathname);
+            if (match === null) continue;
+            request.pathname = match.groups ?? {};
+          }
+
+          await handler.handler(request, response);
+          if (response.writableEnded) break;
+        }
+
+        if (!response.writableEnded) {
+          // TODO: Log error
+          response.statusCode = 500;
+          response.end("The server didn’t finish handling this request.");
+        }
+
+        for (const after of response.afters) await after();
+      }
     })
     .listen(port, "localhost");
 
