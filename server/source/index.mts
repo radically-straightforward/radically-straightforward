@@ -49,17 +49,19 @@ export default function server({
                 headers: request.headers,
                 preservePath: true,
                 limits: {
+                  headerPairs: 200,
                   fields: 300,
                   fieldNameSize: 300,
                   fieldSize: 2 ** 20,
                   files: 100,
-                  headerPairs: 200,
                   fileSize: 10 * 2 ** 20,
                 },
               })
                 .on("field", (name, value, information) => {
-                  if (information.nameTruncated || information.valueTruncated)
-                    reject(new Error("Truncated field."));
+                  if (information.nameTruncated || information.valueTruncated) {
+                    response.statusCode = 413;
+                    reject(new Error("Field too large."));
+                  }
                   if (name.endsWith("[]"))
                     (request.body[name.slice(0, -"[]".length)] ??= []).push(
                       value,
@@ -89,8 +91,10 @@ export default function server({
                       await fs.mkdir(path.dirname(value.path));
                       await fs.writeFile(value.path, file);
                       directoriesToCleanup.push(path.dirname(value.path));
-                      if ((file as any).truncated)
-                        throw new Error("Truncated file.");
+                      if ((file as any).truncated) {
+                        response.statusCode = 413;
+                        throw new Error("File too large.");
+                      }
                     })(),
                   );
                 })
@@ -98,10 +102,12 @@ export default function server({
                   resolve();
                 })
                 .on("fieldsLimit", () => {
-                  reject(new Error("Fields limit."));
+                  response.statusCode = 413;
+                  reject(new Error("Too many fields."));
                 })
                 .on("filesLimit", () => {
-                  reject(new Error("Files limit."));
+                  response.statusCode = 413;
+                  reject(new Error("Too many files."));
                 })
                 .on("error", (error) => {
                   reject(error);
@@ -151,11 +157,11 @@ export default function server({
           response.end();
           return response;
         };
-      } catch (error) {
-        // TODO: Improve this error logging.
+      } catch (error: any) {
         console.log(error);
-        response.statusCode = 400;
-        response.end("The server failed to parse the request.");
+        if (response.statusCode === 200) response.statusCode = 400;
+        response.setHeader("Content-Type", "text/plain; charset=utf-8");
+        response.end(error?.message);
       }
 
       if (!response.writableEnded) {
@@ -186,7 +192,6 @@ export default function server({
         }
 
         if (!response.writableEnded) {
-          // TODO: Improve this error logging.
           console.log("The application didn’t finish handling this request.");
           response.statusCode = 500;
           response.end("The application didn’t finish handling this request.");

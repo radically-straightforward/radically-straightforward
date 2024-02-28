@@ -28,6 +28,7 @@ test({ timeout: 30 * 1000 }, async () => {
       response.setHeader("Content-Type", "application/json; charset=utf-8");
       response.end(
         JSON.stringify({
+          href: request.URL.href,
           pathname: request.pathname,
           search: request.search,
           headers: { "custom-header": request.headers["custom-header"] },
@@ -58,6 +59,7 @@ test({ timeout: 30 * 1000 }, async () => {
       "application/json; charset=utf-8",
     );
     assert.deepEqual(await response.json(), {
+      href: "http://localhost:18000/request-parsing/10?searchParameter=20",
       pathname: { pathnameParameter: "10" },
       search: { searchParameter: "20" },
       headers: { "custom-header": "Hello" },
@@ -87,6 +89,7 @@ test({ timeout: 30 * 1000 }, async () => {
         })
       ).json(),
       {
+        href: "http://localhost:18000/request-parsing/10?searchParameter=20",
         pathname: { pathnameParameter: "10" },
         search: {},
         headers: {},
@@ -116,6 +119,87 @@ test({ timeout: 30 * 1000 }, async () => {
         await fs.access(directoryThatShouldHaveBeenCleanedUp);
       });
   }
+
+  {
+    const response = await fetch("http://localhost:18000/", {
+      headers: {
+        Cookie: "__Host-example",
+      },
+    });
+    assert.equal(response.status, 400);
+    assert.equal(
+      response.headers.get("Content-Type"),
+      "text/plain; charset=utf-8",
+    );
+    assert.equal(await response.text(), "Malformed ‘Cookie’ header.");
+  }
+
+  assert.equal(
+    (
+      await fetch("http://localhost:18000/", {
+        headers: { "Custom-Header": "TOO LARGE".repeat(10_000) },
+      })
+    ).status,
+    431,
+  );
+
+  assert.equal(
+    (
+      await fetch("http://localhost:18000/", {
+        headers: Object.fromEntries(
+          Array.from({ length: 1_000 }, (value, key) => [
+            `Custom-Header-${key}`,
+            "Hello",
+          ]),
+        ),
+      })
+    ).status,
+    431,
+  );
+
+  {
+    const response = await fetch("http://localhost:18000/", {
+      method: "PATCH",
+      body: new URLSearchParams(
+        Object.fromEntries(
+          Array.from({ length: 1_000 }, (value, key) => [
+            `bodyField-${key}`,
+            "33",
+          ]),
+        ),
+      ),
+    });
+    assert.equal(response.status, 413);
+    assert.equal(
+      response.headers.get("Content-Type"),
+      "text/plain; charset=utf-8",
+    );
+    assert.equal(await response.text(), "Field too large.");
+  }
+
+  // TODO: "File too large."
+
+  {
+    const response = await fetch("http://localhost:18000/", {
+      method: "PATCH",
+      body: new URLSearchParams(
+        Object.fromEntries(
+          Array.from({ length: 1_000 }, (value, key) => [
+            `bodyField-${key}`,
+            "33",
+          ]),
+        ),
+      ),
+    });
+    assert.equal(response.status, 413);
+    assert.equal(
+      response.headers.get("Content-Type"),
+      "text/plain; charset=utf-8",
+    );
+    assert.equal(await response.text(), "Too many fields.");
+  }
+
+  // TODO: "Too many files."
 
   application.push({
     method: "GET",
@@ -166,61 +250,60 @@ test({ timeout: 30 * 1000 }, async () => {
     ]);
   }
 
-  assert.equal((await fetch("http://localhost:18000/unhandled")).status, 500);
+  {
+    const trace = new Array<string>();
 
-  const trace = new Array<string>();
+    application.push({
+      method: "GET",
+      pathname: "/error",
+      handler: (request: any, response: any) => {
+        trace.push("BEFORE ERROR");
+        throw new Error("ERROR");
+        trace.push("AFTER ERROR");
+      },
+    });
 
-  application.push({
-    method: "GET",
-    pathname: "/error",
-    handler: (request: any, response: any) => {
-      trace.push("BEFORE ERROR");
-      throw new Error("ERROR");
-      trace.push("AFTER ERROR");
-    },
-  });
+    application.push({
+      method: "GET",
+      pathname: "/error",
+      handler: (request: any, response: any) => {
+        trace.push("UNREACHABLE HANDLER");
+      },
+    });
 
-  application.push({
-    method: "GET",
-    pathname: "/error",
-    handler: (request: any, response: any) => {
-      trace.push("UNREACHABLE HANDLER");
-    },
-  });
+    application.push({
+      error: true,
+      handler: (request: any, response: any) => {
+        trace.push("REACHABLE ERROR HANDLER");
+        trace.push(response.error.message);
+        response.statusCode = 422;
+        response.end();
+      },
+    });
 
-  application.push({
-    error: true,
-    handler: (request: any, response: any) => {
-      trace.push("REACHABLE ERROR HANDLER");
-      trace.push(response.error.message);
-      response.statusCode = 422;
-      response.end();
-    },
-  });
+    application.push({
+      error: true,
+      handler: (request: any, response: any) => {
+        trace.push("UNREACHABLE ERROR HANDLER");
+      },
+    });
 
-  application.push({
-    error: true,
-    handler: (request: any, response: any) => {
-      trace.push("UNREACHABLE ERROR HANDLER");
-    },
-  });
+    assert.equal((await fetch("http://localhost:18000/error")).status, 422);
+    assert.deepEqual(trace, [
+      "BEFORE ERROR",
+      "REACHABLE ERROR HANDLER",
+      "ERROR",
+    ]);
+  }
 
-  assert.equal((await fetch("http://localhost:18000/error")).status, 422);
-  assert.deepEqual(trace, ["BEFORE ERROR", "REACHABLE ERROR HANDLER", "ERROR"]);
-
-  assert.equal(
-    (
-      await fetch("http://localhost:18000/", {
-        headers: Object.fromEntries(
-          Array.from({ length: 100_000 }, (n) => [
-            `Custom-Header-${n}`,
-            "Hello",
-          ]),
-        ),
-      })
-    ).status,
-    413,
-  );
+  {
+    const response = await fetch("http://localhost:18000/unhandled");
+    assert.equal(response.status, 500);
+    assert.equal(
+      await response.text(),
+      "The application didn’t finish handling this request.",
+    );
+  }
 
   process.kill(process.pid);
 });

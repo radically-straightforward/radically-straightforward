@@ -16,14 +16,14 @@ TODO
 
 - Edge cases
   - Request size limits (HTTP status 413)
-    - Number of headers
-    - Size of header
-      - `createServer()`’s `maxHeaderSize` (default: `16384`) (This applies to a single header, and there’s no limit on the number of headers, right? Which is not what we want…)
-    - Number of multipart body headers
-    - Size of multipart body headers
-    - Number of body fields
-    - Size of body field key
-    - Size of body field value
+    - [x] Number of headers
+    - [x] Size of header
+      - `createServer()`’s `maxHeaderSize` (default: `16384`) (The documentation led me to believe that this applied to the size of a single header, but it also applies to the size of the headers overall.)
+    - [ ] Number of multipart body headers
+    - [ ] Size of multipart body headers
+    - [ ] Number of body fields
+    - [ ] Size of body field key
+    - [ ] Size of body field value
   - Request timeout (HTTP status 408) (https://nodejs.org/dist/latest-v21.x/docs/api/http.html#serverrequesttimeout)
     - Deal with this in Caddy?
     - Headers
@@ -34,7 +34,7 @@ TODO
   - Different charsets?
   - `Content-Encoding` (for example, compression)
 - Extra features
-  - Logging (`TODO`)
+  - Logging (`console.log()`)
   - Live updates.
   - Content proxy (we already have one in Courselore using Got—try to develop one using `fetch`)
     - Link in documentation for `@radically-straightforward/caddy`’s `header()`.
