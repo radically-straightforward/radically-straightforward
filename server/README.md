@@ -15,15 +15,6 @@ TODO
 ## Requirements
 
 - Extra features
-  - CSRF
-    - Currently we’re defending from CSRF with a [custom header](https://cheatsheetseries.owasp.org/cheatsheets/Cross-Site_Request_Forgery_Prevention_Cheat_Sheet.html#use-of-custom-request-headers). This is the simplest viable protection, but it’s vulnerable to broken environments that let cross-site requests include custom headers (for example, an old version of Flash).
-    - [Synchronizer tokens](https://cheatsheetseries.owasp.org/cheatsheets/Cross-Site_Request_Forgery_Prevention_Cheat_Sheet.html#synchronizer-token-pattern) are the most secure option.
-      - Communicate the token to the server with the custom header (`CSRF-Protection`), combining the synchronizer token with the custom header approach.
-      - Let the synchronizer tokens be session-wide, not specific per page, so as to not break the browser “Back” button.
-      - Couple the synchronizer token to the user session.
-      - Have pre-sessions with synchronizer tokens for signed out users to protect against login CSRF.
-    - In case the implementation of the synchronizer token doesn’t go well, try to use the [double-submit pattern](https://cheatsheetseries.owasp.org/cheatsheets/Cross-Site_Request_Forgery_Prevention_Cheat_Sheet.html#double-submit-cookie).
-      - It requires a secret known by the server to implement most securely. Note how everything boils down to the server recognizing itself by seeing a secret piece of data that it created.
   - Live updates.
   - Content proxy (we already have one in Courselore using Got—try to develop one using `fetch`)
     - Link in documentation for `@radically-straightforward/caddy`’s `header()`.
@@ -37,6 +28,15 @@ TODO
   - Response body `Content-Length`?
     - Node.js already sets `Content-Length` if you use `end()`. If you use `write()` Node.js sets chunked transfer.
     - `Buffer.byteLength()`
+  - CSRF
+    - Currently we’re defending from CSRF with a [custom header](https://cheatsheetseries.owasp.org/cheatsheets/Cross-Site_Request_Forgery_Prevention_Cheat_Sheet.html#use-of-custom-request-headers) (`CSRF-Protection`). This is the simplest viable protection, but it’s vulnerable to broken environments that let cross-site requests include custom headers (for example, an old version of Flash).
+    - [Synchronizer tokens](https://cheatsheetseries.owasp.org/cheatsheets/Cross-Site_Request_Forgery_Prevention_Cheat_Sheet.html#synchronizer-token-pattern) are the most secure option.
+      - Communicate the token to the server with the custom header (`CSRF-Protection`), combining the synchronizer token with the custom header approach.
+      - Let the synchronizer tokens be session-wide, not specific per page, so as to not break the browser “Back” button.
+      - Couple the synchronizer token to the user session.
+      - Have pre-sessions with synchronizer tokens for signed out users to protect against login CSRF.
+    - In case the implementation of the synchronizer token doesn’t go well, try to use the [double-submit pattern](https://cheatsheetseries.owasp.org/cheatsheets/Cross-Site_Request_Forgery_Prevention_Cheat_Sheet.html#double-submit-cookie).
+      - It requires a secret known by the server to implement most securely. Note how everything boils down to the server recognizing itself by seeing a secret piece of data that it created.
   - Rate limiting
     - Could be done on Caddy with extension
   - Edge cases
@@ -64,8 +64,8 @@ TODO
   - Headers: `createServer()`’s `headersTimeout` (default: `60000`)
   - Body: `createServer()`’s `requestTimeout` (default: `300000`)
 - CSRF protection
-  - Make requests with custom header
   - Don’t let `GET` handlers have side-effects
+  - Make non-`GET` requests with custom header (`CSRF-Protection`)
   - References
     - <https://cheatsheetseries.owasp.org/cheatsheets/Cross-Site_Request_Forgery_Prevention_Cheat_Sheet.html>
 
