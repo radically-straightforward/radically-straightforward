@@ -63,6 +63,11 @@ TODO
 - Request timeout (HTTP status 408) (https://nodejs.org/dist/latest-v21.x/docs/api/http.html#serverrequesttimeout)
   - Headers: `createServer()`’s `headersTimeout` (default: `60000`)
   - Body: `createServer()`’s `requestTimeout` (default: `300000`)
+- CSRF protection
+  - Make requests with custom header
+  - Don’t let `GET` handlers have side-effects
+  - References
+    - <https://cheatsheetseries.owasp.org/cheatsheets/Cross-Site_Request_Forgery_Prevention_Cheat_Sheet.html>
 
 ## Related Work
 
