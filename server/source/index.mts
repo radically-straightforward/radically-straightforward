@@ -15,12 +15,23 @@ export default function server({
     .createServer(async (request: any, response: any) => {
       {
         const id = utilities.randomString();
+        const start = process.hrtime.bigint();
         response.log = (...messageParts: string[]): void => {
-          utilities.log(String(port), id, ...messageParts);
+          utilities.log(
+            String(port),
+            id,
+            `${(process.hrtime.bigint() - start) / 1_000_000n}ms`,
+            ...messageParts,
+          );
         };
       }
 
-      response.log("START");
+      response.log(
+        "REQUEST",
+        request.headers["x-forwarded-for"],
+        request.method,
+        request.url,
+      );
 
       const directoriesToCleanup = new Array<string>();
       try {
@@ -217,7 +228,11 @@ export default function server({
       for (const directoryToCleanup of directoriesToCleanup)
         await fs.rm(directoryToCleanup, { recursive: true, force: true });
 
-      response.log("FINISH");
+      response.log(
+        "RESPONSE",
+        String(response.statusCode),
+        response.getHeader("Location"),
+      );
     })
     .listen(port, "localhost");
 
