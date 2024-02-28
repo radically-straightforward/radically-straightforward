@@ -137,6 +137,9 @@ export default function server({
           await Promise.all(filePromises);
         }
 
+        if (process.env.NODE_ENV !== "production" && request.method !== "GET")
+          response.log(JSON.stringify(request.body, undefined, 2));
+
         response.state = {};
         response.afters = [];
 
