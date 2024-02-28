@@ -105,6 +105,10 @@ export default function server({
                   else request.body[name] = value;
                 })
                 .on("file", (name, file, information) => {
+                  if (information.filename.length > 200) {
+                    response.statusCode = 413;
+                    reject(new Error("File name too large."));
+                  }
                   const value = {
                     ...information,
                     path: path.join(

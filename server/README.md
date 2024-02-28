@@ -14,8 +14,6 @@ TODO
 
 ## Requirements
 
-- Edge cases
-  - Long file names
 - Extra features
   - CSRF
     - Currently we’re defending from CSRF with a [custom header](https://cheatsheetseries.owasp.org/cheatsheets/Cross-Site_Request_Forgery_Prevention_Cheat_Sheet.html#use-of-custom-request-headers). This is the simplest viable protection, but it’s vulnerable to broken environments that let cross-site requests include custom headers (for example, an old version of Flash).
