@@ -15,7 +15,9 @@ TODO
 ## Requirements
 
 - Extra features
-  - Logging (`console.log()`)
+  - Logging
+    - Request
+    - Server startup and shutdown
   - Live updates.
   - Content proxy (we already have one in Courselore using Got—try to develop one using `fetch`)
     - Link in documentation for `@radically-straightforward/caddy`’s `header()`.

@@ -13,6 +13,15 @@ export default function server({
 
   const httpServer = http
     .createServer(async (request: any, response: any) => {
+      {
+        const id = utilities.randomString();
+        response.log = (...messageParts: string[]): void => {
+          utilities.log(String(port), id, ...messageParts);
+        };
+      }
+
+      response.log("START");
+
       const directoriesToCleanup = new Array<string>();
       try {
         if (request.method === undefined || request.url === undefined)
@@ -158,10 +167,10 @@ export default function server({
           return response;
         };
       } catch (error: any) {
-        console.log(error);
+        response.log("ERROR", String(error), error?.stack);
         if (response.statusCode === 200) response.statusCode = 400;
         response.setHeader("Content-Type", "text/plain; charset=utf-8");
-        response.end(error?.message);
+        response.end(String(error));
       }
 
       if (!response.writableEnded) {
@@ -192,7 +201,10 @@ export default function server({
         }
 
         if (!response.writableEnded) {
-          console.log("The application didn’t finish handling this request.");
+          response.log(
+            "ERROR",
+            "The application didn’t finish handling this request.",
+          );
           response.statusCode = 500;
           response.setHeader("Content-Type", "text/plain; charset=utf-8");
           response.end("The application didn’t finish handling this request.");
@@ -203,6 +215,8 @@ export default function server({
 
       for (const directoryToCleanup of directoriesToCleanup)
         await fs.rm(directoryToCleanup, { recursive: true, force: true });
+
+      response.log("FINISH");
     })
     .listen(port, "localhost");
 

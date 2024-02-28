@@ -354,7 +354,7 @@ test({ timeout: 30 * 1000 }, async () => {
       error: true,
       handler: (request: any, response: any) => {
         trace.push("REACHABLE ERROR HANDLER");
-        trace.push(response.error.message);
+        trace.push(String(response.error));
         response.statusCode = 422;
         response.end();
       },
