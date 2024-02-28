@@ -50,16 +50,16 @@ export default function server({
           }`,
         );
 
-        // if (
-        //   request.method !== "GET" &&
-        //   request.headers["csrf-protection"] !== "true" &&
-        //   request.URL.pathname.match(csrfProtectionPathnameException) === null
-        // ) {
-        //   response.statusCode = 403;
-        //   throw new Error(
-        //     "CSRF protection failed: This request appears to have come from outside the application. Please close this tab and start again.",
-        //   );
-        // }
+        if (
+          request.method !== "GET" &&
+          request.headers["csrf-protection"] !== "true" &&
+          request.URL.pathname.match(csrfProtectionPathnameException) === null
+        ) {
+          response.statusCode = 403;
+          throw new Error(
+            "This request appears to have come from outside the application. Please close this tab and start again. (Cross-Site Request Forgery (CSRF) protection failed.)",
+          );
+        }
 
         request.search = Object.fromEntries(request.URL.searchParams);
 
