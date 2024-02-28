@@ -18,6 +18,7 @@ TODO
   - Request size limits (HTTP status 413)
     - Number of headers
     - Size of header
+      - `createServer()`’s `maxHeaderSize` (default: `16384`) (This applies to a single header, and there’s no limit on the number of headers, right? Which is not what we want…)
     - Number of multipart body headers
     - Size of multipart body headers
     - Number of body fields
@@ -26,7 +27,10 @@ TODO
   - Request timeout (HTTP status 408) (https://nodejs.org/dist/latest-v21.x/docs/api/http.html#serverrequesttimeout)
     - Deal with this in Caddy?
     - Headers
+      - `createServer()`’s `headersTimeout` (default: `60000`)
     - Body
+      - `createServer()`’s `requestTimeout` (default: `300000`)
+  - Decide which of these (request size limits and timeouts) should be configurable
   - Different charsets?
   - `Content-Encoding` (for example, compression)
 - Extra features

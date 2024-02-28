@@ -11,13 +11,6 @@ export default function server({
 }: { port?: number } = {}): any[] {
   const handlers: any[] = [];
 
-  // TODO: options
-  // - ‘createServer’
-  //   - maxHeaderSize
-  //     - This applies to a single header, and there’s no limit on the number of headers, right?
-  //   - headersTimeout
-  //   - requestTimeout
-  // - busboy
   const httpServer = http
     .createServer(async (request: any, response: any) => {
       const directoriesToCleanup = new Array<string>();

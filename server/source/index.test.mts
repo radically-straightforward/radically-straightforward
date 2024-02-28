@@ -208,5 +208,16 @@ test({ timeout: 30 * 1000 }, async () => {
   assert.equal((await fetch("http://localhost:18000/error")).status, 422);
   assert.deepEqual(trace, ["BEFORE ERROR", "REACHABLE ERROR HANDLER", "ERROR"]);
 
+  assert.equal(
+    (
+      await fetch("http://localhost:18000/", {
+        headers: Object.fromEntries(
+          new Array(100_000).fill(["Custom-Header", "Hello"]),
+        ),
+      })
+    ).status,
+    413,
+  );
+
   process.kill(process.pid);
 });
