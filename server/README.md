@@ -15,15 +15,6 @@ TODO
 ## Requirements
 
 - Edge cases
-  - Request size limits (HTTP status 413)
-    - [x] Number of headers
-    - [x] Size of header
-      - `createServer()`’s `maxHeaderSize` (default: `16384`) (The documentation led me to believe that this applied to the size of a single header, but it also applies to the size of the headers overall.)
-    - [ ] Number of multipart body headers
-    - [ ] Size of multipart body headers
-    - [ ] Number of body fields
-    - [ ] Size of body field key
-    - [ ] Size of body field value
   - Request timeout (HTTP status 408) (https://nodejs.org/dist/latest-v21.x/docs/api/http.html#serverrequesttimeout)
     - Deal with this in Caddy?
     - Headers

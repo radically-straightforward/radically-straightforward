@@ -135,6 +135,15 @@ test({ timeout: 30 * 1000 }, async () => {
   assert.equal(
     (
       await fetch("http://localhost:18000/", {
+        headers: { ["Custom-Header".repeat(10_000)]: "TOO LARGE" },
+      })
+    ).status,
+    431,
+  );
+
+  assert.equal(
+    (
+      await fetch("http://localhost:18000/", {
         headers: { "Custom-Header": "TOO LARGE".repeat(10_000) },
       })
     ).status,
