@@ -18,6 +18,7 @@ TODO
   - Logging
     - Request
     - Server startup and shutdown
+  - CSRF.
   - Live updates.
   - Content proxy (we already have one in Courselore using Got—try to develop one using `fetch`)
     - Link in documentation for `@radically-straightforward/caddy`’s `header()`.
