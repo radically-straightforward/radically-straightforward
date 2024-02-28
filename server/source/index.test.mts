@@ -48,6 +48,7 @@ test({ timeout: 30 * 1000 }, async () => {
       {
         method: "PATCH",
         headers: {
+          "CSRF-Protection": "true",
           "Custom-Header": "Hello",
           Cookie: "__Host-example=abc; __Host-anotherExample=def",
         },
@@ -85,6 +86,7 @@ test({ timeout: 30 * 1000 }, async () => {
       await (
         await fetch("http://localhost:18000/request-parsing/10", {
           method: "PATCH",
+          headers: { "CSRF-Protection": "true" },
           body: requestBody,
         })
       ).json(),
@@ -167,6 +169,7 @@ test({ timeout: 30 * 1000 }, async () => {
   {
     const response = await fetch("http://localhost:18000/", {
       method: "PATCH",
+      headers: { "CSRF-Protection": "true" },
       body: new URLSearchParams({ ["bodyField".repeat(10_000)]: "33" }),
     });
     assert.equal(response.status, 413);
@@ -180,6 +183,7 @@ test({ timeout: 30 * 1000 }, async () => {
   {
     const response = await fetch("http://localhost:18000/", {
       method: "PATCH",
+      headers: { "CSRF-Protection": "true" },
       body: new URLSearchParams({ bodyField: "33".repeat(1_000_000) }),
     });
     assert.equal(response.status, 413);
@@ -198,6 +202,7 @@ test({ timeout: 30 * 1000 }, async () => {
     );
     const response = await fetch("http://localhost:18000/", {
       method: "PATCH",
+      headers: { "CSRF-Protection": "true" },
       body: requestBody,
     });
     assert.equal(response.status, 400);
@@ -212,6 +217,7 @@ test({ timeout: 30 * 1000 }, async () => {
     requestBody.append("bodyFileField", new Blob([Buffer.alloc(100_000_000)]));
     const response = await fetch("http://localhost:18000/", {
       method: "PATCH",
+      headers: { "CSRF-Protection": "true" },
       body: requestBody,
     });
     assert.equal(response.status, 413);
@@ -225,6 +231,7 @@ test({ timeout: 30 * 1000 }, async () => {
   {
     const response = await fetch("http://localhost:18000/", {
       method: "PATCH",
+      headers: { "CSRF-Protection": "true" },
       body: new URLSearchParams(
         Object.fromEntries(
           Array.from({ length: 1_000 }, (value, key) => [
@@ -252,6 +259,7 @@ test({ timeout: 30 * 1000 }, async () => {
       requestBody.append("bodyFileField", new Blob([Buffer.from([33, 34, 3])]));
     const response = await fetch("http://localhost:18000/", {
       method: "PATCH",
+      headers: { "CSRF-Protection": "true" },
       body: requestBody,
     });
     assert.equal(response.status, 413);
