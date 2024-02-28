@@ -14,10 +14,6 @@ TODO
 
 ## Requirements
 
-- Edge cases
-  - Decide which of these (request size limits and timeouts) should be configurable
-  - Different charsets?
-  - `Content-Encoding` (for example, compression)
 - Extra features
   - Logging (`console.log()`)
   - Live updates.
@@ -35,6 +31,9 @@ TODO
     - `Buffer.byteLength()`
   - Rate limiting
     - Could be done on Caddy with extension
+  - Edge cases
+    - Different charsets?
+    - `Content-Encoding` (for example, compression)
 
 ## Features
 
