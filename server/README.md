@@ -16,7 +16,6 @@ TODO
 
 - Edge cases
   - Request timeout (HTTP status 408) (https://nodejs.org/dist/latest-v21.x/docs/api/http.html#serverrequesttimeout)
-    - Deal with this in Caddy?
     - Headers
       - `createServer()`’s `headersTimeout` (default: `60000`)
     - Body
@@ -39,6 +38,8 @@ TODO
   - Response body `Content-Length`?
     - Node.js already sets `Content-Length` if you use `end()`. If you use `write()` Node.js sets chunked transfer.
     - `Buffer.byteLength()`
+  - Rate limiting
+    - Could be done on Caddy with extension
 
 ## Features
 
