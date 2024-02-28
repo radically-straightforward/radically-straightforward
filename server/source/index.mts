@@ -8,7 +8,11 @@ import * as utilities from "@radically-straightforward/utilities";
 
 export default function server({
   port = 18000,
-}: { port?: number } = {}): any[] {
+  csrfProtectionPathnameException = /^$/,
+}: {
+  port?: number;
+  csrfProtectionPathnameException?: RegExp;
+} = {}): any[] {
   log("STARTING");
 
   const handlers: any[] = [];
@@ -45,6 +49,17 @@ export default function server({
             request.headers["x-forwarded-host"] ?? request.headers["host"]
           }`,
         );
+
+        if (
+          request.method !== "GET" &&
+          request.headers["csrf-protection"] !== "true" &&
+          request.URL.pathname.match(csrfProtectionPathnameException) === null
+        ) {
+          response.statusCode = 403;
+          throw new Error(
+            "CSRF protection failed: This request appears to have come from outside the application. Please close this tab and start again.",
+          );
+        }
 
         request.search = Object.fromEntries(request.URL.searchParams);
 
