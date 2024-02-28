@@ -181,25 +181,37 @@ test({ timeout: 30 * 1000 }, async () => {
     assert.equal(await response.text(), "Field too large.");
   }
 
-  // TODO: "File too large." (both field name and contents)
+  {
+    const requestBody = new FormData();
+    requestBody.append(
+      "bodyFileField".repeat(10_000),
+      new Blob([Buffer.from([33, 34, 3])]),
+    );
+    const response = await fetch("http://localhost:18000/", {
+      method: "PATCH",
+      body: requestBody,
+    });
+    assert.equal(response.status, 400);
+    assert.equal(
+      response.headers.get("Content-Type"),
+      "text/plain; charset=utf-8",
+    );
+  }
 
-  // {
-  //   const requestBody = new FormData();
-  //   requestBody.append(
-  //     "bodyFileField".repeat(10_000),
-  //     new Blob([Buffer.from([33, 34, 3])]),
-  //   );
-  //   const response = await fetch("http://localhost:18000/", {
-  //     method: "PATCH",
-  //     body: requestBody,
-  //   });
-  //   assert.equal(response.status, 413);
-  //   assert.equal(
-  //     response.headers.get("Content-Type"),
-  //     "text/plain; charset=utf-8",
-  //   );
-  //   assert.equal(await response.text(), "File too large.");
-  // }
+  {
+    const requestBody = new FormData();
+    requestBody.append("bodyFileField", new Blob([Buffer.alloc(100_000_000)]));
+    const response = await fetch("http://localhost:18000/", {
+      method: "PATCH",
+      body: requestBody,
+    });
+    assert.equal(response.status, 413);
+    assert.equal(
+      response.headers.get("Content-Type"),
+      "text/plain; charset=utf-8",
+    );
+    assert.equal(await response.text(), "File too large.");
+  }
 
   {
     const response = await fetch("http://localhost:18000/", {
@@ -221,7 +233,25 @@ test({ timeout: 30 * 1000 }, async () => {
     assert.equal(await response.text(), "Too many fields.");
   }
 
-  // TODO: "Too many files."
+  {
+    const requestBody = new FormData();
+    for (
+      let bodyFileFieldCount = 0;
+      bodyFileFieldCount < 1000;
+      bodyFileFieldCount++
+    )
+      requestBody.append("bodyFileField", new Blob([Buffer.from([33, 34, 3])]));
+    const response = await fetch("http://localhost:18000/", {
+      method: "PATCH",
+      body: requestBody,
+    });
+    assert.equal(response.status, 413);
+    assert.equal(
+      response.headers.get("Content-Type"),
+      "text/plain; charset=utf-8",
+    );
+    assert.equal(await response.text(), "Too many files.");
+  }
 
   application.push({
     method: "GET",
