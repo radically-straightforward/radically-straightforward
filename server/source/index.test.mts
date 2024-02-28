@@ -183,6 +183,24 @@ test({ timeout: 30 * 1000 }, async () => {
 
   // TODO: "File too large." (both field name and contents)
 
+  // {
+  //   const requestBody = new FormData();
+  //   requestBody.append(
+  //     "bodyFileField".repeat(10_000),
+  //     new Blob([Buffer.from([33, 34, 3])]),
+  //   );
+  //   const response = await fetch("http://localhost:18000/", {
+  //     method: "PATCH",
+  //     body: requestBody,
+  //   });
+  //   assert.equal(response.status, 413);
+  //   assert.equal(
+  //     response.headers.get("Content-Type"),
+  //     "text/plain; charset=utf-8",
+  //   );
+  //   assert.equal(await response.text(), "File too large.");
+  // }
+
   {
     const response = await fetch("http://localhost:18000/", {
       method: "PATCH",
