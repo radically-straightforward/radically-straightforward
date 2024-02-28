@@ -15,9 +15,6 @@ TODO
 ## Requirements
 
 - Extra features
-  - Logging
-    - Request
-    - Server startup and shutdown
   - CSRF.
   - Live updates.
   - Content proxy (we already have one in Courselore using Got—try to develop one using `fetch`)

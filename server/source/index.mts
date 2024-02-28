@@ -9,6 +9,8 @@ import * as utilities from "@radically-straightforward/utilities";
 export default function server({
   port = 18000,
 }: { port?: number } = {}): any[] {
+  log("STARTING");
+
   const handlers: any[] = [];
 
   const httpServer = http
@@ -17,8 +19,7 @@ export default function server({
         const id = utilities.randomString();
         const start = process.hrtime.bigint();
         response.log = (...messageParts: string[]): void => {
-          utilities.log(
-            String(port),
+          log(
             id,
             `${(process.hrtime.bigint() - start) / 1_000_000n}ms`,
             ...messageParts,
@@ -241,7 +242,12 @@ export default function server({
 
   process.once("gracefulTermination", () => {
     httpServer.close();
+    log("STOPPED");
   });
 
   return handlers;
+
+  function log(...messageParts: string[]): void {
+    utilities.log(String(port), ...messageParts);
+  }
 }
