@@ -264,7 +264,7 @@ test({ timeout: 30 * 1000 }, async () => {
 
   application.push({
     method: "GET",
-    pathname: "/default-response",
+    pathname: /^\/default-response$/,
     handler: (request: any, response: any) => {
       response.end("<p>Hello World</p>");
     },
@@ -282,7 +282,7 @@ test({ timeout: 30 * 1000 }, async () => {
 
   application.push({
     method: "GET",
-    pathname: "/response-helpers",
+    pathname: /^\/response-helpers$/,
     handler: (request: any, response: any) => {
       response.state.example = "Hello";
     },
@@ -290,7 +290,7 @@ test({ timeout: 30 * 1000 }, async () => {
 
   application.push({
     method: "GET",
-    pathname: "/response-helpers",
+    pathname: /^\/response-helpers$/,
     handler: (request: any, response: any) => {
       assert.equal(response.state.example, "Hello");
       assert.equal(request.cookies.example, undefined);
@@ -307,7 +307,7 @@ test({ timeout: 30 * 1000 }, async () => {
 
   application.push({
     method: "GET",
-    pathname: "/response-helpers",
+    pathname: /^\/response-helpers$/,
     handler: (request: any, response: any) => {
       assert.fail();
     },
@@ -334,7 +334,7 @@ test({ timeout: 30 * 1000 }, async () => {
 
     application.push({
       method: "GET",
-      pathname: "/error",
+      pathname: /^\/error$/,
       handler: (request: any, response: any) => {
         trace.push("BEFORE ERROR");
         throw new Error("ERROR");
@@ -344,7 +344,7 @@ test({ timeout: 30 * 1000 }, async () => {
 
     application.push({
       method: "GET",
-      pathname: "/error",
+      pathname: /^\/error$/,
       handler: (request: any, response: any) => {
         trace.push("UNREACHABLE HANDLER");
       },
