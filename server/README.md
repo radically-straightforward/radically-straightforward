@@ -15,9 +15,9 @@ TODO
 ## Requirements
 
 - Extra features
-  - Live updates.
   - Content proxy (we already have one in Courselore using Got—try to develop one using `fetch`)
     - Link in documentation for `@radically-straightforward/caddy`’s `header()`.
+  - Live updates.
 - Types
   - Request & response types
   - Address all `any`s
