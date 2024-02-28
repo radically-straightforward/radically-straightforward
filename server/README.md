@@ -34,7 +34,7 @@ TODO
   - Different charsets?
   - `Content-Encoding` (for example, compression)
 - Extra features
-  - Logging
+  - Logging (`TODO`)
   - Live updates.
   - Content proxy (we already have one in Courselore using Got—try to develop one using `fetch`)
     - Link in documentation for `@radically-straightforward/caddy`’s `header()`.
