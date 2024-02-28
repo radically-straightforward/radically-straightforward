@@ -89,7 +89,7 @@ test({ timeout: 30 * 1000 }, async () => {
         })
       ).json(),
       {
-        href: "http://localhost:18000/request-parsing/10?searchParameter=20",
+        href: "http://localhost:18000/request-parsing/10",
         pathname: { pathnameParameter: "10" },
         search: {},
         headers: {},
@@ -171,7 +171,7 @@ test({ timeout: 30 * 1000 }, async () => {
   {
     const response = await fetch("http://localhost:18000/", {
       method: "PATCH",
-      body: new URLSearchParams({ bodyField: "33".repeat(10_000) }),
+      body: new URLSearchParams({ bodyField: "33".repeat(1_000_000) }),
     });
     assert.equal(response.status, 413);
     assert.equal(
