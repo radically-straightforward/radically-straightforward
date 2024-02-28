@@ -194,6 +194,7 @@ export default function server({
         if (!response.writableEnded) {
           console.log("The application didn’t finish handling this request.");
           response.statusCode = 500;
+          response.setHeader("Content-Type", "text/plain; charset=utf-8");
           response.end("The application didn’t finish handling this request.");
         }
 

@@ -15,11 +15,6 @@ TODO
 ## Requirements
 
 - Edge cases
-  - Request timeout (HTTP status 408) (https://nodejs.org/dist/latest-v21.x/docs/api/http.html#serverrequesttimeout)
-    - Headers
-      - `createServer()`’s `headersTimeout` (default: `60000`)
-    - Body
-      - `createServer()`’s `requestTimeout` (default: `300000`)
   - Decide which of these (request size limits and timeouts) should be configurable
   - Different charsets?
   - `Content-Encoding` (for example, compression)
@@ -57,6 +52,9 @@ TODO
 - Compared to Express.js
   - No need for `next()`, no requests left unresponded.
   - Async handlers 😅
+- Request timeout (HTTP status 408) (https://nodejs.org/dist/latest-v21.x/docs/api/http.html#serverrequesttimeout)
+  - Headers: `createServer()`’s `headersTimeout` (default: `60000`)
+  - Body: `createServer()`’s `requestTimeout` (default: `300000`)
 
 ## Related Work
 
