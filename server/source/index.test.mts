@@ -129,7 +129,7 @@ test({ timeout: 30 * 1000 }, async () => {
       response.headers.get("Content-Type"),
       "text/plain; charset=utf-8",
     );
-    assert.equal(await response.text(), "Malformed ‘Cookie’ header.");
+    assert.equal(await response.text(), "Error: Malformed ‘Cookie’ header.");
   }
 
   assert.equal(
@@ -174,7 +174,7 @@ test({ timeout: 30 * 1000 }, async () => {
       response.headers.get("Content-Type"),
       "text/plain; charset=utf-8",
     );
-    assert.equal(await response.text(), "Field too large.");
+    assert.equal(await response.text(), "Error: Field too large.");
   }
 
   {
@@ -187,7 +187,7 @@ test({ timeout: 30 * 1000 }, async () => {
       response.headers.get("Content-Type"),
       "text/plain; charset=utf-8",
     );
-    assert.equal(await response.text(), "Field too large.");
+    assert.equal(await response.text(), "Error: Field too large.");
   }
 
   {
@@ -219,7 +219,7 @@ test({ timeout: 30 * 1000 }, async () => {
       response.headers.get("Content-Type"),
       "text/plain; charset=utf-8",
     );
-    assert.equal(await response.text(), "File too large.");
+    assert.equal(await response.text(), "Error: File too large.");
   }
 
   {
@@ -239,7 +239,7 @@ test({ timeout: 30 * 1000 }, async () => {
       response.headers.get("Content-Type"),
       "text/plain; charset=utf-8",
     );
-    assert.equal(await response.text(), "Too many fields.");
+    assert.equal(await response.text(), "Error: Too many fields.");
   }
 
   {
@@ -259,7 +259,7 @@ test({ timeout: 30 * 1000 }, async () => {
       response.headers.get("Content-Type"),
       "text/plain; charset=utf-8",
     );
-    assert.equal(await response.text(), "Too many files.");
+    assert.equal(await response.text(), "Error: Too many files.");
   }
 
   application.push({
@@ -371,7 +371,7 @@ test({ timeout: 30 * 1000 }, async () => {
     assert.deepEqual(trace, [
       "BEFORE ERROR",
       "REACHABLE ERROR HANDLER",
-      "ERROR",
+      "Error: ERROR",
     ]);
   }
 

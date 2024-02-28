@@ -167,7 +167,7 @@ export default function server({
           return response;
         };
       } catch (error: any) {
-        response.log("ERROR", String(error), error?.stack);
+        response.log("ERROR", String(error));
         if (response.statusCode === 200) response.statusCode = 400;
         response.setHeader("Content-Type", "text/plain; charset=utf-8");
         response.end(String(error));
@@ -193,7 +193,8 @@ export default function server({
 
           try {
             await handler.handler(request, response);
-          } catch (error) {
+          } catch (error: any) {
+            response.log("ERROR", String(error), error?.stack);
             response.error = error;
           }
 
