@@ -153,7 +153,7 @@ export default function server({
         };
       } catch (error) {
         // TODO: Improve this error logging.
-        console.error(error);
+        console.log(error);
         response.statusCode = 400;
         response.end("The server failed to parse the request.");
       }
@@ -186,7 +186,8 @@ export default function server({
         }
 
         if (!response.writableEnded) {
-          // TODO: Log error
+          // TODO: Improve this error logging.
+          console.log("The application didn’t finish handling this request.");
           response.statusCode = 500;
           response.end("The application didn’t finish handling this request.");
         }

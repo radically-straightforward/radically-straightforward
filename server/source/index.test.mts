@@ -212,7 +212,10 @@ test({ timeout: 30 * 1000 }, async () => {
     (
       await fetch("http://localhost:18000/", {
         headers: Object.fromEntries(
-          new Array(100_000).fill(["Custom-Header", "Hello"]),
+          Array.from({ length: 100_000 }, (n) => [
+            `Custom-Header-${n}`,
+            "Hello",
+          ]),
         ),
       })
     ).status,
