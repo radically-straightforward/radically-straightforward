@@ -31,15 +31,14 @@ test({ timeout: 30 * 1000 }, async () => {
     pathname: new RegExp("^/request-parsing/(?<pathnameParameter>[0-9]+)$"),
     handler: async (request: any, response: any) => {
       for (const values of Object.values<any>(request.body))
-        if (Array.isArray(values))
-          for (const value of values)
-            if (typeof value.path === "string") {
-              value.content = [...(await fs.readFile(value.path))];
-              directoriesThatShouldHaveBeenCleanedUp.push(
-                path.dirname(value.path),
-              );
-              delete value.path;
-            }
+        for (const value of values)
+          if (typeof value.path === "string") {
+            value.content = [...(await fs.readFile(value.path))];
+            directoriesThatShouldHaveBeenCleanedUp.push(
+              path.dirname(value.path),
+            );
+            delete value.path;
+          }
       response.setHeader("Content-Type", "application/json; charset=utf-8");
       response.end(
         JSON.stringify({
