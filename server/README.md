@@ -77,6 +77,7 @@ TODO
   - Make non-`GET` requests with custom header (`CSRF-Protection`)
   - References
     - <https://cheatsheetseries.owasp.org/cheatsheets/Cross-Site_Request_Forgery_Prevention_Cheat_Sheet.html>
+- Images/videos/audios proxy.
 
 ## Related Work
 
