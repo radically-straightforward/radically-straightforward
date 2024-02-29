@@ -285,6 +285,82 @@ test({ timeout: 30 * 1000 }, async () => {
     assert.equal(await response.text(), "Error: Too many files.");
   }
 
+  {
+    const response = await fetch("http://localhost:18000/proxy");
+    assert.equal(response.status, 422);
+    assert.equal(
+      response.headers.get("Content-Type"),
+      "text/plain; charset=utf-8",
+    );
+    assert.equal(
+      await response.text(),
+      "Error: Missing ‘destination’ search parameter.",
+    );
+  }
+
+  {
+    const response = await fetch(
+      `http://localhost:18000/proxy?destination=${encodeURIComponent("ftp://localhost")}`,
+    );
+    assert.equal(response.status, 422);
+    assert.equal(
+      response.headers.get("Content-Type"),
+      "text/plain; charset=utf-8",
+    );
+    assert.equal(await response.text(), "Error: Invalid destination.");
+  }
+
+  {
+    const response = await fetch(
+      `http://localhost:18000/proxy?destination=${encodeURIComponent("http://localhost/")}`,
+    );
+    assert.equal(response.status, 422);
+    assert.equal(
+      response.headers.get("Content-Type"),
+      "text/plain; charset=utf-8",
+    );
+    assert.equal(await response.text(), "Error: Invalid destination.");
+  }
+
+  {
+    const response = await fetch(
+      `http://localhost:18000/proxy?destination=${encodeURIComponent("https://developer.mozilla.org/")}`,
+    );
+    assert.equal(response.status, 502);
+    assert.equal(
+      response.headers.get("Content-Type"),
+      "text/plain; charset=utf-8",
+    );
+    assert.equal(await response.text(), "Error: Invalid destination response.");
+  }
+
+  {
+    const response = await fetch(
+      `http://localhost:18000/proxy?destination=${encodeURIComponent("https://interactive-examples.mdn.mozilla.net/media/cc0-images/grapefruit-slice-332-332.jpg")}`,
+    );
+    assert.equal(response.status, 200);
+    assert.equal(response.headers.get("Content-Type"), "image/jpeg");
+    await response.blob();
+  }
+
+  {
+    const response = await fetch(
+      `http://localhost:18000/proxy?destination=${encodeURIComponent("https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.webm")}`,
+    );
+    assert.equal(response.status, 200);
+    assert.equal(response.headers.get("Content-Type"), "video/webm");
+    await response.blob();
+  }
+
+  {
+    const response = await fetch(
+      `http://localhost:18000/proxy?destination=${encodeURIComponent("https://interactive-examples.mdn.mozilla.net/media/cc0-audio/t-rex-roar.mp3")}`,
+    );
+    assert.equal(response.status, 200);
+    assert.equal(response.headers.get("Content-Type"), "audio/mpeg");
+    await response.blob();
+  }
+
   application.push({
     method: "GET",
     pathname: "/default-response",
@@ -411,5 +487,19 @@ test({ timeout: 30 * 1000 }, async () => {
     );
   }
 
-  process.kill(process.pid);
+  if (process.stdin.isTTY) {
+    console.log(`Test proxy in browser with the following URLs:
+
+http://localhost:18000/proxy?destination=${encodeURIComponent("https://interactive-examples.mdn.mozilla.net/media/cc0-images/grapefruit-slice-332-332.jpg")}
+
+http://localhost:18000/proxy?destination=${encodeURIComponent("https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.webm")}
+
+http://localhost:18000/proxy?destination=${encodeURIComponent("https://interactive-examples.mdn.mozilla.net/media/cc0-audio/t-rex-roar.mp3")}
+`);
+  } else {
+    console.log(
+      "Interact with the test server and run manual tests with ‘node ./build/index.test.mjs’.",
+    );
+    process.kill(process.pid);
+  }
 });

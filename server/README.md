@@ -15,16 +15,7 @@ TODO
 ## Requirements
 
 - Extra features
-  - Content proxy (we already have one in Courselore using Got—try to develop one using `fetch`)
-    - Test
-      - Images
-      - Videos (range requests?)
-      - Audios
-      - Automated tests
-      - `curl -v "http://localhost:18000/proxy"`
-      - `curl -v "http://localhost:18000/proxy?destination=https%3A%2F%2Fdeveloper.mozilla.org%2Fen-US%2Fdocs%2FWeb%2FHTTP%2FStatus"`
-      - `curl -v "http://localhost:18000/proxy?destination=http%3A%2F%2Flocalhost%3A18000%2F"`
-      - `curl -v "http://localhost:18000/proxy?destination=https%3A%2F%2Finteractive-examples.mdn.mozilla.net%2Fmedia%2Fcc0-images%2Fgrapefruit-slice-332-332.jpg"`
+  - Proxy
     - Error modes
       - Max number of redirects 4
       - Max size 5242880

@@ -217,7 +217,7 @@ export default function server({
           try {
             if (typeof request.search.destination !== "string") {
               response.statusCode = 422;
-              throw new Error("Missing ‘destination’.");
+              throw new Error("Missing ‘destination’ search parameter.");
             }
 
             const destination = new URL(request.search.destination);
