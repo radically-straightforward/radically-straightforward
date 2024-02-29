@@ -8,10 +8,10 @@ import * as utilities from "@radically-straightforward/utilities";
 
 export default function server({
   port = 18000,
-  csrfProtectionPathnameException = /^$/,
+  csrfProtectionPathnameException = "",
 }: {
   port?: number;
-  csrfProtectionPathnameException?: RegExp;
+  csrfProtectionPathnameException?: string | RegExp;
 } = {}): any[] {
   log("STARTING");
 
@@ -53,7 +53,11 @@ export default function server({
         if (
           request.method !== "GET" &&
           request.headers["csrf-protection"] !== "true" &&
-          request.URL.pathname.match(csrfProtectionPathnameException) === null
+          ((typeof csrfProtectionPathnameException === "string" &&
+            request.URL.pathname !== csrfProtectionPathnameException) ||
+            (csrfProtectionPathnameException instanceof RegExp &&
+              request.URL.pathname.match(csrfProtectionPathnameException) ===
+                null))
         ) {
           response.statusCode = 403;
           throw new Error(
@@ -213,17 +217,23 @@ export default function server({
             continue;
 
           if (
-            handler.method !== undefined &&
-            request.method.match(handler.method) === null
+            (typeof handler.method === "string" &&
+              request.method !== handler.method) ||
+            (handler.method instanceof RegExp &&
+              request.method.match(handler.method) === null)
           )
             continue;
 
-          if (handler.pathname === undefined) request.pathname = {};
-          else {
+          if (
+            typeof handler.pathname === "string" &&
+            request.URL.pathname !== handler.pathname
+          )
+            continue;
+          else if (handler.pathname instanceof RegExp) {
             const match = request.URL.pathname.match(handler.pathname);
             if (match === null) continue;
             request.pathname = match.groups ?? {};
-          }
+          } else request.pathname = {};
 
           try {
             await handler.handler(request, response);
