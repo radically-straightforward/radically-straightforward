@@ -15,8 +15,6 @@ TODO
 ## Requirements
 
 - Extra features
-  - Proxy
-    - Link in documentation for `@radically-straightforward/caddy`’s `header()`.
   - `stream.pipeline()` on `busboy`?
   - Live updates.
 - Types
