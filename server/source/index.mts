@@ -212,50 +212,89 @@ export default function server({
       }
 
       if (!response.writableEnded) {
-        for (const handler of handlers) {
-          if ((response.error !== undefined) !== (handler.error ?? false))
-            continue;
-
-          if (
-            (typeof handler.method === "string" &&
-              request.method !== handler.method) ||
-            (handler.method instanceof RegExp &&
-              request.method.match(handler.method) === null)
-          )
-            continue;
-
-          if (
-            typeof handler.pathname === "string" &&
-            request.URL.pathname !== handler.pathname
-          )
-            continue;
-          else if (handler.pathname instanceof RegExp) {
-            const match = request.URL.pathname.match(handler.pathname);
-            if (match === null) continue;
-            request.pathname = match.groups ?? {};
-          } else request.pathname = {};
-
+        if (request.URL.pathname === "/proxy") {
           try {
-            await handler.handler(request, response);
-          } catch (error: any) {
-            response.log("ERROR", String(error), error?.stack);
-            response.error = error;
+            if (typeof request.search.destination !== "string")
+              throw new Error("Missing ‘destination’.");
+
+            const destination = new URL(request.search.destination);
+            if (
+              (destination.protocol !== "http:" &&
+                destination.protocol !== "https:") ||
+              destination.hostname === request.URL.hostname
+            )
+              throw new Error("Invalid destination");
+
+            const destinationResponse = await fetch(destination.href, {
+              signal: AbortSignal.timeout(30 * 1000),
+            });
+            const destinationResponseContentType =
+              destinationResponse.headers.get("Content-Type");
+            if (
+              !destinationResponse.ok ||
+              typeof destinationResponseContentType !== "string" ||
+              destinationResponseContentType.match(
+                new RegExp("^(?:image|video|audio)/"),
+              ) === null ||
+              !(destinationResponse.body instanceof ReadableStream)
+            )
+              throw new Error("Invalid destination response.");
+
+            response.setHeader("Content-Type", destinationResponseContentType);
+            await destinationResponse.body.pipeTo(response, {
+              signal: AbortSignal.timeout(5 * 60 * 1000),
+            });
+          } catch (error) {
+            // TODO
+          }
+        } else {
+          for (const handler of handlers) {
+            if ((response.error !== undefined) !== (handler.error ?? false))
+              continue;
+
+            if (
+              (typeof handler.method === "string" &&
+                request.method !== handler.method) ||
+              (handler.method instanceof RegExp &&
+                request.method.match(handler.method) === null)
+            )
+              continue;
+
+            if (
+              typeof handler.pathname === "string" &&
+              request.URL.pathname !== handler.pathname
+            )
+              continue;
+            else if (handler.pathname instanceof RegExp) {
+              const match = request.URL.pathname.match(handler.pathname);
+              if (match === null) continue;
+              request.pathname = match.groups ?? {};
+            } else request.pathname = {};
+
+            try {
+              await handler.handler(request, response);
+            } catch (error: any) {
+              response.log("ERROR", String(error), error?.stack);
+              response.error = error;
+            }
+
+            if (response.writableEnded) break;
           }
 
-          if (response.writableEnded) break;
-        }
+          if (!response.writableEnded) {
+            response.log(
+              "ERROR",
+              "The application didn’t finish handling this request.",
+            );
+            response.statusCode = 500;
+            response.setHeader("Content-Type", "text/plain; charset=utf-8");
+            response.end(
+              "The application didn’t finish handling this request.",
+            );
+          }
 
-        if (!response.writableEnded) {
-          response.log(
-            "ERROR",
-            "The application didn’t finish handling this request.",
-          );
-          response.statusCode = 500;
-          response.setHeader("Content-Type", "text/plain; charset=utf-8");
-          response.end("The application didn’t finish handling this request.");
+          for (const after of response.afters) await after();
         }
-
-        for (const after of response.afters) await after();
       }
 
       for (const directoryToCleanup of directoriesToCleanup)
