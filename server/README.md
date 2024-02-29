@@ -16,16 +16,6 @@ TODO
 
 - Extra features
   - Proxy
-    - Error modes
-      - Max number of redirects 4
-      - Max size 5242880
-      - Timeout 10s
-    - Resizing?
-    - Caching? Not only for performance, but also because third-party images may go away
-    - Include HMAC
-      - Perhaps not, because as far as I understand the purpose of HMAC is to prevent abuse, but hotlinked images can only be used from our website anyway due to Cross-Origin-Resource-Policy. In other words, you can’t hotlink a hotlinked (proxied) image. This saves us from having to compute & verify HMACs.
-    - Allow hotlinking from our proxy? This has implications on the decision to not use HMAC on the proxy, and also has implications on rendering hotlinked images on third-party websites, for example, the Outlook email client, as soon as we start sending email notifications with fully processed content (right now we send the pre-processed content, but we want to change that so that things like `@mentions` show up more properly.)
-      - This is necessary to 100% guarantee that people will be able to see images on Outlook
     - Link in documentation for `@radically-straightforward/caddy`’s `header()`.
   - `stream.pipeline()` on `busboy`?
   - Live updates.
@@ -53,6 +43,16 @@ TODO
   - Edge cases
     - Different charsets?
     - `Content-Encoding` (for example, compression)
+  - Proxy
+      - Test redirect loop
+      - Test timeout 10s
+      - Limit size?
+      - Resize images?
+      - Cache? Not only for performance, but also because third-party images may go away
+      - Include HMAC?
+        - Perhaps not, because as far as I understand the purpose of HMAC is to prevent abuse, but hotlinked images can only be used from our website anyway due to Cross-Origin-Resource-Policy. In other words, you can’t hotlink a hotlinked (proxied) image. This saves us from having to compute & verify HMACs.
+      - Allow third-parties to hotlink from our proxy? This has implications on the decision to not use HMAC on the proxy, and also has implications on rendering hotlinked images on third-party websites, for example, the Outlook email client, as soon as we start sending email notifications with fully processed content (right now we send the pre-processed content, but we want to change that so that things like `@mentions` show up more properly.)
+        - This is necessary to 100% guarantee that people will be able to see images on Outlook
 
 ## Features
 
@@ -70,7 +70,7 @@ TODO
 - Compared to Express.js
   - No need for `next()`, no requests left unresponded.
   - Async handlers 😅
-- Request size limits (HTTP status 431 (headers) and 413 (body))
+- Request size limits (HTTP status 431 (headers) (Node.js) and 413 (body) (busboy (in the way we use it)))
 - Request timeout (HTTP status 408) (https://nodejs.org/dist/latest-v21.x/docs/api/http.html#serverrequesttimeout)
   - Headers: `createServer()`’s `headersTimeout` (default: `60000`)
   - Body: `createServer()`’s `requestTimeout` (default: `300000`)
