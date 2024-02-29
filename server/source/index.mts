@@ -2,6 +2,7 @@ import os from "node:os";
 import path from "node:path";
 import fs from "node:fs/promises";
 import http from "node:http";
+import stream from "node:stream/promises";
 import busboy from "busboy";
 import "@radically-straightforward/node";
 import * as utilities from "@radically-straightforward/utilities";
@@ -245,7 +246,7 @@ export default function server({
               throw new Error("Invalid destination response.");
 
             response.setHeader("Content-Type", destinationResponseContentType);
-            await destinationResponse.body.pipeTo(response, {
+            await stream.pipeline(destinationResponse.body as any, response, {
               signal: AbortSignal.timeout(5 * 60 * 1000),
             });
           } catch (error: any) {
