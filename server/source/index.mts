@@ -226,7 +226,7 @@ export default function server({
               destination.hostname === request.URL.hostname
             ) {
               response.statusCode = 422;
-              throw new Error("Invalid destination");
+              throw new Error("Invalid destination.");
             }
 
             const destinationResponse = await fetch(destination.href, {
