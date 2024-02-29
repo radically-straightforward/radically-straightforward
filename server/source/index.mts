@@ -214,16 +214,20 @@ export default function server({
       if (!response.writableEnded) {
         if (request.URL.pathname === "/proxy") {
           try {
-            if (typeof request.search.destination !== "string")
+            if (typeof request.search.destination !== "string") {
+              response.statusCode = 422;
               throw new Error("Missing ‘destination’.");
+            }
 
             const destination = new URL(request.search.destination);
             if (
               (destination.protocol !== "http:" &&
                 destination.protocol !== "https:") ||
               destination.hostname === request.URL.hostname
-            )
+            ) {
+              response.statusCode = 422;
               throw new Error("Invalid destination");
+            }
 
             const destinationResponse = await fetch(destination.href, {
               signal: AbortSignal.timeout(30 * 1000),
@@ -244,8 +248,13 @@ export default function server({
             await destinationResponse.body.pipeTo(response, {
               signal: AbortSignal.timeout(5 * 60 * 1000),
             });
-          } catch (error) {
-            // TODO
+          } catch (error: any) {
+            response.log("ERROR", String(error));
+            if (!response.headersSent) {
+              if (response.statusCode === 200) response.statusCode = 502;
+              response.setHeader("Content-Type", "text/plain; charset=utf-8");
+            }
+            if (!response.writableEnded) response.end(String(error));
           }
         } else {
           for (const handler of handlers) {
@@ -286,8 +295,10 @@ export default function server({
               "ERROR",
               "The application didn’t finish handling this request.",
             );
-            response.statusCode = 500;
-            response.setHeader("Content-Type", "text/plain; charset=utf-8");
+            if (!response.headersSent) {
+              response.statusCode = 500;
+              response.setHeader("Content-Type", "text/plain; charset=utf-8");
+            }
             response.end(
               "The application didn’t finish handling this request.",
             );
