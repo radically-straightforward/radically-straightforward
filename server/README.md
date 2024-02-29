@@ -15,7 +15,6 @@ TODO
 ## Requirements
 
 - Extra features
-  - `stream.pipeline()` on `busboy`?
   - Live updates.
 - Types
   - Request & response types
