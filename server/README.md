@@ -14,8 +14,16 @@ TODO
 
 ## Requirements
 
-- Extra features
-  - Live updates.
+- Live Connection.
+  - Features
+    - Detect that you’re offline.
+    - Detect a server version update.
+    - Live Reload in development.
+    - Live Update when there’s a new version of the page.
+  - Implementation
+    - Inter-process communication between server processes.
+      - Pick up a Live Connection initiated by another process.
+      - Trigger Live Updates.
 - Types
   - Request & response types
   - Address all `any`s
@@ -81,6 +89,12 @@ TODO
   - References
     - <https://cheatsheetseries.owasp.org/cheatsheets/Cross-Site_Request_Forgery_Prevention_Cheat_Sheet.html>
 - Images/videos/audios proxy.
+- Live Connection.
+  - Features
+    - Detect that you’re offline.
+    - Detect a server version update.
+    - Live Reload in development.
+    - Live Update when there’s a new version of the page.
 
 ## Related Work
 
