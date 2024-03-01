@@ -299,6 +299,18 @@ test({ timeout: 30 * 1000 }, async () => {
 
   {
     const response = await fetch(
+      `http://localhost:18000/proxy?destination=${encodeURIComponent("not-even-a-url")}`,
+    );
+    assert.equal(response.status, 422);
+    assert.equal(
+      response.headers.get("Content-Type"),
+      "text/plain; charset=utf-8",
+    );
+    assert.equal(await response.text(), "Error: Invalid destination.");
+  }
+
+  {
+    const response = await fetch(
       `http://localhost:18000/proxy?destination=${encodeURIComponent("ftp://localhost")}`,
     );
     assert.equal(response.status, 422);
@@ -319,6 +331,18 @@ test({ timeout: 30 * 1000 }, async () => {
       "text/plain; charset=utf-8",
     );
     assert.equal(await response.text(), "Error: Invalid destination.");
+  }
+
+  {
+    const response = await fetch(
+      `http://localhost:18000/proxy?destination=${encodeURIComponent("http://a-nonexistent-website-lskjfpqslek41u20.com/")}`,
+    );
+    assert.equal(response.status, 502);
+    assert.equal(
+      response.headers.get("Content-Type"),
+      "text/plain; charset=utf-8",
+    );
+    assert.equal(await response.text(), "TypeError: fetch failed");
   }
 
   {

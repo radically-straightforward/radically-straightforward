@@ -65,7 +65,7 @@ TODO
 - Cookies:
   - `SameSite=None` for SAML to work, because the Identity Provider sends a `POST` request with the assertions back to the Service Provider, and anything other than `SameSite=None` would prevent cookies from being sent, and the server wouldn’t be able to ascertain whether a session already exists.
   - Expects the server to be available under a single `hostname`, which is fair, because it’s meant to be used with Caddy.
-  - Don’t use the `Domain` option, because the default is to associate the cookie only with the current domain, and if you set the option, the cookie applies to subdomains as well.
+  - Don’t use the `Domain` option, because the default is to associate the cookie only with the current domain, and if you set the option, the cookie applies to subdomains as well. (https://cheatsheetseries.owasp.org/cheatsheets/Cross-Site_Request_Forgery_Prevention_Cheat_Sheet.html)
 - Compared to Express.js
   - No need for `next()`, no requests left unresponded.
   - Async handlers 😅

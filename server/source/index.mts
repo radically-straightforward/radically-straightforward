@@ -38,6 +38,7 @@ export default function server({
       );
 
       const directoriesToCleanup = new Array<string>();
+
       try {
         if (request.method === undefined || request.url === undefined)
           throw new Error("Missing request ‘method’ or ‘url’.");
@@ -218,7 +219,13 @@ export default function server({
               throw new Error("Missing ‘destination’ search parameter.");
             }
 
-            const destination = new URL(request.search.destination);
+            let destination: URL;
+            try {
+              destination = new URL(request.search.destination);
+            } catch (error) {
+              response.statusCode = 422;
+              throw new Error("Invalid destination.");
+            }
             if (
               (destination.protocol !== "http:" &&
                 destination.protocol !== "https:") ||
@@ -322,7 +329,7 @@ export default function server({
 
   process.once("gracefulTermination", () => {
     httpServer.close((error) => {
-      log("STOPPED", error === undefined ? "" : String(error));
+      log("STOPPED", String(error ?? ""));
     });
   });
 
