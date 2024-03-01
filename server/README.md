@@ -15,6 +15,11 @@ TODO
 ## Requirements
 
 - Extra features
+  - Benchmark
+    - Node.js
+    - My framework
+    - Express
+    - Fastify
   - Live updates.
 - Types
   - Request & response types
