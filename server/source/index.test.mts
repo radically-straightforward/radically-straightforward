@@ -394,14 +394,14 @@ test({ timeout: process.stdin.isTTY ? undefined : 30 * 1000 }, async () => {
 
   application.push({
     method: "GET",
-    pathname: "/handlers",
+    pathname: "/routes",
     handler: (request: any, response: any) => {
       response.end("<p>Hello World</p>");
     },
   });
 
   {
-    const response = await fetch("http://localhost:18000/handlers");
+    const response = await fetch("http://localhost:18000/routes");
     assert.equal(response.status, 200);
     assert.equal(
       response.headers.get("Content-Type"),

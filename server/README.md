@@ -15,18 +15,8 @@ TODO
 ## Requirements
 
 - Connection.
-  - Features
-    - Detect that you’re offline.
-    - Detect a server version update.
-    - Live Reload in development.
-    - Live Update when there’s a new version of the page.
-  - Implementation
-    - Inter-process communication between server processes to trigger updates.
-    - When establishing connection, allow the application request handlers to run up to a certain point (for example, to setup a “user last seen at” feature).
-  - Research
-    - Inter-process communication
-      - Between child processes, not centralized through the main process: Sometimes to any process (worker to send email), sometimes to all processes (Live Update), sometimes to specific process (mostly to self / Live Update on a connection that was just established)
-      - Use in-band HTTP requests that only respond to `localhost`
+  - When establishing connection, allow the application request handlers to run up to a certain point (for example, to setup a “user last seen at” feature).
+  - Trigger updates: Inter-process communication between server processes with in-band HTTP requests that only respond to `localhost` only
 - Health checks
 - Types
   - Request & response types

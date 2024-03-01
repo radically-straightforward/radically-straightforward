@@ -14,7 +14,7 @@ export default function server({
   port?: number;
   csrfProtectionPathnameException?: string | RegExp;
 } = {}): any[] {
-  const handlers: any[] = [];
+  const routes: any[] = [];
 
   const httpServer = http
     .createServer(async (request: any, response: any) => {
@@ -271,31 +271,31 @@ export default function server({
           default:
             response.setHeader("Content-Type", "text/html; charset=utf-8");
 
-            for (const handler of handlers) {
-              if ((response.error !== undefined) !== (handler.error ?? false))
+            for (const route of routes) {
+              if ((response.error !== undefined) !== (route.error ?? false))
                 continue;
 
               if (
-                (typeof handler.method === "string" &&
-                  request.method !== handler.method) ||
-                (handler.method instanceof RegExp &&
-                  request.method.match(handler.method) === null)
+                (typeof route.method === "string" &&
+                  request.method !== route.method) ||
+                (route.method instanceof RegExp &&
+                  request.method.match(route.method) === null)
               )
                 continue;
 
               if (
-                typeof handler.pathname === "string" &&
-                request.URL.pathname !== handler.pathname
+                typeof route.pathname === "string" &&
+                request.URL.pathname !== route.pathname
               )
                 continue;
-              else if (handler.pathname instanceof RegExp) {
-                const match = request.URL.pathname.match(handler.pathname);
+              else if (route.pathname instanceof RegExp) {
+                const match = request.URL.pathname.match(route.pathname);
                 if (match === null) continue;
                 request.pathname = match.groups ?? {};
               } else request.pathname = {};
 
               try {
-                await handler.handler(request, response);
+                await route.handler(request, response);
               } catch (error: any) {
                 response.log("ERROR", String(error), error?.stack);
                 response.error = error;
@@ -341,7 +341,7 @@ export default function server({
     });
   });
 
-  return handlers;
+  return routes;
 
   function log(...messageParts: string[]): void {
     utilities.log(String(port), ...messageParts);
