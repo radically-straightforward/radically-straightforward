@@ -14,8 +14,6 @@ export default function server({
   port?: number;
   csrfProtectionPathnameException?: string | RegExp;
 } = {}): any[] {
-  log("STARTING");
-
   const handlers: any[] = [];
 
   const httpServer = http
@@ -318,11 +316,14 @@ export default function server({
         response.getHeader("Location"),
       );
     })
-    .listen(port, "localhost");
+    .listen(port, "localhost", () => {
+      log("STARTED");
+    });
 
   process.once("gracefulTermination", () => {
-    httpServer.close();
-    log("STOPPED");
+    httpServer.close((error) => {
+      log("STOPPED", error === undefined ? "" : String(error));
+    });
   });
 
   return handlers;
