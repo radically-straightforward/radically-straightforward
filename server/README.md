@@ -15,7 +15,9 @@ TODO
 ## Requirements
 
 - Connection.
-  - When establishing connection, allow the application request handlers to run up to a certain point (for example, to setup a “user last seen at” feature).
+  - Establish connection
+    - Allow the application routes to run up to a certain point (for example, to setup a “user last seen at” feature).
+  - Create connection on first request
   - Trigger updates: Inter-process communication between server processes with in-band HTTP requests that only respond to `localhost` only
 - Health checks
 - Types
@@ -64,7 +66,7 @@ TODO
 - Parse pathname parameters, query parameters, headers, and request body.
 - Trusts reverse proxy, because it’s meant to be used with Caddy.
 - Doesn’t serve static files, because it’s meant to be used with Caddy.
-- Handlers infrastructure:
+- Router infrastructure:
   - Register functions to run after.
 - Cookies:
   - `SameSite=None` for SAML to work, because the Identity Provider sends a `POST` request with the assertions back to the Service Provider, and anything other than `SameSite=None` would prevent cookies from being sent, and the server wouldn’t be able to ascertain whether a session already exists.
@@ -78,7 +80,7 @@ TODO
   - Headers: `createServer()`’s `headersTimeout` (default: `60000`)
   - Body: `createServer()`’s `requestTimeout` (default: `300000`)
 - CSRF protection
-  - Don’t let `GET` handlers have side-effects
+  - Don’t let `GET` routes have side-effects
   - Make non-`GET` requests with custom header (`CSRF-Protection`)
   - References
     - <https://cheatsheetseries.owasp.org/cheatsheets/Cross-Site_Request_Forgery_Prevention_Cheat_Sheet.html>
