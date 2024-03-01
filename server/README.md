@@ -21,20 +21,9 @@ TODO
     - Live Reload in development.
     - Live Update when there’s a new version of the page.
   - Implementation
-    - Inter-process communication between server processes.
-      - Uses:
-        - Pick up a Live Connection initiated by another process.
-        - Trigger Live Updates.
-      - Implementation:
-        - SQLite database for persistence
-        - HTTP server for inter-process communication
+    - Inter-process communication between server processes to trigger updates.
     - When establishing connection, allow the application request handlers to run up to a certain point (for example, to setup a “user last seen at” feature).
   - Research
-    - Caddy sticky session in reverse proxy, which would allow the server to be stateful and sidestep the issue of database (`lb_policy`)
-      - `ip_hash`: Everyone at Hopkins would go to the same process
-      - `uri_hash`: Everyone at `/` would go to the same process
-      - `header`: We can’t create a header to specify a particular process, which is necessary for a Live Connection
-      - `cookie`: Seems to be the best option
     - Inter-process communication
       - Between child processes, not centralized through the main process: Sometimes to any process (worker to send email), sometimes to all processes (Live Update), sometimes to specific process (mostly to self / Live Update on a connection that was just established)
       - Use in-band HTTP requests that only respond to `localhost`
@@ -104,12 +93,14 @@ TODO
   - References
     - <https://cheatsheetseries.owasp.org/cheatsheets/Cross-Site_Request_Forgery_Prevention_Cheat_Sheet.html>
 - Images/videos/audios proxy.
-- Live Connection.
+- Connection.
   - Features
     - Detect that you’re offline.
     - Detect a server version update.
     - Live Reload in development.
     - Live Update when there’s a new version of the page.
+  - Requirements
+    - Sticky load balancer, because we keep state on the server (which is simpler than the SQLite approach necessary for sharing state between processes)
 
 ## Related Work
 
