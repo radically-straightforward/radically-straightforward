@@ -43,9 +43,11 @@ TODO
   - Different charsets?
   - `Content-Encoding` (for example, compression)
 - Proxy
-  - Test redirect loop
-  - Test timeout 10s
-  - Limit size?
+  - Edge cases
+    - Test redirect loop
+    - Test timeout 10s
+    - Limit size?
+  - Range requests?
   - Resize images?
   - Cache? Not only for performance, but also because third-party images may go away
   - Include HMAC?
