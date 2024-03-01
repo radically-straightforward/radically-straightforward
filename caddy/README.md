@@ -47,8 +47,16 @@ $ npx caddy
 Besides the Caddy binary, `@radically-straightforward/caddy` also comes with helpers to define a [Caddyfile](https://caddyserver.com/docs/quick-starts/caddyfile).
 
 ```typescript
+import childProcess from "node:child_process";
 import caddyfile from "@radically-straightforward/caddy";
 import * as caddy from "@radically-straightforward/caddy";
+
+const caddyServer = childProcess.spawn(
+  "./node_modules/.bin/caddy",
+  ["run", "--adapter", "caddyfile", "--config", "-"],
+  { stdio: [undefined, "inherit", "inherit"] },
+);
+caddyServer.stdin.end(caddy.application());
 ```
 
 <!-- DOCUMENTATION START: ./source/index.mts -->
