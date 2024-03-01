@@ -167,8 +167,6 @@ export default function server({
         response.state = {};
         response.afters = [];
 
-        response.setHeader("Content-Type", "text/html; charset=utf-8");
-
         response.setCookie = (
           key: string,
           value: string,
@@ -211,108 +209,118 @@ export default function server({
         response.end(String(error));
       }
 
-      if (!response.writableEnded) {
-        if (request.URL.pathname === "/_proxy") {
-          try {
-            if (typeof request.search.destination !== "string") {
-              response.statusCode = 422;
-              throw new Error("Missing ‘destination’ search parameter.");
-            }
-
-            let destination: URL;
+      if (!response.writableEnded)
+        switch (request.URL.pathname) {
+          case "/_health":
+            response.end();
+            break;
+          case "/_proxy":
             try {
-              destination = new URL(request.search.destination);
-            } catch (error) {
-              response.statusCode = 422;
-              throw new Error("Invalid destination.");
-            }
-            if (
-              (destination.protocol !== "http:" &&
-                destination.protocol !== "https:") ||
-              destination.hostname === request.URL.hostname
-            ) {
-              response.statusCode = 422;
-              throw new Error("Invalid destination.");
-            }
+              if (typeof request.search.destination !== "string") {
+                response.statusCode = 422;
+                throw new Error("Missing ‘destination’ search parameter.");
+              }
 
-            const destinationResponse = await fetch(destination.href, {
-              signal: AbortSignal.timeout(30 * 1000),
-            });
-            const destinationResponseContentType =
-              destinationResponse.headers.get("Content-Type");
-            if (
-              !destinationResponse.ok ||
-              typeof destinationResponseContentType !== "string" ||
-              destinationResponseContentType.match(
-                new RegExp("^(?:image|video|audio)/"),
-              ) === null ||
-              !(destinationResponse.body instanceof ReadableStream)
-            )
-              throw new Error("Invalid destination response.");
+              let destination: URL;
+              try {
+                destination = new URL(request.search.destination);
+              } catch (error) {
+                response.statusCode = 422;
+                throw new Error("Invalid destination.");
+              }
+              if (
+                (destination.protocol !== "http:" &&
+                  destination.protocol !== "https:") ||
+                destination.hostname === request.URL.hostname
+              ) {
+                response.statusCode = 422;
+                throw new Error("Invalid destination.");
+              }
 
-            response.setHeader("Content-Type", destinationResponseContentType);
-            await stream.pipeline(destinationResponse.body as any, response, {
-              signal: AbortSignal.timeout(5 * 60 * 1000),
-            });
-          } catch (error: any) {
-            response.log("ERROR", String(error));
-            if (!response.headersSent) {
-              if (response.statusCode === 200) response.statusCode = 502;
-              response.setHeader("Content-Type", "text/plain; charset=utf-8");
-            }
-            if (!response.writableEnded) response.end(String(error));
-          }
-        } else {
-          for (const handler of handlers) {
-            if ((response.error !== undefined) !== (handler.error ?? false))
-              continue;
+              const destinationResponse = await fetch(destination.href, {
+                signal: AbortSignal.timeout(30 * 1000),
+              });
+              const destinationResponseContentType =
+                destinationResponse.headers.get("Content-Type");
+              if (
+                !destinationResponse.ok ||
+                typeof destinationResponseContentType !== "string" ||
+                destinationResponseContentType.match(
+                  new RegExp("^(?:image|video|audio)/"),
+                ) === null ||
+                !(destinationResponse.body instanceof ReadableStream)
+              )
+                throw new Error("Invalid destination response.");
 
-            if (
-              (typeof handler.method === "string" &&
-                request.method !== handler.method) ||
-              (handler.method instanceof RegExp &&
-                request.method.match(handler.method) === null)
-            )
-              continue;
-
-            if (
-              typeof handler.pathname === "string" &&
-              request.URL.pathname !== handler.pathname
-            )
-              continue;
-            else if (handler.pathname instanceof RegExp) {
-              const match = request.URL.pathname.match(handler.pathname);
-              if (match === null) continue;
-              request.pathname = match.groups ?? {};
-            } else request.pathname = {};
-
-            try {
-              await handler.handler(request, response);
+              response.setHeader(
+                "Content-Type",
+                destinationResponseContentType,
+              );
+              await stream.pipeline(destinationResponse.body as any, response, {
+                signal: AbortSignal.timeout(5 * 60 * 1000),
+              });
             } catch (error: any) {
-              response.log("ERROR", String(error), error?.stack);
-              response.error = error;
+              response.log("ERROR", String(error));
+              if (!response.headersSent) {
+                if (response.statusCode === 200) response.statusCode = 502;
+                response.setHeader("Content-Type", "text/plain; charset=utf-8");
+              }
+              if (!response.writableEnded) response.end(String(error));
+            }
+            break;
+          default:
+            response.setHeader("Content-Type", "text/html; charset=utf-8");
+
+            for (const handler of handlers) {
+              if ((response.error !== undefined) !== (handler.error ?? false))
+                continue;
+
+              if (
+                (typeof handler.method === "string" &&
+                  request.method !== handler.method) ||
+                (handler.method instanceof RegExp &&
+                  request.method.match(handler.method) === null)
+              )
+                continue;
+
+              if (
+                typeof handler.pathname === "string" &&
+                request.URL.pathname !== handler.pathname
+              )
+                continue;
+              else if (handler.pathname instanceof RegExp) {
+                const match = request.URL.pathname.match(handler.pathname);
+                if (match === null) continue;
+                request.pathname = match.groups ?? {};
+              } else request.pathname = {};
+
+              try {
+                await handler.handler(request, response);
+              } catch (error: any) {
+                response.log("ERROR", String(error), error?.stack);
+                response.error = error;
+              }
+
+              if (response.writableEnded) break;
             }
 
-            if (response.writableEnded) break;
-          }
-
-          if (!response.writableEnded) {
-            response.log(
-              "ERROR",
-              "The application didn’t finish handling this request.",
-            );
-            if (!response.headersSent) {
-              response.statusCode = 500;
-              response.setHeader("Content-Type", "text/plain; charset=utf-8");
+            if (!response.writableEnded) {
+              response.log(
+                "ERROR",
+                "The application didn’t finish handling this request.",
+              );
+              if (!response.headersSent) {
+                response.statusCode = 500;
+                response.setHeader("Content-Type", "text/plain; charset=utf-8");
+              }
+              response.end(
+                "The application didn’t finish handling this request.",
+              );
             }
-            response.end(
-              "The application didn’t finish handling this request.",
-            );
-          }
 
-          for (const after of response.afters) await after();
+            for (const after of response.afters) await after();
+            break;
         }
-      }
 
       for (const directoryToCleanup of directoriesToCleanup)
         await fs.rm(directoryToCleanup, { recursive: true, force: true });

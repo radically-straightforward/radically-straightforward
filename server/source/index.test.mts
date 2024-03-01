@@ -286,6 +286,13 @@ test({ timeout: process.stdin.isTTY ? undefined : 30 * 1000 }, async () => {
   }
 
   {
+    const response = await fetch("http://localhost:18000/_health");
+    assert.equal(response.status, 200);
+    assert.equal(response.headers.get("Content-Type"), null);
+    assert.equal(await response.text(), "");
+  }
+
+  {
     const response = await fetch("http://localhost:18000/_proxy");
     assert.equal(response.status, 422);
     assert.equal(
@@ -387,14 +394,14 @@ test({ timeout: process.stdin.isTTY ? undefined : 30 * 1000 }, async () => {
 
   application.push({
     method: "GET",
-    pathname: "/default-response",
+    pathname: "/handlers",
     handler: (request: any, response: any) => {
       response.end("<p>Hello World</p>");
     },
   });
 
   {
-    const response = await fetch("http://localhost:18000/default-response");
+    const response = await fetch("http://localhost:18000/handlers");
     assert.equal(response.status, 200);
     assert.equal(
       response.headers.get("Content-Type"),
