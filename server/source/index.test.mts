@@ -5,7 +5,7 @@ import fs from "node:fs/promises";
 import timers from "node:timers/promises";
 import server from "@radically-straightforward/server";
 
-test({ timeout: 30 * 1000 }, async () => {
+test({ timeout: process.stdin.isTTY ? undefined : 30 * 1000 }, async () => {
   const application = server();
 
   {
@@ -24,7 +24,7 @@ test({ timeout: 30 * 1000 }, async () => {
   }
 
   const directoriesThatShouldHaveBeenCleanedUp = new Array<string>();
-  let counter = 0;
+  let afterCounter = 0;
 
   application.push({
     method: "PATCH",
@@ -51,7 +51,7 @@ test({ timeout: 30 * 1000 }, async () => {
         }),
       );
       response.afters.push(() => {
-        counter++;
+        afterCounter++;
       });
     },
   });
@@ -81,7 +81,7 @@ test({ timeout: 30 * 1000 }, async () => {
       cookies: { example: "abc", anotherExample: "def" },
       body: { bodyField: "33" },
     });
-    assert.equal(counter, 1);
+    assert.equal(afterCounter, 1);
   }
 
   {
