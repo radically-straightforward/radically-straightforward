@@ -31,14 +31,15 @@ test({ timeout: process.stdin.isTTY ? undefined : 30 * 1000 }, async () => {
     pathname: new RegExp("^/request-parsing/(?<pathnameParameter>[0-9]+)$"),
     handler: async (request: any, response: any) => {
       for (const values of Object.values<any>(request.body))
-        for (const value of values)
-          if (typeof value.path === "string") {
-            value.content = [...(await fs.readFile(value.path))];
-            directoriesThatShouldHaveBeenCleanedUp.push(
-              path.dirname(value.path),
-            );
-            delete value.path;
-          }
+        if (Array.isArray(values))
+          for (const value of values)
+            if (typeof value.path === "string") {
+              value.content = [...(await fs.readFile(value.path))];
+              directoriesThatShouldHaveBeenCleanedUp.push(
+                path.dirname(value.path),
+              );
+              delete value.path;
+            }
       response.setHeader("Content-Type", "application/json; charset=utf-8");
       response.end(
         JSON.stringify({
@@ -170,7 +171,7 @@ test({ timeout: process.stdin.isTTY ? undefined : 30 * 1000 }, async () => {
     (
       await fetch("http://localhost:18000/", {
         headers: Object.fromEntries(
-          Array.from({ length: 1_000 }, (value, key) => [
+          Array.from({ length: 1000 }, (value, key) => [
             `Custom-Header-${key}`,
             "Hello",
           ]),
@@ -248,7 +249,7 @@ test({ timeout: process.stdin.isTTY ? undefined : 30 * 1000 }, async () => {
       headers: { "CSRF-Protection": "true" },
       body: new URLSearchParams(
         Object.fromEntries(
-          Array.from({ length: 1_000 }, (value, key) => [
+          Array.from({ length: 1000 }, (value, key) => [
             `bodyField-${key}`,
             "33",
           ]),
@@ -299,7 +300,7 @@ test({ timeout: process.stdin.isTTY ? undefined : 30 * 1000 }, async () => {
 
   {
     const response = await fetch(
-      `http://localhost:18000/proxy?destination=${encodeURIComponent("not-even-a-url")}`,
+      `http://localhost:18000/proxy?destination=${encodeURIComponent("not-a-url")}`,
     );
     assert.equal(response.status, 422);
     assert.equal(
