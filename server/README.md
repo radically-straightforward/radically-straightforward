@@ -14,7 +14,7 @@ TODO
 
 ## Requirements
 
-- Live Connection.
+- Connection.
   - Features
     - Detect that you’re offline.
     - Detect a server version update.
