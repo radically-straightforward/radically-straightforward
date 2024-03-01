@@ -30,11 +30,15 @@ TODO
         - HTTP server for inter-process communication
     - When establishing connection, allow the application request handlers to run up to a certain point (for example, to setup a “user last seen at” feature).
   - Research
+    - Caddy sticky session in reverse proxy, which would allow the server to be stateful and sidestep the issue of database (`lb_policy`)
+      - `ip_hash`: Everyone at Hopkins would go to the same process
+      - `uri_hash`: Everyone at `/` would go to the same process
+      - `header`: We can’t create a header to specify a particular process, which is necessary for a Live Connection
+      - `cookie`: Seems to be the best option
     - Inter-process communication
-      - Between child processes, not centralized
-      - Using in-band HTTP requests that only respond to `localhost`
-      - ZeroMQ
-      - SQLite as a message broker
+      - Between child processes, not centralized through the main process: Sometimes to any process (worker to send email), sometimes to all processes (Live Update), sometimes to specific process (mostly to self / Live Update on a connection that was just established)
+      - Use in-band HTTP requests that only respond to `localhost`
+- Health checks
 - Types
   - Request & response types
   - Address all `any`s
