@@ -212,7 +212,7 @@ export default function server({
       }
 
       if (!response.writableEnded) {
-        if (request.URL.pathname === "/proxy") {
+        if (request.URL.pathname === "/_proxy") {
           try {
             if (typeof request.search.destination !== "string") {
               response.statusCode = 422;

@@ -286,7 +286,7 @@ test({ timeout: process.stdin.isTTY ? undefined : 30 * 1000 }, async () => {
   }
 
   {
-    const response = await fetch("http://localhost:18000/proxy");
+    const response = await fetch("http://localhost:18000/_proxy");
     assert.equal(response.status, 422);
     assert.equal(
       response.headers.get("Content-Type"),
@@ -300,7 +300,7 @@ test({ timeout: process.stdin.isTTY ? undefined : 30 * 1000 }, async () => {
 
   {
     const response = await fetch(
-      `http://localhost:18000/proxy?destination=${encodeURIComponent("not-a-url")}`,
+      `http://localhost:18000/_proxy?destination=${encodeURIComponent("not-a-url")}`,
     );
     assert.equal(response.status, 422);
     assert.equal(
@@ -312,7 +312,7 @@ test({ timeout: process.stdin.isTTY ? undefined : 30 * 1000 }, async () => {
 
   {
     const response = await fetch(
-      `http://localhost:18000/proxy?destination=${encodeURIComponent("ftp://localhost")}`,
+      `http://localhost:18000/_proxy?destination=${encodeURIComponent("ftp://localhost")}`,
     );
     assert.equal(response.status, 422);
     assert.equal(
@@ -324,7 +324,7 @@ test({ timeout: process.stdin.isTTY ? undefined : 30 * 1000 }, async () => {
 
   {
     const response = await fetch(
-      `http://localhost:18000/proxy?destination=${encodeURIComponent("http://localhost/")}`,
+      `http://localhost:18000/_proxy?destination=${encodeURIComponent("http://localhost/")}`,
     );
     assert.equal(response.status, 422);
     assert.equal(
@@ -336,7 +336,7 @@ test({ timeout: process.stdin.isTTY ? undefined : 30 * 1000 }, async () => {
 
   {
     const response = await fetch(
-      `http://localhost:18000/proxy?destination=${encodeURIComponent("http://a-nonexistent-website-lskjfpqslek41u20.com/")}`,
+      `http://localhost:18000/_proxy?destination=${encodeURIComponent("http://a-nonexistent-website-lskjfpqslek41u20.com/")}`,
     );
     assert.equal(response.status, 502);
     assert.equal(
@@ -348,7 +348,7 @@ test({ timeout: process.stdin.isTTY ? undefined : 30 * 1000 }, async () => {
 
   {
     const response = await fetch(
-      `http://localhost:18000/proxy?destination=${encodeURIComponent("https://developer.mozilla.org/")}`,
+      `http://localhost:18000/_proxy?destination=${encodeURIComponent("https://developer.mozilla.org/")}`,
     );
     assert.equal(response.status, 502);
     assert.equal(
@@ -360,7 +360,7 @@ test({ timeout: process.stdin.isTTY ? undefined : 30 * 1000 }, async () => {
 
   {
     const response = await fetch(
-      `http://localhost:18000/proxy?destination=${encodeURIComponent("https://interactive-examples.mdn.mozilla.net/media/cc0-images/grapefruit-slice-332-332.jpg")}`,
+      `http://localhost:18000/_proxy?destination=${encodeURIComponent("https://interactive-examples.mdn.mozilla.net/media/cc0-images/grapefruit-slice-332-332.jpg")}`,
     );
     assert.equal(response.status, 200);
     assert.equal(response.headers.get("Content-Type"), "image/jpeg");
@@ -369,7 +369,7 @@ test({ timeout: process.stdin.isTTY ? undefined : 30 * 1000 }, async () => {
 
   {
     const response = await fetch(
-      `http://localhost:18000/proxy?destination=${encodeURIComponent("https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.webm")}`,
+      `http://localhost:18000/_proxy?destination=${encodeURIComponent("https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.webm")}`,
     );
     assert.equal(response.status, 200);
     assert.equal(response.headers.get("Content-Type"), "video/webm");
@@ -378,7 +378,7 @@ test({ timeout: process.stdin.isTTY ? undefined : 30 * 1000 }, async () => {
 
   {
     const response = await fetch(
-      `http://localhost:18000/proxy?destination=${encodeURIComponent("https://interactive-examples.mdn.mozilla.net/media/cc0-audio/t-rex-roar.mp3")}`,
+      `http://localhost:18000/_proxy?destination=${encodeURIComponent("https://interactive-examples.mdn.mozilla.net/media/cc0-audio/t-rex-roar.mp3")}`,
     );
     assert.equal(response.status, 200);
     assert.equal(response.headers.get("Content-Type"), "audio/mpeg");
@@ -514,11 +514,11 @@ test({ timeout: process.stdin.isTTY ? undefined : 30 * 1000 }, async () => {
   if (process.stdin.isTTY) {
     console.log(`Test proxy in browser with the following URLs:
 
-http://localhost:18000/proxy?destination=${encodeURIComponent("https://interactive-examples.mdn.mozilla.net/media/cc0-images/grapefruit-slice-332-332.jpg")}
+http://localhost:18000/_proxy?destination=${encodeURIComponent("https://interactive-examples.mdn.mozilla.net/media/cc0-images/grapefruit-slice-332-332.jpg")}
 
-http://localhost:18000/proxy?destination=${encodeURIComponent("https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.webm")}
+http://localhost:18000/_proxy?destination=${encodeURIComponent("https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.webm")}
 
-http://localhost:18000/proxy?destination=${encodeURIComponent("https://interactive-examples.mdn.mozilla.net/media/cc0-audio/t-rex-roar.mp3")}
+http://localhost:18000/_proxy?destination=${encodeURIComponent("https://interactive-examples.mdn.mozilla.net/media/cc0-audio/t-rex-roar.mp3")}
 `);
   } else {
     console.log(

@@ -22,8 +22,19 @@ TODO
     - Live Update when there’s a new version of the page.
   - Implementation
     - Inter-process communication between server processes.
-      - Pick up a Live Connection initiated by another process.
-      - Trigger Live Updates.
+      - Uses:
+        - Pick up a Live Connection initiated by another process.
+        - Trigger Live Updates.
+      - Implementation:
+        - SQLite database for persistence
+        - HTTP server for inter-process communication
+    - When establishing connection, allow the application request handlers to run up to a certain point (for example, to setup a “user last seen at” feature).
+  - Research
+    - Inter-process communication
+      - Between child processes, not centralized
+      - Using in-band HTTP requests that only respond to `localhost`
+      - ZeroMQ
+      - SQLite as a message broker
 - Types
   - Request & response types
   - Address all `any`s
