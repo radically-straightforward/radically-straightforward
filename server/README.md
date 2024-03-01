@@ -15,12 +15,11 @@ TODO
 ## Requirements
 
 - Connection.
-  - Implementation
-    - Create connection on first request
-    - Establish connection
-      - Allow the application routes to run up to a certain point (for example, to setup a “user last seen at” feature).
-    - Terminate connection
-    - Trigger updates: Inter-process communication between server processes with in-band HTTP requests that only respond to `localhost` only
+  - Create connection on first request
+  - Establish connection
+    - Allow the application routes to run up to a certain point (for example, to setup a “user last seen at” feature).
+  - Terminate connection
+  - Trigger updates: Inter-process communication between server processes with in-band HTTP requests that only respond to `localhost` only
 - Health checks
 - Types
   - Request & response types

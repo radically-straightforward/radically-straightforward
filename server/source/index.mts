@@ -14,21 +14,22 @@ export default function server({
   port?: number;
   csrfProtectionPathnameException?: string | RegExp;
 } = {}): any[] {
-  const routes: any[] = [];
+  const routes = new Array<any>();
+
+  const connections = new Set<any>();
 
   const httpServer = http
     .createServer(async (request: any, response: any) => {
-      {
-        const id = utilities.randomString();
-        const start = process.hrtime.bigint();
-        response.log = (...messageParts: string[]): void => {
-          log(
-            id,
-            `${(process.hrtime.bigint() - start) / 1_000_000n}ms`,
-            ...messageParts,
-          );
-        };
-      }
+      request.start = process.hrtime.bigint();
+      request.id = utilities.randomString();
+
+      response.log = (...messageParts: string[]): void => {
+        log(
+          request.id,
+          `${(process.hrtime.bigint() - request.start) / 1_000_000n}ms`,
+          ...messageParts,
+        );
+      };
 
       response.log(
         "REQUEST",
@@ -325,6 +326,13 @@ export default function server({
       for (const directoryToCleanup of directoriesToCleanup)
         await fs.rm(directoryToCleanup, { recursive: true, force: true });
 
+      if (
+        request.method === "GET" &&
+        response.statusCode === 200 &&
+        response.getHeader("Content-Type", "text/html; charset=utf-8")
+      )
+        connections.add({ request });
+
       response.log(
         "RESPONSE",
         String(response.statusCode),
@@ -334,6 +342,16 @@ export default function server({
     .listen(port, "localhost", () => {
       log("STARTED");
     });
+
+  utilities.backgroundJob({ interval: 2 * 60 * 1000 }, () => {
+    const now = process.hrtime.bigint();
+    for (const connection of connections)
+      if (
+        connection.response === undefined &&
+        30 * 1000 * 1_000_000 < now - connection.request.start
+      )
+        connections.delete(connection);
+  });
 
   process.once("gracefulTermination", () => {
     httpServer.close((error) => {
