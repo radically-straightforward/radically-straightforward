@@ -233,22 +233,32 @@ export default function server({
                 connectionId.match(/^[a-z0-9]{5,}$/) === null
               )
                 throw new Error("Invalid ‘Connection-Id’.");
-              const existingConnection = [...connections].find(
+
+              let connection = [...connections].find(
                 (connection) => connection.request.id === connectionId,
               );
-              if (existingConnection === undefined)
-                connections.add({ request, response, update: true });
-              else if (existingConnection.request.url !== request.url)
+              if (connection === undefined) {
+                connection = { request, response, update: true };
+                connections.add(connection);
+              } else if (connection.request.url !== request.url)
                 throw new Error("Unmatched ‘url’ of existing connection.");
               else {
-                if (existingConnection.response !== undefined) response._end();
-                existingConnection.request = request;
-                existingConnection.response = response;
+                if (connection.response !== undefined)
+                  connection.response._end();
+                connection.request = request;
+                connection.response = response;
               }
+
               response.setHeader(
                 "Content-Type",
                 "application/json-lines; charset=utf-8",
               );
+
+              response._end = response.end;
+              response.end = (data?: string): typeof response => {
+                response.write(JSON.stringify(data) + "\n");
+                return response;
+              };
             } catch (error: any) {
               request.log("ERROR", String(error));
               response.statusCode = 400;
