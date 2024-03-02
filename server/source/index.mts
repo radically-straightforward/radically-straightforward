@@ -172,185 +172,178 @@ export default function server({
       }
 
       if (!response.writableEnded)
-        switch (request.URL.pathname) {
-          case "/_health":
-            response.end();
-            break;
-          case "/_proxy":
+        if (request.method === "GET" && request.URL.pathname === "/_health")
+          response.end();
+        else if (request.method === "GET" && request.URL.pathname === "/_proxy")
+          try {
+            if (typeof request.search.destination !== "string") {
+              response.statusCode = 422;
+              throw new Error("Missing ‘destination’ search parameter.");
+            }
+
+            let destination: URL;
             try {
-              if (typeof request.search.destination !== "string") {
-                response.statusCode = 422;
-                throw new Error("Missing ‘destination’ search parameter.");
-              }
+              destination = new URL(request.search.destination);
+            } catch (error) {
+              response.statusCode = 422;
+              throw new Error("Invalid destination.");
+            }
+            if (
+              (destination.protocol !== "http:" &&
+                destination.protocol !== "https:") ||
+              destination.hostname === request.URL.hostname
+            ) {
+              response.statusCode = 422;
+              throw new Error("Invalid destination.");
+            }
 
-              let destination: URL;
-              try {
-                destination = new URL(request.search.destination);
-              } catch (error) {
-                response.statusCode = 422;
-                throw new Error("Invalid destination.");
-              }
-              if (
-                (destination.protocol !== "http:" &&
-                  destination.protocol !== "https:") ||
-                destination.hostname === request.URL.hostname
-              ) {
-                response.statusCode = 422;
-                throw new Error("Invalid destination.");
-              }
+            const destinationResponse = await fetch(destination.href, {
+              signal: AbortSignal.timeout(30 * 1000),
+            });
+            const destinationResponseContentType =
+              destinationResponse.headers.get("Content-Type");
+            if (
+              !destinationResponse.ok ||
+              typeof destinationResponseContentType !== "string" ||
+              destinationResponseContentType.match(
+                new RegExp("^(?:image|video|audio)/"),
+              ) === null ||
+              !(destinationResponse.body instanceof ReadableStream)
+            )
+              throw new Error("Invalid destination response.");
 
-              const destinationResponse = await fetch(destination.href, {
-                signal: AbortSignal.timeout(30 * 1000),
-              });
-              const destinationResponseContentType =
-                destinationResponse.headers.get("Content-Type");
-              if (
-                !destinationResponse.ok ||
-                typeof destinationResponseContentType !== "string" ||
-                destinationResponseContentType.match(
-                  new RegExp("^(?:image|video|audio)/"),
-                ) === null ||
-                !(destinationResponse.body instanceof ReadableStream)
-              )
-                throw new Error("Invalid destination response.");
+            response.setHeader("Content-Type", destinationResponseContentType);
+            await stream.pipeline(destinationResponse.body as any, response, {
+              signal: AbortSignal.timeout(5 * 60 * 1000),
+            });
+          } catch (error: any) {
+            request.log("ERROR", String(error));
+            if (!response.headersSent) {
+              if (response.statusCode === 200) response.statusCode = 502;
+              response.setHeader("Content-Type", "text/plain; charset=utf-8");
+            }
+            if (!response.writableEnded) response.end(String(error));
+          }
+        else {
+          let connectionId = request.headers["connection-id"];
+          if (
+            typeof connectionId !== "string" ||
+            connectionId.match(/^[a-z0-9]{5,}$/) === null ||
+            request.method !== "GET"
+          )
+            connectionId = undefined;
+          if (connectionId === undefined)
+            response.setHeader("Content-Type", "text/html; charset=utf-8");
+          else {
+            response.setHeader(
+              "Content-Type",
+              "application/json-lines; charset=utf-8",
+            );
+            const existingConnection = [...connections].find(
+              (connection) => connection.request.id === connectionId,
+            );
+            if (existingConnection === undefined)
+              connections.add({ request, response, update: true });
+            else if (existingConnection.request.url !== request.url) {
+              response.statusCode = 400;
+            } else {
+              if (existingConnection.response !== undefined) response._end();
+              existingConnection.request = request;
+              existingConnection.response = response;
+            }
+          }
 
-              response.setHeader(
-                "Content-Type",
-                destinationResponseContentType,
-              );
-              await stream.pipeline(destinationResponse.body as any, response, {
-                signal: AbortSignal.timeout(5 * 60 * 1000),
-              });
+          response.state = {};
+
+          response.setCookie = (
+            key: string,
+            value: string,
+            maxAge: number = 150 * 24 * 60 * 60,
+          ): typeof response => {
+            request.cookies[key] = value;
+            response.setHeader("Set-Cookie", [
+              ...(response.getHeader("Set-Cookie") ?? []),
+              `__Host-${encodeURIComponent(key)}=${encodeURIComponent(value)}; Max-Age=${maxAge}; Path=/; Secure; HttpOnly; SameSite=None`,
+            ]);
+            return response;
+          };
+
+          response.deleteCookie = (key: string): typeof response => {
+            delete request.cookies[key];
+            response.setHeader("Set-Cookie", [
+              ...(response.getHeader("Set-Cookie") ?? []),
+              `__Host-${encodeURIComponent(key)}=; Max-Age=0; Path=/; Secure; HttpOnly; SameSite=None`,
+            ]);
+            return response;
+          };
+
+          response.redirect = (
+            destination: string,
+            type: "see-other" | "temporary" | "permanent" = "see-other",
+          ): typeof response => {
+            response.statusCode = {
+              "see-other": 303,
+              temporary: 307,
+              permanent: 308,
+            }[type];
+            response.setHeader("Location", new URL(destination, request.URL));
+            response.end();
+            return response;
+          };
+
+          for (const route of routes) {
+            if ((response.error !== undefined) !== (route.error ?? false))
+              continue;
+
+            if (
+              (typeof route.method === "string" &&
+                request.method !== route.method) ||
+              (route.method instanceof RegExp &&
+                request.method.match(route.method) === null)
+            )
+              continue;
+
+            if (
+              typeof route.pathname === "string" &&
+              request.URL.pathname !== route.pathname
+            )
+              continue;
+            else if (route.pathname instanceof RegExp) {
+              const match = request.URL.pathname.match(route.pathname);
+              if (match === null) continue;
+              request.pathname = match.groups ?? {};
+            } else request.pathname = {};
+
+            try {
+              await route.handler(request, response);
             } catch (error: any) {
-              request.log("ERROR", String(error));
-              if (!response.headersSent) {
-                if (response.statusCode === 200) response.statusCode = 502;
-                response.setHeader("Content-Type", "text/plain; charset=utf-8");
-              }
-              if (!response.writableEnded) response.end(String(error));
-            }
-            break;
-          default:
-            let connectionId = request.headers["connection-id"];
-            if (
-              typeof connectionId !== "string" ||
-              connectionId.match(/^[a-z0-9]{5,}$/) === null ||
-              request.method !== "GET"
-            )
-              connectionId = undefined;
-            if (connectionId === undefined)
-              response.setHeader("Content-Type", "text/html; charset=utf-8");
-            else {
-              response.setHeader(
-                "Content-Type",
-                "application/json-lines; charset=utf-8",
-              );
-              const existingConnection = [...connections].find(
-                (connection) => connection.request.id === connectionId,
-              );
-              if (existingConnection === undefined)
-                connections.add({ request, response, update: true });
-              else if (existingConnection.request.url !== request.url) {
-                response.statusCode = 400;
-              } else {
-                if (existingConnection.response !== undefined) response._end();
-                existingConnection.request = request;
-                existingConnection.response = response;
-              }
+              request.log("ERROR", String(error), error?.stack);
+              response.error = error;
             }
 
-            response.state = {};
+            if (response.writableEnded) break;
+          }
 
-            response.setCookie = (
-              key: string,
-              value: string,
-              maxAge: number = 150 * 24 * 60 * 60,
-            ): typeof response => {
-              request.cookies[key] = value;
-              response.setHeader("Set-Cookie", [
-                ...(response.getHeader("Set-Cookie") ?? []),
-                `__Host-${encodeURIComponent(key)}=${encodeURIComponent(value)}; Max-Age=${maxAge}; Path=/; Secure; HttpOnly; SameSite=None`,
-              ]);
-              return response;
-            };
-
-            response.deleteCookie = (key: string): typeof response => {
-              delete request.cookies[key];
-              response.setHeader("Set-Cookie", [
-                ...(response.getHeader("Set-Cookie") ?? []),
-                `__Host-${encodeURIComponent(key)}=; Max-Age=0; Path=/; Secure; HttpOnly; SameSite=None`,
-              ]);
-              return response;
-            };
-
-            response.redirect = (
-              destination: string,
-              type: "see-other" | "temporary" | "permanent" = "see-other",
-            ): typeof response => {
-              response.statusCode = {
-                "see-other": 303,
-                temporary: 307,
-                permanent: 308,
-              }[type];
-              response.setHeader("Location", new URL(destination, request.URL));
-              response.end();
-              return response;
-            };
-
-            for (const route of routes) {
-              if ((response.error !== undefined) !== (route.error ?? false))
-                continue;
-
-              if (
-                (typeof route.method === "string" &&
-                  request.method !== route.method) ||
-                (route.method instanceof RegExp &&
-                  request.method.match(route.method) === null)
-              )
-                continue;
-
-              if (
-                typeof route.pathname === "string" &&
-                request.URL.pathname !== route.pathname
-              )
-                continue;
-              else if (route.pathname instanceof RegExp) {
-                const match = request.URL.pathname.match(route.pathname);
-                if (match === null) continue;
-                request.pathname = match.groups ?? {};
-              } else request.pathname = {};
-
-              try {
-                await route.handler(request, response);
-              } catch (error: any) {
-                request.log("ERROR", String(error), error?.stack);
-                response.error = error;
-              }
-
-              if (response.writableEnded) break;
+          if (!response.writableEnded) {
+            request.log(
+              "ERROR",
+              "The application didn’t finish handling this request.",
+            );
+            if (!response.headersSent) {
+              response.statusCode = 500;
+              response.setHeader("Content-Type", "text/plain; charset=utf-8");
             }
+            response.end(
+              "The application didn’t finish handling this request.",
+            );
+          }
 
-            if (!response.writableEnded) {
-              request.log(
-                "ERROR",
-                "The application didn’t finish handling this request.",
-              );
-              if (!response.headersSent) {
-                response.statusCode = 500;
-                response.setHeader("Content-Type", "text/plain; charset=utf-8");
-              }
-              response.end(
-                "The application didn’t finish handling this request.",
-              );
-            }
-
-            if (
-              request.method === "GET" &&
-              response.statusCode === 200 &&
-              response.getHeader("Content-Type", "text/html; charset=utf-8")
-            )
-              connections.add({ request });
-            break;
+          if (
+            request.method === "GET" &&
+            response.statusCode === 200 &&
+            response.getHeader("Content-Type", "text/html; charset=utf-8")
+          )
+            connections.add({ request });
         }
 
       for (const directoryToCleanup of directoriesToCleanup)
