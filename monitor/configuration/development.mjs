@@ -1,5 +1,5 @@
 export default {
-  resources: ["https://leafac.com", "https://non-existent.leafac.com"],
+  resources: ["http://localhost:8000", "http://localhost:18000"],
   email: {
     options: {
       host: "localhost",
