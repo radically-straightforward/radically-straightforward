@@ -122,7 +122,7 @@ export default function server({
                       information.filename.trim() === ""
                         ? "file"
                         : information.filename
-                            .replace(/[^a-zA-Z0-9\-_\.]/gu, "-")
+                            .replace(/[^A-Za-z0-9\-_\.]/gu, "-")
                             .toLowerCase(),
                     ),
                   };

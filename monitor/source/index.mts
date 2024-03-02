@@ -37,6 +37,8 @@ utilities.backgroundJob({ interval: 5 * 60 * 1000 }, async () => {
             .createTransport(configuration.email.options)
             .sendMail({
               ...configuration.email.defaults,
+              inReplyTo: `monitor/${JSON.stringify(resource).replace(/[^A-Za-z0-9]/gu, "-")}@monitor.leafac.com`,
+              references: `monitor/${JSON.stringify(resource).replace(/[^A-Za-z0-9]/gu, "-")}@monitor.leafac.com`,
               subject: `😮‍💨 MONITOR SUCCESS: ‘${JSON.stringify(resource)}’`,
               html: html`<pre>
 ‘${JSON.stringify(resource)}’ is back online.
@@ -62,6 +64,8 @@ utilities.backgroundJob({ interval: 5 * 60 * 1000 }, async () => {
             .createTransport(configuration.email.options)
             .sendMail({
               ...configuration.email.defaults,
+              inReplyTo: `monitor/${JSON.stringify(resource).replace(/[^A-Za-z0-9]/gu, "-")}@monitor.leafac.com`,
+              references: `monitor/${JSON.stringify(resource).replace(/[^A-Za-z0-9]/gu, "-")}@monitor.leafac.com`,
               subject: `⚠️ MONITOR ERROR: ‘${JSON.stringify(resource)}’`,
               html: html`
                 <pre>

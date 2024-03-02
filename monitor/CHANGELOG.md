@@ -1,5 +1,8 @@
 # Changelog
 
+- inreplyto
+- send email when back online
+
 ## 2.0.0 · 2024-02-21
 
 - Breaking changes to configuration file:
