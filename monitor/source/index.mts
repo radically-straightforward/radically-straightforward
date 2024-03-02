@@ -31,7 +31,26 @@ utilities.backgroundJob({ interval: 5 * 60 * 1000 }, async () => {
         signal: AbortSignal.timeout(60 * 1000),
       });
       if (!response.ok) throw new Error(`Response status ‘${response.status}’`);
-      alerts.delete(resource);
+      if (alerts.has(resource))
+        try {
+          const sentMessageInfo = await nodemailer
+            .createTransport(configuration.email.options)
+            .sendMail({
+              ...configuration.email.defaults,
+              subject: `😮‍💨 MONITOR SUCCESS: ‘${JSON.stringify(resource)}’`,
+              html: html`<pre>
+‘${JSON.stringify(resource)}’ is back online.
+</pre>`,
+            });
+          log("ALERT SENT", sentMessageInfo.response ?? "");
+          alerts.delete(resource);
+        } catch (error: any) {
+          log(
+            "CATASTROPHIC ERROR TRYING TO SEND ALERT SUCCESS",
+            String(error),
+            error?.stack,
+          );
+        }
       log("SUCCESS", String(response.status));
     } catch (error: any) {
       log("ERROR", String(error), error?.stack);
@@ -43,7 +62,7 @@ utilities.backgroundJob({ interval: 5 * 60 * 1000 }, async () => {
             .createTransport(configuration.email.options)
             .sendMail({
               ...configuration.email.defaults,
-              subject: `⚠️ MONITOR: ‘${JSON.stringify(resource)}’`,
+              subject: `⚠️ MONITOR ERROR: ‘${JSON.stringify(resource)}’`,
               html: html`
                 <pre>
 ${String(error)}
@@ -52,11 +71,11 @@ ${error?.stack}
 </pre>
               `,
             });
-          alerts.add(resource);
           log("ALERT SENT", sentMessageInfo.response ?? "");
+          alerts.add(resource);
         } catch (error: any) {
           log(
-            "CATASTROPHIC ERROR TRYING TO SEND ALERT",
+            "CATASTROPHIC ERROR TRYING TO SEND ALERT ERROR",
             String(error),
             error?.stack,
           );
