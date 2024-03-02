@@ -317,18 +317,18 @@ export default function server({
                 "The application didn’t finish handling this request.",
               );
             }
+
+            if (
+              request.method === "GET" &&
+              response.statusCode === 200 &&
+              response.getHeader("Content-Type", "text/html; charset=utf-8")
+            )
+              connections.add({ request });
             break;
         }
 
       for (const directoryToCleanup of directoriesToCleanup)
         await fs.rm(directoryToCleanup, { recursive: true, force: true });
-
-      if (
-        request.method === "GET" &&
-        response.statusCode === 200 &&
-        response.getHeader("Content-Type", "text/html; charset=utf-8")
-      )
-        connections.add({ request });
 
       response.log(
         "RESPONSE",
