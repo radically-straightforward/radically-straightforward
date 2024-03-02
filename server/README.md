@@ -67,8 +67,6 @@ TODO
 - Parse pathname parameters, query parameters, headers, and request body.
 - Trusts reverse proxy, because it’s meant to be used with Caddy.
 - Doesn’t serve static files, because it’s meant to be used with Caddy.
-- Router infrastructure:
-  - Register functions to run after.
 - Cookies:
   - `SameSite=None` for SAML to work, because the Identity Provider sends a `POST` request with the assertions back to the Service Provider, and anything other than `SameSite=None` would prevent cookies from being sent, and the server wouldn’t be able to ascertain whether a session already exists.
   - Expects the server to be available under a single `hostname`, which is fair, because it’s meant to be used with Caddy.
