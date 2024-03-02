@@ -15,32 +15,32 @@ export default function server({
   csrfProtectionPathnameException?: string | RegExp;
 } = {}): any[] {
   const routes = new Array<any>();
-
   const connections = new Set<any>();
 
   const httpServer = http
     .createServer(async (request: any, response: any) => {
-      request.start = process.hrtime.bigint();
-      request.id = utilities.randomString();
-
-      response.log = (...messageParts: string[]): void => {
-        log(
-          request.id,
-          `${(process.hrtime.bigint() - request.start) / 1_000_000n}ms`,
-          ...messageParts,
-        );
-      };
-
-      response.log(
-        "REQUEST",
-        request.headers["x-forwarded-for"],
-        request.method,
-        request.url,
-      );
-
       const directoriesToCleanup = new Array<string>();
 
       try {
+        request.id = utilities.randomString();
+
+        request.start = process.hrtime.bigint();
+
+        request.log = (...messageParts: string[]): void => {
+          log(
+            request.id,
+            `${(process.hrtime.bigint() - request.start) / 1_000_000n}ms`,
+            ...messageParts,
+          );
+        };
+
+        request.log(
+          "REQUEST",
+          request.headers["x-forwarded-for"],
+          request.method,
+          request.url,
+        );
+
         if (request.method === undefined || request.url === undefined)
           throw new Error("Missing request ‘method’ or ‘url’.");
 
@@ -163,47 +163,9 @@ export default function server({
         }
 
         if (process.env.NODE_ENV !== "production" && request.method !== "GET")
-          response.log(JSON.stringify(request.body, undefined, 2));
-
-        response.state = {};
-
-        response.setCookie = (
-          key: string,
-          value: string,
-          maxAge: number = 150 * 24 * 60 * 60,
-        ): typeof response => {
-          request.cookies[key] = value;
-          response.setHeader("Set-Cookie", [
-            ...(response.getHeader("Set-Cookie") ?? []),
-            `__Host-${encodeURIComponent(key)}=${encodeURIComponent(value)}; Max-Age=${maxAge}; Path=/; Secure; HttpOnly; SameSite=None`,
-          ]);
-          return response;
-        };
-
-        response.deleteCookie = (key: string): typeof response => {
-          delete request.cookies[key];
-          response.setHeader("Set-Cookie", [
-            ...(response.getHeader("Set-Cookie") ?? []),
-            `__Host-${encodeURIComponent(key)}=; Max-Age=0; Path=/; Secure; HttpOnly; SameSite=None`,
-          ]);
-          return response;
-        };
-
-        response.redirect = (
-          destination: string,
-          type: "see-other" | "temporary" | "permanent" = "see-other",
-        ): typeof response => {
-          response.statusCode = {
-            "see-other": 303,
-            temporary: 307,
-            permanent: 308,
-          }[type];
-          response.setHeader("Location", new URL(destination, request.URL));
-          response.end();
-          return response;
-        };
+          request.log(JSON.stringify(request.body, undefined, 2));
       } catch (error: any) {
-        response.log("ERROR", String(error));
+        request.log("ERROR", String(error));
         if (response.statusCode === 200) response.statusCode = 400;
         response.setHeader("Content-Type", "text/plain; charset=utf-8");
         response.end(String(error));
@@ -260,7 +222,7 @@ export default function server({
                 signal: AbortSignal.timeout(5 * 60 * 1000),
               });
             } catch (error: any) {
-              response.log("ERROR", String(error));
+              request.log("ERROR", String(error));
               if (!response.headersSent) {
                 if (response.statusCode === 200) response.statusCode = 502;
                 response.setHeader("Content-Type", "text/plain; charset=utf-8");
@@ -269,7 +231,71 @@ export default function server({
             }
             break;
           default:
-            response.setHeader("Content-Type", "text/html; charset=utf-8");
+            let connectionId = request.headers["connection-id"];
+            if (
+              typeof connectionId !== "string" ||
+              connectionId.match(/^[a-z0-9]{5,}$/) === null ||
+              request.method !== "GET"
+            )
+              connectionId = undefined;
+            if (connectionId === undefined)
+              response.setHeader("Content-Type", "text/html; charset=utf-8");
+            else {
+              response.setHeader(
+                "Content-Type",
+                "application/json-lines; charset=utf-8",
+              );
+              const existingConnection = [...connections].find(
+                (connection) => connection.request.id === connectionId,
+              );
+              if (existingConnection === undefined)
+                connections.add({ request, response, update: true });
+              else if (existingConnection.request.url !== request.url) {
+                response.statusCode = 400;
+              } else {
+                if (existingConnection.response !== undefined) response._end();
+                existingConnection.request = request;
+                existingConnection.response = response;
+              }
+            }
+
+            response.state = {};
+
+            response.setCookie = (
+              key: string,
+              value: string,
+              maxAge: number = 150 * 24 * 60 * 60,
+            ): typeof response => {
+              request.cookies[key] = value;
+              response.setHeader("Set-Cookie", [
+                ...(response.getHeader("Set-Cookie") ?? []),
+                `__Host-${encodeURIComponent(key)}=${encodeURIComponent(value)}; Max-Age=${maxAge}; Path=/; Secure; HttpOnly; SameSite=None`,
+              ]);
+              return response;
+            };
+
+            response.deleteCookie = (key: string): typeof response => {
+              delete request.cookies[key];
+              response.setHeader("Set-Cookie", [
+                ...(response.getHeader("Set-Cookie") ?? []),
+                `__Host-${encodeURIComponent(key)}=; Max-Age=0; Path=/; Secure; HttpOnly; SameSite=None`,
+              ]);
+              return response;
+            };
+
+            response.redirect = (
+              destination: string,
+              type: "see-other" | "temporary" | "permanent" = "see-other",
+            ): typeof response => {
+              response.statusCode = {
+                "see-other": 303,
+                temporary: 307,
+                permanent: 308,
+              }[type];
+              response.setHeader("Location", new URL(destination, request.URL));
+              response.end();
+              return response;
+            };
 
             for (const route of routes) {
               if ((response.error !== undefined) !== (route.error ?? false))
@@ -297,7 +323,7 @@ export default function server({
               try {
                 await route.handler(request, response);
               } catch (error: any) {
-                response.log("ERROR", String(error), error?.stack);
+                request.log("ERROR", String(error), error?.stack);
                 response.error = error;
               }
 
@@ -305,7 +331,7 @@ export default function server({
             }
 
             if (!response.writableEnded) {
-              response.log(
+              request.log(
                 "ERROR",
                 "The application didn’t finish handling this request.",
               );
@@ -330,7 +356,7 @@ export default function server({
       for (const directoryToCleanup of directoriesToCleanup)
         await fs.rm(directoryToCleanup, { recursive: true, force: true });
 
-      response.log(
+      request.log(
         "RESPONSE",
         String(response.statusCode),
         response.getHeader("Location"),
