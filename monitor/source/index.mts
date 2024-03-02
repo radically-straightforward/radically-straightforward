@@ -39,8 +39,8 @@ utilities.backgroundJob({ interval: 5 * 60 * 1000 }, async () => {
               ...configuration.email.defaults,
               inReplyTo: `monitor/${JSON.stringify(resource).replace(/[^A-Za-z0-9]/gu, "-")}@monitor.leafac.com`,
               references: `monitor/${JSON.stringify(resource).replace(/[^A-Za-z0-9]/gu, "-")}@monitor.leafac.com`,
-              subject: `😮‍💨 MONITOR SUCCESS: ‘${JSON.stringify(resource)}’`,
-              html: html`<pre>SUCCESS</pre>`,
+              subject: `⚠️ MONITOR: ‘${JSON.stringify(resource)}’`,
+              html: html`<pre>😮‍💨 SUCCESS</pre>`,
             });
           log("ALERT SUCCESS SENT", sentMessageInfo.response ?? "");
           alerts.delete(resource);
@@ -60,7 +60,7 @@ utilities.backgroundJob({ interval: 5 * 60 * 1000 }, async () => {
               ...configuration.email.defaults,
               inReplyTo: `monitor/${JSON.stringify(resource).replace(/[^A-Za-z0-9]/gu, "-")}@monitor.leafac.com`,
               references: `monitor/${JSON.stringify(resource).replace(/[^A-Za-z0-9]/gu, "-")}@monitor.leafac.com`,
-              subject: `⚠️ MONITOR ERROR: ‘${JSON.stringify(resource)}’`,
+              subject: `⚠️ MONITOR: ‘${JSON.stringify(resource)}’`,
               html: html`<pre>${String(error)}</pre>`,
             });
           log("ALERT ERROR SENT", sentMessageInfo.response ?? "");
