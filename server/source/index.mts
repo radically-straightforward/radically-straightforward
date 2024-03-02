@@ -257,45 +257,45 @@ export default function server({
             }
           else {
             response.setHeader("Content-Type", "text/html; charset=utf-8");
+
+            response.setCookie = (
+              key: string,
+              value: string,
+              maxAge: number = 150 * 24 * 60 * 60,
+            ): typeof response => {
+              request.cookies[key] = value;
+              response.setHeader("Set-Cookie", [
+                ...(response.getHeader("Set-Cookie") ?? []),
+                `__Host-${encodeURIComponent(key)}=${encodeURIComponent(value)}; Max-Age=${maxAge}; Path=/; Secure; HttpOnly; SameSite=None`,
+              ]);
+              return response;
+            };
+
+            response.deleteCookie = (key: string): typeof response => {
+              delete request.cookies[key];
+              response.setHeader("Set-Cookie", [
+                ...(response.getHeader("Set-Cookie") ?? []),
+                `__Host-${encodeURIComponent(key)}=; Max-Age=0; Path=/; Secure; HttpOnly; SameSite=None`,
+              ]);
+              return response;
+            };
+
+            response.redirect = (
+              destination: string,
+              type: "see-other" | "temporary" | "permanent" = "see-other",
+            ): typeof response => {
+              response.statusCode = {
+                "see-other": 303,
+                temporary: 307,
+                permanent: 308,
+              }[type];
+              response.setHeader("Location", new URL(destination, request.URL));
+              response.end();
+              return response;
+            };
           }
 
           response.state = {};
-
-          response.setCookie = (
-            key: string,
-            value: string,
-            maxAge: number = 150 * 24 * 60 * 60,
-          ): typeof response => {
-            request.cookies[key] = value;
-            response.setHeader("Set-Cookie", [
-              ...(response.getHeader("Set-Cookie") ?? []),
-              `__Host-${encodeURIComponent(key)}=${encodeURIComponent(value)}; Max-Age=${maxAge}; Path=/; Secure; HttpOnly; SameSite=None`,
-            ]);
-            return response;
-          };
-
-          response.deleteCookie = (key: string): typeof response => {
-            delete request.cookies[key];
-            response.setHeader("Set-Cookie", [
-              ...(response.getHeader("Set-Cookie") ?? []),
-              `__Host-${encodeURIComponent(key)}=; Max-Age=0; Path=/; Secure; HttpOnly; SameSite=None`,
-            ]);
-            return response;
-          };
-
-          response.redirect = (
-            destination: string,
-            type: "see-other" | "temporary" | "permanent" = "see-other",
-          ): typeof response => {
-            response.statusCode = {
-              "see-other": 303,
-              temporary: 307,
-              permanent: 308,
-            }[type];
-            response.setHeader("Location", new URL(destination, request.URL));
-            response.end();
-            return response;
-          };
 
           for (const route of routes) {
             if ((response.error !== undefined) !== (route.error ?? false))
