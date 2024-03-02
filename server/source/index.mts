@@ -171,7 +171,7 @@ export default function server({
         response.end(String(error));
       }
 
-      if (!response.writableEnded)
+      if (!response.writableEnded) {
         if (request.method === "GET" && request.URL.pathname === "/_health")
           response.end();
         else if (request.method === "GET" && request.URL.pathname === "/_proxy")
@@ -225,32 +225,38 @@ export default function server({
             if (!response.writableEnded) response.end(String(error));
           }
         else {
-          let connectionId = request.headers["connection-id"];
-          if (
-            typeof connectionId !== "string" ||
-            connectionId.match(/^[a-z0-9]{5,}$/) === null ||
-            request.method !== "GET"
-          )
-            connectionId = undefined;
-          if (connectionId === undefined)
-            response.setHeader("Content-Type", "text/html; charset=utf-8");
-          else {
-            response.setHeader(
-              "Content-Type",
-              "application/json-lines; charset=utf-8",
-            );
-            const existingConnection = [...connections].find(
-              (connection) => connection.request.id === connectionId,
-            );
-            if (existingConnection === undefined)
-              connections.add({ request, response, update: true });
-            else if (existingConnection.request.url !== request.url) {
+          const connectionId = request.headers["connection-id"];
+          if (typeof connectionId === "string")
+            try {
+              if (
+                request.method !== "GET" ||
+                connectionId.match(/^[a-z0-9]{5,}$/) === null
+              )
+                throw new Error("Invalid ‘Connection-Id’.");
+              const existingConnection = [...connections].find(
+                (connection) => connection.request.id === connectionId,
+              );
+              if (existingConnection === undefined)
+                connections.add({ request, response, update: true });
+              else if (existingConnection.request.url !== request.url)
+                throw new Error("Unmatched ‘url’ of existing connection.");
+              else {
+                if (existingConnection.response !== undefined) response._end();
+                existingConnection.request = request;
+                existingConnection.response = response;
+              }
+              response.setHeader(
+                "Content-Type",
+                "application/json-lines; charset=utf-8",
+              );
+            } catch (error: any) {
+              request.log("ERROR", String(error));
               response.statusCode = 400;
-            } else {
-              if (existingConnection.response !== undefined) response._end();
-              existingConnection.request = request;
-              existingConnection.response = response;
+              response.setHeader("Content-Type", "text/plain; charset=utf-8");
+              response.end(String(error));
             }
+          else {
+            response.setHeader("Content-Type", "text/html; charset=utf-8");
           }
 
           response.state = {};
@@ -345,6 +351,7 @@ export default function server({
           )
             connections.add({ request });
         }
+      }
 
       for (const directoryToCleanup of directoriesToCleanup)
         await fs.rm(directoryToCleanup, { recursive: true, force: true });
