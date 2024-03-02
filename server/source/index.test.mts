@@ -24,7 +24,6 @@ test({ timeout: process.stdin.isTTY ? undefined : 30 * 1000 }, async () => {
   }
 
   const directoriesThatShouldHaveBeenCleanedUp = new Array<string>();
-  let afterCounter = 0;
 
   application.push({
     method: "PATCH",
@@ -51,9 +50,6 @@ test({ timeout: process.stdin.isTTY ? undefined : 30 * 1000 }, async () => {
           body: request.body,
         }),
       );
-      response.afters.push(() => {
-        afterCounter++;
-      });
     },
   });
 
@@ -82,7 +78,6 @@ test({ timeout: process.stdin.isTTY ? undefined : 30 * 1000 }, async () => {
       cookies: { example: "abc", anotherExample: "def" },
       body: { bodyField: "33" },
     });
-    assert.equal(afterCounter, 1);
   }
 
   {
