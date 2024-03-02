@@ -101,7 +101,7 @@ export function sleep(duration: number): Promise<void> {
 }
 
 /**
- * A fast random string generator. The generated strings vary in length, but are generally around 10 characters. The generated strings include the characters `[0-9a-z]`. The generated strings are **not** cryptographically secure—if you need that, then use [`crypto-random-string`](https://www.npmjs.com/package/crypto-random-string).
+ * A fast random string generator. The generated strings vary in length, but are generally around 10 characters. The generated strings include the characters `[a-z0-9]`. The generated strings are **not** cryptographically secure—if you need that, then use [`crypto-random-string`](https://www.npmjs.com/package/crypto-random-string).
  */
 export function randomString(): string {
   return Math.random().toString(36).slice(2);

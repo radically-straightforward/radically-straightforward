@@ -35,7 +35,7 @@ test("sleep()", async () => {
 });
 
 test("randomString()", () => {
-  assert.match(utilities.randomString(), /^[0-9a-z]+$/);
+  assert.match(utilities.randomString(), /^[a-z0-9]+$/);
 });
 
 test("randomString()", () => {
