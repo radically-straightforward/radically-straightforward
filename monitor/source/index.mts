@@ -13,7 +13,7 @@ const configuration: {
 
 utilities.log(
   "MONITOR",
-  "2.0.0",
+  "2.1.0",
   "STARTED",
   JSON.stringify(configuration.resources),
 );
