@@ -1,7 +1,9 @@
 # Changelog
 
-- inreplyto
-- send email when back online
+## 2.1.0 · 2024-03-02
+
+- Send an alert when the resource is back online.
+- Thread the email alerts.
 
 ## 2.0.0 · 2024-02-21
 
