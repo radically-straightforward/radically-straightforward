@@ -340,6 +340,12 @@ export default function server({
       log("STARTED");
     });
 
+  process.once("gracefulTermination", () => {
+    httpServer.close((error) => {
+      log("STOPPED", String(error ?? ""));
+    });
+  });
+
   utilities.backgroundJob({ interval: 2 * 60 * 1000 }, () => {
     const now = process.hrtime.bigint();
     for (const connection of connections)
@@ -348,12 +354,6 @@ export default function server({
         30 * 1000 * 1_000_000 < now - connection.request.start
       )
         connections.delete(connection);
-  });
-
-  process.once("gracefulTermination", () => {
-    httpServer.close((error) => {
-      log("STOPPED", String(error ?? ""));
-    });
   });
 
   return routes;
