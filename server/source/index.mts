@@ -166,7 +166,6 @@ export default function server({
           response.log(JSON.stringify(request.body, undefined, 2));
 
         response.state = {};
-        response.afters = [];
 
         response.setCookie = (
           key: string,
@@ -318,8 +317,6 @@ export default function server({
                 "The application didn’t finish handling this request.",
               );
             }
-
-            for (const after of response.afters) await after();
             break;
         }
 
