@@ -290,6 +290,7 @@ export default function server({
               response.end = (data?: string): typeof response => {
                 request.log("LIVE CONNECTION UPDATE");
                 response.write(JSON.stringify(data) + "\n");
+                request.liveConnection.writableEnded = true;
                 return response;
               };
             } catch (error: any) {
@@ -338,54 +339,82 @@ export default function server({
             };
           }
 
-          response.state = {};
+          if (request.liveConnection !== undefined)
+            request.liveConnection.establishing = true;
+          do {
+            response.state = {};
 
-          for (const route of routes) {
-            if ((response.error !== undefined) !== (route.error ?? false))
-              continue;
-
-            if (
-              (typeof route.method === "string" &&
-                request.method !== route.method) ||
-              (route.method instanceof RegExp &&
-                request.method.match(route.method) === null)
-            )
-              continue;
-
-            if (
-              typeof route.pathname === "string" &&
-              request.URL.pathname !== route.pathname
-            )
-              continue;
-            else if (route.pathname instanceof RegExp) {
-              const match = request.URL.pathname.match(route.pathname);
-              if (match === null) continue;
-              request.pathname = match.groups ?? {};
-            } else request.pathname = {};
-
-            try {
-              await route.handler(request, response);
-            } catch (error: any) {
-              request.log("ERROR", String(error), error?.stack);
-              response.error = error;
+            let liveConnectionUpdate;
+            if (request.liveConnection !== undefined) {
+              liveConnectionUpdate = new Promise((resolve) => {
+                request.liveConnection.update = resolve;
+              });
+              request.liveConnection.writableEnded = false;
             }
 
-            if (response.writableEnded) break;
-          }
+            for (const route of routes) {
+              if ((response.error !== undefined) !== (route.error ?? false))
+                continue;
 
-          if (!response.writableEnded) {
-            request.log(
-              "ERROR",
-              "The application didn’t finish handling this request.",
-            );
-            if (!response.headersSent) {
-              response.statusCode = 500;
-              response.setHeader("Content-Type", "text/plain; charset=utf-8");
+              if (
+                (typeof route.method === "string" &&
+                  request.method !== route.method) ||
+                (route.method instanceof RegExp &&
+                  request.method.match(route.method) === null)
+              )
+                continue;
+
+              if (
+                typeof route.pathname === "string" &&
+                request.URL.pathname !== route.pathname
+              )
+                continue;
+              else if (route.pathname instanceof RegExp) {
+                const match = request.URL.pathname.match(route.pathname);
+                if (match === null) continue;
+                request.pathname = match.groups ?? {};
+              } else request.pathname = {};
+
+              try {
+                await route.handler(request, response);
+              } catch (error: any) {
+                request.log("ERROR", String(error), error?.stack);
+                response.error = error;
+              }
+
+              if (
+                (request.liveConnection === undefined &&
+                  response.writableEnded) ||
+                (request.liveConnection !== undefined &&
+                  request.liveConnection.writableEnded)
+              )
+                break;
             }
-            response.end(
-              "The application didn’t finish handling this request.",
-            );
-          }
+
+            if (
+              (request.liveConnection === undefined &&
+                !response.writableEnded) ||
+              (request.liveConnection !== undefined &&
+                !request.liveConnection.writableEnded)
+            ) {
+              request.log(
+                "ERROR",
+                "The application didn’t finish handling this request.",
+              );
+              if (!response.headersSent) {
+                response.statusCode = 500;
+                response.setHeader("Content-Type", "text/plain; charset=utf-8");
+              }
+              response.end(
+                "The application didn’t finish handling this request.",
+              );
+            }
+
+            if (request.liveConnection !== undefined) {
+              request.liveConnection.establishing = false;
+              await liveConnectionUpdate;
+            }
+          } while (request.liveConnection !== undefined);
 
           if (
             request.method === "GET" &&
