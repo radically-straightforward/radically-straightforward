@@ -253,7 +253,7 @@ export default function server({
                   "LIVE CONNECTION ESTABLISH",
                   request.liveConnection.request.id,
                 );
-                request.liveConnection.response?._end?.();
+                request.liveConnection.response?.liveConnectionEnd?.();
                 request.id = request.liveConnection.request.id;
                 request.liveConnection.request = request;
                 request.liveConnection.response = response;
@@ -286,7 +286,7 @@ export default function server({
                 heartbeat.stop();
               });
 
-              response._end = response.end;
+              response.liveConnectionEnd = response.end;
               response.end = (data?: string): typeof response => {
                 request.log("LIVE CONNECTION UPDATE");
                 response.write(JSON.stringify(data) + "\n");
@@ -410,7 +410,7 @@ export default function server({
   process.once("gracefulTermination", () => {
     httpServer.close();
     for (const liveConnection of liveConnections)
-      liveConnection.response?._end?.();
+      liveConnection.response?.liveConnectionEnd?.();
   });
   process.once("beforeExit", () => {
     log("STOP");
