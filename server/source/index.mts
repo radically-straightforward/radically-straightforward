@@ -238,13 +238,16 @@ export default function server({
                 (connection) => connection.request.id === connectionId,
               );
               if (connection === undefined) {
+                request.log("CONNECTION CREATE");
                 connection = { request, response, update: true };
                 connections.add(connection);
               } else if (connection.request.url !== request.url)
                 throw new Error("Unmatched ‘url’ of existing connection.");
               else {
+                request.log("CONNECTION ESTABLISH", connection.request.id);
                 if (connection.response !== undefined)
                   connection.response._end();
+                request.id = connection.request.id;
                 connection.request = request;
                 connection.response = response;
               }

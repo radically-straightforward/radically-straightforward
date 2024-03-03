@@ -14,6 +14,17 @@ TODO
 
 ## Requirements
 
+- Connection
+  - [x] CONNECTION PREPARE
+  - [x] CONNECTION ESTABLISH
+  - [x] CONNECTION CREATE
+  - [x] CONNECTION UPDATE
+  - [x] CONNECTION DELETE
+  - [x] CONNECTION ERROR
+  - [ ] `response.once("end")`
+  - [ ] Run the first time around the routes
+  - [ ] Send updates
+  - [ ] API endpoint to trigger updates
 - Types
   - Request & response types
   - Address all `any`s
