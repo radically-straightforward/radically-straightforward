@@ -385,13 +385,14 @@ export default function server({
       );
     })
     .listen(port, "localhost", () => {
-      log("STARTED");
+      log("START");
     });
 
   process.once("gracefulTermination", () => {
-    httpServer.close((error) => {
-      log("STOPPED", String(error ?? ""));
-    });
+    httpServer.close();
+  });
+  process.once("beforeExit", () => {
+    log("STOP");
   });
 
   utilities.backgroundJob({ interval: 2 * 60 * 1000 }, () => {

@@ -14,23 +14,24 @@ const configuration: {
 utilities.log(
   "MONITOR",
   "2.1.0",
-  "STARTED",
+  "START",
   JSON.stringify(configuration.resources),
 );
 process.once("beforeExit", () => {
-  utilities.log("STOPPED");
+  utilities.log("STOP");
 });
 
 const alerts = new Set<(typeof configuration)["resources"][number]>();
 utilities.backgroundJob({ interval: 5 * 60 * 1000 }, async () => {
   for (const resource of configuration.resources) {
-    log("STARTED");
+    log("START");
 
     try {
       const response = await fetch(resource, {
         signal: AbortSignal.timeout(60 * 1000),
       });
       if (!response.ok) throw new Error(`Response status ‘${response.status}’`);
+      log("SUCCESS", String(response.status));
       if (alerts.has(resource))
         try {
           const sentMessageInfo = await nodemailer
@@ -47,7 +48,6 @@ utilities.backgroundJob({ interval: 5 * 60 * 1000 }, async () => {
         } catch (error: any) {
           log("CATASTROPHIC ERROR TRYING TO SEND ALERT SUCCESS", String(error));
         }
-      log("SUCCESS", String(response.status));
     } catch (error: any) {
       log("ERROR", String(error));
       if (alerts.has(resource))
@@ -69,8 +69,6 @@ utilities.backgroundJob({ interval: 5 * 60 * 1000 }, async () => {
           log("CATASTROPHIC ERROR TRYING TO SEND ALERT ERROR", String(error));
         }
     }
-
-    log("FINISHED");
 
     function log(...messageParts: string[]) {
       utilities.log(JSON.stringify(resource), ...messageParts);
