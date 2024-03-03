@@ -19,8 +19,6 @@ export default function server({
 
   const httpServer = http
     .createServer(async (request: any, response: any) => {
-      const directoriesToCleanup = new Array<string>();
-
       try {
         request.id = utilities.randomString();
 
@@ -133,9 +131,15 @@ export default function server({
                   else request.body[name] = value;
                   filePromises.push(
                     (async (): Promise<void> => {
-                      await fs.mkdir(path.dirname(value.path));
-                      await fs.writeFile(value.path, file);
-                      directoriesToCleanup.push(path.dirname(value.path));
+                      const valuePath = value.path;
+                      await fs.mkdir(path.dirname(valuePath));
+                      await fs.writeFile(valuePath, file);
+                      response.once("close", async () => {
+                        await fs.rm(path.dirname(valuePath), {
+                          recursive: true,
+                          force: true,
+                        });
+                      });
                       if ((file as any).truncated) {
                         response.statusCode = 413;
                         throw new Error("File too large.");
@@ -373,9 +377,6 @@ export default function server({
           }
         }
       }
-
-      for (const directoryToCleanup of directoriesToCleanup)
-        await fs.rm(directoryToCleanup, { recursive: true, force: true });
 
       request.log(
         "RESPONSE",
