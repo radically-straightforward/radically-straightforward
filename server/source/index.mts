@@ -402,6 +402,7 @@ export default function server({
     });
   process.once("gracefulTermination", () => {
     httpServer.close();
+    for (const connection of connections) connection.response?._end?.();
   });
   process.once("beforeExit", () => {
     log("STOP");
