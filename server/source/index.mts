@@ -286,6 +286,8 @@ export default function server({
                 heartbeat.stop();
               });
 
+              request.liveConnection.establishing = true;
+
               response.liveConnectionEnd = response.end;
               response.end = (data?: string): typeof response => {
                 request.log("LIVE CONNECTION UPDATE");
@@ -339,8 +341,6 @@ export default function server({
             };
           }
 
-          if (request.liveConnection !== undefined)
-            request.liveConnection.establishing = true;
           do {
             response.state = {};
 
