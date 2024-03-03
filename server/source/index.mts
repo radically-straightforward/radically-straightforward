@@ -387,7 +387,6 @@ export default function server({
     .listen(port, "localhost", () => {
       log("START");
     });
-
   process.once("gracefulTermination", () => {
     httpServer.close();
   });
