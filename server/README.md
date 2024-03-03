@@ -90,14 +90,16 @@ TODO
   - References
     - <https://cheatsheetseries.owasp.org/cheatsheets/Cross-Site_Request_Forgery_Prevention_Cheat_Sheet.html>
 - Images/videos/audios proxy.
-- Connection.
+- Persistent Connection.
   - Features
     - Detect that you’re offline.
+    - Update when there’s a new version of the page.
+    - Reload in development.
     - Detect a server version update.
-    - Live Reload in development.
-    - Live Update when there’s a new version of the page.
   - Requirements
     - Sticky load balancer, because we keep state on the server (which is simpler than the SQLite approach necessary for sharing state between processes)
+    - `GET` requests
+    - Don’t send headers
 
 ## Related Work
 
