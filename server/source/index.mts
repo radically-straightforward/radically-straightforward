@@ -249,8 +249,7 @@ export default function server({
                 throw new Error("Unmatched ‘url’ of existing connection.");
               else {
                 request.log("CONNECTION ESTABLISH", connection.request.id);
-                if (connection.response !== undefined)
-                  connection.response._end();
+                connection.response?._end?.();
                 request.id = connection.request.id;
                 connection.request = request;
                 connection.response = response;
