@@ -256,11 +256,12 @@ export default function server({
 
               response._end = response.end;
               response.end = (data?: string): typeof response => {
+                request.log("CONNECTION UPDATE");
                 response.write(JSON.stringify(data) + "\n");
                 return response;
               };
             } catch (error: any) {
-              request.log("ERROR", String(error));
+              request.log("CONNECTION ERROR", String(error));
               response.statusCode = 400;
               response.setHeader("Content-Type", "text/plain; charset=utf-8");
               response.end(String(error));
@@ -358,8 +359,10 @@ export default function server({
             request.method === "GET" &&
             response.statusCode === 200 &&
             response.getHeader("Content-Type", "text/html; charset=utf-8")
-          )
+          ) {
+            request.log("CONNECTION PREPARE");
             connections.add({ request });
+          }
         }
       }
 
@@ -388,8 +391,10 @@ export default function server({
       if (
         connection.response === undefined &&
         30 * 1000 * 1_000_000 < now - connection.request.start
-      )
+      ) {
+        connection.request.log("CONNECTION DELETE");
         connections.delete(connection);
+      }
   });
 
   return routes;
