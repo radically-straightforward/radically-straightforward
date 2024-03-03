@@ -271,6 +271,20 @@ export default function server({
                 response.write(JSON.stringify(data) + "\n");
                 return response;
               };
+
+              const heartbeat = utilities.backgroundJob(
+                { interval: 30 * 1000 },
+                () => {
+                  try {
+                    response.write("\n");
+                  } catch (error) {
+                    request.log("CONNECTION HEARTBEAT ERROR", String(error));
+                  }
+                },
+              );
+              response.once("close", () => {
+                heartbeat.stop();
+              });
             } catch (error: any) {
               request.log("CONNECTION ERROR", String(error));
               response.statusCode = 400;
