@@ -25,8 +25,8 @@ TODO
   - [ ] Run the first time around the routes
   - [ ] Send updates (run around the routes subsequent times)
   - [ ] Detect response not sent
-  - [ ] API endpoint to trigger updates
-  - [ ] Manage `request.start`
+  - [ ] API endpoint to trigger updates via inter-process communication
+  - [ ] Manage `request.start` times
 - Types
   - Request & response types
   - Address all `any`s
