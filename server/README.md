@@ -23,7 +23,8 @@ TODO
   - [x] CONNECTION CLOSE
   - [x] CONNECTION DELETE
   - [ ] Run the first time around the routes
-  - [ ] Send updates
+  - [ ] Send updates (run around the routes subsequent times)
+  - [ ] Detect response not sent
   - [ ] API endpoint to trigger updates
   - [ ] Manage `request.start`
 - Types
