@@ -255,6 +255,11 @@ export default function server({
                 connection.response = response;
               }
 
+              response.once("close", () => {
+                request.log("CONNECTION CLOSE");
+                delete connection.response;
+              });
+
               response.setHeader(
                 "Content-Type",
                 "application/json-lines; charset=utf-8",
@@ -266,11 +271,6 @@ export default function server({
                 response.write(JSON.stringify(data) + "\n");
                 return response;
               };
-
-              response.once("close", () => {
-                request.log("CONNECTION CLOSE");
-                delete connection.response;
-              });
             } catch (error: any) {
               request.log("CONNECTION ERROR", String(error));
               response.statusCode = 400;
