@@ -18,13 +18,14 @@ TODO
   - [x] CONNECTION PREPARE
   - [x] CONNECTION ESTABLISH
   - [x] CONNECTION CREATE
-  - [x] CONNECTION UPDATE
-  - [x] CONNECTION DELETE
   - [x] CONNECTION ERROR
-  - [ ] `response.once("end")`
+  - [x] CONNECTION UPDATE
+  - [x] CONNECTION CLOSE
+  - [x] CONNECTION DELETE
   - [ ] Run the first time around the routes
   - [ ] Send updates
   - [ ] API endpoint to trigger updates
+  - [ ] Manage `request.start`
 - Types
   - Request & response types
   - Address all `any`s
