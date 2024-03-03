@@ -265,13 +265,6 @@ export default function server({
                 "application/json-lines; charset=utf-8",
               );
 
-              response._end = response.end;
-              response.end = (data?: string): typeof response => {
-                request.log("CONNECTION UPDATE");
-                response.write(JSON.stringify(data) + "\n");
-                return response;
-              };
-
               const heartbeat = utilities.backgroundJob(
                 { interval: 30 * 1000 },
                 () => {
@@ -285,6 +278,13 @@ export default function server({
               response.once("close", () => {
                 heartbeat.stop();
               });
+
+              response._end = response.end;
+              response.end = (data?: string): typeof response => {
+                request.log("CONNECTION UPDATE");
+                response.write(JSON.stringify(data) + "\n");
+                return response;
+              };
             } catch (error: any) {
               request.log("CONNECTION ERROR", String(error));
               response.statusCode = 400;
