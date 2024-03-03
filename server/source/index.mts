@@ -15,7 +15,7 @@ export default function server({
   csrfProtectionPathnameException?: string | RegExp;
 } = {}): any[] {
   const routes = new Array<any>();
-  const connections = new Set<any>();
+  const liveConnections = new Set<any>();
 
   const httpServer = http
     .createServer(async (request: any, response: any) => {
@@ -229,35 +229,39 @@ export default function server({
             if (!response.writableEnded) response.end(String(error));
           }
         else {
-          const connectionId = request.headers["live-connection"];
-          if (typeof connectionId === "string")
+          const liveConnectionId = request.headers["live-connection"];
+          if (typeof liveConnectionId === "string")
             try {
               if (
                 request.method !== "GET" ||
-                connectionId.match(/^[a-z0-9]{5,}$/) === null
+                liveConnectionId.match(/^[a-z0-9]{5,}$/) === null
               )
-                throw new Error("Invalid ‘Connection-Id’.");
+                throw new Error("Invalid ‘Live-Connection’ header.");
 
-              let connection = [...connections].find(
-                (connection) => connection.request.id === connectionId,
+              request.liveConnection = [...liveConnections].find(
+                (liveConnection) =>
+                  liveConnection.request.id === liveConnectionId,
               );
-              if (connection === undefined) {
+              if (request.liveConnection === undefined) {
                 request.log("LIVE CONNECTION CREATE");
-                connection = { request, response, update: true };
-                connections.add(connection);
-              } else if (connection.request.url !== request.url)
-                throw new Error("Unmatched ‘url’ of existing connection.");
+                request.liveConnection = { request, response, update: true };
+                liveConnections.add(request.liveConnection);
+              } else if (request.liveConnection.request.url !== request.url)
+                throw new Error("Unmatched ‘url’ of existing Live Connection.");
               else {
-                request.log("LIVE CONNECTION ESTABLISH", connection.request.id);
-                connection.response?._end?.();
-                request.id = connection.request.id;
-                connection.request = request;
-                connection.response = response;
+                request.log(
+                  "LIVE CONNECTION ESTABLISH",
+                  request.liveConnection.request.id,
+                );
+                request.liveConnection.response?._end?.();
+                request.id = request.liveConnection.request.id;
+                request.liveConnection.request = request;
+                request.liveConnection.response = response;
               }
 
               response.once("close", () => {
                 request.log("LIVE CONNECTION CLOSE");
-                delete connection.response;
+                delete request.liveConnection.response;
               });
 
               response.setHeader(
@@ -389,7 +393,7 @@ export default function server({
             response.getHeader("Content-Type", "text/html; charset=utf-8")
           ) {
             request.log("LIVE CONNECTION PREPARE");
-            connections.add({ request });
+            liveConnections.add({ request });
           }
         }
       }
@@ -405,7 +409,8 @@ export default function server({
     });
   process.once("gracefulTermination", () => {
     httpServer.close();
-    for (const connection of connections) connection.response?._end?.();
+    for (const liveConnection of liveConnections)
+      liveConnection.response?._end?.();
   });
   process.once("beforeExit", () => {
     log("STOP");
@@ -413,13 +418,13 @@ export default function server({
 
   utilities.backgroundJob({ interval: 2 * 60 * 1000 }, () => {
     const now = process.hrtime.bigint();
-    for (const connection of connections)
+    for (const liveConnection of liveConnections)
       if (
-        connection.response === undefined &&
-        30 * 1000 * 1_000_000 < now - connection.request.start
+        liveConnection.response === undefined &&
+        30 * 1000 * 1_000_000 < now - liveConnection.request.start
       ) {
-        connection.request.log("LIVE CONNECTION DELETE");
-        connections.delete(connection);
+        liveConnection.request.log("LIVE CONNECTION DELETE");
+        liveConnections.delete(liveConnection);
       }
   });
 
