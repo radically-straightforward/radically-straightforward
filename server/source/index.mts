@@ -229,7 +229,7 @@ export default function server({
             if (!response.writableEnded) response.end(String(error));
           }
         else {
-          const connectionId = request.headers["connection-id"];
+          const connectionId = request.headers["live-connection"];
           if (typeof connectionId === "string")
             try {
               if (
@@ -242,13 +242,13 @@ export default function server({
                 (connection) => connection.request.id === connectionId,
               );
               if (connection === undefined) {
-                request.log("CONNECTION CREATE");
+                request.log("LIVE CONNECTION CREATE");
                 connection = { request, response, update: true };
                 connections.add(connection);
               } else if (connection.request.url !== request.url)
                 throw new Error("Unmatched ‘url’ of existing connection.");
               else {
-                request.log("CONNECTION ESTABLISH", connection.request.id);
+                request.log("LIVE CONNECTION ESTABLISH", connection.request.id);
                 connection.response?._end?.();
                 request.id = connection.request.id;
                 connection.request = request;
@@ -256,7 +256,7 @@ export default function server({
               }
 
               response.once("close", () => {
-                request.log("CONNECTION CLOSE");
+                request.log("LIVE CONNECTION CLOSE");
                 delete connection.response;
               });
 
@@ -271,7 +271,10 @@ export default function server({
                   try {
                     response.write("\n");
                   } catch (error) {
-                    request.log("CONNECTION HEARTBEAT ERROR", String(error));
+                    request.log(
+                      "LIVE CONNECTION HEARTBEAT ERROR",
+                      String(error),
+                    );
                   }
                 },
               );
@@ -281,12 +284,12 @@ export default function server({
 
               response._end = response.end;
               response.end = (data?: string): typeof response => {
-                request.log("CONNECTION UPDATE");
+                request.log("LIVE CONNECTION UPDATE");
                 response.write(JSON.stringify(data) + "\n");
                 return response;
               };
             } catch (error: any) {
-              request.log("CONNECTION ERROR", String(error));
+              request.log("LIVE CONNECTION ERROR", String(error));
               response.statusCode = 400;
               response.setHeader("Content-Type", "text/plain; charset=utf-8");
               response.end(String(error));
@@ -385,7 +388,7 @@ export default function server({
             response.statusCode === 200 &&
             response.getHeader("Content-Type", "text/html; charset=utf-8")
           ) {
-            request.log("CONNECTION PREPARE");
+            request.log("LIVE CONNECTION PREPARE");
             connections.add({ request });
           }
         }
@@ -415,7 +418,7 @@ export default function server({
         connection.response === undefined &&
         30 * 1000 * 1_000_000 < now - connection.request.start
       ) {
-        connection.request.log("CONNECTION DELETE");
+        connection.request.log("LIVE CONNECTION DELETE");
         connections.delete(connection);
       }
   });
