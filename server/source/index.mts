@@ -251,7 +251,7 @@ export default function server({
                 };
                 liveConnections.add(request.liveConnection);
               } else if (request.liveConnection.request.url !== request.url)
-                throw new Error("Unmatched ‘url’ of existing Live Connection.");
+                throw new Error("Unmatched ‘url’ of existing request.");
               else {
                 request.log(
                   "LIVE CONNECTION ESTABLISH",
@@ -288,6 +288,16 @@ export default function server({
               );
               response.once("close", () => {
                 heartbeat.stop();
+              });
+
+              const periodicUpdates = utilities.backgroundJob(
+                { interval: 5 * 60 * 1000 },
+                () => {
+                  request.liveConnection.update?.();
+                },
+              );
+              response.once("close", () => {
+                periodicUpdates.stop();
               });
 
               request.liveConnection.establishing = true;
@@ -436,18 +446,6 @@ export default function server({
   });
   process.once("beforeExit", () => {
     log("STOP");
-  });
-
-  utilities.backgroundJob({ interval: 2 * 60 * 1000 }, () => {
-    const now = process.hrtime.bigint();
-    for (const liveConnection of liveConnections)
-      if (
-        liveConnection.response === undefined &&
-        30 * 1000 * 1_000_000 < now - liveConnection.request.start
-      ) {
-        liveConnection.request.log("LIVE CONNECTION DELETE");
-        liveConnections.delete(liveConnection);
-      }
   });
 
   return routes;

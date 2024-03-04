@@ -15,18 +15,10 @@ TODO
 ## Requirements
 
 - Connection
-  - [x] CONNECTION PREPARE
-  - [x] CONNECTION ESTABLISH
-  - [x] CONNECTION CREATE
-  - [x] CONNECTION ERROR
-  - [x] CONNECTION UPDATE
-  - [x] CONNECTION CLOSE
-  - [x] CONNECTION DELETE
-  - [ ] Manage `needUpdate` & `establishing`
-  - [ ] Logic that calls `update()`
-  - [ ] Periodic updates
-  - [ ] API endpoint to trigger updates via inter-process communication
-  - [ ] Manage `request.start` times
+  - Clean connections with timers per connection, instead of a background job which traverses all connections
+  - Logic that calls `update()`
+  - API endpoint to trigger updates via inter-process communication
+  - Manage `request.start` times
 - Types
   - Request & response types
   - Address all `any`s
