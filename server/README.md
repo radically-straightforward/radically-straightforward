@@ -51,6 +51,7 @@ TODO
 - Rate limiting
   - Could be done on Caddy with extension
 - Edge cases
+  - In the case of a request with a file that is too big, the server may not stop writing the file to the filesystem early enough, abusing the user of resources (for example, disk).
   - Different charsets?
   - `Content-Encoding` (for example, compression)
 - Proxy

@@ -133,13 +133,13 @@ export default function server({
                     (async (): Promise<void> => {
                       const valuePath = value.path;
                       await fs.mkdir(path.dirname(valuePath));
-                      await fs.writeFile(valuePath, file);
                       response.once("close", async () => {
                         await fs.rm(path.dirname(valuePath), {
                           recursive: true,
                           force: true,
                         });
                       });
+                      await fs.writeFile(valuePath, file);
                       if ((file as any).truncated) {
                         response.statusCode = 413;
                         throw new Error("File too large.");
