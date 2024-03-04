@@ -283,14 +283,16 @@ export default function server({
                 request.log(
                   "LIVE CONNECTION ESTABLISH",
                   request.liveConnection.request.id,
+                  request.liveConnection.skipUpdateOnEstablish
+                    ? "SKIP UPDATE"
+                    : "",
                 );
-                request.liveConnection.response.liveConnectionEnd?.();
                 clearTimeout(request.liveConnection.deleteTimeout);
+                request.liveConnection.response.liveConnectionEnd?.();
                 request.id = request.liveConnection.request.id;
                 request.liveConnection.request = request;
                 request.liveConnection.response = response;
               }
-
               response.once("close", () => {
                 request.log("LIVE CONNECTION CLOSE");
                 request.liveConnection.deleteTimeout = setTimeout(() => {
