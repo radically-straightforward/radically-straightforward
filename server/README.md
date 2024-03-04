@@ -15,7 +15,6 @@ TODO
 ## Requirements
 
 - Connection
-  - Clean connections with timers per connection (self-destruction), instead of a background job which traverses all connections
   - Logic that calls `update()`
   - API endpoint to trigger updates via inter-process communication
   - Manage `request.start` times

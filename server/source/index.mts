@@ -258,6 +258,7 @@ export default function server({
                   request.liveConnection.request.id,
                 );
                 request.liveConnection.response?.liveConnectionEnd?.();
+                clearTimeout(request.liveConnection.deleteTimeout);
                 request.id = request.liveConnection.request.id;
                 request.liveConnection.request = request;
                 request.liveConnection.response = response;
@@ -265,7 +266,9 @@ export default function server({
 
               response.once("close", () => {
                 request.log("LIVE CONNECTION CLOSE");
-                delete request.liveConnection.response;
+                request.liveConnection.deleteTimeout = setTimeout(() => {
+                  liveConnections.delete(request.liveConnection);
+                }, 30 * 1000);
               });
 
               response.setHeader(
@@ -425,7 +428,13 @@ export default function server({
             response.getHeader("Content-Type", "text/html; charset=utf-8")
           ) {
             request.log("LIVE CONNECTION PREPARE");
-            liveConnections.add({ request });
+            const liveConnection = {
+              request,
+              deleteTimeout: setTimeout(() => {
+                liveConnections.delete(liveConnection);
+              }, 30 * 1000),
+            };
+            liveConnections.add(liveConnection);
           }
         }
       }
