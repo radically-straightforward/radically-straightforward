@@ -17,7 +17,6 @@ TODO
 - Connection
   - Logic that calls `update()`
   - API endpoint to trigger updates via inter-process communication
-  - Manage `request.start` times
 - Types
   - Request & response types
   - Address all `any`s

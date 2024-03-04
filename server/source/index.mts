@@ -419,6 +419,7 @@ export default function server({
               request.liveConnection.establishing = false;
               request.liveConnection.shouldUpdate = true;
               await liveConnectionUpdate;
+              request.start = process.hrtime.bigint();
             }
           } while (request.liveConnection !== undefined);
 
