@@ -546,7 +546,59 @@ test({ timeout: process.stdin.isTTY ? undefined : 30 * 1000 }, async () => {
         `^<!DOCTYPE html><html><head><meta name="live-connection" content="(?<liveConnectionId>[a-z0-9]+)" /></head><body></body></html>$`,
       ),
     )?.groups?.liveConnectionId;
-    assert.equal(typeof liveConnectionId, "string");
+    assert(typeof liveConnectionId === "string");
+
+    {
+      const response = await fetch("http://localhost:18000/live-connection", {
+        method: "POST",
+        headers: {
+          "CSRF-Protection": "true",
+          "Live-Connection": liveConnectionId,
+        },
+      });
+      assert.equal(response.status, 400);
+      assert.equal(
+        response.headers.get("Content-Type"),
+        "text/plain; charset=utf-8",
+      );
+      assert.equal(
+        await response.text(),
+        "Error: Invalid ‘Live-Connection’ header.",
+      );
+    }
+
+    {
+      const response = await fetch("http://localhost:18000/live-connection", {
+        headers: { "Live-Connection": "hi" },
+      });
+      assert.equal(response.status, 400);
+      assert.equal(
+        response.headers.get("Content-Type"),
+        "text/plain; charset=utf-8",
+      );
+      assert.equal(
+        await response.text(),
+        "Error: Invalid ‘Live-Connection’ header.",
+      );
+    }
+
+    {
+      const response = await fetch(
+        "http://localhost:18000/live-connection?otherUrl=true",
+        {
+          headers: { "Live-Connection": liveConnectionId },
+        },
+      );
+      assert.equal(response.status, 400);
+      assert.equal(
+        response.headers.get("Content-Type"),
+        "text/plain; charset=utf-8",
+      );
+      assert.equal(
+        await response.text(),
+        "Error: Unmatched ‘url’ of existing request.",
+      );
+    }
 
     await fetch("http://localhost:18000/live-connection", {
       method: "POST",
