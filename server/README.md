@@ -16,6 +16,7 @@ TODO
 
 - Live Connection
   - Tests
+  - Review Courselore’s implementation
 - Types
   - Request & response types
   - Address all `any`s

@@ -56,7 +56,8 @@ export default function server({
             request.URL.pathname !== csrfProtectionPathnameException) ||
             (csrfProtectionPathnameException instanceof RegExp &&
               request.URL.pathname.match(csrfProtectionPathnameException) ===
-                null))
+                null)) &&
+          request.URL.pathname !== "/__live-connections"
         ) {
           response.statusCode = 403;
           throw new Error(
@@ -235,15 +236,15 @@ export default function server({
         )
           try {
             if (
-              typeof request.search.pathname !== "string" ||
-              request.search.pathname.trim() === ""
+              typeof request.body.pathname !== "string" ||
+              request.body.pathname.trim() === ""
             )
               throw new Error("Invalid ‘pathname’.");
             response.once("close", () => {
               for (const liveConnection of liveConnections) {
                 if (
                   liveConnection.request.URL.pathname.match(
-                    new RegExp(request.search.pathname),
+                    new RegExp(request.body.pathname),
                   ) === null
                 )
                   continue;

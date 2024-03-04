@@ -513,33 +513,48 @@ test({ timeout: process.stdin.isTTY ? undefined : 30 * 1000 }, async () => {
     );
   }
 
-  // {
-  //   const messages = new Array<string>();
+  {
+    const messages = new Array<string>();
 
-  //   application.push({
-  //     method: "GET",
-  //     pathname: "/live-connection",
-  //     handler: (request: any, response: any) => {
-  //       response.end(
-  //         messages.map((message) => `<div>${message}</div>`).join("\n"),
-  //       );
-  //     },
-  //   });
+    application.push({
+      method: "GET",
+      pathname: "/live-connection",
+      handler: (request: any, response: any) => {
+        response.end(
+          `<!DOCTYPE html><html><head><meta name="live-connection" content="${request.id}" /></head><body>${messages.map((message) => `<div>${message}</div>`).join("\n")}</body></html>`,
+        );
+      },
+    });
 
-  //   application.push({
-  //     method: "POST",
-  //     pathname: "/live-connection",
-  //     handler: (request: any, response: any) => {
-  //       messages.push(request.body.message);
-  //       response.redirect();
-  //     },
-  //   });
+    application.push({
+      method: "POST",
+      pathname: "/live-connection",
+      handler: async (request: any, response: any) => {
+        messages.push(request.body.message);
+        response.redirect();
+        fetch("http://localhost:18000/__live-connections", {
+          method: "POST",
+          body: new URLSearchParams({ pathname: "^/live-connection$" }),
+        });
+      },
+    });
 
-  //   // assert.equal(
-  //   //   await (await fetch("http://localhost:18000/live-connection")).text(),
-  //   //   "",
-  //   // );
-  // }
+    const liveConnectionId = (
+      await (await fetch("http://localhost:18000/live-connection")).text()
+    ).match(
+      new RegExp(
+        `^<!DOCTYPE html><html><head><meta name="live-connection" content="(?<liveConnectionId>[a-z0-9]+)" /></head><body></body></html>$`,
+      ),
+    )?.groups?.liveConnectionId;
+    assert.equal(typeof liveConnectionId, "string");
+
+    await fetch("http://localhost:18000/live-connection", {
+      method: "POST",
+      headers: { "CSRF-Protection": "true" },
+      body: new URLSearchParams({ message: "Hello" }),
+      redirect: "manual",
+    });
+  }
 
   if (process.stdin.isTTY) {
     console.log(`Test proxy in browser with the following URLs:
