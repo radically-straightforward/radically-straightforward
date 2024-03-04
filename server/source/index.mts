@@ -239,18 +239,20 @@ export default function server({
               request.search.pathname.trim() === ""
             )
               throw new Error("Invalid ‘pathname’.");
+            response.once("close", () => {
+              for (const liveConnection of liveConnections) {
+                if (
+                  liveConnection.request.URL.pathname.match(
+                    new RegExp(request.search.pathname),
+                  ) === null
+                )
+                  continue;
+                if (liveConnection.response.writableEnded)
+                  liveConnection.skipUpdateOnEstablish = false;
+                else request.liveConnection.update?.();
+              }
+            });
             response.end();
-            for (const liveConnection of liveConnections) {
-              if (
-                liveConnection.request.URL.pathname.match(
-                  new RegExp(request.search.pathname),
-                ) === null
-              )
-                continue;
-              if (liveConnection.response.writableEnded)
-                liveConnection.skipUpdateOnEstablish = false;
-              else request.liveConnection.update?.();
-            }
           } catch (error: any) {
             request.log("ERROR", String(error));
             response.statusCode = 422;
