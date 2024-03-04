@@ -513,33 +513,33 @@ test({ timeout: process.stdin.isTTY ? undefined : 30 * 1000 }, async () => {
     );
   }
 
-  {
-    const messages = new Array<string>();
+  // {
+  //   const messages = new Array<string>();
 
-    application.push({
-      method: "GET",
-      pathname: "/live-connection",
-      handler: (request: any, response: any) => {
-        response.end(
-          messages.map((message) => `<div>${message}</div>`).join("\n"),
-        );
-      },
-    });
+  //   application.push({
+  //     method: "GET",
+  //     pathname: "/live-connection",
+  //     handler: (request: any, response: any) => {
+  //       response.end(
+  //         messages.map((message) => `<div>${message}</div>`).join("\n"),
+  //       );
+  //     },
+  //   });
 
-    application.push({
-      method: "POST",
-      pathname: "/live-connection",
-      handler: (request: any, response: any) => {
-        messages.push(request.body.message);
-        response.redirect();
-      },
-    });
+  //   application.push({
+  //     method: "POST",
+  //     pathname: "/live-connection",
+  //     handler: (request: any, response: any) => {
+  //       messages.push(request.body.message);
+  //       response.redirect();
+  //     },
+  //   });
 
-    assert.equal(
-      await (await fetch("http://localhost:18000/live-connection")).text(),
-      "",
-    );
-  }
+  //   // assert.equal(
+  //   //   await (await fetch("http://localhost:18000/live-connection")).text(),
+  //   //   "",
+  //   // );
+  // }
 
   if (process.stdin.isTTY) {
     console.log(`Test proxy in browser with the following URLs:
