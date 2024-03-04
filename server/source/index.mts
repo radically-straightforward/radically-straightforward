@@ -244,7 +244,11 @@ export default function server({
               );
               if (request.liveConnection === undefined) {
                 request.log("LIVE CONNECTION CREATE");
-                request.liveConnection = { request, response, needUpdate: true };
+                request.liveConnection = {
+                  request,
+                  response,
+                  shouldUpdate: true,
+                };
                 liveConnections.add(request.liveConnection);
               } else if (request.liveConnection.request.url !== request.url)
                 throw new Error("Unmatched ‘url’ of existing Live Connection.");
@@ -341,17 +345,18 @@ export default function server({
             };
           }
 
+          let liveConnection: any;
           do {
-            response.state = {};
-
+            liveConnection = request.liveConnection;
             let liveConnectionUpdate;
-            if (request.liveConnection !== undefined) {
+            if (liveConnection !== undefined) {
+              liveConnection.writableEnded = false;
               liveConnectionUpdate = new Promise((resolve) => {
-                request.liveConnection.update = resolve;
+                liveConnection.update = resolve;
               });
-              request.liveConnection.writableEnded = false;
             }
 
+            response.state = {};
             for (const route of routes) {
               if ((response.error !== undefined) !== (route.error ?? false))
                 continue;
@@ -382,21 +387,10 @@ export default function server({
                 response.error = error;
               }
 
-              if (
-                (request.liveConnection === undefined &&
-                  response.writableEnded) ||
-                (request.liveConnection !== undefined &&
-                  request.liveConnection.writableEnded)
-              )
-                break;
+              if ((liveConnection ?? response).writableEnded) break;
             }
 
-            if (
-              (request.liveConnection === undefined &&
-                !response.writableEnded) ||
-              (request.liveConnection !== undefined &&
-                !request.liveConnection.writableEnded)
-            ) {
+            if (!(liveConnection ?? response).writableEnded) {
               request.log(
                 "ERROR",
                 "The application didn’t finish handling this request.",
@@ -410,11 +404,12 @@ export default function server({
               );
             }
 
-            if (request.liveConnection !== undefined) {
-              request.liveConnection.establishing = false;
+            if (liveConnection !== undefined) {
+              liveConnection.establishing = false;
+              liveConnection.shouldUpdate = true;
               await liveConnectionUpdate;
             }
-          } while (request.liveConnection !== undefined);
+          } while (liveConnection !== undefined);
 
           if (
             request.method === "GET" &&
