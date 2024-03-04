@@ -248,7 +248,7 @@ export default function server({
               )
                 continue;
               if (liveConnection.response.writableEnded)
-                liveConnection.updateOnEstablishing = true;
+                liveConnection.skipUpdateOnEstablish = false;
               else request.liveConnection.update?.();
             }
           } catch (error: any) {
@@ -273,11 +273,7 @@ export default function server({
               );
               if (request.liveConnection === undefined) {
                 request.log("LIVE CONNECTION CREATE");
-                request.liveConnection = {
-                  request,
-                  response,
-                  updateOnEstablishing: true,
-                };
+                request.liveConnection = { request, response };
                 liveConnections.add(request.liveConnection);
               } else if (request.liveConnection.request.url !== request.url)
                 throw new Error("Unmatched ‘url’ of existing request.");
@@ -295,7 +291,6 @@ export default function server({
 
               response.once("close", () => {
                 request.log("LIVE CONNECTION CLOSE");
-                request.liveConnection.updateOnEstablishing = false;
                 request.liveConnection.deleteTimeout = setTimeout(() => {
                   liveConnections.delete(request.liveConnection);
                 }, 30 * 1000);
@@ -333,7 +328,7 @@ export default function server({
                 periodicUpdates.stop();
               });
 
-              request.liveConnection.establishing = true;
+              request.liveConnection.establish = true;
 
               response.liveConnectionEnd = response.end;
               response.end = (data?: string): typeof response => {
@@ -447,8 +442,8 @@ export default function server({
             }
 
             if (request.liveConnection !== undefined) {
-              request.liveConnection.establishing = false;
-              request.liveConnection.updateOnEstablishing = true;
+              request.liveConnection.establish = false;
+              request.liveConnection.skipUpdateOnEstablish = true;
               await liveConnectionUpdate;
               request.start = process.hrtime.bigint();
             }
@@ -463,6 +458,7 @@ export default function server({
             const liveConnection = {
               request,
               response,
+              skipUpdateOnEstablish: true,
               deleteTimeout: setTimeout(() => {
                 liveConnections.delete(liveConnection);
               }, 30 * 1000),
