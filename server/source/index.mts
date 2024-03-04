@@ -297,7 +297,7 @@ export default function server({
                 request.log("LIVE CONNECTION CLOSE");
                 request.liveConnection.deleteTimeout = setTimeout(() => {
                   liveConnections.delete(request.liveConnection);
-                }, 30 * 1000);
+                }, 30 * 1000).unref();
               });
 
               response.setHeader(
@@ -459,7 +459,7 @@ export default function server({
               skipUpdateOnEstablish: true,
               deleteTimeout: setTimeout(() => {
                 liveConnections.delete(liveConnection);
-              }, 30 * 1000),
+              }, 30 * 1000).unref(),
             };
             liveConnections.add(liveConnection);
           }
