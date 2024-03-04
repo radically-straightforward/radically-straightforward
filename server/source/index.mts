@@ -34,7 +34,7 @@ export default function server({
 
         request.log(
           "REQUEST",
-          request.headers["x-forwarded-for"],
+          request.headers["x-forwarded-for"] ?? "127.0.0.1",
           request.method,
           request.url,
         );

@@ -609,13 +609,18 @@ test({ timeout: process.stdin.isTTY ? undefined : 30 * 1000 }, async () => {
   }
 
   if (process.stdin.isTTY) {
-    console.log(`Test proxy in browser with the following URLs:
+    console.log(`
+============================================
+    
+Test proxy in browser with the following URLs:
 
 http://localhost:18000/_proxy?destination=${encodeURIComponent("https://interactive-examples.mdn.mozilla.net/media/cc0-images/grapefruit-slice-332-332.jpg")}
 
 http://localhost:18000/_proxy?destination=${encodeURIComponent("https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.webm")}
 
 http://localhost:18000/_proxy?destination=${encodeURIComponent("https://interactive-examples.mdn.mozilla.net/media/cc0-audio/t-rex-roar.mp3")}
+
+============================================
 `);
   } else {
     console.log(
