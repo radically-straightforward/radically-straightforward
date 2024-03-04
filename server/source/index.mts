@@ -367,7 +367,7 @@ export default function server({
             };
 
             response.redirect = (
-              destination: string,
+              destination: string = "",
               type: "see-other" | "temporary" | "permanent" = "see-other",
             ): typeof response => {
               response.statusCode = {
