@@ -295,6 +295,7 @@ export default function server({
 
               response.once("close", () => {
                 request.log("LIVE CONNECTION CLOSE");
+                request.liveConnection.shouldUpdate = false;
                 request.liveConnection.deleteTimeout = setTimeout(() => {
                   liveConnections.delete(request.liveConnection);
                 }, 30 * 1000);
@@ -337,7 +338,8 @@ export default function server({
               response.liveConnectionEnd = response.end;
               response.end = (data?: string): typeof response => {
                 request.log("LIVE CONNECTION UPDATE");
-                response.write(JSON.stringify(data) + "\n");
+                if (typeof data === "string")
+                  response.write(JSON.stringify(data) + "\n");
                 request.liveConnection.writableEnded = true;
                 return response;
               };
