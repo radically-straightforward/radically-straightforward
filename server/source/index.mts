@@ -9,10 +9,10 @@ import * as utilities from "@radically-straightforward/utilities";
 
 export default function server({
   port = 18000,
-  csrfProtectionPathnameException = "",
+  csrfProtectionExceptionPathname = "",
 }: {
   port?: number;
-  csrfProtectionPathnameException?: string | RegExp;
+  csrfProtectionExceptionPathname?: string | RegExp;
 } = {}): any[] {
   const routes = new Array<any>();
   const liveConnections = new Set<any>();
@@ -52,10 +52,10 @@ export default function server({
         if (
           request.method !== "GET" &&
           request.headers["csrf-protection"] !== "true" &&
-          ((typeof csrfProtectionPathnameException === "string" &&
-            request.URL.pathname !== csrfProtectionPathnameException) ||
-            (csrfProtectionPathnameException instanceof RegExp &&
-              request.URL.pathname.match(csrfProtectionPathnameException) ===
+          ((typeof csrfProtectionExceptionPathname === "string" &&
+            request.URL.pathname !== csrfProtectionExceptionPathname) ||
+            (csrfProtectionExceptionPathname instanceof RegExp &&
+              request.URL.pathname.match(csrfProtectionExceptionPathname) ===
                 null)) &&
           request.URL.pathname !== "/__live-connections"
         ) {
