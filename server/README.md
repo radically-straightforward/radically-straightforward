@@ -15,7 +15,6 @@ TODO
 ## Requirements
 
 - Connection
-  - Logic that calls `update()`
   - API endpoint to trigger updates via inter-process communication
 - Types
   - Request & response types
