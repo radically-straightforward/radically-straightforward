@@ -247,9 +247,9 @@ export default function server({
                   ) === null
                 )
                   continue;
-                if (liveConnection.response.writableEnded)
-                  liveConnection.skipUpdateOnEstablish = false;
-                else request.liveConnection.update?.();
+                liveConnection.skipUpdateOnEstablish = false;
+                if (!liveConnection.response.writableEnded)
+                  request.liveConnection.update?.();
               }
             });
             response.end();
@@ -284,7 +284,7 @@ export default function server({
                   "LIVE CONNECTION ESTABLISH",
                   request.liveConnection.request.id,
                 );
-                request.liveConnection.response?.liveConnectionEnd?.();
+                request.liveConnection.response.liveConnectionEnd?.();
                 clearTimeout(request.liveConnection.deleteTimeout);
                 request.id = request.liveConnection.request.id;
                 request.liveConnection.request = request;
@@ -306,14 +306,7 @@ export default function server({
               const heartbeat = utilities.backgroundJob(
                 { interval: 30 * 1000 },
                 () => {
-                  try {
-                    response.write("\n");
-                  } catch (error) {
-                    request.log(
-                      "LIVE CONNECTION HEARTBEAT ERROR",
-                      String(error),
-                    );
-                  }
+                  response.write("\n");
                 },
               );
               response.once("close", () => {
@@ -334,7 +327,7 @@ export default function server({
 
               response.liveConnectionEnd = response.end;
               response.end = (data?: string): typeof response => {
-                request.log("LIVE CONNECTION UPDATE");
+                request.log("LIVE CONNECTION UPDATE RESPONSE");
                 if (typeof data === "string")
                   response.write(JSON.stringify(data) + "\n");
                 request.liveConnection.writableEnded = true;
@@ -448,6 +441,7 @@ export default function server({
               request.liveConnection.skipUpdateOnEstablish = true;
               await liveConnectionUpdate;
               request.start = process.hrtime.bigint();
+              request.log("LIVE CONNECTION UPDATE REQUEST");
             }
           } while (request.liveConnection !== undefined);
 
@@ -482,7 +476,7 @@ export default function server({
   process.once("gracefulTermination", () => {
     httpServer.close();
     for (const liveConnection of liveConnections)
-      liveConnection.response?.liveConnectionEnd?.();
+      liveConnection.response.liveConnectionEnd?.();
   });
   process.once("beforeExit", () => {
     log("STOP");
