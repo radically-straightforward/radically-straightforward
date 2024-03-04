@@ -345,14 +345,12 @@ export default function server({
             };
           }
 
-          let liveConnection: any;
           do {
-            liveConnection = request.liveConnection;
             let liveConnectionUpdate;
-            if (liveConnection !== undefined) {
-              liveConnection.writableEnded = false;
+            if (request.liveConnection !== undefined) {
+              request.liveConnection.writableEnded = false;
               liveConnectionUpdate = new Promise((resolve) => {
-                liveConnection.update = resolve;
+                request.liveConnection.update = resolve;
               });
             }
 
@@ -387,10 +385,10 @@ export default function server({
                 response.error = error;
               }
 
-              if ((liveConnection ?? response).writableEnded) break;
+              if ((request.liveConnection ?? response).writableEnded) break;
             }
 
-            if (!(liveConnection ?? response).writableEnded) {
+            if (!(request.liveConnection ?? response).writableEnded) {
               request.log(
                 "ERROR",
                 "The application didn’t finish handling this request.",
@@ -404,12 +402,12 @@ export default function server({
               );
             }
 
-            if (liveConnection !== undefined) {
-              liveConnection.establishing = false;
-              liveConnection.shouldUpdate = true;
+            if (request.liveConnection !== undefined) {
+              request.liveConnection.establishing = false;
+              request.liveConnection.shouldUpdate = true;
               await liveConnectionUpdate;
             }
-          } while (liveConnection !== undefined);
+          } while (request.liveConnection !== undefined);
 
           if (
             request.method === "GET" &&
