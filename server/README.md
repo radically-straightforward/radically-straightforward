@@ -14,8 +14,8 @@ TODO
 
 ## Requirements
 
-- Connection
-  - API endpoint to trigger updates via inter-process communication
+- Live Connection
+  - Tests
 - Types
   - Request & response types
   - Address all `any`s

@@ -228,6 +228,35 @@ export default function server({
             }
             if (!response.writableEnded) response.end(String(error));
           }
+        else if (
+          request.method === "POST" &&
+          request.URL.hostname === "localhost" &&
+          request.URL.pathname === "/__live-connections"
+        )
+          try {
+            if (
+              typeof request.search.pathname !== "string" ||
+              request.search.pathname.trim() === ""
+            )
+              throw new Error("Invalid ‘pathname’.");
+            response.end();
+            for (const liveConnection of liveConnections) {
+              if (
+                liveConnection.request.URL.pathname.match(
+                  new RegExp(request.search.pathname),
+                ) === null
+              )
+                continue;
+              if (liveConnection.response.writableEnded)
+                liveConnection.shouldUpdate = true;
+              else request.liveConnection.update?.();
+            }
+          } catch (error: any) {
+            request.log("ERROR", String(error));
+            response.statusCode = 422;
+            response.setHeader("Content-Type", "text/plain; charset=utf-8");
+            response.end(String(error));
+          }
         else {
           const liveConnectionId = request.headers["live-connection"];
           if (typeof liveConnectionId === "string")
@@ -431,6 +460,7 @@ export default function server({
             request.log("LIVE CONNECTION PREPARE");
             const liveConnection = {
               request,
+              response,
               deleteTimeout: setTimeout(() => {
                 liveConnections.delete(liveConnection);
               }, 30 * 1000),
