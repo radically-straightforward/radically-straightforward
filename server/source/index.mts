@@ -3,6 +3,7 @@ import path from "node:path";
 import fs from "node:fs/promises";
 import http from "node:http";
 import stream from "node:stream/promises";
+import timers from "node:timers/promises";
 import busboy from "busboy";
 import "@radically-straightforward/node";
 import * as utilities from "@radically-straightforward/utilities";
@@ -240,7 +241,7 @@ export default function server({
               request.body.pathname.trim() === ""
             )
               throw new Error("Invalid ‘pathname’.");
-            response.once("close", () => {
+            response.once("close", async () => {
               for (const liveConnection of liveConnections) {
                 if (
                   liveConnection.request.URL.pathname.match(
@@ -251,6 +252,7 @@ export default function server({
                 liveConnection.skipUpdateOnEstablish = false;
                 if (!liveConnection.response.writableEnded)
                   request.liveConnection.update?.();
+                await timers.setTimeout(200);
               }
             });
             response.end();
@@ -297,6 +299,7 @@ export default function server({
               response.once("close", () => {
                 request.log("LIVE CONNECTION CLOSE");
                 request.liveConnection.deleteTimeout = setTimeout(() => {
+                  request.log("LIVE CONNECTION DELETE");
                   liveConnections.delete(request.liveConnection);
                 }, 30 * 1000).unref();
               });
@@ -463,6 +466,7 @@ export default function server({
               response,
               skipUpdateOnEstablish: true,
               deleteTimeout: setTimeout(() => {
+                request.log("LIVE CONNECTION DELETE");
                 liveConnections.delete(liveConnection);
               }, 30 * 1000).unref(),
             };

@@ -514,39 +514,19 @@ test({ timeout: process.stdin.isTTY ? undefined : 30 * 1000 }, async () => {
   }
 
   {
-    const messages = new Array<string>();
+    let state = 0;
 
     application.push({
       method: "GET",
       pathname: "/live-connection",
       handler: (request: any, response: any) => {
-        response.end(
-          `<!DOCTYPE html><html><head><meta name="live-connection" content="${request.id}" /></head><body>${messages.map((message) => `<div>${message}</div>`).join("\n")}</body></html>`,
-        );
-      },
-    });
-
-    application.push({
-      method: "POST",
-      pathname: "/live-connection",
-      handler: async (request: any, response: any) => {
-        messages.push(request.body.message);
-        response.redirect();
-        fetch("http://localhost:18000/__live-connections", {
-          method: "POST",
-          body: new URLSearchParams({ pathname: "^/live-connection$" }),
-        });
+        response.end(`${request.id}|${state}`);
       },
     });
 
     const liveConnectionId = (
       await (await fetch("http://localhost:18000/live-connection")).text()
-    ).match(
-      new RegExp(
-        `^<!DOCTYPE html><html><head><meta name="live-connection" content="(?<liveConnectionId>[a-z0-9]+)" /></head><body></body></html>$`,
-      ),
-    )?.groups?.liveConnectionId;
-    assert(typeof liveConnectionId === "string");
+    ).split("|")[0];
 
     {
       const response = await fetch("http://localhost:18000/live-connection", {
@@ -606,6 +586,11 @@ test({ timeout: process.stdin.isTTY ? undefined : 30 * 1000 }, async () => {
       body: new URLSearchParams({ message: "Hello" }),
       redirect: "manual",
     });
+
+    // await fetch("http://localhost:18000/__live-connections", {
+    //   method: "POST",
+    //   body: new URLSearchParams({ pathname: "^/live-connection$" }),
+    // });
   }
 
   if (process.stdin.isTTY) {
