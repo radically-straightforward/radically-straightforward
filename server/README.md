@@ -22,6 +22,9 @@ TODO
   - [x] CONNECTION UPDATE
   - [x] CONNECTION CLOSE
   - [x] CONNECTION DELETE
+  - [ ] Manage `needUpdate` & `establishing`
+  - [ ] Logic that calls `update()`
+  - [ ] Periodic updates
   - [ ] API endpoint to trigger updates via inter-process communication
   - [ ] Manage `request.start` times
 - Types

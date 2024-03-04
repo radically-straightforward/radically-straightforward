@@ -244,7 +244,7 @@ export default function server({
               );
               if (request.liveConnection === undefined) {
                 request.log("LIVE CONNECTION CREATE");
-                request.liveConnection = { request, response, update: true };
+                request.liveConnection = { request, response, needUpdate: true };
                 liveConnections.add(request.liveConnection);
               } else if (request.liveConnection.request.url !== request.url)
                 throw new Error("Unmatched ‘url’ of existing Live Connection.");
