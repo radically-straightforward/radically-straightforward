@@ -248,7 +248,7 @@ export default function server({
               )
                 continue;
               if (liveConnection.response.writableEnded)
-                liveConnection.shouldUpdate = true;
+                liveConnection.updateOnEstablishing = true;
               else request.liveConnection.update?.();
             }
           } catch (error: any) {
@@ -276,7 +276,7 @@ export default function server({
                 request.liveConnection = {
                   request,
                   response,
-                  shouldUpdate: true,
+                  updateOnEstablishing: true,
                 };
                 liveConnections.add(request.liveConnection);
               } else if (request.liveConnection.request.url !== request.url)
@@ -295,7 +295,7 @@ export default function server({
 
               response.once("close", () => {
                 request.log("LIVE CONNECTION CLOSE");
-                request.liveConnection.shouldUpdate = false;
+                request.liveConnection.updateOnEstablishing = false;
                 request.liveConnection.deleteTimeout = setTimeout(() => {
                   liveConnections.delete(request.liveConnection);
                 }, 30 * 1000);
@@ -448,7 +448,7 @@ export default function server({
 
             if (request.liveConnection !== undefined) {
               request.liveConnection.establishing = false;
-              request.liveConnection.shouldUpdate = true;
+              request.liveConnection.updateOnEstablishing = true;
               await liveConnectionUpdate;
               request.start = process.hrtime.bigint();
             }
