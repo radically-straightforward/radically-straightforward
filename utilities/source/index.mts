@@ -117,8 +117,9 @@ export function log(...messageParts: string[]): void {
 /**
  * Utility type for `intern()`.
  */
-export type Intern<Type> = Readonly<Type & { [internSymbol]: true }>;
+export type Interned<Type> = Readonly<Type & { [internSymbol]: true }>;
 
+type InternInnerKey = number | symbol | string;
 /**
  * Utility type for `intern()`.
  */
@@ -130,7 +131,18 @@ export type InternInnerValue =
   | symbol
   | undefined
   | null
-  | Intern<unknown>;
+  | Interned<unknown>;
+
+type InternCacheNode = {
+  /** A weak reference to the final Tuple or Record we have interned */
+  internedObject?: WeakRef<Interned<unknown>>;
+  /** The intermediary key for this node ie `node.innerKey === node.parent.get(node.innerKey).get(node.innerValue).innerKey` */
+  innerKey?: InternInnerKey;
+  /** The intermediary value for this node ie `node.innerValue === node.parent.get(node.innerKey).get(node.innerValue).innerValue` */
+  innerValue?: InternInnerValue;
+  parent?: InternCacheNode;
+  children?: Map<InternInnerKey, Map<InternInnerValue, InternCacheNode>>;
+};
 
 /**
  * [Interning](<https://en.wikipedia.org/wiki/Interning_(computer_science)>) a value makes it unique across the program, which is useful for checking equality with `===` (reference equality), using it as a key in a `Map`, adding it to a `Set`, and so forth:
@@ -182,11 +194,11 @@ export type InternInnerValue =
  *
  * > **Note:** You must not mutate an interned value. Interned values are [frozen](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/freeze) to prevent mutation.
  *
- * > **Note:** Interning a value is a costly operation which grows more expensive as you intern more values. Only intern values when really necessary.
- *
  * > **Note:** Interned objects do not preserve the order of the attributes: `$({ a: 1, b: 2 }) === $({ b: 2, a: 1 })`.
  *
- * > **Note:** The pool of interned values is available as `intern.pool`. The interned values are kept with `WeakRef`s to allow them to be garbage collected when they aren’t referenced anywhere else anymore. There’s a `FinalizationRegistry` at `intern.finalizationRegistry` that cleans up interned values that have been garbage collected.
+ * > **Note:** The pool of interned values is available as `intern._pool`. The interned values are kept with `WeakRef`s to allow them to be garbage collected when they aren’t referenced anywhere else anymore. There’s a `FinalizationRegistry` at `intern._finalizationRegistry` that cleans up interned values that have been garbage collected.
+ *
+ * > **Note:** `+0` and `-0` are not necessarily preserved. ie `Object.is($([+0])[0], $([-0])[0])` returns `true`
  *
  * **Related Work**
  *
@@ -209,8 +221,6 @@ export type InternInnerValue =
  * **[Immutable.js](https://www.npmjs.com/package/immutable), [`collections`](https://www.npmjs.com/package/collections), [`mori`](https://www.npmjs.com/package/mori), [TypeScript Collections](https://www.npmjs.com/package/typescript-collections), [`prelude-ts`](https://www.npmjs.com/package/prelude-ts), [`collectable`](https://www.npmjs.com/package/collectable), and so forth**
  *
  * Similar to `collections-deep-equal`, these libraries implement their own data structures instead of relying on JavaScript’s `Map`s and `Set`s. Some of them go a step further and add their own notions of objects and arrays, which requires you to convert your values back and forth, may not show up nicely in the JavaScript inspector, may be less ergonomic to use with TypeScript, and so forth.
- *
- * The advantage of these libraries over interning is that they may be faster.
  *
  * **[`immer`](https://www.npmjs.com/package/immer) and [`icepick`](https://www.npmjs.com/package/icepick)**
  *
@@ -235,26 +245,10 @@ export type InternInnerValue =
  * - <https://gist.github.com/modernserf/c000e62d40f678cf395e3f360b9b0e43>
  */
 export function intern<
-  Type extends Array<InternInnerValue> | { [key: string]: InternInnerValue },
->(value: Type): Intern<Type> {
-  const type = Array.isArray(value)
-    ? "tuple"
-    : typeof value === "object" && value !== null
-      ? "record"
-      : (() => {
-          throw new Error(`Failed to intern value.`);
-        })();
-  const keys = Object.keys(value);
-  for (const internWeakRef of intern.pool[type].values()) {
-    const internValue = internWeakRef.deref();
-    if (
-      internValue === undefined ||
-      keys.length !== Object.keys(internValue).length
-    )
-      continue;
-    if (keys.every((key) => (value as any)[key] === (internValue as any)[key]))
-      return internValue as any;
-  }
+  Type extends
+    | Array<InternInnerValue>
+    | { [key: string | symbol]: InternInnerValue },
+>(value: Type): Interned<Type> {
   for (const innerValue of Object.values(value))
     if (
       !(
@@ -265,33 +259,74 @@ export function intern<
         typeof innerValue === "symbol" ||
         innerValue === undefined ||
         innerValue === null ||
-        (innerValue as any)[internSymbol] === true
+        intern.isInterned(innerValue)
       )
     )
       throw new Error(
         `Failed to intern value because of non-interned inner value.`,
       );
-  const key = Symbol();
-  (value as any)[internSymbol] = true;
-  Object.freeze(value);
-  intern.pool[type].set(key, new WeakRef(value as any));
-  intern.finalizationRegistry.register(value, { type, key });
-  return value as any;
+
+  const isTuple = Array.isArray(value);
+  const entries = isTuple
+    ? value.entries()
+    : Object.entries(value).sort(([aKey], [bKey]) => aKey.localeCompare(bKey));
+
+  // Find leaf node, creating intermediary nodes as necessary
+  let node = isTuple ? intern._pool.tuples : intern._pool.records;
+  for (const [innerKey, innerValue] of entries) {
+    if (node.children === undefined) node.children = new Map();
+    if (!node.children.has(innerKey)) node.children.set(innerKey, new Map());
+    const valueMap = node.children.get(innerKey)!;
+    if (!valueMap.has(innerValue))
+      valueMap.set(innerValue, { parent: node, innerKey, innerValue });
+    node = valueMap.get(innerValue)!;
+  }
+
+  // If we already have a value, return it
+  const existingValue = node.internedObject?.deref();
+  if (existingValue !== undefined) return existingValue as Interned<Type>;
+
+  // Otherwise intern the value and cache it
+  intern._markInterned(value);
+  node.internedObject = new WeakRef(value);
+  intern._finalizationRegistry.register(value, node);
+  return value;
 }
 
-export const internSymbol = Symbol("intern");
-
-intern.pool = {
-  tuple: new Map<Symbol, WeakRef<Intern<InternInnerValue[]>>>(),
-  record: new Map<
-    Symbol,
-    WeakRef<Intern<{ [key: string]: InternInnerValue }>>
-  >(),
+const internSymbol = Symbol("intern");
+intern._markInterned = <T,>(value: T): asserts value is Interned<T> => {
+  Object.defineProperty(value, internSymbol, {
+    enumerable: false,
+    value: true,
+  });
+  Object.freeze(value);
 };
 
-intern.finalizationRegistry = new FinalizationRegistry<{
-  type: "tuple" | "record";
-  key: Symbol;
-}>(({ type, key }) => {
-  intern.pool[type].delete(key);
-});
+intern.isInterned = (value: any): boolean =>
+  (value as any)[internSymbol] === true;
+
+intern._pool = {
+  tuples: {} as InternCacheNode,
+  records: {} as InternCacheNode,
+};
+
+intern._finalizationRegistryCallback = (node: InternCacheNode) => {
+  // Value has been garbage collected prune the tree
+  let currentNode: InternCacheNode | undefined = node;
+  while (currentNode?.parent && currentNode.innerKey !== undefined) {
+    // If the current node has no children and no final value, delete it
+    if (!currentNode.children?.size && !currentNode.internedObject?.deref()) {
+      currentNode.parent.children
+        ?.get(currentNode.innerKey)
+        ?.delete(currentNode.innerValue);
+
+      if (currentNode.parent.children?.get(currentNode.innerKey)?.size === 0)
+        currentNode.parent.children.delete(currentNode.innerKey);
+    }
+
+    currentNode = currentNode.parent;
+  }
+};
+intern._finalizationRegistry = new FinalizationRegistry<InternCacheNode>(
+  intern._finalizationRegistryCallback,
+);
