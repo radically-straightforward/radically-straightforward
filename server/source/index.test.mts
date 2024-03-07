@@ -636,7 +636,13 @@ http://localhost:18000/_proxy?destination=${encodeURIComponent("https://interact
 `);
   } else {
     console.log(
-      "Interact with the test server and run manual tests with ‘node ./build/index.test.mjs’.",
+      `
+============================================
+
+Interact with the test server and run manual tests with ‘node ./build/index.test.mjs’.
+
+============================================
+`,
     );
     process.kill(process.pid);
   }
