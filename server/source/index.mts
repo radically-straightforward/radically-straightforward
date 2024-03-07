@@ -33,12 +33,9 @@ export default function server({
           );
         };
 
-        request.log(
-          "REQUEST",
-          request.headers["x-forwarded-for"] ?? "127.0.0.1",
-          request.method,
-          request.url,
-        );
+        request.ip = request.headers["x-forwarded-for"] ?? "127.0.0.1";
+
+        request.log("REQUEST", request.ip, request.method, request.url);
 
         if (request.method === undefined || request.url === undefined)
           throw new Error("Missing request ‘method’ or ‘url’.");
@@ -231,8 +228,8 @@ export default function server({
             if (!response.writableEnded) response.end(String(error));
           }
         else if (
+          request.ip === "127.0.0.1" &&
           request.method === "POST" &&
-          request.URL.hostname === "localhost" &&
           request.URL.pathname === "/__live-connections"
         )
           try {

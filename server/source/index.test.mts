@@ -580,13 +580,6 @@ test({ timeout: process.stdin.isTTY ? undefined : 30 * 1000 }, async () => {
       );
     }
 
-    await fetch("http://localhost:18000/live-connection", {
-      method: "POST",
-      headers: { "CSRF-Protection": "true" },
-      body: new URLSearchParams({ message: "Hello" }),
-      redirect: "manual",
-    });
-
     // await fetch("http://localhost:18000/__live-connections", {
     //   method: "POST",
     //   body: new URLSearchParams({ pathname: "^/live-connection$" }),
