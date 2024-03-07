@@ -336,7 +336,7 @@ test({ timeout: process.stdin.isTTY ? undefined : 30 * 1000 }, async () => {
     assert.equal(await response.text(), "Error: Invalid destination.");
   }
 
-  {
+  if (process.stdin.isTTY) {
     const response = await fetch(
       `http://localhost:18000/_proxy?destination=${encodeURIComponent("http://a-nonexistent-website-lskjfpqslek41u20.com/")}`,
     );
