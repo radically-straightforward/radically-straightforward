@@ -586,8 +586,10 @@ test({ timeout: process.stdin.isTTY ? undefined : 30 * 1000 }, async () => {
     }
 
     {
+      const fetchAbortController = new AbortController();
       const response = await fetch("http://localhost:18000/live-connection", {
         headers: { "Live-Connection": liveConnectionId },
+        signal: fetchAbortController.signal,
       });
       assert.equal(response.status, 200);
       assert.equal(
@@ -601,7 +603,9 @@ test({ timeout: process.stdin.isTTY ? undefined : 30 * 1000 }, async () => {
         .getReader();
       (async () => {
         while (true) {
-          const value = (await responseBodyReader.read()).value;
+          const value = (
+            await responseBodyReader.read().catch(() => ({ value: undefined }))
+          ).value;
           if (value === undefined) break;
           body += value;
         }
@@ -617,6 +621,8 @@ test({ timeout: process.stdin.isTTY ? undefined : 30 * 1000 }, async () => {
       });
       await timers.setTimeout(500);
       assert.equal(body, `"${liveConnectionId}|1"\n`);
+
+      fetchAbortController.abort();
     }
   }
 
