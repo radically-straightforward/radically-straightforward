@@ -17,14 +17,15 @@ TODO
 - Live Connection
   - Tests
     - Main workflow
-      - `LIVE CONNECTION PREPARE`
-      - `LIVE CONNECTION ESTABLISH` (should not update) (heartbeat & periodic updates)
-      - `POST /__live-connections` (should update)
+      - [x] `LIVE CONNECTION PREPARE`
+      - [x] `LIVE CONNECTION ESTABLISH` (should not update)
+      - [x] `POST /__live-connections` (should update)
       - `LIVE CONNECTION CLOSE`
       - `POST /__live-connections` (should flag for update)
       - `LIVE CONNECTION ESTABLISH` (should update)
       - `LIVE CONNECTION ESTABLISH` (again, to see other Live Connection be closed, should not update again)
       - `POST /__live-connections` twice in a row, while an update is already underway, should trigger yet another update
+    - Periodic updates
     - `LIVE CONNECTION CREATE`
     - `LIVE CONNECTION DELETE`
       - It **does** happen after `LIVE CONNECTION PREPARE`

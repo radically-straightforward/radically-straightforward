@@ -248,7 +248,7 @@ export default function server({
                   continue;
                 liveConnection.skipUpdateOnEstablish = false;
                 if (!liveConnection.response.writableEnded)
-                  request.liveConnection.update?.();
+                  liveConnection.update?.();
                 await timers.setTimeout(200);
               }
             });

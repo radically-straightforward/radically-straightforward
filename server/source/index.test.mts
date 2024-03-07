@@ -520,7 +520,12 @@ test({ timeout: process.stdin.isTTY ? undefined : 30 * 1000 }, async () => {
       method: "GET",
       pathname: "/live-connection",
       handler: (request: any, response: any) => {
-        response.end(`${request.id}|${state}`);
+        response.end(
+          request.liveConnection?.establish &&
+            request.liveConnection?.skipUpdateOnEstablish
+            ? "SKIP UPDATE ON ESTABLISH"
+            : `${request.id}|${state}`,
+        );
       },
     });
 
@@ -580,10 +585,39 @@ test({ timeout: process.stdin.isTTY ? undefined : 30 * 1000 }, async () => {
       );
     }
 
-    // await fetch("http://localhost:18000/__live-connections", {
-    //   method: "POST",
-    //   body: new URLSearchParams({ pathname: "^/live-connection$" }),
-    // });
+    {
+      const response = await fetch("http://localhost:18000/live-connection", {
+        headers: { "Live-Connection": liveConnectionId },
+      });
+      assert.equal(response.status, 200);
+      assert.equal(
+        response.headers.get("Content-Type"),
+        "application/json-lines; charset=utf-8",
+      );
+      assert(response.body);
+      let body = "";
+      const responseBodyReader = response.body
+        .pipeThrough(new TextDecoderStream())
+        .getReader();
+      (async () => {
+        while (true) {
+          const value = (await responseBodyReader.read()).value;
+          if (value === undefined) break;
+          body += value;
+        }
+      })();
+      await timers.setTimeout(500);
+      assert.equal(body, `\n"SKIP UPDATE ON ESTABLISH"\n`);
+
+      body = "";
+      state = 1;
+      await fetch("http://localhost:18000/__live-connections", {
+        method: "POST",
+        body: new URLSearchParams({ pathname: "^/live-connection$" }),
+      });
+      await timers.setTimeout(500);
+      assert.equal(body, `"${liveConnectionId}|1"\n`);
+    }
   }
 
   if (process.stdin.isTTY) {
