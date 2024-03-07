@@ -389,6 +389,8 @@ export default function server({
             do {
               let liveConnectionUpdate;
               if (request.liveConnection !== undefined) {
+                if (!request.liveConnection.establish)
+                  request.log("LIVE CONNECTION REQUEST");
                 request.liveConnection.writableEnded = false;
                 liveConnectionUpdate = new Promise((resolve) => {
                   request.liveConnection.update = resolve;
@@ -451,8 +453,6 @@ export default function server({
                 request.liveConnection.establish = false;
                 request.liveConnection.skipUpdateOnEstablish = true;
                 await liveConnectionUpdate;
-                request.start = process.hrtime.bigint();
-                request.log("LIVE CONNECTION REQUEST");
               }
             } while (request.liveConnection !== undefined);
 
