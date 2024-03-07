@@ -698,6 +698,24 @@ test({ timeout: process.stdin.isTTY ? undefined : 30 * 1000 }, async () => {
           })();
           await timers.setTimeout(500);
           assert.equal(body, `\n"SKIP UPDATE ON ESTABLISH"\n`);
+
+          body = "";
+          state = 3;
+          await fetch("http://localhost:18000/__live-connections", {
+            method: "POST",
+            body: new URLSearchParams({ pathname: "^/live-connection$" }),
+          });
+          await timers.setTimeout(500);
+          state = 4;
+          await fetch("http://localhost:18000/__live-connections", {
+            method: "POST",
+            body: new URLSearchParams({ pathname: "^/live-connection$" }),
+          });
+          await timers.setTimeout(500);
+          assert.equal(
+            body,
+            `"${liveConnectionId}|3"\n"${liveConnectionId}|4"\n`,
+          );
         }
       }
     }

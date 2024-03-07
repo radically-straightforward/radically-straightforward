@@ -297,7 +297,7 @@ export default function server({
               }
               response.once("close", () => {
                 request.log("LIVE CONNECTION CLOSE");
-                request.liveConnection.response.liveConnectionEnd?.();
+                response.liveConnectionEnd?.();
                 if (request.liveConnection.request === request)
                   request.liveConnection.deleteTimeout = setTimeout(() => {
                     request.log("LIVE CONNECTION DELETE");
