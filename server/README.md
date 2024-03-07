@@ -15,11 +15,6 @@ TODO
 ## Requirements
 
 - Live Connection
-  - Improvements
-    - DRY `LIVE CONNECTION DELETE`
-  - Issues
-    - Upon `LIVE CONNECTION ESTABLISH` we clear the `deleteTimeout`, but the `response.once("close")` will set it up again
-      - Potential solution: Check that `request.liveConnection.request === request`. We may not even need to clear the timeout 🤷‍♂️
   - Tests
     - `LIVE CONNECTION PREPARE` → `LIVE CONNECTION ESTABLISH` → `POST` to `/__live-connections` → `LIVE CONNECTION CLOSE` → `LIVE CONNECTION ESTABLISH` → `LIVE CONNECTION ESTABLISH` (again, to see other Live Connection be closed) → `POST` to `/__live-connections`
     - `LIVE CONNECTION CREATE`

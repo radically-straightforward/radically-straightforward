@@ -298,10 +298,11 @@ export default function server({
               }
               response.once("close", () => {
                 request.log("LIVE CONNECTION CLOSE");
-                request.liveConnection.deleteTimeout = setTimeout(() => {
-                  request.log("LIVE CONNECTION DELETE");
-                  liveConnections.delete(request.liveConnection);
-                }, 30 * 1000).unref();
+                if (request.liveConnection.request === request)
+                  request.liveConnection.deleteTimeout = setTimeout(() => {
+                    request.log("LIVE CONNECTION DELETE");
+                    liveConnections.delete(request.liveConnection);
+                  }, 30 * 1000).unref();
               });
 
               response.setHeader(
