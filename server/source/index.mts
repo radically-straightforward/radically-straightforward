@@ -331,7 +331,7 @@ export default function server({
 
               response.liveConnectionEnd = response.end;
               response.end = (data?: string): typeof response => {
-                request.log("LIVE CONNECTION UPDATE RESPONSE");
+                request.log("LIVE CONNECTION RESPONSE");
                 if (typeof data === "string")
                   response.write(JSON.stringify(data) + "\n");
                 request.liveConnection.writableEnded = true;
@@ -394,6 +394,7 @@ export default function server({
               }
 
               response.state = {};
+              delete response.error;
               for (const route of routes) {
                 if ((response.error !== undefined) !== (route.error ?? false))
                   continue;
@@ -449,7 +450,7 @@ export default function server({
                 request.liveConnection.skipUpdateOnEstablish = true;
                 await liveConnectionUpdate;
                 request.start = process.hrtime.bigint();
-                request.log("LIVE CONNECTION UPDATE REQUEST");
+                request.log("LIVE CONNECTION REQUEST");
               }
             } while (request.liveConnection !== undefined);
 
