@@ -650,6 +650,7 @@ test({ timeout: process.stdin.isTTY ? undefined : 30 * 1000 }, async () => {
         const responseBodyReader = response.body
           .pipeThrough(new TextDecoderStream())
           .getReader();
+        let responseBodyReaderEnded = false;
         (async () => {
           while (true) {
             const value = (
@@ -657,45 +658,47 @@ test({ timeout: process.stdin.isTTY ? undefined : 30 * 1000 }, async () => {
                 .read()
                 .catch(() => ({ value: undefined }))
             ).value;
-            if (value === undefined) break;
+            if (value === undefined) {
+              responseBodyReaderEnded = true;
+              break;
+            }
             body += value;
           }
         })();
         await timers.setTimeout(500);
         assert.equal(body, `\n"${liveConnectionId}|2"\n`);
-        // assert(!response.bodyUsed);
+        assert(!responseBodyReaderEnded);
 
-        //   {
-        //     const response = await fetch(
-        //       "http://localhost:18000/live-connection",
-        //       { headers: { "Live-Connection": liveConnectionId } },
-        //     );
-        //     assert.equal(response.status, 200);
-        //     assert.equal(
-        //       response.headers.get("Content-Type"),
-        //       "application/json-lines; charset=utf-8",
-        //     );
-        //     assert(response.body);
-        //     let body = "";
-        //     const responseBodyReader = response.body
-        //       .pipeThrough(new TextDecoderStream())
-        //       .getReader();
-        //     (async () => {
-        //       while (true) {
-        //         const value = (
-        //           await responseBodyReader
-        //             .read()
-        //             .catch(() => ({ value: undefined }))
-        //         ).value;
-        //         if (value === undefined) break;
-        //         body += value;
-        //       }
-        //     })();
-        //     await timers.setTimeout(500);
-        //     assert.equal(body, `\n"SKIP UPDATE ON ESTABLISH"\n`);
-        //   }
-
-        //   assert(response.bodyUsed);
+        {
+          const response = await fetch(
+            "http://localhost:18000/live-connection",
+            { headers: { "Live-Connection": liveConnectionId } },
+          );
+          assert(responseBodyReaderEnded);
+          assert.equal(response.status, 200);
+          assert.equal(
+            response.headers.get("Content-Type"),
+            "application/json-lines; charset=utf-8",
+          );
+          assert(response.body);
+          let body = "";
+          const responseBodyReader = response.body
+            .pipeThrough(new TextDecoderStream())
+            .getReader();
+          (async () => {
+            while (true) {
+              const value = (
+                await responseBodyReader
+                  .read()
+                  .catch(() => ({ value: undefined }))
+              ).value;
+              if (value === undefined) break;
+              body += value;
+            }
+          })();
+          await timers.setTimeout(500);
+          assert.equal(body, `\n"SKIP UPDATE ON ESTABLISH"\n`);
+        }
       }
     }
   }

@@ -22,9 +22,9 @@ TODO
       - [x] Heartbeat
       - [x] `POST /__live-connections` (should update)
       - [x] `LIVE CONNECTION CLOSE`
-      - [ ] `POST /__live-connections` (should flag for update)
-      - [ ] `LIVE CONNECTION ESTABLISH` (should update)
-      - [ ] `LIVE CONNECTION ESTABLISH` (again, to see other Live Connection be closed, should not update again)
+      - [x] `POST /__live-connections` (should flag for update)
+      - [x] `LIVE CONNECTION ESTABLISH` (should update)
+      - [x] `LIVE CONNECTION ESTABLISH` (again, to see other Live Connection be closed, should not update again)
       - [ ] `POST /__live-connections` twice in a row, while an update is already underway, should trigger yet another update
     - Periodic updates
     - `LIVE CONNECTION CREATE`
