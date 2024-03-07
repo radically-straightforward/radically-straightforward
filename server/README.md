@@ -19,6 +19,7 @@ TODO
     - Main workflow
       - [x] `LIVE CONNECTION PREPARE`
       - [x] `LIVE CONNECTION ESTABLISH` (should not update)
+      - [x] Heartbeat
       - [x] `POST /__live-connections` (should update)
       - `LIVE CONNECTION CLOSE`
       - `POST /__live-connections` (should flag for update)
