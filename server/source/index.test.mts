@@ -576,7 +576,7 @@ test({ timeout: process.stdin.isTTY ? undefined : 30 * 1000 }, async () => {
       );
       assert.equal(
         await response.text(),
-        "Error: Unmatched ‘url’ of existing request.",
+        "Error: Unmatched ‘href’ of existing request.",
       );
     }
 

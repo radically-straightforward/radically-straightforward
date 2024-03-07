@@ -277,15 +277,17 @@ export default function server({
                 request.log("LIVE CONNECTION CREATE");
                 request.liveConnection = { request, response };
                 liveConnections.add(request.liveConnection);
-              } else if (request.liveConnection.request.url !== request.url)
-                throw new Error("Unmatched ‘url’ of existing request.");
+              } else if (
+                request.liveConnection.request.URL.href !== request.URL.href
+              )
+                throw new Error("Unmatched ‘href’ of existing request.");
               else {
                 request.log(
                   "LIVE CONNECTION ESTABLISH",
                   request.liveConnection.request.id,
                   request.liveConnection.skipUpdateOnEstablish
                     ? "SKIP UPDATE"
-                    : "",
+                    : "UPDATE",
                 );
                 clearTimeout(request.liveConnection.deleteTimeout);
                 request.liveConnection.response.liveConnectionEnd?.();
