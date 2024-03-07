@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.2.0 · 2024-03-07
+
+- Added `JSONLinesTransformStream`.
+
 ## 1.1.1 · 2024-02-21
 
 - Added date to `log()`.

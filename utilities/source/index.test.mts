@@ -38,8 +38,35 @@ test("randomString()", () => {
   assert.match(utilities.randomString(), /^[a-z0-9]+$/);
 });
 
-test("randomString()", () => {
+test("log()", () => {
   utilities.log("EXAMPLE", "OF", "TAB-SEPARATED LOGGING");
+});
+
+test("JSONLinesTransformStream", async () => {
+  {
+    const reader = new Blob([
+      `\n\n${JSON.stringify("hi")}\n${JSON.stringify({ hello: "world" })}\n`,
+    ])
+      .stream()
+      .pipeThrough(new TextDecoderStream())
+      .pipeThrough(new utilities.JSONLinesTransformStream())
+      .getReader();
+    assert.equal((await reader.read()).value, "hi");
+    assert.deepEqual((await reader.read()).value, { hello: "world" });
+    assert.equal((await reader.read()).value, undefined);
+  }
+
+  {
+    const reader = new Blob([`\n\n${JSON.stringify("hi")}\n{\n`])
+      .stream()
+      .pipeThrough(new TextDecoderStream())
+      .pipeThrough(new utilities.JSONLinesTransformStream())
+      .getReader();
+    assert.equal((await reader.read()).value, "hi");
+    await assert.rejects(async () => {
+      await reader.read();
+    });
+  }
 });
 
 test("intern()", () => {

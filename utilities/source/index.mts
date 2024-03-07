@@ -115,6 +115,44 @@ export function log(...messageParts: string[]): void {
 }
 
 /**
+ * A [TransformStream](https://developer.mozilla.org/en-US/docs/Web/API/TransformStream) to convert a stream of a string with JSON lines into a stream of JSON objects.
+ *
+ * **Example**
+ *
+ * ```typescript
+ * const reader = new Blob([
+ *   `\n\n${JSON.stringify("hi")}\n${JSON.stringify({ hello: "world" })}\n`,
+ * ])
+ *   .stream()
+ *   .pipeThrough(new TextDecoderStream())
+ *   .pipeThrough(new utilities.JSONLinesTransformStream())
+ *   .getReader();
+ * (await reader.read()).value; // => "hi"
+ * (await reader.read()).value; // => { hello: "world" }
+ * (await reader.read()).value; // => undefined
+ * ```
+ */
+export class JSONLinesTransformStream extends TransformStream {
+  constructor() {
+    let buffer = "";
+    super({
+      async transform(chunk, controller) {
+        buffer += await chunk;
+        const lines = buffer.split("\n");
+        buffer = lines.pop() ?? "";
+        for (const line of lines)
+          if (line.trim() !== "")
+            try {
+              controller.enqueue(JSON.parse(line));
+            } catch (error) {
+              controller.error(error);
+            }
+      },
+    });
+  }
+}
+
+/**
  * Utility type for `intern()`.
  */
 export type Intern<Type> = Readonly<Type & { [internSymbol]: true }>;

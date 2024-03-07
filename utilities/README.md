@@ -103,6 +103,29 @@ export function log(...messageParts: string[]): void;
 
 Tab-separated logging.
 
+### `JSONLinesTransformStream`
+
+```typescript
+export class JSONLinesTransformStream extends TransformStream;
+```
+
+A [TransformStream](https://developer.mozilla.org/en-US/docs/Web/API/TransformStream) to convert a stream of a string with JSON lines into a stream of JSON objects.
+
+**Example**
+
+```typescript
+const reader = new Blob([
+  `\n\n${JSON.stringify("hi")}\n${JSON.stringify({ hello: "world" })}\n`,
+])
+  .stream()
+  .pipeThrough(new TextDecoderStream())
+  .pipeThrough(new utilities.JSONLinesTransformStream())
+  .getReader();
+(await reader.read()).value; // => "hi"
+(await reader.read()).value; // => { hello: "world" }
+(await reader.read()).value; // => undefined
+```
+
 ### `Intern`
 
 ```typescript
