@@ -804,7 +804,7 @@ http://localhost:18000/_proxy?destination=${encodeURIComponent("https://interact
 
 Test Live Connections (some of these tests may be more convenient to perform if you modify the timeouts in the source code):
 
-1. Connect to server:
+1. Create a Live Connection to server:
 
 $ curl -v --header "Live-Connection: fje89jvdj394f" "http://localhost:18000/live-connection/manual"
 
@@ -818,17 +818,17 @@ $ curl -v --request POST --header "CSRF-Protection: true" --data-urlencode "path
 
 In particular, trigger an update while an update is in progress.
 
-5. Wait and check that the connection is *not* deleted.
+5. Wait and check that the Live Connection is *not* deleted.
 
 6. While still connected to the server, connect to the server again:
 
 $ curl -v --header "Live-Connection: fje89jvdj394f" "http://localhost:18000/live-connection/manual"
 
-The previous connection should be closed, and the current connection should *not* be deleted after a while.
+The previous Live Connection should be closed, and the current Live Connection should *not* be deleted after a while.
 
-7. Close the connection to the server (⌃C). The connection should be deleted after a while.
+7. Close the Live Connection to the server (⌃C). The Live Connection should be deleted after a while.
 
-8. Create a connection and watch it be deleted after a while:
+8. Prepare a Live Connection but don’t establish it and watch it be deleted after a while:
 
 $ curl -v "http://localhost:18000/live-connection/manual"
 

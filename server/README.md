@@ -15,7 +15,6 @@ TODO
 ## Requirements
 
 - Live Connection
-  - Run manual tests
   - Review Courselore’s implementation
 - Types
   - Request & response types
