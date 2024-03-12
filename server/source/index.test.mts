@@ -623,7 +623,6 @@ test({ timeout: process.stdin.isTTY ? undefined : 30 * 1000 }, async () => {
         });
         await timers.setTimeout(500);
         assert.equal(body, `"${liveConnectionId}|1"\n`);
-
         fetchAbortController.abort();
         await timers.setTimeout(500);
       }
