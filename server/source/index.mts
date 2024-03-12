@@ -246,7 +246,7 @@ export default function server({
                 )
                   continue;
                 liveConnection.skipUpdateOnEstablish = false;
-                if (!liveConnection.response.writableEnded)
+                if (!(liveConnection.response.socket?.destroyed ?? true))
                   liveConnection.update?.();
                 await timers.setTimeout(200);
               }
@@ -296,7 +296,6 @@ export default function server({
               }
               response.once("close", () => {
                 request.log("LIVE CONNECTION CLOSE");
-                response.liveConnectionEnd?.();
                 if (request.liveConnection.request === request)
                   request.liveConnection.deleteTimeout = setTimeout(() => {
                     request.log("LIVE CONNECTION DELETE");
@@ -334,9 +333,9 @@ export default function server({
               response.liveConnectionEnd = response.end;
               response.end = (data?: string): typeof response => {
                 request.log("LIVE CONNECTION RESPONSE");
+                request.liveConnection.writableEnded = true;
                 if (typeof data === "string")
                   response.write(JSON.stringify(data) + "\n");
-                request.liveConnection.writableEnded = true;
                 return response;
               };
             } catch (error: any) {

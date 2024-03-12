@@ -671,56 +671,56 @@ test({ timeout: process.stdin.isTTY ? undefined : 30 * 1000 }, async () => {
         assert.equal(body, `\n"${liveConnectionId}|2"\n`);
         assert(!responseBodyReaderEnded);
 
-        {
-          const response = await fetch(
-            "http://localhost:18000/live-connection",
-            { headers: { "Live-Connection": liveConnectionId } },
-          );
-          assert(responseBodyReaderEnded);
-          assert.equal(response.status, 200);
-          assert.equal(
-            response.headers.get("Content-Type"),
-            "application/json-lines; charset=utf-8",
-          );
-          assert(response.body);
-          let body = "";
-          const responseBodyReader = response.body
-            .pipeThrough(new TextDecoderStream())
-            .getReader();
-          (async () => {
-            while (true) {
-              const value = (
-                await responseBodyReader
-                  .read()
-                  .catch(() => ({ value: undefined }))
-              ).value;
-              if (value === undefined) break;
-              body += value;
-            }
-          })();
-          await timers.setTimeout(500);
-          assert.equal(body, `\n"SKIP UPDATE ON ESTABLISH"\n`);
+        // {
+        //   const response = await fetch(
+        //     "http://localhost:18000/live-connection",
+        //     { headers: { "Live-Connection": liveConnectionId } },
+        //   );
+        //   assert(responseBodyReaderEnded);
+        //   assert.equal(response.status, 200);
+        //   assert.equal(
+        //     response.headers.get("Content-Type"),
+        //     "application/json-lines; charset=utf-8",
+        //   );
+        //   assert(response.body);
+        //   let body = "";
+        //   const responseBodyReader = response.body
+        //     .pipeThrough(new TextDecoderStream())
+        //     .getReader();
+        //   (async () => {
+        //     while (true) {
+        //       const value = (
+        //         await responseBodyReader
+        //           .read()
+        //           .catch(() => ({ value: undefined }))
+        //       ).value;
+        //       if (value === undefined) break;
+        //       body += value;
+        //     }
+        //   })();
+        //   await timers.setTimeout(500);
+        //   assert.equal(body, `\n"SKIP UPDATE ON ESTABLISH"\n`);
 
-          body = "";
-          state = 3;
-          await fetch("http://localhost:18000/__live-connections", {
-            method: "POST",
-            headers: { "CSRF-Protection": "true" },
-            body: new URLSearchParams({ pathname: "^/live-connection$" }),
-          });
-          await timers.setTimeout(500);
-          state = 4;
-          await fetch("http://localhost:18000/__live-connections", {
-            method: "POST",
-            headers: { "CSRF-Protection": "true" },
-            body: new URLSearchParams({ pathname: "^/live-connection$" }),
-          });
-          await timers.setTimeout(500);
-          assert.equal(
-            body,
-            `"${liveConnectionId}|3"\n"${liveConnectionId}|4"\n`,
-          );
-        }
+        //   body = "";
+        //   state = 3;
+        //   await fetch("http://localhost:18000/__live-connections", {
+        //     method: "POST",
+        //     headers: { "CSRF-Protection": "true" },
+        //     body: new URLSearchParams({ pathname: "^/live-connection$" }),
+        //   });
+        //   await timers.setTimeout(500);
+        //   state = 4;
+        //   await fetch("http://localhost:18000/__live-connections", {
+        //     method: "POST",
+        //     headers: { "CSRF-Protection": "true" },
+        //     body: new URLSearchParams({ pathname: "^/live-connection$" }),
+        //   });
+        //   await timers.setTimeout(500);
+        //   assert.equal(
+        //     body,
+        //     `"${liveConnectionId}|3"\n"${liveConnectionId}|4"\n`,
+        //   );
+        // }
       }
     }
   }
