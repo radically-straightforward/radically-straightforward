@@ -722,6 +722,40 @@ test({ timeout: process.stdin.isTTY ? undefined : 30 * 1000 }, async () => {
         //   );
         // }
       }
+
+      {
+        const fetchAbortController = new AbortController();
+        const response = await fetch("http://localhost:18000/unhandled", {
+          headers: { "Live-Connection": "1j3k34l294jsdv" },
+          signal: fetchAbortController.signal,
+        });
+        assert.equal(response.status, 200);
+        assert.equal(
+          response.headers.get("Content-Type"),
+          "application/json-lines; charset=utf-8",
+        );
+        assert(response.body);
+        let body = "";
+        const responseBodyReader = response.body
+          .pipeThrough(new TextDecoderStream())
+          .getReader();
+        (async () => {
+          while (true) {
+            const value = (
+              await responseBodyReader
+                .read()
+                .catch(() => ({ value: undefined }))
+            ).value;
+            if (value === undefined) break;
+            body += value;
+          }
+        })();
+        await timers.setTimeout(500);
+        assert.equal(
+          body,
+          `\n"The application didn’t finish handling this request."\n`,
+        );
+      }
     }
   }
 
