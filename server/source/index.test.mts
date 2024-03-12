@@ -526,137 +526,60 @@ test({ timeout: process.stdin.isTTY ? undefined : 30 * 1000 }, async () => {
     },
   });
 
-  const liveConnectionId = await (
-    await fetch("http://localhost:18000/live-connection")
-  ).text();
-
   {
-    const response = await fetch("http://localhost:18000/live-connection", {
-      method: "POST",
-      headers: {
-        "CSRF-Protection": "true",
-        "Live-Connection": liveConnectionId,
-      },
-    });
-    assert.equal(response.status, 400);
-    assert.equal(
-      response.headers.get("Content-Type"),
-      "text/plain; charset=utf-8",
-    );
-    assert.equal(
-      await response.text(),
-      "Error: Invalid ‘Live-Connection’ header.",
-    );
-  }
+    const liveConnectionId = await (
+      await fetch("http://localhost:18000/live-connection")
+    ).text();
 
-  {
-    const response = await fetch("http://localhost:18000/live-connection", {
-      headers: { "Live-Connection": "hi" },
-    });
-    assert.equal(response.status, 400);
-    assert.equal(
-      response.headers.get("Content-Type"),
-      "text/plain; charset=utf-8",
-    );
-    assert.equal(
-      await response.text(),
-      "Error: Invalid ‘Live-Connection’ header.",
-    );
-  }
+    {
+      const response = await fetch("http://localhost:18000/live-connection", {
+        method: "POST",
+        headers: {
+          "CSRF-Protection": "true",
+          "Live-Connection": liveConnectionId,
+        },
+      });
+      assert.equal(response.status, 400);
+      assert.equal(
+        response.headers.get("Content-Type"),
+        "text/plain; charset=utf-8",
+      );
+      assert.equal(
+        await response.text(),
+        "Error: Invalid ‘Live-Connection’ header.",
+      );
+    }
 
-  {
-    const response = await fetch(
-      "http://localhost:18000/live-connection?otherUrl=true",
-      { headers: { "Live-Connection": liveConnectionId } },
-    );
-    assert.equal(response.status, 400);
-    assert.equal(
-      response.headers.get("Content-Type"),
-      "text/plain; charset=utf-8",
-    );
-    assert.equal(
-      await response.text(),
-      "Error: Unmatched ‘href’ of existing request.",
-    );
-  }
+    {
+      const response = await fetch("http://localhost:18000/live-connection", {
+        headers: { "Live-Connection": "hi" },
+      });
+      assert.equal(response.status, 400);
+      assert.equal(
+        response.headers.get("Content-Type"),
+        "text/plain; charset=utf-8",
+      );
+      assert.equal(
+        await response.text(),
+        "Error: Invalid ‘Live-Connection’ header.",
+      );
+    }
 
-  {
-    const fetchAbortController = new AbortController();
-    const response = await fetch("http://localhost:18000/live-connection", {
-      headers: { "Live-Connection": liveConnectionId },
-      signal: fetchAbortController.signal,
-    });
-    assert.equal(response.status, 200);
-    assert.equal(
-      response.headers.get("Content-Type"),
-      "application/json-lines; charset=utf-8",
-    );
-    assert(response.body);
-    let body = "";
-    const responseBodyReader = response.body
-      .pipeThrough(new TextDecoderStream())
-      .getReader();
-    (async () => {
-      while (true) {
-        const value = (
-          await responseBodyReader.read().catch(() => ({ value: undefined }))
-        ).value;
-        if (value === undefined) break;
-        body += value;
-      }
-    })();
-    await timers.setTimeout(500);
-    assert.equal(body, `\n"SKIP UPDATE ON ESTABLISH"\n`);
-
-    body = "";
-    await fetch("http://localhost:18000/__live-connections", {
-      method: "POST",
-      headers: { "CSRF-Protection": "true" },
-      body: new URLSearchParams({ pathname: "^/live-connection$" }),
-    });
-    await timers.setTimeout(500);
-    assert.equal(body, `"${liveConnectionId}"\n`);
-    fetchAbortController.abort();
-    await timers.setTimeout(500);
-  }
-
-  await fetch("http://localhost:18000/__live-connections", {
-    method: "POST",
-    headers: { "CSRF-Protection": "true" },
-    body: new URLSearchParams({ pathname: "^/live-connection$" }),
-  });
-  await timers.setTimeout(500);
-
-  {
-    const response = await fetch("http://localhost:18000/live-connection", {
-      headers: { "Live-Connection": liveConnectionId },
-    });
-    assert.equal(response.status, 200);
-    assert.equal(
-      response.headers.get("Content-Type"),
-      "application/json-lines; charset=utf-8",
-    );
-    assert(response.body);
-    let body = "";
-    const responseBodyReader = response.body
-      .pipeThrough(new TextDecoderStream())
-      .getReader();
-    let responseBodyReaderEnded = false;
-    (async () => {
-      while (true) {
-        const value = (
-          await responseBodyReader.read().catch(() => ({ value: undefined }))
-        ).value;
-        if (value === undefined) {
-          responseBodyReaderEnded = true;
-          break;
-        }
-        body += value;
-      }
-    })();
-    await timers.setTimeout(500);
-    assert.equal(body, `\n"${liveConnectionId}"\n`);
-    assert(!responseBodyReaderEnded);
+    {
+      const response = await fetch(
+        "http://localhost:18000/live-connection?otherUrl=true",
+        { headers: { "Live-Connection": liveConnectionId } },
+      );
+      assert.equal(response.status, 400);
+      assert.equal(
+        response.headers.get("Content-Type"),
+        "text/plain; charset=utf-8",
+      );
+      assert.equal(
+        await response.text(),
+        "Error: Unmatched ‘href’ of existing request.",
+      );
+    }
 
     {
       const fetchAbortController = new AbortController();
@@ -664,7 +587,6 @@ test({ timeout: process.stdin.isTTY ? undefined : 30 * 1000 }, async () => {
         headers: { "Live-Connection": liveConnectionId },
         signal: fetchAbortController.signal,
       });
-      assert(responseBodyReaderEnded);
       assert.equal(response.status, 200);
       assert.equal(
         response.headers.get("Content-Type"),
@@ -686,8 +608,90 @@ test({ timeout: process.stdin.isTTY ? undefined : 30 * 1000 }, async () => {
       })();
       await timers.setTimeout(500);
       assert.equal(body, `\n"SKIP UPDATE ON ESTABLISH"\n`);
+
+      body = "";
+      await fetch("http://localhost:18000/__live-connections", {
+        method: "POST",
+        headers: { "CSRF-Protection": "true" },
+        body: new URLSearchParams({ pathname: "^/live-connection$" }),
+      });
+      await timers.setTimeout(500);
+      assert.equal(body, `"${liveConnectionId}"\n`);
       fetchAbortController.abort();
       await timers.setTimeout(500);
+    }
+
+    await fetch("http://localhost:18000/__live-connections", {
+      method: "POST",
+      headers: { "CSRF-Protection": "true" },
+      body: new URLSearchParams({ pathname: "^/live-connection$" }),
+    });
+    await timers.setTimeout(500);
+
+    {
+      const response = await fetch("http://localhost:18000/live-connection", {
+        headers: { "Live-Connection": liveConnectionId },
+      });
+      assert.equal(response.status, 200);
+      assert.equal(
+        response.headers.get("Content-Type"),
+        "application/json-lines; charset=utf-8",
+      );
+      assert(response.body);
+      let body = "";
+      const responseBodyReader = response.body
+        .pipeThrough(new TextDecoderStream())
+        .getReader();
+      let responseBodyReaderEnded = false;
+      (async () => {
+        while (true) {
+          const value = (
+            await responseBodyReader.read().catch(() => ({ value: undefined }))
+          ).value;
+          if (value === undefined) {
+            responseBodyReaderEnded = true;
+            break;
+          }
+          body += value;
+        }
+      })();
+      await timers.setTimeout(500);
+      assert.equal(body, `\n"${liveConnectionId}"\n`);
+      assert(!responseBodyReaderEnded);
+
+      {
+        const fetchAbortController = new AbortController();
+        const response = await fetch("http://localhost:18000/live-connection", {
+          headers: { "Live-Connection": liveConnectionId },
+          signal: fetchAbortController.signal,
+        });
+        assert(responseBodyReaderEnded);
+        assert.equal(response.status, 200);
+        assert.equal(
+          response.headers.get("Content-Type"),
+          "application/json-lines; charset=utf-8",
+        );
+        assert(response.body);
+        let body = "";
+        const responseBodyReader = response.body
+          .pipeThrough(new TextDecoderStream())
+          .getReader();
+        (async () => {
+          while (true) {
+            const value = (
+              await responseBodyReader
+                .read()
+                .catch(() => ({ value: undefined }))
+            ).value;
+            if (value === undefined) break;
+            body += value;
+          }
+        })();
+        await timers.setTimeout(500);
+        assert.equal(body, `\n"SKIP UPDATE ON ESTABLISH"\n`);
+        fetchAbortController.abort();
+        await timers.setTimeout(500);
+      }
     }
   }
 
