@@ -802,7 +802,7 @@ http://localhost:18000/_proxy?destination=${encodeURIComponent("https://interact
 
 --------------------------------------------
 
-Test Live Connections:
+Test Live Connections (some of these tests may be more convenient to perform if you modify the timeouts in the source code):
 
 1. Connect to server:
 
@@ -810,7 +810,7 @@ $ curl -v --header "Live-Connection: fje89jvdj394f" "http://localhost:18000/live
 
 2. Receive heartbeat.
 
-3. Receive periodic update (may be easier to test if you modify the source code to reduce the interval between periodic updates).
+3. Receive periodic update.
 
 4. Trigger updates:
 
