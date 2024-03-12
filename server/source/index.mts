@@ -79,7 +79,7 @@ export default function server({
 
         request.body = {};
         if (typeof request.headers["content-type"] === "string") {
-          const filePromises = new Array<Promise<void>>();
+          const filesPromises = new Set<Promise<void>>();
           await new Promise<void>((resolve, reject) => {
             request.pipe(
               busboy({
@@ -127,7 +127,7 @@ export default function server({
                       value,
                     );
                   else request.body[name] = value;
-                  filePromises.push(
+                  filesPromises.add(
                     (async (): Promise<void> => {
                       const valuePath = value.path;
                       await fs.mkdir(path.dirname(valuePath));
@@ -161,7 +161,7 @@ export default function server({
                 }),
             );
           });
-          await Promise.all(filePromises);
+          await Promise.all(filesPromises);
         }
 
         if (process.env.NODE_ENV !== "production" && request.method !== "GET")
