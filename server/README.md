@@ -15,7 +15,6 @@ TODO
 ## Requirements
 
 - Live Connection
-  - Fix warning about memory leak and too many event listeners?
   - Run manual tests
   - Review Courselore’s implementation
 - Types
