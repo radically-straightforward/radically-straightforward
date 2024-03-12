@@ -620,6 +620,7 @@ test({ timeout: process.stdin.isTTY ? undefined : 30 * 1000 }, async () => {
         state = 1;
         await fetch("http://localhost:18000/__live-connections", {
           method: "POST",
+          headers: { "CSRF-Protection": "true" },
           body: new URLSearchParams({ pathname: "^/live-connection$" }),
         });
         await timers.setTimeout(500);
@@ -632,6 +633,7 @@ test({ timeout: process.stdin.isTTY ? undefined : 30 * 1000 }, async () => {
       state = 2;
       await fetch("http://localhost:18000/__live-connections", {
         method: "POST",
+        headers: { "CSRF-Protection": "true" },
         body: new URLSearchParams({ pathname: "^/live-connection$" }),
       });
       await timers.setTimeout(500);
@@ -703,12 +705,14 @@ test({ timeout: process.stdin.isTTY ? undefined : 30 * 1000 }, async () => {
           state = 3;
           await fetch("http://localhost:18000/__live-connections", {
             method: "POST",
+            headers: { "CSRF-Protection": "true" },
             body: new URLSearchParams({ pathname: "^/live-connection$" }),
           });
           await timers.setTimeout(500);
           state = 4;
           await fetch("http://localhost:18000/__live-connections", {
             method: "POST",
+            headers: { "CSRF-Protection": "true" },
             body: new URLSearchParams({ pathname: "^/live-connection$" }),
           });
           await timers.setTimeout(500);

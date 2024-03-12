@@ -54,8 +54,7 @@ export default function server({
             request.URL.pathname !== csrfProtectionExceptionPathname) ||
             (csrfProtectionExceptionPathname instanceof RegExp &&
               request.URL.pathname.match(csrfProtectionExceptionPathname) ===
-                null)) &&
-          request.URL.pathname !== "/__live-connections"
+                null))
         ) {
           response.statusCode = 403;
           throw new Error(
