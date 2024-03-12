@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.2.1 · 2024-03-12
+
+- Changed `backgroundJob()` so that in Node.js it doesn’t leak `process.once.("gracefulTermination")` event listeners to terminate gracefully.
+
 ## 1.2.0 · 2024-03-07
 
 - Added `JSONLinesTransformStream`.
