@@ -83,13 +83,14 @@ export function backgroundJob(
     stop: () => {
       clearTimeout(timeout);
       state = "stopped";
+      process?.off?.("gracefulTermination", gracefulTerminationListener);
     },
   };
   scheduler.run();
-  if (process !== undefined)
-    process.once("gracefulTermination", () => {
-      scheduler.stop();
-    });
+  const gracefulTerminationListener = () => {
+    scheduler.stop();
+  };
+  process?.once?.("gracefulTermination", gracefulTerminationListener);
   return scheduler;
 }
 
