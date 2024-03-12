@@ -779,7 +779,7 @@ test({ timeout: process.stdin.isTTY ? undefined : 30 * 1000 }, async () => {
       method: "GET",
       pathname: "/live-connection/manual",
       handler: async (request: any, response: any) => {
-        await timers.setTimeout(2 * 1000);
+        await timers.setTimeout(3 * 1000);
         response.end(
           request.liveConnection?.establish &&
             request.liveConnection?.skipUpdateOnEstablish

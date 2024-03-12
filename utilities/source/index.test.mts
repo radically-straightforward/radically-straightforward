@@ -11,6 +11,15 @@ test(
       : "Run interactive test with ‘node ./build/index.test.mjs’.",
   },
   async () => {
+    for (let iteration = 0; iteration < 1000; iteration++) {
+      const backgroundJob = utilities.backgroundJob(
+        { interval: 3 * 1000 },
+        () => {},
+      );
+      backgroundJob.stop();
+      // If background jobs leak ‘process.once("gracefulTermination")’ event listeners, then we get a warning in the console.
+    }
+
     const backgroundJob = utilities.backgroundJob(
       { interval: 3 * 1000 },
       async () => {
