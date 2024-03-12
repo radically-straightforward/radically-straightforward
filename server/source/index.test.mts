@@ -570,9 +570,7 @@ test({ timeout: process.stdin.isTTY ? undefined : 30 * 1000 }, async () => {
     {
       const response = await fetch(
         "http://localhost:18000/live-connection?otherUrl=true",
-        {
-          headers: { "Live-Connection": liveConnectionId },
-        },
+        { headers: { "Live-Connection": liveConnectionId } },
       );
       assert.equal(response.status, 400);
       assert.equal(
