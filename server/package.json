@@ -28,7 +28,7 @@
   },
   "dependencies": {
     "@radically-straightforward/node": "^3.0.0",
-    "@radically-straightforward/utilities": "^1.2.0",
+    "@radically-straightforward/utilities": "^1.2.1",
     "busboy": "^1.6.0"
   },
   "devDependencies": {
