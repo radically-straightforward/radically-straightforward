@@ -273,7 +273,8 @@ export default function server({
                   liveConnection.request.id === liveConnectionId,
               );
               if (request.liveConnection === undefined) {
-                request.log("LIVE CONNECTION CREATE");
+                request.log("LIVE CONNECTION CREATE", liveConnectionId);
+                request.id = liveConnectionId;
                 request.liveConnection = { request, response };
                 liveConnections.add(request.liveConnection);
               } else if (

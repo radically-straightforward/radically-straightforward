@@ -16,7 +16,6 @@ TODO
 
 - Live Connection
   - Tests
-    - `LIVE CONNECTION CREATE`
     - Manual tests
       - `POST /__live-connections` twice in a row, while an update is already underway, should trigger yet another update
       - Heartbeat
