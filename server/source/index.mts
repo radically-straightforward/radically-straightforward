@@ -79,6 +79,11 @@ export default function server({
 
         request.body = {};
         if (typeof request.headers["content-type"] === "string") {
+          const directoriesToDelete = new Set<string>();
+          response.once("close", async () => {
+            for (const directoryToDelete of directoriesToDelete)
+              await fs.rm(directoryToDelete, { recursive: true, force: true });
+          });
           const filesPromises = new Set<Promise<void>>();
           await new Promise<void>((resolve, reject) => {
             request.pipe(
@@ -129,15 +134,9 @@ export default function server({
                   else request.body[name] = value;
                   filesPromises.add(
                     (async (): Promise<void> => {
-                      const valuePath = value.path;
-                      await fs.mkdir(path.dirname(valuePath));
-                      response.once("close", async () => {
-                        await fs.rm(path.dirname(valuePath), {
-                          recursive: true,
-                          force: true,
-                        });
-                      });
-                      await fs.writeFile(valuePath, file);
+                      directoriesToDelete.add(path.dirname(value.path));
+                      await fs.mkdir(path.dirname(value.path));
+                      await fs.writeFile(value.path, file);
                       if ((file as any).truncated) {
                         response.statusCode = 413;
                         throw new Error("File too large.");
