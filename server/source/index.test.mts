@@ -814,7 +814,7 @@ $ curl -v --header "Live-Connection: fje89jvdj394f" "http://localhost:18000/live
 
 4. Trigger updates:
 
-$ curl -v --request POST --header "CSRF-Protection: true" "http://localhost:18000/__live-connections"
+$ curl -v --request POST --header "CSRF-Protection: true" --data-urlencode "pathname=^/live-connection/manual$" "http://localhost:18000/__live-connections"
 
 In particular, trigger an update while an update is in progress.
 
