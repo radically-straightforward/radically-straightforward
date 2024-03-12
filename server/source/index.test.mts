@@ -756,6 +756,23 @@ test({ timeout: process.stdin.isTTY ? undefined : 30 * 1000 }, async () => {
           `\n"The application didn’t finish handling this request."\n`,
         );
       }
+
+      {
+        const response = await fetch(
+          "http://localhost:18000/__live-connections",
+          {
+            method: "POST",
+            headers: { "CSRF-Protection": "true" },
+            body: new URLSearchParams({}),
+          },
+        );
+        assert.equal(response.status, 422);
+        assert.equal(
+          response.headers.get("Content-Type"),
+          "text/plain; charset=utf-8",
+        );
+        assert.equal(await response.text(), "Error: Invalid ‘pathname’.");
+      }
     }
   }
 
