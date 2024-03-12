@@ -16,14 +16,6 @@ TODO
 
 - Live Connection
   - Tests
-    - Main workflow
-      - [x] `LIVE CONNECTION PREPARE`
-      - [x] `LIVE CONNECTION ESTABLISH` (should not update)
-      - [x] `POST /__live-connections` (should update)
-      - [x] `LIVE CONNECTION CLOSE`
-      - [x] `POST /__live-connections` (should flag for update)
-      - [x] `LIVE CONNECTION ESTABLISH` (should update)
-      - [x] `LIVE CONNECTION ESTABLISH` (again, to see other Live Connection be closed, should not update again)
     - `LIVE CONNECTION CREATE`
     - Manual tests
       - `POST /__live-connections` twice in a row, while an update is already underway, should trigger yet another update
