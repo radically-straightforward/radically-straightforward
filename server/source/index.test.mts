@@ -789,6 +789,37 @@ test({ timeout: process.stdin.isTTY ? undefined : 30 * 1000 }, async () => {
       },
     });
 
+    application.push({
+      method: "GET",
+      pathname: "/live-connection/browser",
+      handler: async (request: any, response: any) => {
+        response.end(
+          request.liveConnection?.establish &&
+            request.liveConnection?.skipUpdateOnEstablish
+            ? "SKIP UPDATE ON ESTABLISH"
+            : `<!DOCTYPE html>
+                <html lang="en">
+                  <head>
+                    <script>
+                      (async () => {
+                        const responseBodyReader = (await fetch(location.href, { headers: { "Live-Connection": ${JSON.stringify(request.id)} } })).body.pipeThrough(new TextDecoderStream()).getReader();
+                        while (true) {
+                          const value = (
+                            await responseBodyReader.read().catch(() => ({ value: undefined }))
+                          ).value;
+                          if (value === undefined) break;
+                          console.log(value);
+                        }
+                      })();
+                    </script>
+                  </head>
+                  <body>Live Connection</body>
+                </html>
+              `,
+        );
+      },
+    });
+
     console.log(`
 ============================================
     
@@ -831,6 +862,8 @@ The previous Live Connection should be closed, and the current Live Connection s
 8. Prepare a Live Connection but don’t establish it and watch it be deleted after a while:
 
 $ curl -v "http://localhost:18000/live-connection/manual"
+
+9. Visit ‘http://localhost:18000/live-connection/browser’ in the browser. The Live Connection prepare must always happen before the establish.
 
 ============================================
 `);

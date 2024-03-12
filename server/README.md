@@ -14,9 +14,6 @@ TODO
 
 ## Requirements
 
-- Live Connection
-  - Potential issue: Browser receives JavaScript, starts executing it, and establishes Live Connection, all before we have time to prepare it
-    - Solution: Overwrite `end()` to prepare Live Connection before send any HTML to the browser
 - Types
   - Request & response types
   - Address all `any`s
