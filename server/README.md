@@ -15,16 +15,6 @@ TODO
 ## Requirements
 
 - Live Connection
-  - Tests
-    - Manual tests
-      - `POST /__live-connections` twice in a row, while an update is already underway, should trigger yet another update
-      - Heartbeat
-      - Periodic updates
-      - `LIVE CONNECTION DELETE`
-        - It **does** happen after `LIVE CONNECTION PREPARE`
-        - It **does** happen after `LIVE CONNECTION CLOSE`
-        - It does **not** happen while the connection is established
-        - Tricky situation involving `clearTimeout()` followed by `response.once("close")`, which is guarded with the `if (request.liveConnection.request === request)` conditional
   - Review Courselore’s implementation
 - Types
   - Request & response types

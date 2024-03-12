@@ -775,6 +775,20 @@ test({ timeout: process.stdin.isTTY ? undefined : 30 * 1000 }, async () => {
   }
 
   if (process.stdin.isTTY) {
+    application.push({
+      method: "GET",
+      pathname: "/live-connection/manual",
+      handler: async (request: any, response: any) => {
+        await timers.setTimeout(2 * 1000);
+        response.end(
+          request.liveConnection?.establish &&
+            request.liveConnection?.skipUpdateOnEstablish
+            ? "SKIP UPDATE ON ESTABLISH"
+            : new Date().toISOString(),
+        );
+      },
+    });
+
     console.log(`
 ============================================
     
@@ -785,6 +799,38 @@ http://localhost:18000/_proxy?destination=${encodeURIComponent("https://interact
 http://localhost:18000/_proxy?destination=${encodeURIComponent("https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.webm")}
 
 http://localhost:18000/_proxy?destination=${encodeURIComponent("https://interactive-examples.mdn.mozilla.net/media/cc0-audio/t-rex-roar.mp3")}
+
+--------------------------------------------
+
+Test Live Connections:
+
+1. Connect to server:
+
+$ curl -v --header "Live-Connection: fje89jvdj394f" "http://localhost:18000/live-connection/manual"
+
+2. Receive heartbeat.
+
+3. Receive periodic update (may be easier to test if you modify the source code to reduce the interval between periodic updates).
+
+4. Trigger updates:
+
+$ curl -v --request POST --header "CSRF-Protection: true" "http://localhost:18000/__live-connections"
+
+In particular, trigger an update while an update is in progress.
+
+5. Wait and check that the connection is *not* deleted.
+
+6. While still connected to the server, connect to the server again:
+
+$ curl -v --header "Live-Connection: fje89jvdj394f" "http://localhost:18000/live-connection/manual"
+
+The previous connection should be closed, and the current connection should *not* be deleted after a while.
+
+7. Close the connection to the server (⌃C). The connection should be deleted after a while.
+
+8. Create a connection and watch it be deleted after a while:
+
+$ curl -v "http://localhost:18000/live-connection/manual"
 
 ============================================
 `);
