@@ -8,6 +8,30 @@ import busboy from "busboy";
 import "@radically-straightforward/node";
 import * as utilities from "@radically-straightforward/utilities";
 
+export type Request<Search, Cookies, Body, State> = http.IncomingMessage & {
+  id: string;
+  start: BigInt;
+  log: (...messageParts: string[]) => void;
+  ip: string;
+  URL: URL;
+  search: Search;
+  cookies: Cookies;
+  body: Body;
+  state: State;
+  error?: any;
+};
+
+export type RequestBodyFile = busboy.FileInfo & { path: string };
+
+export type Response = http.ServerResponse & {
+  setCookie: (key: string, value: string, maxAge?: number) => Response;
+  deleteCookie: (key: string) => Response;
+  redirect: (
+    destination?: string,
+    type?: "see-other" | "temporary" | "permanent",
+  ) => Response;
+};
+
 export default function server({
   port = 18000,
   csrfProtectionExceptionPathname = "",
@@ -396,10 +420,10 @@ export default function server({
                 });
               }
 
-              response.state = {};
-              delete response.error;
+              request.state = {};
+              delete request.error;
               for (const route of routes) {
-                if ((response.error !== undefined) !== (route.error ?? false))
+                if ((request.error !== undefined) !== (route.error ?? false))
                   continue;
 
                 if (
@@ -425,7 +449,7 @@ export default function server({
                   await route.handler(request, response);
                 } catch (error: any) {
                   request.log("ERROR", String(error), error?.stack);
-                  response.error = error;
+                  request.error = error;
                 }
 
                 if ((request.liveConnection ?? response).writableEnded) break;

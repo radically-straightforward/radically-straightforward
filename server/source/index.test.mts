@@ -409,7 +409,7 @@ test({ timeout: process.stdin.isTTY ? undefined : 30 * 1000 }, async () => {
     method: "GET",
     pathname: "/response-helpers",
     handler: (request: any, response: any) => {
-      response.state.example = "Hello";
+      request.state.example = "Hello";
     },
   });
 
@@ -417,7 +417,7 @@ test({ timeout: process.stdin.isTTY ? undefined : 30 * 1000 }, async () => {
     method: "GET",
     pathname: "/response-helpers",
     handler: (request: any, response: any) => {
-      assert.equal(response.state.example, "Hello");
+      assert.equal(request.state.example, "Hello");
       assert.equal(request.cookies.example, undefined);
       assert.equal(request.cookies.anotherExample, undefined);
       response.setCookie("example", "abc");
@@ -479,7 +479,7 @@ test({ timeout: process.stdin.isTTY ? undefined : 30 * 1000 }, async () => {
       error: true,
       handler: (request: any, response: any) => {
         trace.push("REACHABLE ERROR HANDLER");
-        trace.push(String(response.error));
+        trace.push(String(request.error));
         response.statusCode = 422;
         response.end();
       },
