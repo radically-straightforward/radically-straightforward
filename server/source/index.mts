@@ -302,7 +302,7 @@ export default function server({
               for (const liveConnection of liveConnections) {
                 if (
                   liveConnection.request.URL.pathname.match(
-                    new RegExp(request.body.pathname),
+                    new RegExp(request.body.pathname as string),
                   ) === null
                 )
                   continue;
