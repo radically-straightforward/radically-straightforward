@@ -28,7 +28,7 @@ export type Request<Search, Cookies, Body, State> = http.IncomingMessage & {
   cookies: Cookies;
   body: Body;
   state: State;
-  error?: any;
+  error?: unknown;
 };
 
 export type RequestBodyFile = busboy.FileInfo & { path: string };
