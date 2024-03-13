@@ -57,7 +57,13 @@ export default function server({
       request: Request<
         { [key: string]: string },
         { [key: string]: string },
-        { [key: string]: string | RequestBodyFile },
+        {
+          [key: string]:
+            | string
+            | RequestBodyFile
+            | string[]
+            | RequestBodyFile[];
+        },
         { [key: string]: unknown }
       >,
       response: Response,
@@ -155,9 +161,12 @@ export default function server({
                     reject(new Error("Field too large."));
                   }
                   if (name.endsWith("[]"))
-                    (request.body[name.slice(0, -"[]".length)] ??= []).push(
-                      value,
-                    );
+                    (
+                      (request.body[name.slice(0, -"[]".length)] ??= []) as (
+                        | string
+                        | RequestBodyFile
+                      )[]
+                    ).push(value);
                   else request.body[name] = value;
                 })
                 .on("file", (name, file, information) => {
@@ -178,9 +187,12 @@ export default function server({
                     ),
                   };
                   if (name.endsWith("[]"))
-                    (request.body[name.slice(0, -"[]".length)] ??= []).push(
-                      value,
-                    );
+                    (
+                      (request.body[name.slice(0, -"[]".length)] ??= []) as (
+                        | string
+                        | RequestBodyFile
+                      )[]
+                    ).push(value);
                   else request.body[name] = value;
                   filesPromises.add(
                     (async (): Promise<void> => {
