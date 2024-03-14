@@ -30,6 +30,17 @@ test({ timeout: process.stdin.isTTY ? undefined : 30 * 1000 }, async () => {
     method: "PATCH",
     pathname: new RegExp("^/request-parsing/(?<pathnameParameter>[0-9]+)$"),
     handler: async (request, response) => {
+      //@ts-expect-error
+      request.pathname.hi;
+      //@ts-expect-error
+      request.search.hi;
+      //@ts-expect-error
+      request.cookies.hi;
+      //@ts-expect-error
+      request.body.hi;
+      //@ts-expect-error
+      request.state.hi;
+
       for (const values of Object.values(request.body))
         if (Array.isArray(values))
           for (const value of values)
@@ -40,6 +51,7 @@ test({ timeout: process.stdin.isTTY ? undefined : 30 * 1000 }, async () => {
               );
               delete value.path;
             }
+
       response.setHeader("Content-Type", "application/json; charset=utf-8");
       response.end(
         JSON.stringify({
