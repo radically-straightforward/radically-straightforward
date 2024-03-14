@@ -15,8 +15,7 @@ TODO
 ## Requirements
 
 - Types
-  - Request & response types
-  - Address all `any`s
+  - Address `any`s
 
 ## Future
 

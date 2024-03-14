@@ -13,25 +13,33 @@ export type Route = {
   pathname?: string | RegExp;
   error?: boolean;
   handler: (
-    request: Request<{}, {}, {}, {}>,
+    request: Request<{}, {}, {}, {}, {}>,
     Response: Response,
   ) => Promise<void>;
 };
 
-export type Request<Search, Cookies, Body, State> = http.IncomingMessage & {
-  id: string;
-  start: bigint;
-  log: (...messageParts: string[]) => void;
-  ip: string;
-  URL: URL;
-  search: Search;
-  cookies: Cookies;
-  body: Body;
-  state: State;
-  error?: unknown;
-};
+export type Request<Pathname, Search, Cookies, Body, State> =
+  http.IncomingMessage & {
+    id: string;
+    start: bigint;
+    log: (...messageParts: string[]) => void;
+    ip: string;
+    URL: URL;
+    pathname: Pathname;
+    search: Search;
+    cookies: Cookies;
+    body: Body;
+    state: State;
+    error?: unknown;
+    liveConnection?: RequestLiveConnection;
+  };
 
 export type RequestBodyFile = busboy.FileInfo & { path: string };
+
+export type RequestLiveConnection = {
+  establish?: boolean;
+  skipUpdateOnEstablish?: boolean;
+};
 
 export type Response = http.ServerResponse & {
   setCookie: (key: string, value: string, maxAge?: number) => Response;
@@ -42,6 +50,14 @@ export type Response = http.ServerResponse & {
   ) => Response;
 };
 
+type LiveConnection = RequestLiveConnection & {
+  request: Request<{}, {}, {}, {}, {}>;
+  response: Response & { liveConnectionEnd?: () => void };
+  writableEnded?: boolean;
+  update?: () => void;
+  deleteTimeout?: NodeJS.Timeout;
+};
+
 export default function server({
   port = 18000,
   csrfProtectionExceptionPathname = "",
@@ -50,11 +66,12 @@ export default function server({
   csrfProtectionExceptionPathname?: string | RegExp;
 } = {}): Route[] {
   const routes = new Array<Route>();
-  const liveConnections = new Set<any>();
+  const liveConnections = new Set<LiveConnection>();
 
   const httpServer = http
     .createServer((async (
       request: Request<
+        { [key: string]: string },
         { [key: string]: string },
         { [key: string]: string },
         {
@@ -65,8 +82,8 @@ export default function server({
             | RequestBodyFile[];
         },
         { [key: string]: unknown }
-      >,
-      response: Response,
+      > & { liveConnection?: LiveConnection },
+      response: Response & { liveConnectionEnd?: () => void },
     ) => {
       try {
         request.id = utilities.randomString();
@@ -358,10 +375,10 @@ export default function server({
               }
               response.once("close", () => {
                 request.log("LIVE CONNECTION CLOSE");
-                if (request.liveConnection.request === request)
-                  request.liveConnection.deleteTimeout = setTimeout(() => {
+                if (request.liveConnection!.request === request)
+                  request.liveConnection!.deleteTimeout = setTimeout(() => {
                     request.log("LIVE CONNECTION DELETE");
-                    liveConnections.delete(request.liveConnection);
+                    liveConnections.delete(request.liveConnection!);
                   }, 30 * 1000).unref();
               });
 
@@ -383,7 +400,7 @@ export default function server({
               const periodicUpdates = utilities.backgroundJob(
                 { interval: 5 * 60 * 1000 },
                 () => {
-                  request.liveConnection.update?.();
+                  request.liveConnection!.update?.();
                 },
               );
               response.once("close", () => {
@@ -393,13 +410,13 @@ export default function server({
               request.liveConnection.establish = true;
 
               response.liveConnectionEnd = response.end;
-              response.end = (data?: string): typeof response => {
+              response.end = ((data?: string): typeof response => {
                 request.log("LIVE CONNECTION RESPONSE");
-                request.liveConnection.writableEnded = true;
+                request.liveConnection!.writableEnded = true;
                 if (typeof data === "string")
                   response.write(JSON.stringify(data) + "\n");
                 return response;
-              };
+              }) as (typeof response)["end"];
             } catch (error: any) {
               request.log("LIVE CONNECTION ERROR", String(error));
               response.statusCode = 400;
@@ -416,7 +433,7 @@ export default function server({
             ): typeof response => {
               request.cookies[key] = value;
               response.setHeader("Set-Cookie", [
-                ...(response.getHeader("Set-Cookie") ?? []),
+                ...((response.getHeader("Set-Cookie") as string[]) ?? []),
                 `__Host-${encodeURIComponent(key)}=${encodeURIComponent(value)}; Max-Age=${maxAge}; Path=/; Secure; HttpOnly; SameSite=None`,
               ]);
               return response;
@@ -425,7 +442,7 @@ export default function server({
             response.deleteCookie = (key: string): typeof response => {
               delete request.cookies[key];
               response.setHeader("Set-Cookie", [
-                ...(response.getHeader("Set-Cookie") ?? []),
+                ...((response.getHeader("Set-Cookie") as string[]) ?? []),
                 `__Host-${encodeURIComponent(key)}=; Max-Age=0; Path=/; Secure; HttpOnly; SameSite=None`,
               ]);
               return response;
@@ -440,7 +457,10 @@ export default function server({
                 temporary: 307,
                 permanent: 308,
               }[type];
-              response.setHeader("Location", new URL(destination, request.URL));
+              response.setHeader(
+                "Location",
+                new URL(destination, request.URL).href,
+              );
               response.end();
               return response;
             };
@@ -453,8 +473,8 @@ export default function server({
                 if (!request.liveConnection.establish)
                   request.log("LIVE CONNECTION REQUEST");
                 request.liveConnection.writableEnded = false;
-                liveConnectionUpdate = new Promise((resolve) => {
-                  request.liveConnection.update = resolve;
+                liveConnectionUpdate = new Promise<void>((resolve) => {
+                  request.liveConnection!.update = resolve;
                 });
               }
 
@@ -468,7 +488,7 @@ export default function server({
                   (typeof route.method === "string" &&
                     request.method !== route.method) ||
                   (route.method instanceof RegExp &&
-                    request.method.match(route.method) === null)
+                    request.method!.match(route.method) === null)
                 )
                   continue;
 
@@ -520,7 +540,7 @@ export default function server({
           if (
             request.method === "GET" &&
             response.statusCode === 200 &&
-            response.getHeader("Content-Type", "text/html; charset=utf-8")
+            response.getHeader("Content-Type") === "text/html; charset=utf-8"
           ) {
             request.log("LIVE CONNECTION PREPARE");
             const liveConnection = {
@@ -540,7 +560,7 @@ export default function server({
       request.log(
         "RESPONSE",
         String(response.statusCode),
-        response.getHeader("Location"),
+        String(response.getHeader("Location") ?? ""),
       );
     }) as (
       request: http.IncomingMessage,
