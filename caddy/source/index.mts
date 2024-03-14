@@ -26,7 +26,7 @@ export default function caddyfile(
  *
  * **Parameters**
  *
- * - `address`: The [`address` of the site block](https://caddyserver.com/docs/caddyfile/concepts#addresses). Usually the `address` is the [`hostname`](https://nodejs.org/dist/latest/docs/api/url.html#url-strings-and-url-objects) part of the application’s URL, for example, `example.com` (notably, the `hostname` doesn’t include neither the protocol nor the port).
+ * - `address`: The [`address` of the site block](https://caddyserver.com/docs/caddyfile/concepts#addresses). Usually the `address` is the [`hostname`](https://nodejs.org/api/url.html#url-strings-and-url-objects) part of the application’s URL, for example, `example.com` (notably, the `hostname` doesn’t include neither the protocol nor the port).
  *
  * - `trustedStaticFilesRoots`: [Caddy `root` directives](https://caddyserver.com/docs/caddyfile/directives/root) for **immutable** static files that are **trusted** by the application, for example, the application’s CSS and browser JavaScript.
  *
