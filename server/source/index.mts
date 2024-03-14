@@ -15,7 +15,7 @@ export type Route = {
   handler: (
     request: Request<{}, {}, {}, {}, {}>,
     Response: Response,
-  ) => Promise<void>;
+  ) => void | Promise<void>;
 };
 
 export type Request<Pathname, Search, Cookies, Body, State> =
@@ -135,12 +135,12 @@ export default function server({
         request.search = Object.fromEntries(request.URL.searchParams);
 
         request.cookies = Object.fromEntries(
-          (request.headers["cookie"] ?? "").split(";").flatMap((pair: any) => {
+          (request.headers["cookie"] ?? "").split(";").flatMap((pair) => {
             if (pair.trim() === "") return [];
             const parts = pair
               .split("=")
-              .map((part: any) => decodeURIComponent(part.trim()));
-            if (parts.length !== 2 || parts.some((part: any) => part === ""))
+              .map((part) => decodeURIComponent(part.trim()));
+            if (parts.length !== 2 || parts.some((part) => part === ""))
               throw new Error("Malformed ‘Cookie’ header.");
             parts[0] = parts[0].replace(/^__Host-/, "");
             return [parts];
@@ -216,7 +216,8 @@ export default function server({
                       directoriesToDelete.add(path.dirname(value.path));
                       await fs.mkdir(path.dirname(value.path));
                       await fs.writeFile(value.path, file);
-                      if ((file as any).truncated) {
+                      // @ts-expect-error: https://github.com/DefinitelyTyped/DefinitelyTyped/pull/68985
+                      if (file.truncated) {
                         response.statusCode = 413;
                         throw new Error("File too large.");
                       }
@@ -244,7 +245,7 @@ export default function server({
 
         if (process.env.NODE_ENV !== "production" && request.method !== "GET")
           request.log(JSON.stringify(request.body, undefined, 2));
-      } catch (error: any) {
+      } catch (error) {
         request.log("ERROR", String(error));
         if (response.statusCode === 200) response.statusCode = 400;
         response.setHeader("Content-Type", "text/plain; charset=utf-8");
@@ -293,10 +294,11 @@ export default function server({
               throw new Error("Invalid destination response.");
 
             response.setHeader("Content-Type", destinationResponseContentType);
-            await stream.pipeline(destinationResponse.body as any, response, {
+            // @ts-expect-error:
+            await stream.pipeline(destinationResponse.body, response, {
               signal: AbortSignal.timeout(5 * 60 * 1000),
             });
-          } catch (error: any) {
+          } catch (error) {
             request.log("ERROR", String(error));
             if (!response.headersSent) {
               if (response.statusCode === 200) response.statusCode = 502;
@@ -330,7 +332,7 @@ export default function server({
               }
             });
             response.end();
-          } catch (error: any) {
+          } catch (error) {
             request.log("ERROR", String(error));
             response.statusCode = 422;
             response.setHeader("Content-Type", "text/plain; charset=utf-8");
@@ -417,7 +419,7 @@ export default function server({
                   response.write(JSON.stringify(data) + "\n");
                 return response;
               }) as (typeof response)["end"];
-            } catch (error: any) {
+            } catch (error) {
               request.log("LIVE CONNECTION ERROR", String(error));
               response.statusCode = 400;
               response.setHeader("Content-Type", "text/plain; charset=utf-8");
@@ -505,8 +507,12 @@ export default function server({
 
                 try {
                   await route.handler(request, response);
-                } catch (error: any) {
-                  request.log("ERROR", String(error), error?.stack);
+                } catch (error) {
+                  request.log(
+                    "ERROR",
+                    String(error),
+                    (error as Error)?.stack ?? "",
+                  );
                   request.error = error;
                 }
 
