@@ -15,6 +15,43 @@ import server from "@radically-straightforward/server";
 import * as serverTypes from "@radically-straightforward/server";
 ```
 
+---
+
+- Always listen on `localhost`, because you should be using Caddy as reverse proxy.
+- Graceful termination.
+- Parse pathname parameters, query parameters, headers, and request body.
+- Trusts reverse proxy, because it’s meant to be used with Caddy.
+- Doesn’t serve static files, because it’s meant to be used with Caddy.
+- Cookies:
+  - `SameSite=None` for SAML to work, because the Identity Provider sends a `POST` request with the assertions back to the Service Provider, and anything other than `SameSite=None` would prevent cookies from being sent, and the server wouldn’t be able to ascertain whether a session already exists.
+  - Expects the server to be available under a single `hostname`, which is fair, because it’s meant to be used with Caddy.
+  - Don’t use the `Domain` option, because the default is to associate the cookie only with the current domain, and if you set the option, the cookie applies to subdomains as well. (https://cheatsheetseries.owasp.org/cheatsheets/Cross-Site_Request_Forgery_Prevention_Cheat_Sheet.html)
+- Compared to Express.js
+  - No need for `next()`, no requests left unresponded.
+  - Async handlers 😅
+- Request size limits (HTTP status 431 (headers) (Node.js) and 413 (body) (busboy (in the way we use it)))
+- Request timeout (HTTP status 408) (https://nodejs.org/api/http.html#serverrequesttimeout)
+  - Headers: `createServer()`’s `headersTimeout` (default: `60000`)
+  - Body: `createServer()`’s `requestTimeout` (default: `300000`)
+- CSRF protection
+  - Don’t let `GET` routes have side-effects
+  - Make non-`GET` requests with custom header (`CSRF-Protection`)
+  - References
+    - <https://cheatsheetseries.owasp.org/cheatsheets/Cross-Site_Request_Forgery_Prevention_Cheat_Sheet.html>
+- Images/videos/audios proxy.
+- Live Connection.
+  - Features
+    - Detect that you’re offline.
+    - Update when there’s a new version of the page.
+    - Reload in development.
+    - Detect a server version update.
+  - Requirements
+    - Sticky load balancer, because we keep state on the server (which is simpler than the SQLite approach necessary for sharing state between processes)
+    - `GET` requests
+    - Don’t send headers
+
+---
+
 <!-- DOCUMENTATION START: ./source/index.mts -->
 
 ### `Route`
@@ -154,41 +191,6 @@ An extension of [Node.js’s `http.createServer()`](https://nodejs.org/api/http.
 **`csrfProtectionExceptionPathname`:** Exceptions for the CSRF prevention mechanism. This may be, for example, `new RegExp("^/saml/(?:assertion-consumer-service|single-logout-service)$")` for applications that work as SAML Service Providers which include routes for Assertion Consumer Service (ACS) and Single Logout (SLO), because the Identity Provider makes the browser send these requests as cross-origin `POST`s (but SAML includes other mechanisms to prevent CSRF in these situations).
 
 <!-- DOCUMENTATION END: ./source/index.mts -->
-
-## Features
-
-- Always listen on `localhost`, because you should be using Caddy as reverse proxy.
-- Graceful termination.
-- Parse pathname parameters, query parameters, headers, and request body.
-- Trusts reverse proxy, because it’s meant to be used with Caddy.
-- Doesn’t serve static files, because it’s meant to be used with Caddy.
-- Cookies:
-  - `SameSite=None` for SAML to work, because the Identity Provider sends a `POST` request with the assertions back to the Service Provider, and anything other than `SameSite=None` would prevent cookies from being sent, and the server wouldn’t be able to ascertain whether a session already exists.
-  - Expects the server to be available under a single `hostname`, which is fair, because it’s meant to be used with Caddy.
-  - Don’t use the `Domain` option, because the default is to associate the cookie only with the current domain, and if you set the option, the cookie applies to subdomains as well. (https://cheatsheetseries.owasp.org/cheatsheets/Cross-Site_Request_Forgery_Prevention_Cheat_Sheet.html)
-- Compared to Express.js
-  - No need for `next()`, no requests left unresponded.
-  - Async handlers 😅
-- Request size limits (HTTP status 431 (headers) (Node.js) and 413 (body) (busboy (in the way we use it)))
-- Request timeout (HTTP status 408) (https://nodejs.org/api/http.html#serverrequesttimeout)
-  - Headers: `createServer()`’s `headersTimeout` (default: `60000`)
-  - Body: `createServer()`’s `requestTimeout` (default: `300000`)
-- CSRF protection
-  - Don’t let `GET` routes have side-effects
-  - Make non-`GET` requests with custom header (`CSRF-Protection`)
-  - References
-    - <https://cheatsheetseries.owasp.org/cheatsheets/Cross-Site_Request_Forgery_Prevention_Cheat_Sheet.html>
-- Images/videos/audios proxy.
-- Live Connection.
-  - Features
-    - Detect that you’re offline.
-    - Update when there’s a new version of the page.
-    - Reload in development.
-    - Detect a server version update.
-  - Requirements
-    - Sticky load balancer, because we keep state on the server (which is simpler than the SQLite approach necessary for sharing state between processes)
-    - `GET` requests
-    - Don’t send headers
 
 ## Future
 
