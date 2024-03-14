@@ -25,11 +25,11 @@ export type Request<Pathname, Search, Cookies, Body, State> =
     log: (...messageParts: string[]) => void;
     ip: string;
     URL: URL;
-    pathname: Pathname;
-    search: Search;
-    cookies: Cookies;
-    body: Body;
-    state: State;
+    pathname: Partial<Pathname>;
+    search: Partial<Search>;
+    cookies: Partial<Cookies>;
+    body: Partial<Body>;
+    state: Partial<State>;
     error?: unknown;
     liveConnection?: RequestLiveConnection;
   };

@@ -432,7 +432,16 @@ test({ timeout: process.stdin.isTTY ? undefined : 30 * 1000 }, async () => {
   application.push({
     method: "GET",
     pathname: "/response-helpers",
-    handler: (request: any, response: any) => {
+    handler: (
+      request: serverTypes.Request<
+        {},
+        {},
+        { example: string; anotherExample: string },
+        {},
+        { example: string }
+      >,
+      response,
+    ) => {
       assert.equal(request.state.example, "Hello");
       assert.equal(request.cookies.example, undefined);
       assert.equal(request.cookies.anotherExample, undefined);
@@ -449,7 +458,7 @@ test({ timeout: process.stdin.isTTY ? undefined : 30 * 1000 }, async () => {
   application.push({
     method: "GET",
     pathname: "/response-helpers",
-    handler: (request: any, response: any) => {
+    handler: (request, response) => {
       assert.fail();
     },
   });
@@ -476,7 +485,7 @@ test({ timeout: process.stdin.isTTY ? undefined : 30 * 1000 }, async () => {
     application.push({
       method: "GET",
       pathname: "/error",
-      handler: (request: any, response: any) => {
+      handler: (request, response) => {
         trace.push("BEFORE ERROR");
         throw new Error("ERROR");
         trace.push("AFTER ERROR");
@@ -486,14 +495,14 @@ test({ timeout: process.stdin.isTTY ? undefined : 30 * 1000 }, async () => {
     application.push({
       method: "GET",
       pathname: "/error",
-      handler: (request: any, response: any) => {
+      handler: (request, response) => {
         trace.push("UNREACHABLE HANDLER");
       },
     });
 
     application.push({
       error: true,
-      handler: (request: any, response: any) => {
+      handler: (request, response) => {
         trace.push("REACHABLE ERROR HANDLER");
         trace.push(String(request.error));
         response.statusCode = 422;
@@ -503,7 +512,7 @@ test({ timeout: process.stdin.isTTY ? undefined : 30 * 1000 }, async () => {
 
     application.push({
       error: true,
-      handler: (request: any, response: any) => {
+      handler: (request, response) => {
         trace.push("UNREACHABLE ERROR HANDLER");
       },
     });
@@ -532,7 +541,7 @@ test({ timeout: process.stdin.isTTY ? undefined : 30 * 1000 }, async () => {
   application.push({
     method: "GET",
     pathname: "/live-connection",
-    handler: (request: any, response: any) => {
+    handler: (request, response) => {
       response.end(
         request.liveConnection?.establish &&
           request.liveConnection?.skipUpdateOnEstablish
@@ -794,7 +803,7 @@ test({ timeout: process.stdin.isTTY ? undefined : 30 * 1000 }, async () => {
     application.push({
       method: "GET",
       pathname: "/live-connection/manual",
-      handler: async (request: any, response: any) => {
+      handler: async (request, response) => {
         await timers.setTimeout(3 * 1000);
         response.end(
           request.liveConnection?.establish &&
@@ -808,7 +817,7 @@ test({ timeout: process.stdin.isTTY ? undefined : 30 * 1000 }, async () => {
     application.push({
       method: "GET",
       pathname: "/live-connection/browser",
-      handler: async (request: any, response: any) => {
+      handler: async (request, response) => {
         response.end(
           request.liveConnection?.establish &&
             request.liveConnection?.skipUpdateOnEstablish
