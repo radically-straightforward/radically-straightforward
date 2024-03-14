@@ -12,12 +12,6 @@ $ npm install @radically-straightforward/server
 
 TODO
 
-## Requirements
-
-- Types
-  - Type tests
-    - Address `any`s
-
 ## Future
 
 - Use Node.js `http.createServer()`’s options `IncomingMessage` and `ServerResponse` instead of ad-hoc extending the `request` and `response` objects? (https://stackoverflow.com/questions/70034891/extending-http-incomingmessage-and-http-serverresponse-providing-it-to-the-htt)
