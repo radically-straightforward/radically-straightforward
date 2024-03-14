@@ -817,7 +817,7 @@ test({ timeout: process.stdin.isTTY ? undefined : 30 * 1000 }, async () => {
     application.push({
       method: "GET",
       pathname: "/live-connection/browser",
-      handler: async (request, response) => {
+      handler: (request, response) => {
         response.end(
           request.liveConnection?.establish &&
             request.liveConnection?.skipUpdateOnEstablish

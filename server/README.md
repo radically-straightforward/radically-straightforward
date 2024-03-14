@@ -8,12 +8,141 @@
 $ npm install @radically-straightforward/server
 ```
 
+## Example
+
+```typescript
+import server from "@radically-straightforward/server";
+import * as serverTypes from "@radically-straightforward/server";
+import html from "@radically-straightforward/html";
+
+// Turn off CSRF protection to simplify example. You should use `@radically-straightforward/browser` for Live Navigation instead.
+const application = server({ csrfProtectionExceptionPathname: new RegExp("") });
+
+const messages = new Array<string>();
+
+application.push({
+  method: "GET",
+  pathname: "/",
+  handler: (request, response) => {
+    response.end(html`
+      <!doctype html>
+      <html lang="en">
+        <body>
+          <h1>@radically-straightforward/server</h1>
+          <ul>
+            $${messages.map((message) => html`<li>${message}</li>`)}
+          </ul>
+          <form method="POST" action="/">
+            <input type="text" name="message" placeholder="Message…" required />
+            <button>Send</button>
+          </form>
+        </body>
+      </html>
+    `);
+  },
+});
+
+application.push({
+  method: "POST",
+  pathname: "/",
+  handler: (
+    request: serverTypes.Request<{}, {}, {}, { message: string }, {}>,
+    response,
+  ) => {
+    if (
+      typeof request.body.message !== "string" ||
+      request.body.message.trim() === ""
+    )
+      throw "validation";
+    messages.push(request.body.message);
+    response.redirect();
+  },
+});
+```
+
 ## Usage
 
 ```typescript
 import server from "@radically-straightforward/server";
 import * as serverTypes from "@radically-straightforward/server";
 ```
+
+`@radically-straightforward/server` is a layer on top of Node.js’s [HTTP server](https://nodejs.org/api/http.html). The `server()` function is similar to [`http.createServer()`](https://nodejs.org/api/http.html#httpcreateserveroptions-requestlistener), and we adhere to Node.js’s way of doing things as much as possible. You should familiarize yourself with how to create a server with Node.js to appreciate what `@radically-straightforward/server` provides—the rest of this documentation assumes that you have read [Node.js’s documentation](https://nodejs.org/api/http.html).
+
+Here’s what `@radically-straightforward/server` provides on top of Node.js’s `http` module:
+
+**Router**
+
+Node.js’s `http.createServer()` expects one `requestListener`—a function that is capable of handling every kind of request your server may receive.
+
+Typically it makes more sense to organize an application into multiple functions, which may even live in multiple files. For example, one function that authenticates users, another that displays the home page, yet another that processes a file upload, and so forth.
+
+What’s more, typically you’d want to only run these functions if the HTTP request satisfies some conditions, for example, the HTTP method is `POST` and the pathname is `/messages`.
+
+That’s what the `@radically-straightforward/server` router does: it allows you to define multiple `requestListener`s that are called depending on the specifics of the request.
+
+Compared to other libraries, `@radically-straightforward/server`’s router is much simpler to conceptualize. It’s an Array of [`Route`s](#route), which are tested against the request one by one and may or may not apply. In contrast to, for example, [Express’s nested `Router`s and things like `next("route")`](https://expressjs.com/en/4x/api.html), a `@radically-straightforward/server` application is more straightforward to understand.
+
+At the same time, `@radically-straightforward/server`’s router has features that other libraries lack, for example:
+
+- It checks whether the response has been send by the end of having run every route and sends an error instead of leaving the request without response.
+
+- It checks whether a response has been sent and stops running subsequent routes.
+
+Together, this means that `@radically-straightforward/server` often does the right thing without you having to call `next()` or risking trying to write content to a response that has ended.
+
+> **Note:** If you need to run code after the response has been sent, for example, code that would be below a call to `next()` in a middleware, you should use Node.js’s `response.once("close")` event.
+
+**Request Parsing**
+
+The Node.js `http` module only parses the request up to the point of distinguishing the headers from the body and separating the headers from one another. This is by design, to keep things flexible.
+
+In `@radically-straightforward/server` we take request parsing some steps further, following the needs of most web applications. We parse the request URL, the cookies, and the body, including regular forms and file uploads.
+
+We also include an assortment of request helpers including a unique request identifier, a logger, and so forth.
+
+See the [`Request` type](#request) for more details.
+
+Compared to other libraries, `@radically-straightforward/server` is more batteries-included in this area, and it doesn’t require configuration, for example, Express’s `app.use(express.urlencoded({ extended: true }))`.
+
+**Response Helpers**
+
+Send cookies and redirects with secure options by default.
+
+See the [`Response` type](#response) for more details.
+
+Compared to other libraries, `@radically-straightforward/server` offers fewer settings and keeps things simple.
+
+**Live Connection**
+
+A simple but powerful paradigm that solves many typical problems in web applications using a tried and true technology: HTTP streaming responses. Live Connections may be used to:
+
+- Update the page with new contents without requiring a full-page refresh (for better user experience) while still relying only on server-side rendering (for better developer experience)
+
+- Detect that the browser is connected to the server.
+
+- Detect that a user is online.
+
+- Detect that a new version of the server has been deployed and a full-page refresh may be necessary.
+
+- And more…
+
+See [Live Connection](#live-connection) for more details.
+
+**Healthcheck**
+
+A simple endpoint at `/_health` to test whether the application is online. It may be used by `@radically-straightforward/monitor`, by Caddy’s active health checks (https://caddyserver.com/docs/caddyfile/directives/reverse_proxy#active-health-checks), and so forth.
+
+**Content Proxy**
+
+**CSRF Protection**
+
+**Logging**
+
+**Lifecycle Management**
+
+- Server graceful termination.
+- Files in request.
 
 ---
 
@@ -192,6 +321,8 @@ An extension of [Node.js’s `http.createServer()`](https://nodejs.org/api/http.
 
 <!-- DOCUMENTATION END: ./source/index.mts -->
 
+## Live Connection
+
 ## Future
 
 - Use Node.js `http.createServer()`’s options `IncomingMessage` and `ServerResponse` instead of ad-hoc extending the `request` and `response` objects? (https://stackoverflow.com/questions/70034891/extending-http-incomingmessage-and-http-serverresponse-providing-it-to-the-htt)
@@ -239,3 +370,10 @@ An extension of [Node.js’s `http.createServer()`](https://nodejs.org/api/http.
 - <https://routup.net/>
 - <https://itty.dev/itty-router>
 - <https://github.com/lukeed/worktop>
+
+- Router
+  - Flat (Express `next("route")`)
+
+---
+
+- <https://hotwired.dev/>
