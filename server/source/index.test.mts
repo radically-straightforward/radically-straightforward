@@ -4,6 +4,7 @@ import path from "node:path";
 import fs from "node:fs/promises";
 import timers from "node:timers/promises";
 import server from "@radically-straightforward/server";
+import * as serverTypes from "@radically-straightforward/server";
 
 test({ timeout: process.stdin.isTTY ? undefined : 30 * 1000 }, async () => {
   const application = server();
@@ -28,8 +29,8 @@ test({ timeout: process.stdin.isTTY ? undefined : 30 * 1000 }, async () => {
   application.push({
     method: "PATCH",
     pathname: new RegExp("^/request-parsing/(?<pathnameParameter>[0-9]+)$"),
-    handler: async (request: any, response: any) => {
-      for (const values of Object.values<any>(request.body))
+    handler: async (request, response) => {
+      for (const values of Object.values(request.body))
         if (Array.isArray(values))
           for (const value of values)
             if (typeof value.path === "string") {
@@ -390,7 +391,7 @@ test({ timeout: process.stdin.isTTY ? undefined : 30 * 1000 }, async () => {
   application.push({
     method: "GET",
     pathname: "/routes",
-    handler: (request: any, response: any) => {
+    handler: (request, response) => {
       response.end("<p>Hello World</p>");
     },
   });
@@ -408,7 +409,10 @@ test({ timeout: process.stdin.isTTY ? undefined : 30 * 1000 }, async () => {
   application.push({
     method: "GET",
     pathname: "/response-helpers",
-    handler: (request: any, response: any) => {
+    handler: (
+      request: serverTypes.Request<{}, {}, {}, {}, { example: string }>,
+      response,
+    ) => {
       request.state.example = "Hello";
     },
   });
