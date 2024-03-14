@@ -15,8 +15,6 @@ TODO
 ## Requirements
 
 - Types
-  - Come up with example of pipeline type issue
-    - Add link to `// @ts-expect-error:`
   - Type tests
     - Address `any`s
 
