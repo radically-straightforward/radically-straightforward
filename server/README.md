@@ -6,15 +6,15 @@
 
 `@radically-straightforward/server` is a layer on top of Node.js’s [HTTP server](https://nodejs.org/api/http.html). The `server()` function is similar to [`http.createServer()`](https://nodejs.org/api/http.html#httpcreateserveroptions-requestlistener), and we follow Node.js’s way of doing things as much as possible. You should familiarize yourself with how to create a server with Node.js to appreciate what `@radically-straightforward/server` provides—the rest of this documentation assumes that you have read [Node.js’s documentation](https://nodejs.org/api/http.html).
 
-Here’s overview of `@radically-straightforward/server` provides on top of Node.js’s `http` module:
+Here’s an overview of `@radically-straightforward/server` provides on top of Node.js’s `http` module:
 
 - [Router](#router): Simple to understand and powerful.
 
-- [Request Parsing](#request-parsing) including file uploads.
+- [Request Parsing](#request-parsing): Including file uploads.
 
-- [Response Helpers](#response-helpers) for things like setting cookies with secure options by default, redirecting, and so forth.
+- [Response Helpers](#response-helpers): Set cookies with secure options by default, send redirect responses, and so forth.
 
-- [Live Connection](#live-connection): Update pages with new content without full-page refreshes (good user experience) using server-side rendering (good developer experience), detect that the user is online, and much more.
+- [Live Connection](#live-connection): Update pages with new content without reloading the page (good user experience) using server-side rendering (good developer experience), detect that the user is online, and much more.
 
 - [Health Check](#health-check): A simple but useful feature that’s built-in.
 
@@ -35,9 +35,8 @@ $ npm install @radically-straightforward/server
 ```typescript
 import server from "@radically-straightforward/server";
 import * as serverTypes from "@radically-straightforward/server";
-import html from "@radically-straightforward/html";
 
-// Turn off CSRF Protection to simplify example. You should use `@radically-straightforward/browser` with Live Navigation instead.
+// CSRF Protection is turned off to simplify this example. You should use `@radically-straightforward/javascript` with Live Navigation instead.
 const application = server({ csrfProtectionExceptionPathname: new RegExp("") });
 
 const messages = new Array<string>();
@@ -91,9 +90,9 @@ Node.js’s `http.createServer()` expects one `requestListener`—a function tha
 
 Typically it makes more sense to organize an application into multiple functions, which may even live in multiple files. For example, one function for the home page, another for the settings page, and so forth.
 
-Naturally, you’d want to only run these functions if the HTTP request satisfies some conditions, for example, if the HTTP method is `GET` and the pathname is `/settings`.
+Naturally, you’d want to only run these functions if the HTTP request satisfies some conditions, for example, the function that renders the settings page should only run if the HTTP method is `GET` and the pathname is `/settings`.
 
-That’s what the `@radically-straightforward/server` router does: It allows you to define multiple `requestListener`s that are called depending on characteristics of the request.
+That’s what the `@radically-straightforward/server` router does: It allows you to define multiple `requestListener`s that are called depending on the characteristics of the request.
 
 > **Compared to Other Libraries**
 >
@@ -101,7 +100,7 @@ That’s what the `@radically-straightforward/server` router does: It allows you
 >
 > At the same time, `@radically-straightforward/server`’s router has features that other libraries lack, for example:
 >
-> - When a route has finished running, it checks whether a response has been sent and stops from running subsequent routes. This prevents you from writing content to a response that has ended.
+> - When a route has finished running, it checks whether a response has been sent and stops subsequent routes from running. This prevents you from writing content to a response that has already ended.
 > - When every route has been considered, it checks whether the response hasn’t been sent and responds with an error. This prevents you from leaving a request without a response.
 >
 > Together, this means that `@radically-straightforward/server` does the right thing without you having to remember to call `next()`.
@@ -120,7 +119,7 @@ See the [`Request` type](#request) for more details.
 
 > **Compared to Other Libraries**
 >
-> `@radically-straightforward/server` is more batteries-included in this area, and it doesn’t require as much configuration (consider, for example, Express’s `app.use(express.urlencoded({ extended: true }))`).
+> `@radically-straightforward/server` is more batteries-included in this area, and it doesn’t require any configuration (consider, for example, Express’s `app.use(express.urlencoded({ extended: true }))`).
 
 ### Response Helpers
 
@@ -134,23 +133,111 @@ See the [`Response` type](#response) for more details.
 
 ### Live Connection
 
-A simple but powerful paradigm that solves many typical problems in web applications using a tried and true technology: HTTP streaming responses. Live Connections may be used to:
+A simple but powerful solution to many typical problems in web applications that works by keeping a connection between browser and server alive (not `response.end()`ing, but leaving the browser waiting for more content). Live Connections may be used to:
 
-- Update the page with new contents without requiring a full-page refresh (for better user experience) while still relying only on server-side rendering (for better developer experience).
+- Update the page with new contents without reloading the page (for better user experience) while still relying only on server-side rendering (for better developer experience).
 
-- Detect that the browser is connected to the server.
+- Detect that the user has internet connection (or, more specifically, that the browser may connect to the server).
 
 - Register that a user is online.
 
-- Detect that a new version of the server has been deployed and a full-page refresh may be necessary.
+- Detect that a new version of the application has been deployed and a reload may be necessary.
+
+- In development, perform a reload when a file has been modified (something often called **Live Reload** in other tools).
 
 - And more…
 
-See [Live Connection](#live-connection) for more details.
+> **Note:** Use Live Connections with [`@radically-straightforward/javascript`](https://github.com/radically-straightforward/radically-straightforward/tree/main/javascript), which implements the browser side of these features and subsumes many of the details below.
+
+To establish a Live Connection perform a `GET` request with the `Live-Connection` header set to the `request.id`, for example:
+
+```javascript
+await fetch(location.href, {
+  headers: { "Live-Connection": requestIdWhichWasObtainedInSomeWay },
+});
+```
+
+This changes the behavior of `@radically-straightforward/server`:
+
+- The `Content-Type` of the response is set to `application/json-lines; charset=utf-8` ([JSON lines](https://jsonlines.org/)).
+
+- You may not set headers or cookies (which includes not being able to manipulate user sessions).
+
+- `response.end(___)` doesn’t end the response, but `response.write(___)`s it in a new line of JSON, so the browser stays connected and waiting for more content.
+
+- Periodically a heartbeat (a newline without any JSON) is sent to keep the connection alive even when there are pieces of infrastructure that would otherwise close inactive connections, for example, a proxy on the user’s network.
+
+- Periodically an update is sent with a new version of the page (encoded as a JSON string). On the server this is implemented by running the `request` and the `response` through the routes again. On the browser there should be code to read the streaming response and render the new version of the page by applying the necessary changes without reloading.
+
+- You may trigger an immediate update by performing a request coming from `localhost` with a method of `POST` at pathname `/__live-connections` including a form field called `pathname` which is a regular expression for `pathname`s that should receive an immediate update.
+
+- A [`request.liveConnection`](#requestliveconnection) property is set.
+
+**Example**
+
+Consider the following application:
+
+```typescript
+import server from "@radically-straightforward/server";
+import * as serverTypes from "@radically-straightforward/server";
+
+const application = server();
+
+application.push({
+  handler: (request, response) => {
+    if (request.liveConnection?.establish) {
+      // Here there could be a [`backgroundJob()`](https://github.com/radically-straightforward/radically-straightforward/tree/main/utilities#backgroundjob) which updates a timestamp of when a user has last been seen online.
+      if (request.liveConnection?.skipUpdateOnEstablish) response.end();
+    }
+  },
+});
+
+application.push({
+  method: "GET",
+  pathname: new RegExp("^/conversations/(?<conversationId>[0-9]+)$"),
+  handler: (request, response) => {
+    response.end(
+      `<!DOCTYPE html>
+        <html lang="en">
+          <head>
+            <script>
+              (async () => {
+                const responseBodyReader = (await fetch(location.href, { headers: { "Live-Connection": ${JSON.stringify(request.id)} } })).body.pipeThrough(new TextDecoderStream()).getReader();
+                while (true) {
+                  const value = (
+                    await responseBodyReader.read().catch(() => ({ value: undefined }))
+                  ).value;
+                  if (value === undefined) break;
+                  console.log(value);
+                }
+              })();
+            </script>
+          </head>
+          <body>Live Connection: ${new Date().toISOString()}. Open the Developer Tools Console and see the updates arriving.</body>
+        </html>
+      `,
+    );
+  },
+});
+```
+
+Visit <http://localhost:18000/conversations/10>.
+
+Send an immediate update with the following snippet:
+
+```typescript
+await fetch("http://localhost:18000/__live-connections", {
+  method: "POST",
+  headers: { "CSRF-Protection": "true" },
+  body: new URLSearchParams({ pathname: "^/conversations/10$" }),
+});
+```
 
 > **Compared to Other Libraries**
 >
 > Some tools like [Hotwire](https://hotwired.dev/) has similar concepts, but Live Connection as implemented in `@radically-straightforward/server` is a novel idea.
+>
+> A Live Connection is reminiscent of [Server-Sent Events (SSE)](https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events). Unfortunately SSEs are limited in features, for example, they don’t allow for sending custom headers (we need a `Live-Connection` header to communicate the `request.id` back to the server and avoid an immediate update upon establishing every connection). What’s more, SSEs don’t appear to receive much attention from browser implementors and are unlikely to receive new features.
 
 ### Health Check
 
@@ -158,17 +245,17 @@ A simple endpoint at `/_health` to test whether the application is online. It ma
 
 > **Compared to Other Libraries**
 >
-> Typically you either have to add a third-party library specifically to handle health checks, or you have to implement them yourself. In fairness, a health check is trivial to implement, but it’s nice to have that taken care of by the library and to have a predictable endpoint for it.
+> Typically you either have to add a third-party library specifically to handle health checks, or you have to implement them yourself. In fairness, a health check is trivial to implement, but it’s nice to have the main server library take care of that for you, and it’s nice to have a predictable endpoint for the health check.
 
 ### Image/Video/Audio Proxy
 
 An endpoint at `/_proxy?destination=<URL>` (for example, `/_proxy?destination=https%3A%2F%2Finteractive-examples.mdn.mozilla.net%2Fmedia%2Fcc0-images%2Fgrapefruit-slice-332-332.jpg`) which proxies images, videos, and audios from other origins.
 
-This is useful for content generated by users that includes image/video/audio from a third-party website. It avoids issues with [mixed content](https://developer.mozilla.org/en-US/docs/Web/Security/Mixed_content) and [Content Security Policy](https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP).
+This is useful for content generated by users that includes images/videos/audios from third-party websites. It avoids issues with [mixed content](https://developer.mozilla.org/en-US/docs/Web/Security/Mixed_content) and [Content Security Policy](https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP).
 
 > **Compared to Other Libraries**
 >
-> Typically you either have to add a third-party library specifically to handle image/video/audio proxying, or you have to implement them yourself.
+> Typically you either have to add a third-party library specifically to handle image/video/audio proxying, or you have to implement it yourself.
 >
 > Note that the implementation in `@radically-straightforward/server` is very simple: it doesn’t resize images, reencode videos, and so forth; it doesn’t cache images/videos/audios to potentially speed things up and to prevent content from disappearing as third-party websites change; and so forth.
 
@@ -362,8 +449,6 @@ An extension of [Node.js’s `http.createServer()`](https://nodejs.org/api/http.
 **`csrfProtectionExceptionPathname`:** Exceptions for the CSRF prevention mechanism. This may be, for example, `new RegExp("^/saml/(?:assertion-consumer-service|single-logout-service)$")` for applications that work as SAML Service Providers which include routes for Assertion Consumer Service (ACS) and Single Logout (SLO), because the Identity Provider makes the browser send these requests as cross-origin `POST`s (but SAML includes other mechanisms to prevent CSRF in these situations).
 
 <!-- DOCUMENTATION END: ./source/index.mts -->
-
-## Live Connection
 
 ## Future
 

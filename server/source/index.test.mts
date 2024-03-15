@@ -838,7 +838,7 @@ test({ timeout: process.stdin.isTTY ? undefined : 30 * 1000 }, async () => {
                       })();
                     </script>
                   </head>
-                  <body>Live Connection</body>
+                  <body>Live Connection: ${new Date().toISOString()}. Open the Developer Tools Console and see the updates arriving.</body>
                 </html>
               `,
         );
