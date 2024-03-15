@@ -2,6 +2,28 @@
 
 **🦾 HTTP server in Node.js**
 
+## Introduction
+
+`@radically-straightforward/server` is a layer on top of Node.js’s [HTTP server](https://nodejs.org/api/http.html). The `server()` function is similar to [`http.createServer()`](https://nodejs.org/api/http.html#httpcreateserveroptions-requestlistener), and we follow Node.js’s way of doing things as much as possible. You should familiarize yourself with how to create a server with Node.js to appreciate what `@radically-straightforward/server` provides—the rest of this documentation assumes that you have read [Node.js’s documentation](https://nodejs.org/api/http.html).
+
+Here’s overview of `@radically-straightforward/server` provides on top of Node.js’s `http` module:
+
+- [Router](#router): Simple to understand and powerful.
+
+- [Request Parsing](#request-parsing) including file uploads.
+
+- [Response Helpers](#response-helpers) for things like setting cookies with secure options by default, redirecting, and so forth.
+
+- [Live Connection](#live-connection): Update pages with new content without full-page refreshes (good user experience) using server-side rendering (good developer experience), detect that the user is online, and much more.
+
+- [Health Check](#health-check): A simple but useful feature that’s built-in.
+
+- [Image/Video/Audio Proxy](#imagevideoaudio-proxy): Avoid issues with [mixed content](https://developer.mozilla.org/en-US/docs/Web/Security/Mixed_content) and [Content Security Policy](https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP).
+
+- [CSRF Protection](#csrf-protection): It’s built-in.
+
+- [Convenient Defaults](#convenient-defaults): Logging requests and responses, graceful termination, and so forth.
+
 ## Installation
 
 ```console
@@ -15,7 +37,7 @@ import server from "@radically-straightforward/server";
 import * as serverTypes from "@radically-straightforward/server";
 import html from "@radically-straightforward/html";
 
-// Turn off CSRF protection to simplify example. You should use `@radically-straightforward/browser` for Live Navigation instead.
+// Turn off CSRF Protection to simplify example. You should use `@radically-straightforward/browser` with Live Navigation instead.
 const application = server({ csrfProtectionExceptionPathname: new RegExp("") });
 
 const messages = new Array<string>();
@@ -26,7 +48,8 @@ application.push({
   handler: (request, response) => {
     response.end(html`
       <!doctype html>
-      <html lang="en">
+      <html>
+        <head></head>
         <body>
           <h1>@radically-straightforward/server</h1>
           <ul>
@@ -60,68 +83,64 @@ application.push({
 });
 ```
 
-## Usage
+## Features
 
-```typescript
-import server from "@radically-straightforward/server";
-import * as serverTypes from "@radically-straightforward/server";
-```
+### Router
 
-`@radically-straightforward/server` is a layer on top of Node.js’s [HTTP server](https://nodejs.org/api/http.html). The `server()` function is similar to [`http.createServer()`](https://nodejs.org/api/http.html#httpcreateserveroptions-requestlistener), and we adhere to Node.js’s way of doing things as much as possible. You should familiarize yourself with how to create a server with Node.js to appreciate what `@radically-straightforward/server` provides—the rest of this documentation assumes that you have read [Node.js’s documentation](https://nodejs.org/api/http.html).
+Node.js’s `http.createServer()` expects one `requestListener`—a function that is capable of handling every kind of request your server may ever receive.
 
-Here’s what `@radically-straightforward/server` provides on top of Node.js’s `http` module:
+Typically it makes more sense to organize an application into multiple functions, which may even live in multiple files. For example, one function for the home page, another for the settings page, and so forth.
 
-**Router**
+Naturally, you’d want to only run these functions if the HTTP request satisfies some conditions, for example, if the HTTP method is `GET` and the pathname is `/settings`.
 
-Node.js’s `http.createServer()` expects one `requestListener`—a function that is capable of handling every kind of request your server may receive.
+That’s what the `@radically-straightforward/server` router does: It allows you to define multiple `requestListener`s that are called depending on characteristics of the request.
 
-Typically it makes more sense to organize an application into multiple functions, which may even live in multiple files. For example, one function that authenticates users, another that displays the home page, yet another that processes a file upload, and so forth.
+> **Compared to Other Libraries**
+>
+> `@radically-straightforward/server`’s router is simpler: It’s an Array of [`Route`s](#route) that are tested against the request one by one in order and may or may not apply. In contrast to, for example, [Express’s nested `Router`s and things like `next("route")`](https://expressjs.com/en/4x/api.html), a `@radically-straightforward/server` application is more straightforward to understand.
+>
+> At the same time, `@radically-straightforward/server`’s router has features that other libraries lack, for example:
+>
+> - When a route has finished running, it checks whether a response has been sent and stops from running subsequent routes. This prevents you from writing content to a response that has ended.
+> - When every route has been considered, it checks whether the response hasn’t been sent and responds with an error. This prevents you from leaving a request without a response.
+>
+> Together, this means that `@radically-straightforward/server` does the right thing without you having to remember to call `next()`.
+>
+> > **Note:** If you need to run code after the response has been sent (that is, code that would be below a call to `next()` in an Express middleware), you should use Node.js’s `response.once("close")` event.
 
-What’s more, typically you’d want to only run these functions if the HTTP request satisfies some conditions, for example, the HTTP method is `POST` and the pathname is `/messages`.
-
-That’s what the `@radically-straightforward/server` router does: it allows you to define multiple `requestListener`s that are called depending on the specifics of the request.
-
-Compared to other libraries, `@radically-straightforward/server`’s router is much simpler to conceptualize. It’s an Array of [`Route`s](#route), which are tested against the request one by one and may or may not apply. In contrast to, for example, [Express’s nested `Router`s and things like `next("route")`](https://expressjs.com/en/4x/api.html), a `@radically-straightforward/server` application is more straightforward to understand.
-
-At the same time, `@radically-straightforward/server`’s router has features that other libraries lack, for example:
-
-- It checks whether the response has been send by the end of having run every route and sends an error instead of leaving the request without response.
-
-- It checks whether a response has been sent and stops running subsequent routes.
-
-Together, this means that `@radically-straightforward/server` often does the right thing without you having to call `next()` or risking trying to write content to a response that has ended.
-
-> **Note:** If you need to run code after the response has been sent, for example, code that would be below a call to `next()` in a middleware, you should use Node.js’s `response.once("close")` event.
-
-**Request Parsing**
+### Request Parsing
 
 The Node.js `http` module only parses the request up to the point of distinguishing the headers from the body and separating the headers from one another. This is by design, to keep things flexible.
 
-In `@radically-straightforward/server` we take request parsing some steps further, following the needs of most web applications. We parse the request URL, the cookies, and the body, including regular forms and file uploads.
+In `@radically-straightforward/server` we take request parsing some steps further, satisfying the needs of most web applications. We parse the request URL, cookies, body (including regular forms and file uploads), and so forth.
 
 We also include an assortment of request helpers including a unique request identifier, a logger, and so forth.
 
 See the [`Request` type](#request) for more details.
 
-Compared to other libraries, `@radically-straightforward/server` is more batteries-included in this area, and it doesn’t require configuration, for example, Express’s `app.use(express.urlencoded({ extended: true }))`.
+> **Compared to Other Libraries**
+>
+> `@radically-straightforward/server` is more batteries-included in this area, and it doesn’t require as much configuration (consider, for example, Express’s `app.use(express.urlencoded({ extended: true }))`).
 
-**Response Helpers**
+### Response Helpers
 
 Send cookies and redirects with secure options by default.
 
 See the [`Response` type](#response) for more details.
 
-Compared to other libraries, `@radically-straightforward/server` offers fewer settings and keeps things simple.
+> **Compared to Other Libraries**
+>
+> `@radically-straightforward/server` offers fewer settings and less **sugar**, for example, instead of [Express’s `response.json(___)`](https://expressjs.com/en/4x/api.html#res.json), you should use Node.js’s `response.setHeader("Content-Type", "application/json; charset=utf-8").end(JSON.stringify(___))`.
 
-**Live Connection**
+### Live Connection
 
 A simple but powerful paradigm that solves many typical problems in web applications using a tried and true technology: HTTP streaming responses. Live Connections may be used to:
 
-- Update the page with new contents without requiring a full-page refresh (for better user experience) while still relying only on server-side rendering (for better developer experience)
+- Update the page with new contents without requiring a full-page refresh (for better user experience) while still relying only on server-side rendering (for better developer experience).
 
 - Detect that the browser is connected to the server.
 
-- Detect that a user is online.
+- Register that a user is online.
 
 - Detect that a new version of the server has been deployed and a full-page refresh may be necessary.
 
@@ -129,20 +148,36 @@ A simple but powerful paradigm that solves many typical problems in web applicat
 
 See [Live Connection](#live-connection) for more details.
 
-**Healthcheck**
+> **Compared to Other Libraries**
+>
+> Some tools like [Hotwire](https://hotwired.dev/) has similar concepts, but Live Connection as implemented in `@radically-straightforward/server` is a novel idea.
 
-A simple endpoint at `/_health` to test whether the application is online. It may be used by `@radically-straightforward/monitor`, by Caddy’s active health checks (https://caddyserver.com/docs/caddyfile/directives/reverse_proxy#active-health-checks), and so forth.
+### Health Check
 
-**Content Proxy**
+A simple endpoint at `/_health` to test whether the application is online. It may be used by `@radically-straightforward/monitor`, by [Caddy’s active health checks](https://caddyserver.com/docs/caddyfile/directives/reverse_proxy#active-health-checks), and so forth.
 
-**CSRF Protection**
+> **Compared to Other Libraries**
+>
+> Typically you either have to add a third-party library specifically to handle health checks, or you have to implement them yourself. In fairness, a health check is trivial to implement, but it’s nice to have that taken care of by the library and to have a predictable endpoint for it.
 
-**Logging**
+### Image/Video/Audio Proxy
 
-**Lifecycle Management**
+An endpoint at `/_proxy?destination=<URL>` (for example, `/_proxy?destination=https%3A%2F%2Finteractive-examples.mdn.mozilla.net%2Fmedia%2Fcc0-images%2Fgrapefruit-slice-332-332.jpg`) which proxies images, videos, and audios from other origins.
 
-- Server graceful termination.
-- Files in request.
+This is useful for content generated by users that includes image/video/audio from a third-party website. It avoids issues with [mixed content](https://developer.mozilla.org/en-US/docs/Web/Security/Mixed_content) and [Content Security Policy](https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP).
+
+> **Compared to Other Libraries**
+>
+> Typically you either have to add a third-party library specifically to handle image/video/audio proxying, or you have to implement them yourself.
+>
+> Note that the implementation in `@radically-straightforward/server` is very simple: it doesn’t resize images, reencode videos, and so forth; it doesn’t cache images/videos/audios to potentially speed things up and to prevent content from disappearing as third-party websites change; and so forth.
+
+### CSRF Protection
+
+### Convenient Defaults
+
+- Logging
+- Graceful termination.
 
 ---
 
@@ -180,6 +215,13 @@ A simple endpoint at `/_health` to test whether the application is online. It ma
     - Don’t send headers
 
 ---
+
+## Usage
+
+```typescript
+import server from "@radically-straightforward/server";
+import * as serverTypes from "@radically-straightforward/server";
+```
 
 <!-- DOCUMENTATION START: ./source/index.mts -->
 
@@ -363,17 +405,24 @@ An extension of [Node.js’s `http.createServer()`](https://nodejs.org/api/http.
 
 ## Related Work
 
-- <https://expressjs.com/>
-- <https://fastify.dev/>
-- <https://koajs.com/>
-- <https://hono.dev/>
-- <https://routup.net/>
-- <https://itty.dev/itty-router>
-- <https://github.com/lukeed/worktop>
-
-- Router
-  - Flat (Express `next("route")`)
-
----
-
-- <https://hotwired.dev/>
+- Basic functionality
+  - <https://expressjs.com/>
+  - <https://fastify.dev/>
+  - <https://koajs.com/>
+  - <https://hono.dev/>
+  - <https://routup.net/>
+  - <https://itty.dev/itty-router>
+  - <https://github.com/lukeed/worktop>
+- Live Connection
+  - <https://hotwired.dev/>
+- Proxy
+  - <https://github.com/atmos/camo>
+  - <https://github.com/imgproxy/imgproxy>
+  - <https://github.com/willnorris/imageproxy>
+  - <https://github.com/http-party/node-http-proxy>
+  - <https://github.com/chimurai/http-proxy-middleware>
+  - <https://github.com/cookpad/ecamo>
+  - <https://github.com/weserv/images>
+  - <https://github.com/jpmckinney/image-proxy>
+  - <https://github.com/sdepold/node-imageable>
+  - <https://github.com/marcjacobs1021/node-image-proxy>
