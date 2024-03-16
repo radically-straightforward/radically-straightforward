@@ -74,7 +74,7 @@ export default function caddyfile(
  *
  * - Configure a server for trusted and untrusted static files. Safe untrusted file types are allowed to be embedded in other origins, and unsafe untrusted file types are forced to be downloaded, which prevents user-generated JavaScript from running within the context of the application ([XSS](https://owasp.org/www-community/attacks/xss/)).
  *
- * - Configure a reverse proxy with load balancing to the dynamic part of the application. The load balancing policy is set to [`cookie`](https://caddyserver.com/docs/caddyfile/directives/reverse_proxy#lb_policy), which uses the `lb` cookie to setup sticky sessions and allows the server to hold state (for example, [`@radically-straightforward/server`’s connections](https://github.com/radically-straightforward/radically-straightforward/tree/main/server)).
+ * - Configure a reverse proxy with load balancing to the dynamic part of the application. The load balancing policy is set to [`cookie`](https://caddyserver.com/docs/caddyfile/directives/reverse_proxy#lb_policy), which uses the `lb` cookie to setup sticky sessions and allows the server to hold state (for example, [`@radically-straightforward/server`’s Live Connections](https://github.com/radically-straightforward/radically-straightforward/tree/main/server#live-connection)).
  *
  * **References**
  *
