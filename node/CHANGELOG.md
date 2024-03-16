@@ -2,7 +2,7 @@
 
 ## 3.0.0 · 2024-02-21
 
-- Replaced `shouldTerminate()` with the `process.once("gracefulTermination", () => { ___ })` event.
+- Replaced `shouldTerminate()` with the `process.once("gracefulTermination")` event.
 
 ## 2.0.1 · 2024-01-06
 

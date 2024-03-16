@@ -22,7 +22,7 @@ Here’s an overview of `@radically-straightforward/server` provides on top of N
 
 - **[CSRF Protection](#csrf-protection):** It’s built-in.
 
-- **[Convenient Defaults](#convenient-defaults):** Logging requests and responses, graceful termination, and so forth.
+- **[Convenient Defaults](#convenient-defaults):** Logging of requests and responses, graceful termination, and so forth.
 
 ## Installation
 
@@ -35,6 +35,7 @@ $ npm install @radically-straightforward/server
 ```typescript
 import server from "@radically-straightforward/server";
 import * as serverTypes from "@radically-straightforward/server";
+import html from "@radically-straightforward/html";
 
 // CSRF Protection is turned off to simplify this example. You should use `@radically-straightforward/javascript` with Live Navigation instead.
 const application = server({ csrfProtectionExceptionPathname: new RegExp("") });
@@ -54,7 +55,7 @@ application.push({
           <ul>
             $${messages.map((message) => html`<li>${message}</li>`)}
           </ul>
-          <form method="POST" action="/">
+          <form method="POST">
             <input type="text" name="message" placeholder="Message…" required />
             <button>Send</button>
           </form>
@@ -82,17 +83,17 @@ application.push({
 });
 ```
 
+Visit <http://localhost:18000>.
+
 ## Features
 
 ### Router
 
-Node.js’s `http.createServer()` expects one `requestListener`—a function that is capable of handling every kind of request your server may ever receive.
-
-Typically it makes more sense to organize an application into multiple functions, which may even live in multiple files. For example, one function for the home page, another for the settings page, and so forth.
-
-Naturally, you’d want to only run these functions if the HTTP request satisfies some conditions, for example, the function that renders the settings page should only run if the HTTP method is `GET` and the pathname is `/settings`.
+Node.js’s `http.createServer()` expects one `requestListener`—a function which is capable of handling every kind of request that your server may ever receive. But typically it makes more sense to organize an application into multiple functions, which may even live in different files. For example, one function for the home page, another for the settings page, and so forth. And you’d want to only run these functions if the HTTP request satisfies some conditions, for example, the function for the settings page should only run if the HTTP method is `GET` and the pathname is `/settings`.
 
 That’s what the `@radically-straightforward/server` router does: It allows you to define multiple `requestListener`s that are called depending on the characteristics of the request.
+
+See the [`Route` type](#route) for more details.
 
 > **Compared to Other Libraries**
 >
@@ -100,7 +101,7 @@ That’s what the `@radically-straightforward/server` router does: It allows you
 >
 > At the same time, `@radically-straightforward/server`’s router has features that other libraries lack, for example:
 >
-> - When a route has finished running, it checks whether a response has been sent and stops subsequent routes from running. This prevents you from writing content to a response that has already ended.
+> - When a route has finished running, it checks whether a response has been sent and stops subsequent routes from running. This prevents you from writing content to a response that has already `end()`ed.
 > - When every route has been considered, it checks whether the response hasn’t been sent and responds with an error. This prevents you from leaving a request without a response.
 >
 > Together, this means that `@radically-straightforward/server` does the right thing without you having to remember to call `next()`.
@@ -133,7 +134,7 @@ See the [`Response` type](#response) for more details.
 
 ### Live Connection
 
-A simple but powerful solution to many typical problems in web applications that works by keeping a connection between browser and server alive (not `response.end()`ing, but leaving the browser waiting for more content). Live Connections may be used to:
+A simple but powerful solution to many typical problems in web applications that works by keeping a connection between browser and server (not `response.end()`ing, but leaving the browser waiting for more content). Live Connections may be used to:
 
 - Update the page with new contents without reloading the page (for better user experience) while still relying only on server-side rendering (for better developer experience).
 
@@ -147,9 +148,9 @@ A simple but powerful solution to many typical problems in web applications that
 
 - And more…
 
-> **Note:** Use Live Connections with [`@radically-straightforward/javascript`](https://github.com/radically-straightforward/radically-straightforward/tree/main/javascript), which implements the browser side of these features and subsumes many of the details below.
+> **Note:** Use Live Connections with [`@radically-straightforward/javascript`](https://github.com/radically-straightforward/radically-straightforward/tree/main/javascript#live-connection), which implements the browser side of these features and subsumes many of the details below.
 
-To establish a Live Connection perform a `GET` request with the `Live-Connection` header set to the `request.id`, for example:
+To establish a Live Connection perform a `GET` request with the `Live-Connection` header set to the `request.id` of the request that resulted in the original page, for example:
 
 ```javascript
 await fetch(location.href, {
@@ -163,19 +164,17 @@ This changes the behavior of `@radically-straightforward/server`:
 
 - You may not set headers or cookies (which includes not being able to manipulate user sessions).
 
-- `response.end(___)` doesn’t end the response, but `response.write(___)`s it in a new line of JSON, so the browser stays connected and waiting for more content.
+- `response.end(___)` doesn’t end the response, but `response.write(___)`s it in a new line of JSON, so that the browser stays connected and waiting for more content.
 
 - Periodically a heartbeat (a newline without any JSON) is sent to keep the connection alive even when there are pieces of infrastructure that would otherwise close inactive connections, for example, a proxy on the user’s network.
 
-- Periodically an update is sent with a new version of the page (encoded as a JSON string). On the server this is implemented by running the `request` and the `response` through the routes again. On the browser there should be code to read the streaming response and render the new version of the page by applying the necessary changes without reloading.
+- Periodically an update is sent with a new version of the page (encoded as a line of JSON). On the server this is implemented by running the `request` and `response` through the routes again. On the browser there should be code to read the streaming response and render the new version of the page by applying the necessary changes without reloading.
 
-- You may trigger an immediate update by performing a request coming from `localhost` with a method of `POST` at pathname `/__live-connections` including a form field called `pathname` which is a regular expression for `pathname`s that should receive an immediate update.
+- You may trigger an immediate update by performing a request coming from the same machine in which the server is running with a method of `POST` at pathname `/__live-connections` including a form field called `pathname` which is a regular expression for `pathname`s that should receive an immediate update.
 
 - A [`request.liveConnection`](#requestliveconnection) property is set.
 
 **Example**
-
-Consider the following application:
 
 ```typescript
 import server from "@radically-straightforward/server";
@@ -237,15 +236,15 @@ await fetch("http://localhost:18000/__live-connections", {
 >
 > Some tools like [Hotwire](https://hotwired.dev/) has similar concepts, but Live Connection as implemented in `@radically-straightforward/server` is a novel idea.
 >
-> A Live Connection is reminiscent of [Server-Sent Events (SSE)](https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events). Unfortunately SSEs are limited in features, for example, they don’t allow for sending custom headers (we need a `Live-Connection` header to communicate the `request.id` back to the server and avoid an immediate update upon establishing every connection). What’s more, SSEs don’t appear to receive much attention from browser implementors and are unlikely to receive new features.
+> A Live Connection is reminiscent of [Server-Sent Events (SSE)](https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events). Unfortunately SSEs are limited in features, for example, they don’t allow for sending custom headers (we need a `Live-Connection` header to communicate back to the server the `request.id` of the request that resulted in the original page, which avoids an immediate update upon establishing every connection). What’s more, SSEs don’t appear to receive much attention from browser implementors and are unlikely to receive new features.
 
 ### Health Check
 
-A simple endpoint at `/_health` to test whether the application is online. It may be used by `@radically-straightforward/monitor`, by [Caddy’s active health checks](https://caddyserver.com/docs/caddyfile/directives/reverse_proxy#active-health-checks), and so forth.
+An endpoint at `/_health` to test whether the application is online. It may be used by `@radically-straightforward/monitor`, by [Caddy’s active health checks](https://caddyserver.com/docs/caddyfile/directives/reverse_proxy#active-health-checks), and so forth.
 
 > **Compared to Other Libraries**
 >
-> Typically you either have to add a third-party library specifically to handle health checks, or you have to implement them yourself. In fairness, a health check is trivial to implement, but it’s nice to have the main server library take care of that for you, and it’s nice to have a predictable endpoint for the health check.
+> Typically you either have to add a third-party library specifically to handle health checks, or you have to implement them yourself. In fairness, a health check is straightforward to implement, but it’s nice to have the server library take care of that for you, and it’s nice to have a predictable endpoint for the health check.
 
 ### Image/Video/Audio Proxy
 
@@ -267,7 +266,7 @@ In your application:
 
 - Don’t let routes with method `GET` have side-effects.
 
-- Ensure that all requests with methods other than `GET` (for example, `POST`, `PATCH`, `PUT`, `DELETE`, and so forth) include a header of `CSRF-Protection: true`. If you’re using regular HTML forms, we recommend using [`@radically-straightforward/javascript`](https://github.com/radically-straightforward/radically-straightforward/tree/main/javascript)’s Live Navigation which already does this.
+- Ensure that all requests with methods other than `GET` (for example, `POST`, `PATCH`, `PUT`, `DELETE`, and so forth) include a header of `CSRF-Protection: true`. If you’re using regular HTML forms, we recommend using [`@radically-straightforward/javascript`’s Live Navigation](https://github.com/radically-straightforward/radically-straightforward/tree/main/javascript#live-navigation) which already does this.
 
 - If there are routes that really should not have CSRF protection, use [`server()`’s `csrfProtectionExceptionPathname` option](#server).
 
@@ -277,7 +276,7 @@ In your application:
 
 - **Graceful Termination:** Using [`@radically-straightforward/node`’s graceful termination](https://github.com/radically-straightforward/radically-straightforward/tree/main/node#graceful-termination).
 
-- **Automatic Management of Uploaded Files:** When parsing the request uploaded files are put in a temporary directory, and if the routes don’t move them to a permanent location, they’re automatically deleted after the response is sent.
+- **Automatic Management of Uploaded Files:** When parsing the request, uploaded files are put in a temporary directory, and if the routes don’t move them to a permanent location, they’re automatically deleted after the response is sent.
 
 ---
 
@@ -324,6 +323,7 @@ import * as serverTypes from "@radically-straightforward/server";
 
 ```typescript
 export type Route = {
+  local?: boolean;
   method?: string | RegExp;
   pathname?: string | RegExp;
   error?: boolean;
@@ -335,6 +335,8 @@ export type Route = {
 ```
 
 A `Route` is a combination of some conditions that the request must satisfy for the `handler` to be called, and the `handler` that produces a response. An application is an Array of `Route`s.
+
+**`local`:** Indicates that this `handler` should only be called if the request is coming from the same machine in which the server is running. This is useful to use the HTTP server for Inter-Process Communication (IPC).
 
 **`method`:** The HTTP request method, for example `"GET"` or `/^PATCH|PUT$/`.
 
