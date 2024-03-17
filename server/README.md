@@ -14,7 +14,7 @@ Here’s an overview of `@radically-straightforward/server` provides on top of N
 
 - **[Response Helpers](#response-helpers):** Set cookies with secure options by default, send redirect responses, and so forth.
 
-- **[Live Connection](#live-connection):** Update pages with new content without reloading the page (good user experience) using server-side rendering (good developer experience), detect that the user is online, and much more.
+- **[Live Connection](#live-connection):** Update a page with new contents without reloading (for better user experience) using server-side rendering (for better developer experience), detect that the user has internet connection, and much more.
 
 - **[Health Check](#health-check):** A simple but useful feature that’s built-in.
 
@@ -89,26 +89,26 @@ Visit <http://localhost:18000>.
 
 ### Router
 
-Node.js’s `http.createServer()` expects one `requestListener`—a function which is capable of handling every kind of request that your server may ever receive. But typically it makes more sense to organize an application into multiple functions, which may even live in different files. For example, one function for the home page, another for the settings page, and so forth. And you’d want to only run these functions if the HTTP request satisfies some conditions, for example, the function for the settings page should only run if the HTTP method is `GET` and the pathname is `/settings`.
+Node.js’s `http.createServer()` expects one `requestListener`—a function which is capable of handling every kind of request that your server may ever receive. But typically it makes more sense to organize an application into multiple functions, which may even live in different files. For example, one function for the home page, another for the settings page, and so forth. And these functions should run only if the HTTP request satisfies some conditions, for example, the function for the settings page should run only if the HTTP method is `GET` and the pathname is `/settings`.
 
-That’s what the `@radically-straightforward/server` router does: It allows you to define multiple `requestListener`s that are called depending on the characteristics of the request.
+That’s what the `@radically-straightforward/server` router does: It allows you to define multiple functions that are called depending on the characteristics of the request.
 
 See the [`Route` type](#route) for more details.
 
 > **Compared to Other Libraries**
 >
-> `@radically-straightforward/server`’s router is simpler: It’s an Array of [`Route`s](#route) that are tested against the request one by one in order and may or may not apply. In contrast to, for example, [Express’s nested `Router`s and things like `next("route")`](https://expressjs.com/en/4x/api.html), a `@radically-straightforward/server` application is more straightforward to understand.
+> `@radically-straightforward/server`’s router is simpler: It’s an Array of [`Route`s](#route) that are tested against the request one by one in order and that may or may not apply. A `@radically-straightforward/server` application is more straightforward to understand than, for example, an application that uses [Express’s nested `Router`s and things like `next("route")`](https://expressjs.com/en/4x/api.html).
 >
 > At the same time, `@radically-straightforward/server`’s router has features that other libraries lack, for example:
 >
-> - When a route has finished running, it checks whether a response has been sent and stops subsequent routes from running. This prevents you from writing content to a response that has already `end()`ed.
-> - When every route has been considered, it checks whether the response hasn’t been sent and responds with an error. This prevents you from leaving a request without a response.
+> - When a route has finished running, `@radically-straightforward/server` checks whether a response has been sent and stops subsequent routes from running. This prevents you from writing content to a response that has already `end()`ed.
+> - When every route has been considered, `@radically-straightforward/server` checks whether the response hasn’t been sent and responds with an error. This prevents you from leaving a request without a response.
 >
 > Together, this means that `@radically-straightforward/server` does the right thing without you having to remember to call `next()`.
 >
 > > **Note:** If you need to run code after the response has been sent (that is, code that would be below a call to `next()` in an Express middleware), you should use Node.js’s `response.once("close")` event.
 >
-> Also, `@radically-straightforward/server`’s routes support asynchronous `handler`s, which is unsupported in Express version 4 (it’s supported in the beta 5 version).
+> Also, `@radically-straightforward/server`’s routes support asynchronous functions, which is unsupported in Express version 4 (it’s supported in the 5 beta version).
 
 ### Request Parsing
 
@@ -122,7 +122,7 @@ See the [`Request` type](#request) for more details.
 
 > **Compared to Other Libraries**
 >
-> `@radically-straightforward/server` is more batteries-included in this area, and it doesn’t require any configuration (consider, for example, Express’s `app.use(express.urlencoded({ extended: true }))`).
+> `@radically-straightforward/server` is more batteries-included in this area, and it doesn’t require any configuration (consider, for example, [Express’s `app.use(express.urlencoded({ extended: true }))`](https://expressjs.com/en/4x/api.html#express.urlencoded)).
 
 ### Response Helpers
 
@@ -136,9 +136,9 @@ See the [`Response` type](#response) for more details.
 
 ### Live Connection
 
-A simple but powerful solution to many typical problems in web applications that works by keeping a connection between browser and server (not `response.end()`ing, but leaving the browser waiting for more content). Live Connections may be used to:
+Live Connections are a simple but powerful solution to many typical problems in web applications, for example:
 
-- Update the page with new contents without reloading the page (for better user experience) while still relying only on server-side rendering (for better developer experience).
+- Update a page with new contents without reloading (for better user experience) using server-side rendering (for better developer experience).
 
 - Detect that the user has internet connection (or, more specifically, that the browser may connect to the server).
 
@@ -152,7 +152,11 @@ A simple but powerful solution to many typical problems in web applications that
 
 > **Note:** Use Live Connections with [`@radically-straightforward/javascript`](https://github.com/radically-straightforward/radically-straightforward/tree/main/javascript#live-connection), which implements the browser side of these features and subsumes many of the details below.
 
-To establish a Live Connection perform a `GET` request with the `Live-Connection` header set to the `request.id` of the request that resulted in the original page, for example:
+A Live Connection is a variation on a `GET` request in which the server doesn’t `response.end()`, but leaves the connection open and the browser waiting for more content. When there’s a change that requires an update on the page, the server runs the `request` and `response` through the routes again and sends the updated page to the browser through that connection.
+
+From the perspective of the application developer this is advantageous because there’s a single source of truth for how to present a page to the user: the server-side rendered page. It’s as if the browser knew that a new version of a page is available and requested it. Also, in combination with [`@radically-straightforward/javascript`](https://github.com/radically-straightforward/radically-straightforward/tree/main/javascript#live-connection) only the part of the page that changed is touched (without the need for virtual DOMs, complex browser state management, and so forth).
+
+To establish a Live Connection perform a `GET` request with the `Live-Connection` header set to the `request.id` of the request for the original page (or, failing that, to a random string which will become the `request.id` moving forward), for example:
 
 ```javascript
 await fetch(location.href, {
@@ -170,7 +174,7 @@ This changes the behavior of `@radically-straightforward/server`:
 
 - Periodically a heartbeat (a newline without any JSON) is sent to keep the connection alive even when there are pieces of infrastructure that would otherwise close inactive connections, for example, a proxy on the user’s network.
 
-- Periodically an update is sent with a new version of the page (encoded as a line of JSON). On the server this is implemented by running the `request` and `response` through the routes again. On the browser there should be code to read the streaming response and render the new version of the page by applying the necessary changes without reloading.
+- Periodically an update is sent with a new version of the page (encoded as a line of JSON). On the server this is implemented by running the `request` and `response` through the routes again. On the browser there should be code to read the streaming response and render the new version of the page by applying the changes without reloading.
 
 - You may trigger an immediate update by performing a request coming from the same machine in which the server is running with a method of `POST` at pathname `/__live-connections` including a form field called `pathname` which is a regular expression for `pathname`s that should receive an immediate update.
 
@@ -189,7 +193,7 @@ const application = server();
 application.push({
   handler: (request, response) => {
     if (request.liveConnection?.establish) {
-      // Here there could be a [`backgroundJob()`](https://github.com/radically-straightforward/radically-straightforward/tree/main/utilities#backgroundjob) which updates a timestamp of when a user has last been seen online.
+      // Here there could be, for example, a [`backgroundJob()`](https://github.com/radically-straightforward/radically-straightforward/tree/main/utilities#backgroundjob) which updates a timestamp of when a user has last been seen online.
       if (request.liveConnection?.skipUpdateOnEstablish) response.end();
     }
   },
@@ -240,7 +244,7 @@ await fetch("http://localhost:18000/__live-connections", {
 >
 > Some tools like [Hotwire](https://hotwired.dev/) has similar concepts, but Live Connection as implemented in `@radically-straightforward/server` is a novel idea.
 >
-> A Live Connection is reminiscent of [Server-Sent Events (SSE)](https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events). Unfortunately SSEs are limited in features, for example, they don’t allow for sending custom headers (we need a `Live-Connection` header to communicate back to the server the `request.id` of the request that resulted in the original page, which avoids an immediate update upon establishing every connection). What’s more, SSEs don’t appear to receive much attention from browser implementors and are unlikely to receive new features.
+> A Live Connection is reminiscent of [Server-Sent Events (SSE)](https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events). Unfortunately SSEs are limited in features, for example, they don’t allow for sending custom headers (we need a `Live-Connection` header to communicate back to the server the `request.id` of the request for the original page, which avoids an immediate update upon establishing every connection). What’s more, SSEs don’t appear to receive much attention from browser implementors and are unlikely to receive new features.
 
 ### Health Check
 
@@ -428,7 +432,6 @@ An extension of [Node.js’s `http.ServerResponse`](https://nodejs.org/api/http.
   > **Note:** The noteworthy cookie settings are the following:
   >
   > - The cookie name is prefixed with [`__Host-`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Cookies#__host-). This assumes that the application is available under a single domain, and that the application is the only thing running on that domain (it can’t, for example, be mounted under a `/my-application/` pathname and share a domain with other applications).
-  >
   > - The `SameSite` cookie option is set to `None`, which is necessary for things like SAML to work (for example, when the Identity Provider sends a `POST` request back to the application’s Assertion Consumer Service (ACS), the application needs the cookies to determine if there’s a previously established session).
 
 - **`deleteCookie`:** Sets an expired [`Set-Cookie` header](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Set-Cookie) without a value and with the same secure settings used by `setCookie`. Also updates the `request.cookies` object so that the new cookies are visible from within the request itself.
