@@ -21,6 +21,7 @@
     "access": "public"
   },
   "scripts": {
+    "postinstall": "node ./postinstall.mjs",
     "test": "prettier --check \"./README.md\" --check \"./CHANGELOG.md\" --check \"./package.json\" --check \"./tsconfig.json\""
   },
   "devDependencies": {
