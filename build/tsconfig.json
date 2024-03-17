@@ -1,0 +1,7 @@
+{
+  "extends": "@radically-straightforward/tsconfig",
+  "compilerOptions": {
+    "rootDir": "./source/",
+    "outDir": "./build/"
+  }
+}

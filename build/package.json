@@ -1,0 +1,52 @@
+{
+  "name": "@radically-straightforward/build",
+  "version": "1.0.0",
+  "description": "🏗️ Build a web application and static assets",
+  "keywords": [
+    "build",
+    "typescript",
+    "esbuild",
+    "tagged template",
+    "template literal"
+  ],
+  "homepage": "https://github.com/leafac/radically-straightforward",
+  "repository": "https://github.com/leafac/radically-straightforward",
+  "bugs": "https://github.com/leafac/radically-straightforward/issues",
+  "funding": [
+    "https://patreon.com/leafac",
+    "https://github.com/sponsors/leafac",
+    "https://paypal.me/LeandroFacchinettiEU",
+    "https://btc.com/34KJBgtaFYMtDqpSgMayw9qiKWg2GQXA9M"
+  ],
+  "author": "Leandro Facchinetti <radically-straightforward@leafac.com> (https://leafac.com)",
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  },
+  "exports": "./build/index.mjs",
+  "types": "./build/index.d.mts",
+  "scripts": {
+    "prepare": "tsc && documentation",
+    "test": "npm run prepare && node --test && prettier --check \"./README.md\" --check \"./CHANGELOG.md\" --check \"./package.json\" --check \"./tsconfig.json\" --check \"./source/**/*.mts\""
+  },
+  "dependencies": {
+    "@babel/core": "^7.24.0",
+    "@babel/generator": "^7.23.6",
+    "@radically-straightforward/css": "^1.0.0",
+    "@radically-straightforward/javascript": "^0.0.1",
+    "base-x": "^4.0.0",
+    "esbuild": "^0.20.2",
+    "globby": "^14.0.1",
+    "xxhash-addon": "^2.0.3"
+  },
+  "devDependencies": {
+    "@radically-straightforward/documentation": "^1.0.1",
+    "@radically-straightforward/tsconfig": "^1.0.1",
+    "@types/babel__core": "^7.20.5",
+    "@types/babel__generator": "^7.6.8",
+    "@types/node": "^20.11.28",
+    "prettier": "^3.2.5",
+    "typescript": "^5.4.2"
+  },
+  "prettier": {}
+}
