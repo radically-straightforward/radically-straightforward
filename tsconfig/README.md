@@ -12,14 +12,13 @@ $ npm install --save-dev @radically-straightforward/tsconfig
 
 `tsconfig.json`
 
-<!-- prettier-ignore -->
 ```json
 {
   "extends": "@radically-straightforward/tsconfig",
   "compilerOptions": {
     "rootDir": "./source/",
-    "outDir": "./build/",
-  },
+    "outDir": "./build/"
+  }
 }
 ```
 
