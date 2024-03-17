@@ -460,25 +460,49 @@ An extension of [Node.js’s `http.createServer()`](https://nodejs.org/api/http.
 
 ## Related Work
 
-- Basic functionality
-  - <https://expressjs.com/>
-  - <https://fastify.dev/>
-  - <https://koajs.com/>
-  - <https://hono.dev/>
-  - <https://routup.net/>
-  - <https://itty.dev/itty-router>
-  - <https://github.com/lukeed/worktop>
-  - No rendering using templating languages.
-- Live Connection
-  - <https://hotwired.dev/>
-- Proxy
-  - <https://github.com/atmos/camo>
-  - <https://github.com/imgproxy/imgproxy>
-  - <https://github.com/willnorris/imageproxy>
-  - <https://github.com/http-party/node-http-proxy>
-  - <https://github.com/chimurai/http-proxy-middleware>
-  - <https://github.com/cookpad/ecamo>
-  - <https://github.com/weserv/images>
-  - <https://github.com/jpmckinney/image-proxy>
-  - <https://github.com/sdepold/node-imageable>
-  - <https://github.com/marcjacobs1021/node-image-proxy>
+### Server Libraries
+
+- <https://expressjs.com/>
+- <https://fastify.dev/>
+- <https://koajs.com/>
+- <https://hono.dev/>
+- <https://routup.net/>
+- <https://itty.dev/itty-router>
+- <https://github.com/lukeed/worktop>
+- And so forth…
+
+For a feature-by-feature comparison, refer to the sections named **Compared to Other Libraries**.
+
+In a nutshell, `@radically-straightforward/server` does **less and more** than other libraries. It does **less** in the sense of not including a templating language (use [`@radically-straightforward/html`](https://github.com/radically-straightforward/radically-straightforward/tree/main/html) instead), having a more simpler router, and so forth. It does **more** in the sense of parsing requests including file uploads, Live Connections, CSRF protection, and so forth.
+
+Also, `@radically-straightforward/server` follows a more didactic approach. It avoids Embedded Domain-Specific Languages (eDSL) (for example, Express’s `.get("/")`), in favor of a more explicit and flexible approach.
+
+### Live Connection
+
+- <https://hotwired.dev/>
+- <https://github.com/phoenixframework/phoenix_live_view>
+
+Live Connections were inspired by the projects above, but it’s conceptually simpler—it boils down to keeping a connection alive and re-running `request` and `response` through the application when an update is necessary.
+
+We expect that Live Connections are interoperable in the sense that other libraries and frameworks, even those implemented in other programming languages, may implement a similar idea.
+
+### Image/Video/Audio Proxy
+
+- <https://github.com/atmos/camo>
+- <https://github.com/imgproxy/imgproxy>
+- <https://github.com/willnorris/imageproxy>
+- <https://github.com/http-party/node-http-proxy>
+- <https://github.com/chimurai/http-proxy-middleware>
+- <https://github.com/cookpad/ecamo>
+- <https://github.com/weserv/images>
+- <https://github.com/jpmckinney/image-proxy>
+- <https://github.com/sdepold/node-imageable>
+- <https://github.com/marcjacobs1021/node-image-proxy>
+
+The projects above, particularly camo, were the inspiration for this feature. The differences are:
+
+- It’s a feature of the server library, instead of being a separate service to manage.
+
+- It’s simpler: It doesn’t implement a image resizer, video re-encoder, cache, and so forth.
+
+- It doesn’t support HMAC to guarantee that the requests came from the same origin and prevent abuse. Instead, it relies on a [Cross-Origin Resource Policy](https://github.com/radically-straightforward/radically-straightforward/tree/main/caddy#application) which prevents proxied content from being embedded in third-party websites.
