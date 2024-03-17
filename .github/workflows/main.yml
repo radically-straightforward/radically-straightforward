@@ -7,6 +7,7 @@ jobs:
           - server
           - html
           - css
+          - javascript
           - sqlite
           - utilities
           - node
