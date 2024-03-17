@@ -4,7 +4,9 @@ import fs from "node:fs/promises";
 import childProcess from "node:child_process";
 import util from "node:util";
 
-const installationDirectory = process.cwd().split(/[\\/]node_modules[\\/]/)[0];
+const installationDirectory = process
+  .cwd()
+  .split(new RegExp("/node_modules/"))[0];
 
 switch (process.argv[2]) {
   case "postinstall":
