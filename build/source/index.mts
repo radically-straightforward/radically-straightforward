@@ -10,8 +10,10 @@ import css, { CSS } from "@radically-straightforward/css";
 import javascript, { JavaScript } from "@radically-straightforward/javascript";
 
 export default async function build({
+  filesToCopyWithHash = [],
   filesToCopy = [],
 }: {
+  filesToCopyWithHash?: string[];
   filesToCopy?: string[];
 }): Promise<void> {
   // let compiledCSS = cssMain;
@@ -170,7 +172,7 @@ export default async function build({
   //     break;
   //   }
 
-  // for (const source of await globby(["./static/about/", "./static/news/"])) {
+  // for (const source of await globby(filesToCopyWithHash)) {
   //   const extension = path.extname(source);
   //   const destination = path.join(
   //     "./build",
@@ -185,10 +187,10 @@ export default async function build({
   //   await fs.cp(source, destination, { recursive: true });
   // }
 
-  // await fs.writeFile(
-  //   new URL("./build/static/paths.json", import.meta.url),
-  //   JSON.stringify(paths, undefined, 2),
-  // );
+  await fs.writeFile(
+    new URL("./build/static/paths.json", import.meta.url),
+    JSON.stringify(paths, undefined, 2),
+  );
 
   for (const source of await globby(filesToCopy)) {
     const destination = path.join(
