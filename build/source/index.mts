@@ -159,7 +159,7 @@ export default async function build({
   // await fs.rm("./static/index.css");
   // await fs.rm("./static/index.mjs");
 
-  // const paths = {};
+  const paths = {};
 
   // for (const [javascriptBundle, { entryPoint, cssBundle }] of Object.entries(
   //   esbuildResult.metafile.outputs,
@@ -170,7 +170,6 @@ export default async function build({
   //     break;
   //   }
 
-  // const baseFileHash = baseX("ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789");
   // for (const source of await globby(["./static/about/", "./static/news/"])) {
   //   const extension = path.extname(source);
   //   const destination = path.join(
@@ -191,12 +190,14 @@ export default async function build({
   //   JSON.stringify(paths, undefined, 2),
   // );
 
-  for (const source of filesToCopy) {
+  for (const source of await globby(filesToCopy)) {
     const destination = path.join(
       "./build/static/",
-      source.replace(new RegExp("^\\./static/"), ""),
+      source.replace(new RegExp("^(?:\\./)?static/"), ""),
     );
     await fs.mkdir(path.dirname(destination), { recursive: true });
-    await fs.cp(source, destination, { recursive: true });
+    await fs.copyFile(source, destination);
   }
 }
+
+const baseFileHash = baseX("ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789");
