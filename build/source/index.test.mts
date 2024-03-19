@@ -30,6 +30,11 @@ test(async () => {
       ),
       `All subdirectory: ${index}`,
     );
+  await fs.mkdir(path.join(directory, "outside-static"));
+  await fs.writeFile(
+    path.join(directory, "outside-static/outside-static--example.txt"),
+    "Outside static",
+  );
 
   process.chdir(directory);
   await build({
@@ -37,6 +42,7 @@ test(async () => {
       "./static/example.txt",
       "./static/select-subdirectory/select-subdirectory--example.txt",
       "./static/all-subdirectory/",
+      "./outside-static/outside-static--example.txt",
     ],
   });
 
@@ -65,4 +71,14 @@ test(async () => {
       ),
       `All subdirectory: ${index}`,
     );
+  assert.equal(
+    await fs.readFile(
+      path.join(
+        directory,
+        "build/static/outside-static/outside-static--example.txt",
+      ),
+      "utf-8",
+    ),
+    "Outside static",
+  );
 });
