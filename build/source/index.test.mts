@@ -31,7 +31,7 @@ test(async () => {
     );
 
   process.chdir(directory);
-  await build({ filesToCopy: [] });
+  await build({ filesToCopy: ["./static/example.txt"] });
 
   assert.equal(
     await fs.readFile(
