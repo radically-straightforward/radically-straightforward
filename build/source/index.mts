@@ -9,7 +9,7 @@ import baseX from "base-x";
 import css, { CSS } from "@radically-straightforward/css";
 import javascript, { JavaScript } from "@radically-straightforward/javascript";
 
-export async function build({
+export default async function build({
   filesToCopy = [],
 }: {
   filesToCopy?: string[];
