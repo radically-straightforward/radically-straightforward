@@ -14,6 +14,8 @@ $ npm install @radically-straightforward/build
 import "@radically-straightforward/build";
 ```
 
+<!-- DOCUMENTATION: ./source/index.mts -->
+
 ## Related Work
 
 TODO
