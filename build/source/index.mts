@@ -9,7 +9,11 @@ import baseX from "base-x";
 import css, { CSS } from "@radically-straightforward/css";
 import javascript, { JavaScript } from "@radically-straightforward/javascript";
 
-export async function build(): Promise<void> {
+export async function build({
+  filesToCopy = [],
+}: {
+  filesToCopy?: string[];
+}): Promise<void> {
   // let compiledCSS = cssMain;
   // let compiledJavaScript = javascriptMain;
 
@@ -187,18 +191,12 @@ export async function build(): Promise<void> {
   //   JSON.stringify(paths, undefined, 2),
   // );
 
-  // for (const source of [
-  //   "./static/apple-touch-icon.png",
-  //   "./static/favicon.ico",
-  //   "./node_modules/fake-avatars/avatars/webp/",
-  //   "./static/demonstration/",
-  // ]) {
-  //   const destination = path.join(
-  //     "./build",
-  //     ...(source.startsWith("./static/") ? [] : ["./static/"]),
-  //     source,
-  //   );
-  //   await fs.mkdir(path.dirname(destination), { recursive: true });
-  //   await fs.cp(source, destination, { recursive: true });
-  // }
+  for (const source of filesToCopy) {
+    const destination = path.join(
+      "./build/static/",
+      source.replace(new RegExp("^\\./static/"), ""),
+    );
+    await fs.mkdir(path.dirname(destination), { recursive: true });
+    await fs.cp(source, destination, { recursive: true });
+  }
 }
