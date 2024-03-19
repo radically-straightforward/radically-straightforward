@@ -9,6 +9,7 @@ test(async () => {
   const directory = await fs.mkdtemp(
     path.join(os.tmpdir(), "radically-straightforward--build--test--"),
   );
+  // console.log(directory);
 
   await fs.mkdir(path.join(directory, "static"));
   await fs.writeFile(path.join(directory, "static/example.txt"), "Example");
