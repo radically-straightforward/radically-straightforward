@@ -31,7 +31,13 @@ test(async () => {
     );
 
   process.chdir(directory);
-  await build({ filesToCopy: ["./static/example.txt"] });
+  await build({
+    filesToCopy: [
+      "./static/example.txt",
+      "./static/select-subdirectory/select-subdirectory--example.txt",
+      "./static/all-subdirectory/",
+    ],
+  });
 
   assert.equal(
     await fs.readFile(
@@ -40,4 +46,22 @@ test(async () => {
     ),
     "Example",
   );
+  assert.equal(
+    await fs.readFile(
+      path.join(
+        directory,
+        "build/static/select-subdirectory/select-subdirectory--example.txt",
+      ),
+      "utf-8",
+    ),
+    "Select subdirectory",
+  );
+  for (let index = 0; index < 5; index++)
+    await fs.writeFile(
+      path.join(
+        directory,
+        `build/static/all-subdirectory/all-subdirectory--example--${index}.txt`,
+      ),
+      `All subdirectory: ${index}`,
+    );
 });
