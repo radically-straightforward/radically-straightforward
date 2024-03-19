@@ -1,5 +1,16 @@
 # TODO
 
+- Use esbuild to unnest & vendor prefix?
+  - Does it support `@at-root`?
+    - No, we’ll have to do something else
+  - Does it require a big rewrite? (Which may be worth doing anyway, to comply to specification… 🤷‍♂️)
+    - Probably not
+- Remove the `.example.example.example.example.example.example` hack that solves specificity issues
+  - Use `@layer`
+    - Relatively new and may not be polyfillable
+  - esbuild’s CSS modules
+- Use Prettier to deduplicate snippets?
+
 ## Authoring
 
 - Define properties in the following order:
