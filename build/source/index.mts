@@ -161,7 +161,7 @@ export default async function build({
   // await fs.rm("./static/index.css");
   // await fs.rm("./static/index.mjs");
 
-  const paths = {};
+  const paths: { [key: string]: string } = {};
 
   // for (const [javascriptBundle, { entryPoint, cssBundle }] of Object.entries(
   //   esbuildResult.metafile.outputs,
@@ -172,20 +172,19 @@ export default async function build({
   //     break;
   //   }
 
-  // for (const source of await globby(filesToCopyWithHash)) {
-  //   const extension = path.extname(source);
-  //   const destination = path.join(
-  //     "./build",
-  //     `${source.slice(0, -extension.length)}--${baseFileHash.encode(
-  //       xxhash.XXHash3.hash(await fs.readFile(source)),
-  //     )}${extension}`,
-  //   );
-  //   paths[source.slice("static/".length)] = destination.slice(
-  //     "build/static/".length,
-  //   );
-  //   await fs.mkdir(path.dirname(destination), { recursive: true });
-  //   await fs.cp(source, destination, { recursive: true });
-  // }
+  for (const source of await globby(filesToCopyWithHash)) {
+    const extension = path.extname(source);
+    const destination = path.join(
+      "./build/static/",
+      `${source.replace(new RegExp("^(?:\\./)?static/"), "").slice(0, -extension.length)}--${baseFileHash.encode(
+        xxhash.XXHash3.hash(await fs.readFile(source)),
+      )}${extension}`,
+    );
+    paths[source.replace(new RegExp("^(?:\\./)?static/"), "")] =
+      destination.replace(new RegExp("^(?:\\./)?build/static/"), "");
+    await fs.mkdir(path.dirname(destination), { recursive: true });
+    await fs.copyFile(source, destination);
+  }
 
   await fs.writeFile(
     new URL("./build/static/paths.json", import.meta.url),
