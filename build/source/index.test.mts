@@ -15,6 +15,27 @@ test(async () => {
   );
   // console.log(process.cwd());
 
+  await fs.mkdir("./build/", { recursive: true });
+  await fs.writeFile(
+    "./build/index.mjs",
+    javascript`
+      import html from "@radically-straightforward/html";
+      import css from "@radically-straightforward/css";
+      import javascript from "@radically-straightforward/javascript";
+
+      const template = html\`<div css="\${css\`background-color: pink;\`}" javascript="\${javascript\`console.log("Hello");\`}"></div>\`;
+    `,
+  );
+  await fs.writeFile(
+    "./build/users.mjs",
+    javascript`
+      import html from "@radically-straightforward/html";
+      import css from "@radically-straightforward/css";
+      import javascript from "@radically-straightforward/javascript";
+
+      const users = html\`<div css="\${css\`background-color: purple;\`}" javascript="\${javascript\`console.log("Users");\`}"></div>\`;
+    `,
+  );
   await fs.mkdir("./static/", { recursive: true });
   await fs.mkdir("./node_modules/example-library/", { recursive: true });
   await fs.writeFile(
