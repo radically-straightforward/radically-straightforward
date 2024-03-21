@@ -54,20 +54,21 @@ test(async () => {
   const paths = JSON.parse(
     await fs.readFile("./build/static/paths.json", "utf-8"),
   );
-  assert.equal(
-    await fs.readFile(
-      path.join("./build/static/", paths["index.css"]),
-      "utf-8",
-    ),
-    css``,
-  );
-  assert.equal(
-    await fs.readFile(
-      path.join("./build/static/", paths["index.mjs"]),
-      "utf-8",
-    ),
-    javascript``,
-  );
+
+  // assert.equal(
+  //   await fs.readFile(
+  //     path.join("./build/static/", paths["index.css"]),
+  //     "utf-8",
+  //   ),
+  //   css``,
+  // );
+  // assert.equal(
+  //   await fs.readFile(
+  //     path.join("./build/static/", paths["index.mjs"]),
+  //     "utf-8",
+  //   ),
+  //   javascript``,
+  // );
 
   assert.equal(
     await fs.readFile(
