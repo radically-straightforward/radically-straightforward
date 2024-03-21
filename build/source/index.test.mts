@@ -52,6 +52,42 @@ test(async () => {
   );
 
   assert.equal(
+    await fs.readFile(
+      path.join("./build/static/", paths["example.txt"]),
+      "utf-8",
+    ),
+    "Example",
+  );
+  assert.equal(
+    await fs.readFile(
+      path.join(
+        "./build/static/",
+        paths["select-subdirectory/select-subdirectory--example.txt"],
+      ),
+      "utf-8",
+    ),
+    "Select subdirectory",
+  );
+  for (let index = 0; index < 5; index++)
+    await fs.writeFile(
+      path.join(
+        "./build/static/",
+        paths[`all-subdirectory/all-subdirectory--example--${index}.txt`],
+      ),
+      `All subdirectory: ${index}`,
+    );
+  assert.equal(
+    await fs.readFile(
+      path.join(
+        "./build/static/",
+        paths["outside-static/outside-static--example.txt"],
+      ),
+      "utf-8",
+    ),
+    "Outside static",
+  );
+
+  assert.equal(
     await fs.readFile("./build/static/example.txt", "utf-8"),
     "Example",
   );
