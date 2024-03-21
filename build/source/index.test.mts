@@ -15,8 +15,8 @@ test(async () => {
   );
   // console.log(process.cwd());
 
-  await fs.mkdir("./static/");
-  await fs.mkdir("./node_modules/example-library/");
+  await fs.mkdir("./static/", { recursive: true });
+  await fs.mkdir("./node_modules/example-library/", { recursive: true });
   await fs.writeFile(
     "./static/index.css",
     css`
@@ -48,18 +48,18 @@ test(async () => {
     `,
   );
   await fs.writeFile("./static/example.txt", "Example");
-  await fs.mkdir("./static/select-subdirectory/");
+  await fs.mkdir("./static/select-subdirectory/", { recursive: true });
   await fs.writeFile(
     "./static/select-subdirectory/select-subdirectory--example.txt",
     "Select subdirectory",
   );
-  await fs.mkdir("./static/all-subdirectory/");
+  await fs.mkdir("./static/all-subdirectory/", { recursive: true });
   for (let index = 0; index < 5; index++)
     await fs.writeFile(
       `./static/all-subdirectory/all-subdirectory--example--${index}.txt`,
       `All subdirectory: ${index}`,
     );
-  await fs.mkdir("./outside-static/");
+  await fs.mkdir("./outside-static/", { recursive: true });
   await fs.writeFile(
     "./outside-static/outside-static--example.txt",
     "Outside static",
