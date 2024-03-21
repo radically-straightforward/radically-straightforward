@@ -19,113 +19,98 @@ export default async function build({
   let extractedCSS = await fs.readFile("./static/index.css", "utf-8");
   let extractedJavaScript = await fs.readFile("./static/index.mjs", "utf-8");
 
-  // const cssIdentifiers = new Set();
-  // const javascriptIdentifiers = new Set();
-  // for (const input of await globby("./source/**/*.mts")) {
-  //   const output = path.join(
-  //     "./build",
-  //     `${input.slice("./source/".length, -path.extname(input).length)}.mjs`,
-  //   );
+  const cssIdentifiers = new Set();
+  const javascriptIdentifiers = new Set();
+  for (const source of await globby("./build/**/*.mjs")) {
+    const babelResult = await babel.transformAsync(
+      await fs.readFile(source, "utf-8"),
+      {
+        filename: source,
+        sourceMaps: true,
+        sourceFileName: path.relative(path.dirname(source), source),
+        compact: false,
+        plugins: [
+          "typescript",
+          {
+            visitor: {
+              ImportDeclaration: (path) => {
+                if (
+                  (path.node.specifiers[0]?.local?.name === "css" &&
+                    path.node.source?.value === "@leafac/css") ||
+                  (path.node.specifiers[0]?.local?.name === "javascript" &&
+                    path.node.source?.value === "@leafac/javascript")
+                )
+                  path.remove();
+              },
 
-  //   const code = await fs.readFile(input, "utf-8");
+              TaggedTemplateExpression: (path) => {
+                switch (path.node.tag.name) {
+                  case "css": {
+                    const css_ = new Function(
+                      "css",
+                      `return (${babelGenerator.default(path.node).code});`,
+                    )(css);
+                    const identifier = baseIdentifier.encode(
+                      xxhash.XXHash3.hash(Buffer.from(css_)),
+                    );
+                    if (!cssIdentifiers.has(identifier)) {
+                      cssIdentifiers.add(identifier);
+                      extractedCSS += css`/********************************************************************************/\n\n${`[css~="${identifier}"]`.repeat(
+                        6,
+                      )} {\n${css_}}\n\n`;
+                    }
+                    path.replaceWith(babel.types.stringLiteral(identifier));
+                    break;
+                  }
 
-  //   const babelResult = await babel.transformFromAstAsync(
-  //     (
-  //       await babel.transformAsync(code, {
-  //         filename: input,
-  //         ast: true,
-  //         code: false,
-  //         presets: ["@babel/preset-typescript"],
-  //       })
-  //     ).ast,
-  //     code,
-  //     {
-  //       filename: input,
-  //       sourceMaps: true,
-  //       sourceFileName: path.relative(path.dirname(output), input),
-  //       cloneInputAst: false,
-  //       compact: false,
-  //       plugins: [
-  //         {
-  //           visitor: {
-  //             ImportDeclaration: (path) => {
-  //               if (
-  //                 (path.node.specifiers[0]?.local?.name === "css" &&
-  //                   path.node.source?.value === "@leafac/css") ||
-  //                 (path.node.specifiers[0]?.local?.name === "javascript" &&
-  //                   path.node.source?.value === "@leafac/javascript")
-  //               )
-  //                 path.remove();
-  //             },
+                  case "javascript": {
+                    let javascript_ = "";
+                    for (const [
+                      index,
+                      quasi,
+                    ] of path.node.quasi.quasis.entries())
+                      javascript_ +=
+                        (index === 0 ? `` : `$$${index - 1}`) +
+                        quasi.value.cooked;
+                    const identifier = baseIdentifier.encode(
+                      xxhash.XXHash3.hash(Buffer.from(javascript_)),
+                    );
+                    if (!javascriptIdentifiers.has(identifier)) {
+                      javascriptIdentifiers.add(identifier);
+                      extractedJavaScript += javascript`/********************************************************************************/\n\nleafac.execute.functions.set("${identifier}", function (${[
+                        "event",
+                        ...path.node.quasi.expressions.map(
+                          (value, index) => `$$${index}`,
+                        ),
+                      ].join(", ")}) {\n${javascript_}});\n\n`;
+                    }
+                    path.replaceWith(
+                      babel.template.ast`
+                      JSON.stringify({
+                        function: ${babel.types.stringLiteral(identifier)},
+                        arguments: ${babel.types.arrayExpression(
+                          path.node.quasi.expressions,
+                        )},
+                      })
+                    `,
+                    );
+                    break;
+                  }
+                }
+              },
+            },
+          },
+        ],
+      },
+    );
+    await babel.transformFromAstAsync(babelResult.ast, code, {});
 
-  //             TaggedTemplateExpression: (path) => {
-  //               switch (path.node.tag.name) {
-  //                 case "css": {
-  //                   const css_ = new Function(
-  //                     "css",
-  //                     `return (${babelGenerator.default(path.node).code});`,
-  //                   )(css);
-  //                   const identifier = baseIdentifier.encode(
-  //                     xxhash.XXHash3.hash(Buffer.from(css_)),
-  //                   );
-  //                   if (!cssIdentifiers.has(identifier)) {
-  //                     cssIdentifiers.add(identifier);
-  //                     extractedCSS += css`/********************************************************************************/\n\n${`[css~="${identifier}"]`.repeat(
-  //                       6,
-  //                     )} {\n${css_}}\n\n`;
-  //                   }
-  //                   path.replaceWith(babel.types.stringLiteral(identifier));
-  //                   break;
-  //                 }
-
-  //                 case "javascript": {
-  //                   let javascript_ = "";
-  //                   for (const [
-  //                     index,
-  //                     quasi,
-  //                   ] of path.node.quasi.quasis.entries())
-  //                     javascript_ +=
-  //                       (index === 0 ? `` : `$$${index - 1}`) +
-  //                       quasi.value.cooked;
-  //                   const identifier = baseIdentifier.encode(
-  //                     xxhash.XXHash3.hash(Buffer.from(javascript_)),
-  //                   );
-  //                   if (!javascriptIdentifiers.has(identifier)) {
-  //                     javascriptIdentifiers.add(identifier);
-  //                     extractedJavaScript += javascript`/********************************************************************************/\n\nleafac.execute.functions.set("${identifier}", function (${[
-  //                       "event",
-  //                       ...path.node.quasi.expressions.map(
-  //                         (value, index) => `$$${index}`,
-  //                       ),
-  //                     ].join(", ")}) {\n${javascript_}});\n\n`;
-  //                   }
-  //                   path.replaceWith(
-  //                     babel.template.ast`
-  //                     JSON.stringify({
-  //                       function: ${babel.types.stringLiteral(identifier)},
-  //                       arguments: ${babel.types.arrayExpression(
-  //                         path.node.quasi.expressions,
-  //                       )},
-  //                     })
-  //                   `,
-  //                   );
-  //                   break;
-  //                 }
-  //               }
-  //             },
-  //           },
-  //         },
-  //       ],
-  //     },
-  //   );
-
-  //   await fs.mkdir(path.dirname(output), { recursive: true });
-  //   await fs.writeFile(
-  //     output,
-  //     `${babelResult.code}\n//# sourceMappingURL=${path.basename(output)}.map`,
-  //   );
-  //   await fs.writeFile(`${output}.map`, JSON.stringify(babelResult.map));
-  // }
+    await fs.writeFile(
+      source,
+      `${babelResult.code}\n//# sourceMappingURL=${path.basename(source)}.map`,
+    );
+    await fs.writeFile(`${source}.map`, JSON.stringify(babelResult.map));
+  }
 
   await fs.rename("./static/index.css", "./static/_index.css");
   await fs.rename("./static/index.mjs", "./static/_index.mjs");
