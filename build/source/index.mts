@@ -16,117 +16,117 @@ export default async function build({
   filesToCopyWithHash?: string[];
   filesToCopyWithoutHash?: string[];
 }): Promise<void> {
-  // let compiledCSS = cssMain;
-  // let compiledJavaScript = javascriptMain;
+  let compiledCSS = css``;
+  let compiledJavaScript = javascript``;
 
-  // const cssIdentifiers = new Set();
-  // const javascriptIdentifiers = new Set();
-  // const baseIdentifier = baseX("abcdefghijklmnopqrstuvwxyz");
-  // for (const input of await globby("./source/**/*.mts")) {
-  //   const output = path.join(
-  //     "./build",
-  //     `${input.slice("./source/".length, -path.extname(input).length)}.mjs`,
-  //   );
+  const cssIdentifiers = new Set();
+  const javascriptIdentifiers = new Set();
+  const baseIdentifier = baseX("abcdefghijklmnopqrstuvwxyz");
+  for (const input of await globby("./source/**/*.mts")) {
+    const output = path.join(
+      "./build",
+      `${input.slice("./source/".length, -path.extname(input).length)}.mjs`,
+    );
 
-  //   const code = await fs.readFile(input, "utf-8");
+    const code = await fs.readFile(input, "utf-8");
 
-  //   const babelResult = await babel.transformFromAstAsync(
-  //     (
-  //       await babel.transformAsync(code, {
-  //         filename: input,
-  //         ast: true,
-  //         code: false,
-  //         presets: ["@babel/preset-typescript"],
-  //       })
-  //     ).ast,
-  //     code,
-  //     {
-  //       filename: input,
-  //       sourceMaps: true,
-  //       sourceFileName: path.relative(path.dirname(output), input),
-  //       cloneInputAst: false,
-  //       compact: false,
-  //       plugins: [
-  //         {
-  //           visitor: {
-  //             ImportDeclaration: (path) => {
-  //               if (
-  //                 (path.node.specifiers[0]?.local?.name === "css" &&
-  //                   path.node.source?.value === "@leafac/css") ||
-  //                 (path.node.specifiers[0]?.local?.name === "javascript" &&
-  //                   path.node.source?.value === "@leafac/javascript")
-  //               )
-  //                 path.remove();
-  //             },
+    const babelResult = await babel.transformFromAstAsync(
+      (
+        await babel.transformAsync(code, {
+          filename: input,
+          ast: true,
+          code: false,
+          presets: ["@babel/preset-typescript"],
+        })
+      ).ast,
+      code,
+      {
+        filename: input,
+        sourceMaps: true,
+        sourceFileName: path.relative(path.dirname(output), input),
+        cloneInputAst: false,
+        compact: false,
+        plugins: [
+          {
+            visitor: {
+              ImportDeclaration: (path) => {
+                if (
+                  (path.node.specifiers[0]?.local?.name === "css" &&
+                    path.node.source?.value === "@leafac/css") ||
+                  (path.node.specifiers[0]?.local?.name === "javascript" &&
+                    path.node.source?.value === "@leafac/javascript")
+                )
+                  path.remove();
+              },
 
-  //             TaggedTemplateExpression: (path) => {
-  //               switch (path.node.tag.name) {
-  //                 case "css": {
-  //                   const css_ = new Function(
-  //                     "css",
-  //                     `return (${babelGenerator.default(path.node).code});`,
-  //                   )(css);
-  //                   const identifier = baseIdentifier.encode(
-  //                     xxhash.XXHash3.hash(Buffer.from(css_)),
-  //                   );
-  //                   if (!cssIdentifiers.has(identifier)) {
-  //                     cssIdentifiers.add(identifier);
-  //                     compiledCSS += css`/********************************************************************************/\n\n${`[css~="${identifier}"]`.repeat(
-  //                       6,
-  //                     )} {\n${css_}}\n\n`;
-  //                   }
-  //                   path.replaceWith(babel.types.stringLiteral(identifier));
-  //                   break;
-  //                 }
+              TaggedTemplateExpression: (path) => {
+                switch (path.node.tag.name) {
+                  case "css": {
+                    const css_ = new Function(
+                      "css",
+                      `return (${babelGenerator.default(path.node).code});`,
+                    )(css);
+                    const identifier = baseIdentifier.encode(
+                      xxhash.XXHash3.hash(Buffer.from(css_)),
+                    );
+                    if (!cssIdentifiers.has(identifier)) {
+                      cssIdentifiers.add(identifier);
+                      compiledCSS += css`/********************************************************************************/\n\n${`[css~="${identifier}"]`.repeat(
+                        6,
+                      )} {\n${css_}}\n\n`;
+                    }
+                    path.replaceWith(babel.types.stringLiteral(identifier));
+                    break;
+                  }
 
-  //                 case "javascript": {
-  //                   let javascript_ = "";
-  //                   for (const [
-  //                     index,
-  //                     quasi,
-  //                   ] of path.node.quasi.quasis.entries())
-  //                     javascript_ +=
-  //                       (index === 0 ? `` : `$$${index - 1}`) +
-  //                       quasi.value.cooked;
-  //                   const identifier = baseIdentifier.encode(
-  //                     xxhash.XXHash3.hash(Buffer.from(javascript_)),
-  //                   );
-  //                   if (!javascriptIdentifiers.has(identifier)) {
-  //                     javascriptIdentifiers.add(identifier);
-  //                     compiledJavaScript += javascript`/********************************************************************************/\n\nleafac.execute.functions.set("${identifier}", function (${[
-  //                       "event",
-  //                       ...path.node.quasi.expressions.map(
-  //                         (value, index) => `$$${index}`,
-  //                       ),
-  //                     ].join(", ")}) {\n${javascript_}});\n\n`;
-  //                   }
-  //                   path.replaceWith(
-  //                     babel.template.ast`
-  //                     JSON.stringify({
-  //                       function: ${babel.types.stringLiteral(identifier)},
-  //                       arguments: ${babel.types.arrayExpression(
-  //                         path.node.quasi.expressions,
-  //                       )},
-  //                     })
-  //                   `,
-  //                   );
-  //                   break;
-  //                 }
-  //               }
-  //             },
-  //           },
-  //         },
-  //       ],
-  //     },
-  //   );
+                  case "javascript": {
+                    let javascript_ = "";
+                    for (const [
+                      index,
+                      quasi,
+                    ] of path.node.quasi.quasis.entries())
+                      javascript_ +=
+                        (index === 0 ? `` : `$$${index - 1}`) +
+                        quasi.value.cooked;
+                    const identifier = baseIdentifier.encode(
+                      xxhash.XXHash3.hash(Buffer.from(javascript_)),
+                    );
+                    if (!javascriptIdentifiers.has(identifier)) {
+                      javascriptIdentifiers.add(identifier);
+                      compiledJavaScript += javascript`/********************************************************************************/\n\nleafac.execute.functions.set("${identifier}", function (${[
+                        "event",
+                        ...path.node.quasi.expressions.map(
+                          (value, index) => `$$${index}`,
+                        ),
+                      ].join(", ")}) {\n${javascript_}});\n\n`;
+                    }
+                    path.replaceWith(
+                      babel.template.ast`
+                      JSON.stringify({
+                        function: ${babel.types.stringLiteral(identifier)},
+                        arguments: ${babel.types.arrayExpression(
+                          path.node.quasi.expressions,
+                        )},
+                      })
+                    `,
+                    );
+                    break;
+                  }
+                }
+              },
+            },
+          },
+        ],
+      },
+    );
 
-  //   await fs.mkdir(path.dirname(output), { recursive: true });
-  //   await fs.writeFile(
-  //     output,
-  //     `${babelResult.code}\n//# sourceMappingURL=${path.basename(output)}.map`,
-  //   );
-  //   await fs.writeFile(`${output}.map`, JSON.stringify(babelResult.map));
-  // }
+    await fs.mkdir(path.dirname(output), { recursive: true });
+    await fs.writeFile(
+      output,
+      `${babelResult.code}\n//# sourceMappingURL=${path.basename(output)}.map`,
+    );
+    await fs.writeFile(`${output}.map`, JSON.stringify(babelResult.map));
+  }
 
   // compiledCSS = (
   //   await postcss([postcssNested, autoprefixer]).process(compiledCSS, {
