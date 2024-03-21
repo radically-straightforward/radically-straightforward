@@ -84,20 +84,20 @@ test(async () => {
     await fs.readFile("./build/static/paths.json", "utf-8"),
   );
 
-  // assert.equal(
-  //   await fs.readFile(
-  //     path.join("./build/static/", paths["index.css"]),
-  //     "utf-8",
-  //   ),
-  //   css``,
-  // );
-  // assert.equal(
-  //   await fs.readFile(
-  //     path.join("./build/static/", paths["index.mjs"]),
-  //     "utf-8",
-  //   ),
-  //   javascript``,
-  // );
+  assert.equal(
+    await fs.readFile(
+      path.join("./build/static/", paths["index.css"]),
+      "utf-8",
+    ),
+    `p{background-color:#00f}body{background-color:red}\n/*# sourceMappingURL=index--UDCVRGRB.css.map */\n`,
+  );
+  assert.equal(
+    await fs.readFile(
+      path.join("./build/static/", paths["index.mjs"]),
+      "utf-8",
+    ),
+    `(()=>{var o=hi="Hi";console.log(o);})();\n//# sourceMappingURL=index--AVDJ53ZY.js.map\n`,
+  );
 
   assert.equal(
     await fs.readFile(
