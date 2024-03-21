@@ -16,8 +16,37 @@ test(async () => {
   // console.log(process.cwd());
 
   await fs.mkdir("./static/");
-  await fs.writeFile("./static/index.css", css``);
-  await fs.writeFile("./static/index.mjs", javascript``);
+  await fs.mkdir("./node_modules/example-library/");
+  await fs.writeFile(
+    "./static/index.css",
+    css`
+      @import "example-library/index.css";
+      body {
+        background-color: red;
+      }
+    `,
+  );
+  await fs.writeFile(
+    "./node_modules/example-library/index.css",
+    css`
+      p {
+        background-color: blue;
+      }
+    `,
+  );
+  await fs.writeFile(
+    "./static/index.mjs",
+    javascript`
+      import hi from "example-library/index.mjs";
+      console.log(hi);
+    `,
+  );
+  await fs.writeFile(
+    "./node_modules/example-library/index.mjs",
+    javascript`
+      export default hi = "Hi";
+    `,
+  );
   await fs.writeFile("./static/example.txt", "Example");
   await fs.mkdir("./static/select-subdirectory/");
   await fs.writeFile(
