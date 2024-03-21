@@ -69,10 +69,13 @@ test(async () => {
     "Select subdirectory",
   );
   for (let index = 0; index < 5; index++)
-    await fs.writeFile(
-      path.join(
-        "./build/static/",
-        paths[`all-subdirectory/all-subdirectory--example--${index}.txt`],
+    assert.equal(
+      await fs.readFile(
+        path.join(
+          "./build/static/",
+          paths[`all-subdirectory/all-subdirectory--example--${index}.txt`],
+        ),
+        "utf-8",
       ),
       `All subdirectory: ${index}`,
     );
@@ -99,8 +102,11 @@ test(async () => {
     "Select subdirectory",
   );
   for (let index = 0; index < 5; index++)
-    await fs.writeFile(
-      `./build/static/all-subdirectory/all-subdirectory--example--${index}.txt`,
+    assert.equal(
+      await fs.readFile(
+        `./build/static/all-subdirectory/all-subdirectory--example--${index}.txt`,
+        "utf-8",
+      ),
       `All subdirectory: ${index}`,
     );
   assert.equal(
