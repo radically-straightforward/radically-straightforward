@@ -1,5 +1,9 @@
 # TODO
 
+- Turn it into a command-line application
+
+---
+
 - Use esbuild to unnest & vendor prefix?
   - Does it support `@at-root`?
     - No, we’ll have to do something else

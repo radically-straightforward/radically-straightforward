@@ -1,10 +1,9 @@
 {
   "name": "@radically-straightforward/build",
   "version": "1.0.0",
-  "description": "🏗️ Build a web application and static assets",
+  "description": "🏗️ Build static assets",
   "keywords": [
     "build",
-    "typescript",
     "esbuild",
     "tagged template",
     "template literal"

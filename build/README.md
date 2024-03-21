@@ -1,6 +1,6 @@
 # Radically Straightforward · Build
 
-**🏗️ Build a web application and static assets**
+**🏗️ Build static assets**
 
 ## Installation
 
