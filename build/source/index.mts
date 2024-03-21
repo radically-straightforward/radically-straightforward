@@ -135,15 +135,11 @@ export default async function build({
   try {
     esbuildResult = await esbuild.build({
       absWorkingDir: path.resolve("./static/"),
-      entryPoints: ["./index.mjs"],
+      entryPoints: ["./index.css", "./index.mjs"],
       outdir: "../build/static/",
       entryNames: "[dir]/[name]--[hash]",
       assetNames: "[dir]/[name]--[hash]",
-      loader: {
-        ".woff2": "file",
-        ".woff": "file",
-        ".ttf": "file",
-      },
+      loader: { ".woff2": "file", ".woff": "file", ".ttf": "file" },
       target: ["chrome100", "safari14", "edge100", "firefox100", "ios14"],
       bundle: true,
       minify: true,
@@ -157,14 +153,11 @@ export default async function build({
 
   const paths: { [key: string]: string } = {};
 
-  for (const [javascriptBundle, { entryPoint, cssBundle }] of Object.entries(
+  for (const [output, { entryPoint }] of Object.entries(
     esbuildResult.metafile?.outputs ?? {},
   ))
-    if (entryPoint === "index.mjs" && typeof cssBundle === "string") {
-      paths["index.css"] = cssBundle.slice("../build/static/".length);
-      paths["index.mjs"] = javascriptBundle.slice("../build/static/".length);
-      break;
-    }
+    if (entryPoint === "index.css" || entryPoint === "index.mjs")
+      paths[entryPoint] = output.slice("../build/static/".length);
 
   for (const source of await globby(filesToCopyWithHash)) {
     const destination = path.join(
