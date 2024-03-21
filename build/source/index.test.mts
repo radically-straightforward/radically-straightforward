@@ -3,6 +3,8 @@ import assert from "node:assert/strict";
 import os from "node:os";
 import path from "node:path";
 import fs from "node:fs/promises";
+import css from "@radically-straightforward/css";
+import javascript from "@radically-straightforward/javascript";
 import build from "@radically-straightforward/build";
 
 test(async () => {
@@ -14,6 +16,8 @@ test(async () => {
   // console.log(process.cwd());
 
   await fs.mkdir("./static/");
+  await fs.writeFile("./static/index.css", css``);
+  await fs.writeFile("./static/index.mjs", javascript``);
   await fs.writeFile("./static/example.txt", "Example");
   await fs.mkdir("./static/select-subdirectory/");
   await fs.writeFile(
@@ -49,6 +53,20 @@ test(async () => {
 
   const paths = JSON.parse(
     await fs.readFile("./build/static/paths.json", "utf-8"),
+  );
+  assert.equal(
+    await fs.readFile(
+      path.join("./build/static/", paths["index.css"]),
+      "utf-8",
+    ),
+    css``,
+  );
+  assert.equal(
+    await fs.readFile(
+      path.join("./build/static/", paths["index.mjs"]),
+      "utf-8",
+    ),
+    javascript``,
   );
 
   assert.equal(
