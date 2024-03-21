@@ -173,12 +173,11 @@ export default async function build({
   //   }
 
   for (const source of await globby(filesToCopyWithHash)) {
-    const extension = path.extname(source);
     const destination = path.join(
       "./build/static/",
-      `${source.replace(new RegExp("^(?:\\./)?(?:static/)?"), "").slice(0, -extension.length)}--${baseFileHash.encode(
+      `${source.replace(new RegExp("^(?:\\./)?(?:static/)?"), "").slice(0, -path.extname(source).length)}--${baseFileHash.encode(
         xxhash.XXHash3.hash(await fs.readFile(source)),
-      )}${extension}`,
+      )}${path.extname(source)}`,
     );
     paths[source.replace(new RegExp("^(?:\\./)?(?:static/)?"), "")] =
       destination.slice("build/static/".length);
