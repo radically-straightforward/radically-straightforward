@@ -11,10 +11,10 @@ import javascript, { JavaScript } from "@radically-straightforward/javascript";
 
 export default async function build({
   filesToCopyWithHash = [],
-  filesToCopy = [],
+  filesToCopyWithoutHash = [],
 }: {
   filesToCopyWithHash?: string[];
-  filesToCopy?: string[];
+  filesToCopyWithoutHash?: string[];
 }): Promise<void> {
   // let compiledCSS = cssMain;
   // let compiledJavaScript = javascriptMain;
@@ -187,11 +187,11 @@ export default async function build({
   }
 
   await fs.writeFile(
-    new URL("./build/static/paths.json", import.meta.url),
+    "./build/static/paths.json",
     JSON.stringify(paths, undefined, 2),
   );
 
-  for (const source of await globby(filesToCopy)) {
+  for (const source of await globby(filesToCopyWithoutHash)) {
     const destination = path.join(
       "./build/static/",
       source.replace(new RegExp("^(?:\\./)?static/"), ""),

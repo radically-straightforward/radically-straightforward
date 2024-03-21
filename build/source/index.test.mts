@@ -38,7 +38,13 @@ test(async () => {
 
   process.chdir(directory);
   await build({
-    filesToCopy: [
+    filesToCopyWithHash: [
+      "./static/example.txt",
+      "./static/select-subdirectory/select-subdirectory--example.txt",
+      "./static/all-subdirectory/",
+      "./outside-static/outside-static--example.txt",
+    ],
+    filesToCopyWithoutHash: [
       "./static/example.txt",
       "./static/select-subdirectory/select-subdirectory--example.txt",
       "./static/all-subdirectory/",
