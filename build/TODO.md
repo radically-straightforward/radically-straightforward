@@ -1,6 +1,7 @@
 # TODO
 
 - Turn it into a command-line application
+- Sourcemaps
 
 ---
 

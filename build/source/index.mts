@@ -21,94 +21,96 @@ export default async function build({
 
   const cssIdentifiers = new Set();
   const javascriptIdentifiers = new Set();
-  // for (const source of await globby("./build/**/*.mjs")) {
-  //   const babelResult = await babel.transformAsync(
-  //     await fs.readFile(source, "utf-8"),
-  //     {
-  //       filename: source,
-  //       sourceMaps: true,
-  //       sourceFileName: path.relative(path.dirname(source), source),
-  //       compact: false,
-  //       plugins: [
-  //         {
-  //           visitor: {
-  //             ImportDeclaration: (path) => {
-  //               if (
-  //                 (path.node.specifiers[0]?.local?.name === "css" &&
-  //                   path.node.source?.value === "@radically-straightforward/css") ||
-  //                 (path.node.specifiers[0]?.local?.name === "javascript" &&
-  //                   path.node.source?.value === "@radically-straightforward/javascript")
-  //               )
-  //                 path.remove();
-  //             },
+  for (const source of await globby("./build/**/*.mjs")) {
+    const babelResult = await babel.transformAsync(
+      await fs.readFile(source, "utf-8"),
+      {
+        filename: source,
+        sourceMaps: true,
+        compact: false,
+        plugins: [
+          {
+            visitor: {
+              ImportDeclaration: (path) => {
+                if (
+                  (path.node.specifiers[0]?.local?.name === "css" &&
+                    path.node.source?.value ===
+                      "@radically-straightforward/css") ||
+                  (path.node.specifiers[0]?.local?.name === "javascript" &&
+                    path.node.source?.value ===
+                      "@radically-straightforward/javascript")
+                )
+                  path.remove();
+              },
 
-  //             TaggedTemplateExpression: (path) => {
-  //               switch (path.node.tag.name) {
-  //                 case "css": {
-  //                   const css_ = new Function(
-  //                     "css",
-  //                     `return (${babelGenerator.default(path.node).code});`,
-  //                   )(css);
-  //                   const identifier = baseIdentifier.encode(
-  //                     xxhash.XXHash3.hash(Buffer.from(css_)),
-  //                   );
-  //                   if (!cssIdentifiers.has(identifier)) {
-  //                     cssIdentifiers.add(identifier);
-  //                     extractedCSS += css`/********************************************************************************/\n\n${`[css~="${identifier}"]`.repeat(
-  //                       6,
-  //                     )} {\n${css_}}\n\n`;
-  //                   }
-  //                   path.replaceWith(babel.types.stringLiteral(identifier));
-  //                   break;
-  //                 }
+              TaggedTemplateExpression: (path) => {
+                switch (path.node.tag.name) {
+                  case "css": {
+                    const css_ = new Function(
+                      "css",
+                      `return (${babelGenerator.default(path.node).code});`,
+                    )(css);
+                    const identifier = baseIdentifier.encode(
+                      xxhash.XXHash3.hash(Buffer.from(css_)),
+                    );
+                    if (!cssIdentifiers.has(identifier)) {
+                      cssIdentifiers.add(identifier);
+                      extractedCSS += css`/********************************************************************************/\n\n${`[css~="${identifier}"]`.repeat(
+                        6,
+                      )} {\n${css_}}\n\n`;
+                    }
+                    path.replaceWith(babel.types.stringLiteral(identifier));
+                    break;
+                  }
 
-  //                 case "javascript": {
-  //                   let javascript_ = "";
-  //                   for (const [
-  //                     index,
-  //                     quasi,
-  //                   ] of path.node.quasi.quasis.entries())
-  //                     javascript_ +=
-  //                       (index === 0 ? `` : `$$${index - 1}`) +
-  //                       quasi.value.cooked;
-  //                   const identifier = baseIdentifier.encode(
-  //                     xxhash.XXHash3.hash(Buffer.from(javascript_)),
-  //                   );
-  //                   if (!javascriptIdentifiers.has(identifier)) {
-  //                     javascriptIdentifiers.add(identifier);
-  //                     extractedJavaScript += javascript`/********************************************************************************/\n\nradicallyStraightforward.execute.functions.set("${identifier}", function (${[
-  //                       "event",
-  //                       ...path.node.quasi.expressions.map(
-  //                         (value, index) => `$$${index}`,
-  //                       ),
-  //                     ].join(", ")}) {\n${javascript_}});\n\n`;
-  //                   }
-  //                   path.replaceWith(
-  //                     babel.template.ast`
-  //                     JSON.stringify({
-  //                       function: ${babel.types.stringLiteral(identifier)},
-  //                       arguments: ${babel.types.arrayExpression(
-  //                         path.node.quasi.expressions,
-  //                       )},
-  //                     })
-  //                   `,
-  //                   );
-  //                   break;
-  //                 }
-  //               }
-  //             },
-  //           },
-  //         },
-  //       ],
-  //     },
-  //   );
+                  case "javascript": {
+                    let javascript_ = "";
+                    for (const [
+                      index,
+                      quasi,
+                    ] of path.node.quasi.quasis.entries())
+                      javascript_ +=
+                        (index === 0 ? `` : `$$${index - 1}`) +
+                        quasi.value.cooked;
+                    const identifier = baseIdentifier.encode(
+                      xxhash.XXHash3.hash(Buffer.from(javascript_)),
+                    );
+                    if (!javascriptIdentifiers.has(identifier)) {
+                      javascriptIdentifiers.add(identifier);
+                      extractedJavaScript += javascript`/********************************************************************************/\n\nradicallyStraightforward.execute.functions.set("${identifier}", function (${[
+                        "event",
+                        ...path.node.quasi.expressions.map(
+                          (value, index) => `$$${index}`,
+                        ),
+                      ].join(", ")}) {\n${javascript_}});\n\n`;
+                    }
+                    path.replaceWith(
+                      babel.template.ast`
+                      JSON.stringify({
+                        function: ${babel.types.stringLiteral(identifier)},
+                        arguments: ${babel.types.arrayExpression(
+                          path.node.quasi.expressions,
+                        )},
+                      })
+                    `,
+                    );
+                    break;
+                  }
+                }
+              },
+            },
+          },
+        ],
+      },
+    );
+    if (babelResult === null) throw new Error("Babel transformation failed.");
 
-  //   await fs.writeFile(
-  //     source,
-  //     `${babelResult.code}\n//# sourceMappingURL=${path.basename(source)}.map`,
-  //   );
-  //   await fs.writeFile(`${source}.map`, JSON.stringify(babelResult.map));
-  // }
+    await fs.writeFile(
+      source,
+      `${babelResult.code}\n//# sourceMappingURL=${path.basename(source)}.map`,
+    );
+    await fs.writeFile(`${source}.map`, JSON.stringify(babelResult.map));
+  }
 
   await fs.rename("./static/index.css", "./static/_index.css");
   await fs.rename("./static/index.mjs", "./static/_index.mjs");
