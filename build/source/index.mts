@@ -80,7 +80,7 @@ export default async function build({
       );
     }
     const javascriptIdentifiers = new Array<string>();
-    for (let snippet of javascriptIdentifiers) {
+    for (let snippet of fileJavaScriptSnippets) {
       snippet = await prettier.format(snippet, { parser: "babel" });
       const identifier = baseIdentifier.encode(
         xxhash.XXHash3.hash(Buffer.from(snippet)),
