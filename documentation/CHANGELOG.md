@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.3 · 2024-03-23
+
+- Fixed an issue in which an `await` was missing.
+
 ## 1.0.2 · 2024-03-23
 
 - Removed the dependency on `execa` and `commander`.
