@@ -23,7 +23,7 @@
   },
   "bin": "./build/index.mjs",
   "scripts": {
-    "prepare": "tsc && documentation",
+    "prepare": "tsc",
     "test": "npm run prepare && node --test && prettier --check \"./README.md\" --check \"./CHANGELOG.md\" --check \"./package.json\" --check \"./tsconfig.json\" --check \"./source/**/*.mts\""
   },
   "dependencies": {
@@ -31,7 +31,6 @@
     "dedent": "^1.5.1"
   },
   "devDependencies": {
-    "@radically-straightforward/documentation": "^1.0.1",
     "@radically-straightforward/tsconfig": "^1.0.0",
     "@types/archiver": "^6.0.1",
     "@types/node": "^20.9.2",
