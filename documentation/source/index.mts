@@ -5,7 +5,6 @@ import path from "node:path";
 import childProcess from "node:child_process";
 import util from "node:util";
 import babel from "@babel/core";
-import babelTypes from "@babel/types";
 import babelGenerator from "@babel/generator";
 import prettier from "prettier";
 
@@ -84,7 +83,7 @@ for (const input of process.argv.length === 2
                                   trailingComments: [],
                                   declaration: {
                                     ...path.node.declaration,
-                                    body: babelTypes.blockStatement([]),
+                                    body: babel.types.blockStatement([]),
                                   },
                                 }
                               : path.node.declaration.type ===
@@ -101,7 +100,7 @@ for (const input of process.argv.length === 2
                                         {
                                           ...path.node.declaration
                                             .declarations[0],
-                                          init: babelTypes.identifier("___"),
+                                          init: babel.types.identifier("___"),
                                         },
                                       ],
                                     },
@@ -114,7 +113,7 @@ for (const input of process.argv.length === 2
                                       trailingComments: [],
                                       declaration: {
                                         ...path.node.declaration,
-                                        body: babelTypes.classBody([]),
+                                        body: babel.types.classBody([]),
                                       },
                                     }
                                   : path.node.declaration.type ===
@@ -206,14 +205,14 @@ for (const input of process.argv.length === 2
                                         ...classBodyNode,
                                         leadingComments: [],
                                         trailingComments: [],
-                                        body: babelTypes.blockStatement([]),
+                                        body: babel.types.blockStatement([]),
                                       }
                                     : classBodyNode.type === "ClassProperty"
                                       ? {
                                           ...classBodyNode,
                                           leadingComments: [],
                                           trailingComments: [],
-                                          value: babelTypes.identifier("___"),
+                                          value: babel.types.identifier("___"),
                                         }
                                       : (() => {
                                           throw new Error(
