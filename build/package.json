@@ -22,8 +22,7 @@
   "publishConfig": {
     "access": "public"
   },
-  "exports": "./build/index.mjs",
-  "types": "./build/index.d.mts",
+  "bin": "./build/index.mjs",
   "scripts": {
     "prepare": "tsc",
     "test": "npm run prepare && node --test && prettier --check \"./README.md\" --check \"./CHANGELOG.md\" --check \"./package.json\" --check \"./tsconfig.json\" --check \"./source/**/*.mts\""
