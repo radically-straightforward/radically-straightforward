@@ -1,6 +1,6 @@
 {
   "name": "@radically-straightforward/documentation",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "📚 Extract documentation from TypeScript source files to Markdown",
   "keywords": [
     "documentation",
