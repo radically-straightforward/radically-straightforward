@@ -32,11 +32,8 @@ for (const input of process.argv.length === 2
         "\n```\n\n",
       );
     else
-      babel.transformAsync(
-        await fs.readFile(
-          path.join(path.dirname(input), match.groups.directive),
-          "utf-8",
-        ),
+      await babel.transformFileAsync(
+        path.join(path.dirname(input), match.groups.directive),
         {
           parserOpts: { plugins: ["typescript"] },
           plugins: [
