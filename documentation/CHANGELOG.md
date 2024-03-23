@@ -3,6 +3,7 @@
 ## Unreleased
 
 - Removed the dependency on `execa` and `commander`.
+- Switched dependencies from `@babel/parser` and `@babel/traverse` into `@babel/core`.
 
 ## 1.0.1 · 2023-11-28
 
