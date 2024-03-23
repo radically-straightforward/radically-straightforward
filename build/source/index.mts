@@ -41,7 +41,7 @@ export default async function build({
                   break;
                 case "javascript":
                   fileJavaScriptSnippets.push(
-                    `function (${[
+                    `async function PLACEHOLDER(${[
                       "event",
                       ...path.node.quasi.expressions.map(
                         (value, index) => `$$${index}`,
@@ -87,7 +87,7 @@ export default async function build({
       );
       javascriptIdentifiers.push(identifier);
       javascriptSnippets.add(
-        `/********************************************************************************/\n\njavascript?.execute?.functions?.set?.("${identifier}", ${snippet});\n\n`,
+        `/********************************************************************************/\n\njavascript?.execute?.functions?.set?.("${identifier}", ${snippet.replace(/^async function PLACEHOLDER/, "async function")});\n\n`,
       );
     }
     babelResult = await babel.transformFromAstAsync(
