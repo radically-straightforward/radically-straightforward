@@ -110,14 +110,14 @@ test(async () => {
       path.join("./build/static/", paths["index.css"]),
       "utf-8",
     ),
-    `p{background-color:#00f}body{background-color:red}\n/*# sourceMappingURL=index--UDCVRGRB.css.map */\n`,
+    `p{background-color:#00f}body{background-color:red}[css~=zwnglzmxwdoiv][css~=zwnglzmxwdoiv][css~=zwnglzmxwdoiv][css~=zwnglzmxwdoiv][css~=zwnglzmxwdoiv][css~=zwnglzmxwdoiv]{background-color:pink}[css~=btplvzejmrgipw][css~=btplvzejmrgipw][css~=btplvzejmrgipw][css~=btplvzejmrgipw][css~=btplvzejmrgipw][css~=btplvzejmrgipw]{background-color:purple}\n/*# sourceMappingURL=index--X4UYHUQG.css.map */\n`,
   );
   assert.equal(
     await fs.readFile(
       path.join("./build/static/", paths["index.mjs"]),
       "utf-8",
     ),
-    `(()=>{var o=hi="Hi";console.log(o);})();\n//# sourceMappingURL=index--AVDJ53ZY.js.map\n`,
+    `(()=>{var e=hi="Hi";console.log(e);radicallyStraightforward.execute.functions.set("ewvvepmpmoaytd",function(o){console.log("Hello")});radicallyStraightforward.execute.functions.set("hfuuqumuycblre",function(o){console.log("Users")});})();\n//# sourceMappingURL=index--66VQE2JB.js.map\n`,
   );
 
   assert.equal(
