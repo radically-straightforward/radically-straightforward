@@ -1,6 +1,8 @@
 # TODO
 
-- Sourcemaps
+- Test sourcemaps
+  - Server JavaScript which had `` css`___` `` and `` javascript`___` `` removed.
+  - CSS and browser JavaScript.
 
 ---
 
