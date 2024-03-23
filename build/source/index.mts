@@ -7,7 +7,6 @@ import esbuild from "esbuild";
 import xxhash from "xxhash-addon";
 import baseX from "base-x";
 import css from "@radically-straightforward/css";
-import javascript from "@radically-straightforward/javascript";
 
 export default async function build({
   filesToCopyWithHash = [],
@@ -25,7 +24,6 @@ export default async function build({
     const babelResult = await babel.transformAsync(
       await fs.readFile(source, "utf-8"),
       {
-        filename: source,
         sourceMaps: true,
         compact: false,
         plugins: [
@@ -44,55 +42,56 @@ export default async function build({
               },
 
               TaggedTemplateExpression: (path) => {
+                if (path.node.tag.type !== "Identifier") return;
                 switch (path.node.tag.name) {
                   case "css": {
-                    const css_ = new Function(
+                    const cssSnippet = new Function(
                       "css",
                       `return (${babelGenerator.default(path.node).code});`,
                     )(css);
                     const identifier = baseIdentifier.encode(
-                      xxhash.XXHash3.hash(Buffer.from(css_)),
+                      xxhash.XXHash3.hash(Buffer.from(cssSnippet)),
                     );
                     if (!cssIdentifiers.has(identifier)) {
                       cssIdentifiers.add(identifier);
-                      extractedCSS += css`/********************************************************************************/\n\n${`[css~="${identifier}"]`.repeat(
+                      extractedCSS += `/********************************************************************************/\n\n${`[css~="${identifier}"]`.repeat(
                         6,
-                      )} {\n${css_}}\n\n`;
+                      )} {\n${cssSnippet}}\n\n`;
                     }
                     path.replaceWith(babel.types.stringLiteral(identifier));
                     break;
                   }
 
                   case "javascript": {
-                    let javascript_ = "";
+                    let javascriptSnippet = "";
                     for (const [
                       index,
                       quasi,
                     ] of path.node.quasi.quasis.entries())
-                      javascript_ +=
+                      javascriptSnippet +=
                         (index === 0 ? `` : `$$${index - 1}`) +
                         quasi.value.cooked;
                     const identifier = baseIdentifier.encode(
-                      xxhash.XXHash3.hash(Buffer.from(javascript_)),
+                      xxhash.XXHash3.hash(Buffer.from(javascriptSnippet)),
                     );
                     if (!javascriptIdentifiers.has(identifier)) {
                       javascriptIdentifiers.add(identifier);
-                      extractedJavaScript += javascript`/********************************************************************************/\n\nradicallyStraightforward.execute.functions.set("${identifier}", function (${[
+                      extractedJavaScript += `/********************************************************************************/\n\nradicallyStraightforward.execute.functions.set("${identifier}", function (${[
                         "event",
                         ...path.node.quasi.expressions.map(
                           (value, index) => `$$${index}`,
                         ),
-                      ].join(", ")}) {\n${javascript_}});\n\n`;
+                      ].join(", ")}) {\n${javascriptSnippet}});\n\n`;
                     }
                     path.replaceWith(
                       babel.template.ast`
-                      JSON.stringify({
-                        function: ${babel.types.stringLiteral(identifier)},
-                        arguments: ${babel.types.arrayExpression(
-                          path.node.quasi.expressions,
-                        )},
-                      })
-                    `,
+                        JSON.stringify({
+                          function: ${babel.types.stringLiteral(identifier)},
+                          arguments: ${babel.types.arrayExpression(
+                            path.node.quasi.expressions as any,
+                          )},
+                        })
+                      ` as any,
                     );
                     break;
                   }
