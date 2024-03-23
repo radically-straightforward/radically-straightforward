@@ -35,7 +35,7 @@ test(async () => {
       import css from "@radically-straightforward/css";
       import javascript from "@radically-straightforward/javascript";
 
-      const users = html\`<div css="\${css\`background-color:   pink;\`}" javascript="\${javascript\`console.log(  \${"Hello"}, \${"World"});\`}"></div><div css="\${css\`background-color: purple;\`}" javascript="\${javascript\`console.log("Users");\`}"></div>\`;
+      const users = html\`<div css="\${css\`background-color:   pink;\`}" javascript="\${javascript\`console.log(  \${"Hello"}, \${"World"});\`}"></div><div css="\${css\`background-color: purple; &:hover { appearance: none; }\`}" javascript="\${javascript\`console.log("Users");\`}"></div>\`;
     `,
   );
   await fs.mkdir("./static/", { recursive: true });
@@ -117,14 +117,14 @@ test(async () => {
   );
   assert.equal(
     await fs.readFile("./build/users.mjs", "utf-8"),
-    'import html from "@radically-straightforward/html";\nconst users = html`<div css="${"feozrypenksece"}" javascript="${JSON.stringify({\n  function: "bgtlnytmxenlex",\n  arguments: ["Hello", "World"]\n})}"></div><div css="${"ggfnfaihrykxjm"}" javascript="${JSON.stringify({\n  function: "fxnzyekoinlefh",\n  arguments: []\n})}"></div>`;\n//# sourceMappingURL=users.mjs.map',
+    'import html from "@radically-straightforward/html";\nconst users = html`<div css="${"feozrypenksece"}" javascript="${JSON.stringify({\n  function: "bgtlnytmxenlex",\n  arguments: ["Hello", "World"]\n})}"></div><div css="${"dxsfkgtqanuneb"}" javascript="${JSON.stringify({\n  function: "fxnzyekoinlefh",\n  arguments: []\n})}"></div>`;\n//# sourceMappingURL=users.mjs.map',
   );
   assert.equal(
     await fs.readFile(
       path.join("./build/static/", paths["index.css"]),
       "utf-8",
     ),
-    "p{background-color:#00f}body{background-color:red}[css~=feozrypenksece][css~=feozrypenksece][css~=feozrypenksece][css~=feozrypenksece][css~=feozrypenksece][css~=feozrypenksece]{background-color:pink}[css~=ggfnfaihrykxjm][css~=ggfnfaihrykxjm][css~=ggfnfaihrykxjm][css~=ggfnfaihrykxjm][css~=ggfnfaihrykxjm][css~=ggfnfaihrykxjm]{background-color:purple}\n/*# sourceMappingURL=index--FYJWGPRV.css.map */\n",
+    "p{background-color:#00f}body{background-color:red}[css~=feozrypenksece][css~=feozrypenksece][css~=feozrypenksece][css~=feozrypenksece][css~=feozrypenksece][css~=feozrypenksece]{background-color:pink}[css~=dxsfkgtqanuneb][css~=dxsfkgtqanuneb][css~=dxsfkgtqanuneb][css~=dxsfkgtqanuneb][css~=dxsfkgtqanuneb][css~=dxsfkgtqanuneb]{background-color:purple}[css~=dxsfkgtqanuneb][css~=dxsfkgtqanuneb][css~=dxsfkgtqanuneb][css~=dxsfkgtqanuneb][css~=dxsfkgtqanuneb][css~=dxsfkgtqanuneb]:hover{-webkit-appearance:none;appearance:none}\n/*# sourceMappingURL=index--ZNY57PGH.css.map */\n",
   );
   assert.equal(
     await fs.readFile(
