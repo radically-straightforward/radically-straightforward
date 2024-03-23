@@ -100,26 +100,26 @@ test(async () => {
       "./outside-static/outside-static--example.txt",
     ],
   });
-
   const paths = JSON.parse(
     await fs.readFile("./build/static/paths.json", "utf-8"),
   );
 
+  assert.equal(await fs.readFile("./build/index.mjs", "utf-8"), ``);
+  assert.equal(await fs.readFile("./build/users.mjs", "utf-8"), ``);
   assert.equal(
     await fs.readFile(
       path.join("./build/static/", paths["index.css"]),
       "utf-8",
     ),
-    `p{background-color:#00f}body{background-color:red}[css~=zwnglzmxwdoiv][css~=zwnglzmxwdoiv][css~=zwnglzmxwdoiv][css~=zwnglzmxwdoiv][css~=zwnglzmxwdoiv][css~=zwnglzmxwdoiv]{background-color:pink}[css~=btplvzejmrgipw][css~=btplvzejmrgipw][css~=btplvzejmrgipw][css~=btplvzejmrgipw][css~=btplvzejmrgipw][css~=btplvzejmrgipw]{background-color:purple}\n/*# sourceMappingURL=index--X4UYHUQG.css.map */\n`,
+    ``,
   );
   assert.equal(
     await fs.readFile(
       path.join("./build/static/", paths["index.mjs"]),
       "utf-8",
     ),
-    `(()=>{var e=hi="Hi";console.log(e);radicallyStraightforward.execute.functions.set("ewvvepmpmoaytd",function(o){console.log("Hello")});radicallyStraightforward.execute.functions.set("hfuuqumuycblre",function(o){console.log("Users")});})();\n//# sourceMappingURL=index--66VQE2JB.js.map\n`,
+    ``,
   );
-
   assert.equal(
     await fs.readFile(
       path.join("./build/static/", paths["example.txt"]),
@@ -158,7 +158,6 @@ test(async () => {
     ),
     "Outside static",
   );
-
   assert.equal(
     await fs.readFile("./build/static/example.txt", "utf-8"),
     "Example",
