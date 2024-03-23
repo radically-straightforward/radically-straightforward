@@ -104,21 +104,27 @@ test(async () => {
     await fs.readFile("./build/static/paths.json", "utf-8"),
   );
 
-  assert.equal(await fs.readFile("./build/index.mjs", "utf-8"), "");
-  assert.equal(await fs.readFile("./build/users.mjs", "utf-8"), "");
+  assert.equal(
+    await fs.readFile("./build/index.mjs", "utf-8"),
+    'import html from "@radically-straightforward/html";\nconst template = html`<div css="${"feozrypenksece"}" javascript="${JSON.stringify({\n  function: "bgtlnytmxenlex",\n  arguments: ["Hello", "World"]\n})}"></div>`;\n//# sourceMappingURL=index.mjs.map',
+  );
+  assert.equal(
+    await fs.readFile("./build/users.mjs", "utf-8"),
+    'import html from "@radically-straightforward/html";\nconst users = html`<div css="${"feozrypenksece"}" javascript="${JSON.stringify({\n  function: "bgtlnytmxenlex",\n  arguments: ["Hello", "World"]\n})}"></div><div css="${"ggfnfaihrykxjm"}" javascript="${JSON.stringify({\n  function: "fxnzyekoinlefh",\n  arguments: []\n})}"></div>`;\n//# sourceMappingURL=users.mjs.map',
+  );
   assert.equal(
     await fs.readFile(
       path.join("./build/static/", paths["index.css"]),
       "utf-8",
     ),
-    "",
+    "p{background-color:#00f}body{background-color:red}[css~=feozrypenksece][css~=feozrypenksece][css~=feozrypenksece][css~=feozrypenksece][css~=feozrypenksece][css~=feozrypenksece]{background-color:pink}[css~=ggfnfaihrykxjm][css~=ggfnfaihrykxjm][css~=ggfnfaihrykxjm][css~=ggfnfaihrykxjm][css~=ggfnfaihrykxjm][css~=ggfnfaihrykxjm]{background-color:purple}\n/*# sourceMappingURL=index--FYJWGPRV.css.map */\n",
   );
   assert.equal(
     await fs.readFile(
       path.join("./build/static/", paths["index.mjs"]),
       "utf-8",
     ),
-    "",
+    '(()=>{var e=hi="Hi";console.log(e);javascript?.execute?.functions?.set?.("bgtlnytmxenlex",async function(n,o,t){console.log(o,t)});javascript?.execute?.functions?.set?.("fxnzyekoinlefh",async function(n){console.log("Users")});})();\n//# sourceMappingURL=index--Y5KNWMCX.js.map\n',
   );
   assert.equal(
     await fs.readFile(
