@@ -33,7 +33,7 @@ test(async () => {
       import css from "@radically-straightforward/css";
       import javascript from "@radically-straightforward/javascript";
 
-      const users = html\`<div css="\${css\`background-color: purple;\`}" javascript="\${javascript\`console.log("Users");\`}"></div>\`;
+      const users = html\`<div css="\${css\`background-color:   pink;\`}" javascript="\${javascript\`console.log(  "Hello");\`}"></div><div css="\${css\`background-color: purple;\`}" javascript="\${javascript\`console.log("Users");\`}"></div>\`;
     `,
   );
   await fs.mkdir("./static/", { recursive: true });
