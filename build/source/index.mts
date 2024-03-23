@@ -46,11 +46,13 @@ export default async function build({
                       ...path.node.quasi.expressions.map(
                         (value, index) => `$$${index}`,
                       ),
-                    ].join(", ")}) { ${path.node.quasi.quasis.map(
-                      (quasi, index) =>
-                        (index === 0 ? `` : `$$${index - 1}`) +
-                        quasi.value.cooked,
-                    )} }`,
+                    ].join(", ")}) { ${path.node.quasi.quasis
+                      .map(
+                        (quasi, index) =>
+                          (index === 0 ? `` : `$$${index - 1}`) +
+                          quasi.value.cooked,
+                      )
+                      .join("")} }`,
                   );
                   break;
               }
@@ -125,10 +127,11 @@ export default async function build({
                         JSON.stringify({
                           function: ${babel.types.stringLiteral(javascriptIdentifiers.shift()!)},
                           arguments: ${babel.types.arrayExpression(
-                            path.node.quasi.expressions as any,
+                            path.node.quasi
+                              .expressions as Array<babel.types.Expression>,
                           )},
                         })
-                      ` as any,
+                      ` as babel.types.Node,
                     );
                     break;
                 }
