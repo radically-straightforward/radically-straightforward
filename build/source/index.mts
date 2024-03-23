@@ -3,6 +3,7 @@ import fs from "node:fs/promises";
 import { globby } from "globby";
 import babel from "@babel/core";
 import babelGenerator from "@babel/generator";
+import prettier from "prettier";
 import esbuild from "esbuild";
 import xxhash from "xxhash-addon";
 import baseX from "base-x";
@@ -19,52 +20,92 @@ export default async function build({
   const cssSnippets = new Set<CSS>();
   const javascriptSnippets = new Set<JavaScript>();
   for (const source of await globby("./build/**/*.mjs")) {
-    const fileCSSSnippets = new Set<CSS>();
-    const fileJavaScriptSnippets = new Set<JavaScript>();
-    let babelResult = await babel.transformAsync(
-      await fs.readFile(source, "utf-8"),
-      {
-        ast: true,
-        code: false,
-        plugins: [
-          {
-            visitor: {
-              TaggedTemplateExpression: (path) => {
-                if (path.node.tag.type !== "Identifier") return;
-                switch (path.node.tag.name) {
-                  case "css": {
-                    fileCSSSnippets.add(
-                      new Function(
-                        "css",
-                        `return (${babelGenerator.default(path.node).code});`,
-                      )(css),
-                    );
-                    break;
-                  }
-
-                  case "javascript": {
-                    let javascriptSnippet = "";
-                    for (const [
-                      index,
-                      quasi,
-                    ] of path.node.quasi.quasis.entries())
-                      javascriptSnippet +=
-                        (index === 0 ? `` : `$$${index - 1}`) +
-                        quasi.value.cooked;
-                    fileJavaScriptSnippets.add(javascriptSnippet);
-                    break;
-                  }
+    const fileCSSSnippets = new Array<CSS>();
+    const fileJavaScriptSnippets = new Array<JavaScript>();
+    let babelResult = await babel.transformFileAsync(source, {
+      ast: true,
+      code: false,
+      plugins: [
+        {
+          visitor: {
+            TaggedTemplateExpression: (path) => {
+              if (path.node.tag.type !== "Identifier") return;
+              switch (path.node.tag.name) {
+                case "css": {
+                  fileCSSSnippets.push(
+                    new Function(
+                      "css",
+                      `return (${babelGenerator.default(path.node).code});`,
+                    )(css),
+                  );
+                  break;
                 }
-              },
+
+                case "javascript": {
+                  let javascriptSnippet = "";
+                  for (const [index, quasi] of path.node.quasi.quasis.entries())
+                    javascriptSnippet +=
+                      (index === 0 ? `` : `$$${index - 1}`) +
+                      quasi.value.cooked;
+                  fileJavaScriptSnippets.push(javascriptSnippet);
+                  break;
+                }
+              }
             },
           },
-        ],
-      },
-    );
+        },
+      ],
+    });
+    if (
+      babelResult === null ||
+      babelResult.ast === undefined ||
+      babelResult.ast === null
+    )
+      throw new Error("Babel transformation failed.");
 
-    babelResult = await babel.transformAsync(
-      await fs.readFile(source, "utf-8"),
+    const cssIdentifiers = new Array<string>();
+    for (const cssSnippet of fileCSSSnippets) {
+      const canonicalCSSSnippet = (
+        await prettier.format(`REMOVE { ${cssSnippet} }`, { parser: "css" })
+      )
+        .replace(/^\s*REMOVE\s*\{\s*/, "")
+        .replace(/\s*\}\s*$/, "");
+      const identifier = baseIdentifier.encode(
+        xxhash.XXHash3.hash(Buffer.from(canonicalCSSSnippet)),
+      );
+      cssIdentifiers.push(identifier);
+      cssSnippets.add(
+        `/********************************************************************************/\n\n${`[css~="${identifier}"]`.repeat(
+          6,
+        )} {\n${canonicalCSSSnippet}}\n\n`,
+      );
+    }
+    const javascriptIdentifiers = new Array<string>();
+    for (const javascriptSnippet of javascriptIdentifiers) {
+      const canonicalJavaScriptSnippet = (
+        await prettier.format(`function REMOVE() { ${javascriptSnippet} }`, {
+          parser: "babel",
+        })
+      )
+        .replace(/^\s*function\s*REMOVE\(\s*\)\s*{\s*/, "")
+        .replace(/\s*\}\s*$/, "");
+      const identifier = baseIdentifier.encode(
+        xxhash.XXHash3.hash(Buffer.from(canonicalJavaScriptSnippet)),
+      );
+      javascriptIdentifiers.push(identifier);
+      javascriptSnippets.add(
+        `/********************************************************************************/\n\nradicallyStraightforward.execute.functions.set("${identifier}", function (${[
+          "event",
+          ...path.node.quasi.expressions.map((value, index) => `$$${index}`),
+        ].join(", ")}) {\n${javascriptSnippet}});\n\n`,
+      );
+    }
+
+    babelResult = await babel.transformFromAstAsync(
+      babelResult.ast,
+      undefined,
       {
+        cloneInputAst: false,
         sourceMaps: true,
         compact: false,
         plugins: [
@@ -143,7 +184,14 @@ export default async function build({
         ],
       },
     );
-    if (babelResult === null) throw new Error("Babel transformation failed.");
+    if (
+      babelResult === null ||
+      babelResult.code === undefined ||
+      babelResult.code === null ||
+      babelResult.map === undefined ||
+      babelResult.map === null
+    )
+      throw new Error("Babel transformation failed.");
 
     await fs.writeFile(
       source,

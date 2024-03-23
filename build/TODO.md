@@ -1,5 +1,6 @@
 # TODO
 
+- Add tests for how the `build/*.mjs` files turned out
 - Turn it into a command-line application
 - Sourcemaps
 
