@@ -33,21 +33,27 @@ export default async function build({
               switch (path.node.tag.name) {
                 case "css": {
                   fileCSSSnippets.push(
-                    new Function(
+                    `PLACEHOLDER { ${new Function(
                       "css",
                       `return (${babelGenerator.default(path.node).code});`,
-                    )(css),
+                    )(css)} }`,
                   );
                   break;
                 }
 
                 case "javascript": {
-                  let javascriptSnippet = "";
-                  for (const [index, quasi] of path.node.quasi.quasis.entries())
-                    javascriptSnippet +=
-                      (index === 0 ? `` : `$$${index - 1}`) +
-                      quasi.value.cooked;
-                  fileJavaScriptSnippets.push(javascriptSnippet);
+                  fileJavaScriptSnippets.push(
+                    `function (${[
+                      "event",
+                      ...path.node.quasi.expressions.map(
+                        (value, index) => `$$${index}`,
+                      ),
+                    ].join(", ")}) { ${path.node.quasi.quasis.map(
+                      (quasi, index) =>
+                        (index === 0 ? `` : `$$${index - 1}`) +
+                        quasi.value.cooked,
+                    )} }`,
+                  );
                   break;
                 }
               }
@@ -64,40 +70,32 @@ export default async function build({
       throw new Error("Babel transformation failed.");
 
     const cssIdentifiers = new Array<string>();
-    for (const cssSnippet of fileCSSSnippets) {
-      const canonicalCSSSnippet = (
-        await prettier.format(`REMOVE { ${cssSnippet} }`, { parser: "css" })
-      )
-        .replace(/^\s*REMOVE\s*\{\s*/, "")
-        .replace(/\s*\}\s*$/, "");
+    for (const snippet of fileCSSSnippets) {
+      const canonicalSnippet = await prettier.format(snippet, {
+        parser: "css",
+      });
       const identifier = baseIdentifier.encode(
-        xxhash.XXHash3.hash(Buffer.from(canonicalCSSSnippet)),
+        xxhash.XXHash3.hash(Buffer.from(canonicalSnippet)),
       );
       cssIdentifiers.push(identifier);
       cssSnippets.add(
-        `/********************************************************************************/\n\n${`[css~="${identifier}"]`.repeat(
-          6,
-        )} {\n${canonicalCSSSnippet}}\n\n`,
+        `/********************************************************************************/\n\n${canonicalSnippet.replace(
+          /^PLACEHOLDER/,
+          `[css~="${identifier}"]`.repeat(6),
+        )}\n\n`,
       );
     }
     const javascriptIdentifiers = new Array<string>();
-    for (const javascriptSnippet of javascriptIdentifiers) {
-      const canonicalJavaScriptSnippet = (
-        await prettier.format(`function REMOVE() { ${javascriptSnippet} }`, {
-          parser: "babel",
-        })
-      )
-        .replace(/^\s*function\s*REMOVE\(\s*\)\s*{\s*/, "")
-        .replace(/\s*\}\s*$/, "");
+    for (const snippet of javascriptIdentifiers) {
+      const canonicalSnippet = await prettier.format(snippet, {
+        parser: "babel",
+      });
       const identifier = baseIdentifier.encode(
-        xxhash.XXHash3.hash(Buffer.from(canonicalJavaScriptSnippet)),
+        xxhash.XXHash3.hash(Buffer.from(canonicalSnippet)),
       );
       javascriptIdentifiers.push(identifier);
       javascriptSnippets.add(
-        `/********************************************************************************/\n\nradicallyStraightforward.execute.functions.set("${identifier}", function (${[
-          "event",
-          ...path.node.quasi.expressions.map((value, index) => `$$${index}`),
-        ].join(", ")}) {\n${javascriptSnippet}});\n\n`,
+        `/********************************************************************************/\n\nradicallyStraightforward?.execute?.functions?.set?.("${identifier}", ${canonicalSnippet});\n\n`,
       );
     }
 
@@ -106,8 +104,8 @@ export default async function build({
       undefined,
       {
         cloneInputAst: false,
-        sourceMaps: true,
         compact: false,
+        sourceMaps: true,
         plugins: [
           {
             visitor: {
@@ -127,48 +125,17 @@ export default async function build({
                 if (path.node.tag.type !== "Identifier") return;
                 switch (path.node.tag.name) {
                   case "css": {
-                    const cssSnippet = new Function(
-                      "css",
-                      `return (${babelGenerator.default(path.node).code});`,
-                    )(css);
-                    const identifier = baseIdentifier.encode(
-                      xxhash.XXHash3.hash(Buffer.from(cssSnippet)),
+                    path.replaceWith(
+                      babel.types.stringLiteral(cssIdentifiers.shift()!),
                     );
-                    if (!cssIdentifiers.has(identifier)) {
-                      cssIdentifiers.add(identifier);
-                      extractedCSS += `/********************************************************************************/\n\n${`[css~="${identifier}"]`.repeat(
-                        6,
-                      )} {\n${cssSnippet}}\n\n`;
-                    }
-                    path.replaceWith(babel.types.stringLiteral(identifier));
                     break;
                   }
 
                   case "javascript": {
-                    let javascriptSnippet = "";
-                    for (const [
-                      index,
-                      quasi,
-                    ] of path.node.quasi.quasis.entries())
-                      javascriptSnippet +=
-                        (index === 0 ? `` : `$$${index - 1}`) +
-                        quasi.value.cooked;
-                    const identifier = baseIdentifier.encode(
-                      xxhash.XXHash3.hash(Buffer.from(javascriptSnippet)),
-                    );
-                    if (!javascriptIdentifiers.has(identifier)) {
-                      javascriptIdentifiers.add(identifier);
-                      extractedJavaScript += `/********************************************************************************/\n\nradicallyStraightforward.execute.functions.set("${identifier}", function (${[
-                        "event",
-                        ...path.node.quasi.expressions.map(
-                          (value, index) => `$$${index}`,
-                        ),
-                      ].join(", ")}) {\n${javascriptSnippet}});\n\n`;
-                    }
                     path.replaceWith(
                       babel.template.ast`
                         JSON.stringify({
-                          function: ${babel.types.stringLiteral(identifier)},
+                          function: ${babel.types.stringLiteral(javascriptIdentifiers.shift()!)},
                           arguments: ${babel.types.arrayExpression(
                             path.node.quasi.expressions as any,
                           )},
