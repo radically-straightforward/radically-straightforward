@@ -3,19 +3,10 @@
 - Test sourcemaps
   - Server JavaScript which had `` css`___` `` and `` javascript`___` `` removed.
   - CSS and browser JavaScript.
-
----
-
-- Use esbuild to unnest & vendor prefix?
-  - Does it support `@at-root`?
-    - No, we’ll have to do something else
-  - Does it require a big rewrite? (Which may be worth doing anyway, to comply to specification… 🤷‍♂️)
-    - Probably not
-- Remove the `.example.example.example.example.example.example` hack that solves specificity issues
+- Investigate how to remove the `.example.example.example.example.example.example` hack that solves specificity issues
   - Use `@layer`
     - Relatively new and may not be polyfillable
   - esbuild’s CSS modules
-- Use Prettier to deduplicate snippets?
 
 ## Authoring
 
@@ -162,9 +153,3 @@
   - https://github.com/CraigCav/css-zero
   - https://github.com/callstack/linaria/tree/master/packages/babel
   - https://github.com/sgtpep/csstag
-
-## Future Work
-
-- Use Prettier to normalize CSS & JavaScript blocks, which reduces duplication.
-  - The complication is that the Babel pass must be synchronous, and Prettier is asynchronous.
-- To make sure that styles applied to an element win over the specificity of parent setting styles on children, currently we set the same selector six times in a row. We could look into using layers instead.
