@@ -10,13 +10,7 @@ $ npm install --save-dev @radically-straightforward/build
 
 ## Usage
 
-```typescript
-import "@radically-straightforward/build";
-```
-
-<!-- DOCUMENTATION START: ./source/index.mts -->
-
-<!-- DOCUMENTATION END: ./source/index.mts -->
+TODO
 
 ## Related Work
 
