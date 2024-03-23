@@ -6,7 +6,8 @@ import babelGenerator from "@babel/generator";
 import esbuild from "esbuild";
 import xxhash from "xxhash-addon";
 import baseX from "base-x";
-import css from "@radically-straightforward/css";
+import css, { CSS } from "@radically-straightforward/css";
+import { JavaScript } from "@radically-straightforward/javascript";
 
 export default async function build({
   filesToCopyWithHash = [],
@@ -15,13 +16,53 @@ export default async function build({
   filesToCopyWithHash?: string[];
   filesToCopyWithoutHash?: string[];
 }): Promise<void> {
-  let extractedCSS = await fs.readFile("./static/index.css", "utf-8");
-  let extractedJavaScript = await fs.readFile("./static/index.mjs", "utf-8");
-
-  const cssIdentifiers = new Set();
-  const javascriptIdentifiers = new Set();
+  const cssSnippets = new Set<CSS>();
+  const javascriptSnippets = new Set<JavaScript>();
   for (const source of await globby("./build/**/*.mjs")) {
-    const babelResult = await babel.transformAsync(
+    const fileCSSSnippets = new Set<CSS>();
+    const fileJavaScriptSnippets = new Set<JavaScript>();
+    let babelResult = await babel.transformAsync(
+      await fs.readFile(source, "utf-8"),
+      {
+        ast: true,
+        code: false,
+        plugins: [
+          {
+            visitor: {
+              TaggedTemplateExpression: (path) => {
+                if (path.node.tag.type !== "Identifier") return;
+                switch (path.node.tag.name) {
+                  case "css": {
+                    fileCSSSnippets.add(
+                      new Function(
+                        "css",
+                        `return (${babelGenerator.default(path.node).code});`,
+                      )(css),
+                    );
+                    break;
+                  }
+
+                  case "javascript": {
+                    let javascriptSnippet = "";
+                    for (const [
+                      index,
+                      quasi,
+                    ] of path.node.quasi.quasis.entries())
+                      javascriptSnippet +=
+                        (index === 0 ? `` : `$$${index - 1}`) +
+                        quasi.value.cooked;
+                    fileJavaScriptSnippets.add(javascriptSnippet);
+                    break;
+                  }
+                }
+              },
+            },
+          },
+        ],
+      },
+    );
+
+    babelResult = await babel.transformAsync(
       await fs.readFile(source, "utf-8"),
       {
         sourceMaps: true,
@@ -111,10 +152,10 @@ export default async function build({
     await fs.writeFile(`${source}.map`, JSON.stringify(babelResult.map));
   }
 
-  await fs.rename("./static/index.css", "./static/_index.css");
-  await fs.rename("./static/index.mjs", "./static/_index.mjs");
-  await fs.writeFile("./static/index.css", extractedCSS);
-  await fs.writeFile("./static/index.mjs", extractedJavaScript);
+  await fs.copyFile("./static/index.css", "./static/_index.css");
+  await fs.copyFile("./static/index.mjs", "./static/_index.mjs");
+  await fs.appendFile("./static/index.css", [...cssSnippets].join(""));
+  await fs.appendFile("./static/index.mjs", [...javascriptSnippets].join(""));
   let esbuildResult: esbuild.BuildResult;
   try {
     esbuildResult = await esbuild.build({
