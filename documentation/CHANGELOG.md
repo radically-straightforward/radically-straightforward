@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 1.0.4 · 2024-03-23
 
 - Removed an explicit dependency on `@babel/types` in favor of `@babel/core`.
 
