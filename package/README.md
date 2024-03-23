@@ -24,8 +24,8 @@ or:
 $ npx package --input "path-to-project" -- "$PACKAGE/node_modules/.bin/node" "$PACKAGE/build/index.mjs"
 ```
 
-- `--input`: The application directory. By default, `.`.
-- `-- command ...`: The command to start the application. By default, `"$PACKAGE/node_modules/.bin/node" "$PACKAGE/build/index.mjs"`. The `$PACKAGE` environment variable contains the path to the application directory. On Windows the `$PACKAGE` syntax is converted into `%PACKAGE%` automatically. The Node.js binary is available at `$PACKAGE/node_modules/.bin/node`, along with other binaries installed by npm.
+- **`--input`:** The application directory. By default, `.`.
+- **`-- command ...`:** The command to start the application. By default, `"$PACKAGE/node_modules/.bin/node" "$PACKAGE/build/index.mjs"`. The `$PACKAGE` environment variable contains the path to the application directory. On Windows the `$PACKAGE` syntax is converted into `%PACKAGE%` automatically. The Node.js binary is available at `$PACKAGE/node_modules/.bin/node`, along with other binaries installed by npm.
 
 > **Note:** The process of packaging includes a call to `env NODE_ENV=production npm dedupe`, which removes development dependencies from the `node_modules/` directory.
 
