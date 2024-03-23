@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- Removed an explicit dependency on `@babel/types` in favor of `@babel/core`.
+
 ## 1.0.3 · 2024-03-23
 
 - Fixed an issue in which an `await` was missing.
