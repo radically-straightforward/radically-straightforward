@@ -23,7 +23,7 @@ test(async () => {
       import css from "@radically-straightforward/css";
       import javascript from "@radically-straightforward/javascript";
 
-      const template = html\`<div css="\${css\`background-color: pink;\`}" javascript="\${javascript\`console.log("Hello");\`}"></div>\`;
+      const template = html\`<div css="\${css\`background-color: pink;\`}" javascript="\${javascript\`console.log(\${"Hello"}, \${"World"});\`}"></div>\`;
     `,
   );
   await fs.writeFile(
@@ -33,7 +33,7 @@ test(async () => {
       import css from "@radically-straightforward/css";
       import javascript from "@radically-straightforward/javascript";
 
-      const users = html\`<div css="\${css\`background-color:   pink;\`}" javascript="\${javascript\`console.log(  "Hello");\`}"></div><div css="\${css\`background-color: purple;\`}" javascript="\${javascript\`console.log("Users");\`}"></div>\`;
+      const users = html\`<div css="\${css\`background-color:   pink;\`}" javascript="\${javascript\`console.log(  \${"Hello"}, \${"World"});\`}"></div><div css="\${css\`background-color: purple;\`}" javascript="\${javascript\`console.log("Users");\`}"></div>\`;
     `,
   );
   await fs.mkdir("./static/", { recursive: true });
@@ -104,21 +104,21 @@ test(async () => {
     await fs.readFile("./build/static/paths.json", "utf-8"),
   );
 
-  assert.equal(await fs.readFile("./build/index.mjs", "utf-8"), ``);
-  assert.equal(await fs.readFile("./build/users.mjs", "utf-8"), ``);
+  assert.equal(await fs.readFile("./build/index.mjs", "utf-8"), "");
+  assert.equal(await fs.readFile("./build/users.mjs", "utf-8"), "");
   assert.equal(
     await fs.readFile(
       path.join("./build/static/", paths["index.css"]),
       "utf-8",
     ),
-    ``,
+    "",
   );
   assert.equal(
     await fs.readFile(
       path.join("./build/static/", paths["index.mjs"]),
       "utf-8",
     ),
-    ``,
+    "",
   );
   assert.equal(
     await fs.readFile(
