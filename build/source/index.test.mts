@@ -3,9 +3,11 @@ import assert from "node:assert/strict";
 import os from "node:os";
 import path from "node:path";
 import fs from "node:fs/promises";
+import childProcess from "node:child_process";
+import util from "node:util";
+import url from "node:url";
 import css from "@radically-straightforward/css";
 import javascript from "@radically-straightforward/javascript";
-import build from "@radically-straightforward/build";
 
 test(async () => {
   process.chdir(
@@ -86,20 +88,25 @@ test(async () => {
     "Outside static",
   );
 
-  await build({
-    filesToCopyWithHash: [
-      "./static/example.txt",
-      "./static/select-subdirectory/select-subdirectory--example.txt",
-      "./static/all-subdirectory/",
-      "./outside-static/outside-static--example.txt",
-    ],
-    filesToCopyWithoutHash: [
-      "./static/example.txt",
-      "./static/select-subdirectory/select-subdirectory--example.txt",
-      "./static/all-subdirectory/",
-      "./outside-static/outside-static--example.txt",
-    ],
-  });
+  await util.promisify(childProcess.execFile)("node", [
+    url.fileURLToPath(new URL("./index.mjs", import.meta.url)),
+    "--file-to-copy-with-hash",
+    "./static/example.txt",
+    "--file-to-copy-with-hash",
+    "./static/select-subdirectory/select-subdirectory--example.txt",
+    "--file-to-copy-with-hash",
+    "./static/all-subdirectory/",
+    "--file-to-copy-with-hash",
+    "./outside-static/outside-static--example.txt",
+    "--file-to-copy-without-hash",
+    "./static/example.txt",
+    "--file-to-copy-without-hash",
+    "./static/select-subdirectory/select-subdirectory--example.txt",
+    "--file-to-copy-without-hash",
+    "./static/all-subdirectory/",
+    "--file-to-copy-without-hash",
+    "./outside-static/outside-static--example.txt",
+  ]);
   const paths = JSON.parse(
     await fs.readFile("./build/static/paths.json", "utf-8"),
   );
