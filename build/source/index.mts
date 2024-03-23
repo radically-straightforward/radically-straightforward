@@ -118,6 +118,7 @@ export default async function build({
                     path.replaceWith(
                       babel.types.stringLiteral(cssIdentifiers.shift()!),
                     );
+                    break;
                   case "javascript":
                     path.replaceWith(
                       babel.template.ast`
@@ -129,6 +130,7 @@ export default async function build({
                         })
                       ` as any,
                     );
+                    break;
                 }
               },
             },
