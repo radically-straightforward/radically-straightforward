@@ -31,7 +31,7 @@ export default async function build({
             TaggedTemplateExpression: (path) => {
               if (path.node.tag.type !== "Identifier") return;
               switch (path.node.tag.name) {
-                case "css": {
+                case "css":
                   fileCSSSnippets.push(
                     `PLACEHOLDER { ${new Function(
                       "css",
@@ -39,9 +39,7 @@ export default async function build({
                     )(css)} }`,
                   );
                   break;
-                }
-
-                case "javascript": {
+                case "javascript":
                   fileJavaScriptSnippets.push(
                     `function (${[
                       "event",
@@ -55,7 +53,6 @@ export default async function build({
                     )} }`,
                   );
                   break;
-                }
               }
             },
           },
@@ -68,37 +65,31 @@ export default async function build({
       babelResult.ast === null
     )
       throw new Error("Babel transformation failed.");
-
     const cssIdentifiers = new Array<string>();
-    for (const snippet of fileCSSSnippets) {
-      const canonicalSnippet = await prettier.format(snippet, {
-        parser: "css",
-      });
+    for (let snippet of fileCSSSnippets) {
+      snippet = await prettier.format(snippet, { parser: "css" });
       const identifier = baseIdentifier.encode(
-        xxhash.XXHash3.hash(Buffer.from(canonicalSnippet)),
+        xxhash.XXHash3.hash(Buffer.from(snippet)),
       );
       cssIdentifiers.push(identifier);
       cssSnippets.add(
-        `/********************************************************************************/\n\n${canonicalSnippet.replace(
+        `/********************************************************************************/\n\n${snippet.replace(
           /^PLACEHOLDER/,
           `[css~="${identifier}"]`.repeat(6),
         )}\n\n`,
       );
     }
     const javascriptIdentifiers = new Array<string>();
-    for (const snippet of javascriptIdentifiers) {
-      const canonicalSnippet = await prettier.format(snippet, {
-        parser: "babel",
-      });
+    for (let snippet of javascriptIdentifiers) {
+      snippet = await prettier.format(snippet, { parser: "babel" });
       const identifier = baseIdentifier.encode(
-        xxhash.XXHash3.hash(Buffer.from(canonicalSnippet)),
+        xxhash.XXHash3.hash(Buffer.from(snippet)),
       );
       javascriptIdentifiers.push(identifier);
       javascriptSnippets.add(
-        `/********************************************************************************/\n\nradicallyStraightforward?.execute?.functions?.set?.("${identifier}", ${canonicalSnippet});\n\n`,
+        `/********************************************************************************/\n\njavascript?.execute?.functions?.set?.("${identifier}", ${snippet});\n\n`,
       );
     }
-
     babelResult = await babel.transformFromAstAsync(
       babelResult.ast,
       undefined,
@@ -120,18 +111,14 @@ export default async function build({
                 )
                   path.remove();
               },
-
               TaggedTemplateExpression: (path) => {
                 if (path.node.tag.type !== "Identifier") return;
                 switch (path.node.tag.name) {
-                  case "css": {
+                  case "css":
                     path.replaceWith(
                       babel.types.stringLiteral(cssIdentifiers.shift()!),
                     );
-                    break;
-                  }
-
-                  case "javascript": {
+                  case "javascript":
                     path.replaceWith(
                       babel.template.ast`
                         JSON.stringify({
@@ -142,8 +129,6 @@ export default async function build({
                         })
                       ` as any,
                     );
-                    break;
-                  }
                 }
               },
             },
@@ -159,7 +144,6 @@ export default async function build({
       babelResult.map === null
     )
       throw new Error("Babel transformation failed.");
-
     await fs.writeFile(
       source,
       `${babelResult.code}\n//# sourceMappingURL=${path.basename(source)}.map`,
