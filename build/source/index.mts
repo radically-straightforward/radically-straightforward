@@ -30,15 +30,14 @@ export default async function build({
   //       sourceFileName: path.relative(path.dirname(source), source),
   //       compact: false,
   //       plugins: [
-  //         "typescript",
   //         {
   //           visitor: {
   //             ImportDeclaration: (path) => {
   //               if (
   //                 (path.node.specifiers[0]?.local?.name === "css" &&
-  //                   path.node.source?.value === "@leafac/css") ||
+  //                   path.node.source?.value === "@radically-straightforward/css") ||
   //                 (path.node.specifiers[0]?.local?.name === "javascript" &&
-  //                   path.node.source?.value === "@leafac/javascript")
+  //                   path.node.source?.value === "@radically-straightforward/javascript")
   //               )
   //                 path.remove();
   //             },
@@ -77,7 +76,7 @@ export default async function build({
   //                   );
   //                   if (!javascriptIdentifiers.has(identifier)) {
   //                     javascriptIdentifiers.add(identifier);
-  //                     extractedJavaScript += javascript`/********************************************************************************/\n\nleafac.execute.functions.set("${identifier}", function (${[
+  //                     extractedJavaScript += javascript`/********************************************************************************/\n\nradicallyStraightforward.execute.functions.set("${identifier}", function (${[
   //                       "event",
   //                       ...path.node.quasi.expressions.map(
   //                         (value, index) => `$$${index}`,
@@ -103,7 +102,6 @@ export default async function build({
   //       ],
   //     },
   //   );
-  //   await babel.transformFromAstAsync(babelResult.ast, code, {});
 
   //   await fs.writeFile(
   //     source,
