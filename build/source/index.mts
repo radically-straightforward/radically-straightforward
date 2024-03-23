@@ -139,14 +139,14 @@ for (const source of await globby("./build/**/*.mjs")) {
               case "javascript":
                 path.replaceWith(
                   babel.template.ast`
-                        JSON.stringify({
-                          function: ${babel.types.stringLiteral(javascriptIdentifiers.shift()!)},
-                          arguments: ${babel.types.arrayExpression(
-                            path.node.quasi
-                              .expressions as Array<babel.types.Expression>,
-                          )},
-                        })
-                      ` as babel.types.Node,
+                    JSON.stringify({
+                      function: ${babel.types.stringLiteral(javascriptIdentifiers.shift()!)},
+                      arguments: ${babel.types.arrayExpression(
+                        path.node.quasi
+                          .expressions as Array<babel.types.Expression>,
+                      )},
+                    })
+                  ` as babel.types.Node,
                 );
                 break;
             }
