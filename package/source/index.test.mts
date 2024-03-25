@@ -8,31 +8,34 @@ import util from "node:util";
 import url from "node:url";
 
 test(async () => {
-  await util.promisify(childProcess.execFile)("npm", ["ci"], {
-    cwd: "./example-application",
-  });
-  await util.promisify(childProcess.execFile)(
-    "node",
-    [url.fileURLToPath(new URL("./index.mjs", import.meta.url))],
-    { cwd: "./example-application" },
+  process.chdir(
+    url.fileURLToPath(new URL("../example-application/", import.meta.url)),
   );
-  await fs.rm("./example-application/node_modules/", { recursive: true });
-  const directory = await fs.mkdtemp(
-    path.join(os.tmpdir(), "radically-straightforward--package--test--"),
+  await util.promisify(childProcess.execFile)("npm", ["ci"]);
+  await util.promisify(childProcess.execFile)("node", [
+    url.fileURLToPath(new URL("./index.mjs", import.meta.url)),
+  ]);
+  process.chdir(
+    await fs.mkdtemp(
+      path.join(os.tmpdir(), "radically-straightforward--package--test--"),
+    ),
   );
-  const outputPackage = `example-application.${
-    process.platform === "win32" ? "zip" : "tar.gz"
-  }`;
+  await fs.rename(
+    new URL(
+      `../example-application.${
+        process.platform === "win32" ? "zip" : "tar.gz"
+      }`,
+      import.meta.url,
+    ),
+    `example-application.${process.platform === "win32" ? "zip" : "tar.gz"}`,
+  );
   await util.promisify(childProcess.execFile)("tar", [
     "-xzf",
-    outputPackage,
-    "-C",
-    directory,
+    `example-application.${process.platform === "win32" ? "zip" : "tar.gz"}`,
   ]);
-  await fs.rm(outputPackage);
   const result = await util
     .promisify(childProcess.execFile)(
-      path.join(directory, "example-application", "example-application"),
+      "example-application/example-application",
       ["examples", "of", "some", "extra", "command-line", "arguments"],
       { env: { ...process.env, EXAMPLE_PROGRAM: "true" } },
     )
