@@ -10,7 +10,17 @@ $ npm install --save-dev @radically-straightforward/package
 
 ## Usage
 
-Prepare the application for packaging. This may include running `npm ci`, `npm run prepare`, and so forth. You may also want to remove directories and files that shouldn’t be part of the package, for example, `.git`, `.env`, and so forth.
+First, prepare your application for packaging. This may include running `npm ci`, `npm run prepare`, and so forth. You may also want to remove directories and files that shouldn’t be distributed, for example, `.git`, `.env`, and so forth.
+
+> **Note:** You don’t need to remove development dependencies from the `node_modules/` directory because `@radically-straightforward/package` does that for you by running `env NODE_ENV=production npm dedupe` in the process of packaging.
+
+Ensure that your application works when you run it using the following command:
+
+```console
+$ node ./build/index.mjs
+```
+
+> **Note:** If you need to run some other command to start your application, then create a startup script at `./build/index.mjs`.
 
 Then, use `package` to produce a package for distribution, for example:
 
@@ -18,28 +28,17 @@ Then, use `package` to produce a package for distribution, for example:
 $ npx package
 ```
 
-or:
-
-```console
-$ npx package --input "path-to-project" -- "$PACKAGE/node_modules/.bin/node" "$PACKAGE/build/index.mjs"
-```
-
-- **`--input`:** The application directory. By default, `.`.
-- **`-- command ...`:** The command to start the application. By default, `"$PACKAGE/node_modules/.bin/node" "$PACKAGE/build/index.mjs"`. The `$PACKAGE` environment variable contains the path to the application directory. On Windows the `$PACKAGE` syntax is converted into `%PACKAGE%` automatically. The Node.js binary is available at `$PACKAGE/node_modules/.bin/node`, along with other binaries installed by npm.
-
-> **Note:** The process of packaging includes a call to `env NODE_ENV=production npm dedupe`, which removes development dependencies from the `node_modules/` directory.
-
 The package will be available as a sibling of the application directory, for example:
 
 - `example-application/`
-- `example-application.tar.gz`
+- `example-application.zip`(Windows) or `example-application.tar.gz` (macOS or Linux)
 
-When extracted, the package includes an entrypoint binary and the application source code, for example:
+When extracted, the package includes an executable entrypoint and the application source code, for example:
 
 - `example-application/example-application`
-- `example-application/example-application--source/`
+- `example-application/_/`
 
-Example of calling the binary:
+And the following is an example of calling the application:
 
 ```console
 $ ./example-application/example-application examples of some extra command-line arguments
@@ -49,15 +48,11 @@ $ ./example-application/example-application examples of some extra command-line 
 
 First `package` cleans up development dependencies and duplicate dependencies with `env NODE_ENV=production npm dedupe`.
 
-Then `package` copies the Node.js binary with which it was executed into the `node_modules/.bin/` directory, where npm installs binaries for dependencies.
+Then `package` copies the Node.js binary with which it was executed into the `node_modules/.bin/` directory, where npm installs binaries of dependencies.
 
-Finally `package` creates a `.zip` (Windows) or a `.tar.gz` (macOS or Linux) including your application’s source code and a shim executable. The shim executable starts your application with the startup command that you provide and sets up the following:
+Finally `package` creates a `.zip` (Windows) or a `.tar.gz` (macOS or Linux) file including your application’s source code and a shim executable. The shim executable starts your application and forwards command-line arguments, environment variables, standard input/output, signals, and return code.
 
-- Absolute paths for starting up the application. You may call the shim executable from any directory, because the paths to the entrypoint of the application are absolute. This is done with the `$PACKAGE` environment variable, which is set to the directory in which the package has been extracted.
-
-- Command-line arguments. The command-line arguments with which the shim executable is called are forwarded to the underlying command that you configured when packaging. For example, if when packaging you configured the startup command to be `"$PACKAGE/node_modules/.bin/node" "$PACKAGE/build/index.mjs"` (the default), and you call the shim executable as `./example-application/example-application examples of some extra command-line arguments`, then the underlying application is called as `"$PACKAGE/node_modules/.bin/node" "$PACKAGE/build/index.mjs" "examples" "of" "some" "extra" "command-line" "arguments"`.
-
-- Environment variables, standard input/output, signals and return code are forwarded into and out of the underlying application.
+> **Note:** The `$PACKAGE` environment variable is set to the directory containing your application.
 
 ## Related Work
 
@@ -77,7 +72,7 @@ The most notable difference between `caxa` and `package` is that `caxa` produces
 
 `package` also improves upon `caxa` in a few other aspects:
 
-- `package` is simpler to use. It provides fewer command-line options and sensible defaults. It doesn’t include obscure features of `caxa`, for example, the ability to generate a macOS Application Bundle (`.app`), and the ability to package from JavaScript as opposed to the command-line.
+- `package` is simpler to use. It provides sensible defaults instead of asking for several command-line arguments. It doesn’t include obscure features of `caxa`, for example, the ability to generate a macOS Application Bundle (`.app`), and the ability to package from JavaScript as opposed to the command-line.
 
 - In macOS and Linux, `package` calls the underlying application with `exec`, replacing the current process instead of creating a child process. This simplifies the process tree and solves issues related to forwarding signals. Unfortunately Windows doesn’t support `exec`, so a child process is still used in that case.
 
