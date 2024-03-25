@@ -10,12 +10,18 @@ import markdown from "dedent";
 import typescript from "dedent";
 
 test(async () => {
-  const directory = await fs.mkdtemp(
-    path.join(os.tmpdir(), "radically-straightforward--documentation--test--"),
+  process.chdir(
+    await fs.mkdtemp(
+      path.join(
+        os.tmpdir(),
+        "radically-straightforward--documentation--test--",
+      ),
+    ),
   );
+  // console.log(process.cwd());
 
   await fs.writeFile(
-    path.join(directory, "README.md"),
+    "README.md",
     markdown`
       # Example of \`@radically-straightforward/documentation\`
 
@@ -29,7 +35,7 @@ test(async () => {
     `,
   );
   await fs.writeFile(
-    path.join(directory, "index.mts"),
+    "index.mts",
     typescript`
       /**
        * Example of \`FunctionDeclaration\`.
@@ -74,14 +80,11 @@ test(async () => {
       // Example of last line for command.
     `,
   );
-  await util.promisify(childProcess.execFile)(
-    "node",
-    [url.fileURLToPath(new URL("./index.mjs", import.meta.url))],
-    { cwd: directory },
-  );
-  // console.log(await fs.readFile(path.join(directory, "README.md"), "utf-8"));
+  await util.promisify(childProcess.execFile)("node", [
+    url.fileURLToPath(new URL("./index.mjs", import.meta.url)),
+  ]);
   assert.equal(
-    await fs.readFile(path.join(directory, "README.md"), "utf-8"),
+    await fs.readFile("README.md", "utf-8"),
     // prettier-ignore
     markdown`
       # Example of \`@radically-straightforward/documentation\`
@@ -159,7 +162,7 @@ test(async () => {
   );
 
   await fs.writeFile(
-    path.join(directory, "index.mts"),
+    "index.mts",
     typescript`
       /**
        * Example of modified documentation.
@@ -169,14 +172,11 @@ test(async () => {
       // Example of modified last line for command.
     `,
   );
-  await util.promisify(childProcess.execFile)(
-    "node",
-    [url.fileURLToPath(new URL("./index.mjs", import.meta.url))],
-    { cwd: directory },
-  );
-  // console.log(await fs.readFile(path.join(directory, "README.md"), "utf-8"));
+  await util.promisify(childProcess.execFile)("node", [
+    url.fileURLToPath(new URL("./index.mjs", import.meta.url)),
+  ]);
   assert.equal(
-    await fs.readFile(path.join(directory, "README.md"), "utf-8"),
+    await fs.readFile("README.md", "utf-8"),
     // prettier-ignore
     markdown`
       # Example of \`@radically-straightforward/documentation\`
