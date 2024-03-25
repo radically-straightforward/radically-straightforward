@@ -159,7 +159,10 @@ for (const source of await globby("./build/**/*.mjs")) {
     source,
     `${babelResult.code}\n//# sourceMappingURL=${path.basename(source)}.map`,
   );
-  await fs.writeFile(`${source}.map`, JSON.stringify(babelResult.map));
+  await fs.writeFile(
+    `${source}.map`,
+    JSON.stringify(babelResult.map, undefined, 2),
+  );
 }
 
 await fs.copyFile("./static/index.css", "./static/_index.css");
