@@ -3,6 +3,7 @@ import assert from "node:assert/strict";
 import os from "node:os";
 import path from "node:path";
 import fs from "node:fs/promises";
+import url from "node:url";
 import http from "node:http";
 import childProcess from "node:child_process";
 import * as caddy from "@radically-straightforward/caddy";
@@ -15,27 +16,26 @@ test(
       : "Install Caddy, make sure that the local certificate authority is working, and run test with ‘node ./build/index.test.mjs’.",
   },
   async () => {
-    const directory = await fs.mkdtemp(
-      path.join(os.tmpdir(), "radically-straightforward--caddy--test--"),
+    process.chdir(
+      await fs.mkdtemp(
+        path.join(os.tmpdir(), "radically-straightforward--caddy--test--"),
+      ),
     );
 
-    await fs.mkdir(path.join(directory, "static/"), { recursive: true });
-    await fs.writeFile(
-      path.join(directory, "static/example.css"),
-      `body { background-color: red; }`,
-    );
+    await fs.mkdir("static/", { recursive: true });
+    await fs.writeFile("static/example.css", `body { background-color: red; }`);
 
-    await fs.mkdir(path.join(directory, "data/files/"), { recursive: true });
+    await fs.mkdir("data/files/", { recursive: true });
     await fs.writeFile(
-      path.join(directory, "data/sensitive.txt"),
+      "data/sensitive.txt",
       `EXAMPLE OF SENSITIVE FILE THAT MUST BE INACCESSIBLE`,
     );
     await fs.writeFile(
-      path.join(directory, "data/files/example.txt"),
+      "data/files/example.txt",
       `EXAMPLE OF USER-GENERATED TXT FILE THAT MAY BE EMBEDDED`,
     );
     await fs.writeFile(
-      path.join(directory, "data/files/example.html"),
+      "data/files/example.html",
       `
         <!DOCTYPE html>
         <html lang="en">
@@ -49,7 +49,7 @@ test(
       `,
     );
     await fs.writeFile(
-      path.join(directory, "data/files/example--html.txt"),
+      "data/files/example--html.txt",
       `
         <!DOCTYPE html>
         <html lang="en">
@@ -70,9 +70,9 @@ test(
       .listen(18000, "localhost");
 
     const caddyServer = childProcess.spawn(
-      path.resolve("./node_modules/.bin/caddy"),
+      url.fileURLToPath(new URL("../node_modules/.bin/caddy", import.meta.url)),
       ["run", "--adapter", "caddyfile", "--config", "-"],
-      { cwd: directory, stdio: [undefined, "ignore", "ignore"] },
+      { stdio: [undefined, "ignore", "ignore"] },
     );
     caddyServer.stdin.end(caddy.application());
 
