@@ -10,32 +10,14 @@ import archiver from "archiver";
 import batch from "dedent";
 import sh from "dedent";
 
-let {
-  values: { input },
-  positionals: command,
-} = util.parseArgs({
-  options: {
-    input: {
-      type: "string",
-      short: "i",
-      default: ".",
-    },
-  },
-  allowPositionals: true,
-});
-input = path.resolve(input!);
-if (command.length === 0)
-  command = ["$PACKAGE/node_modules/.bin/node", "$PACKAGE/build/index.mjs"];
-
 await util.promisify(childProcess.execFile)("npm", ["dedupe"], {
-  cwd: input,
   env: { ...process.env, NODE_ENV: "production" },
 });
 
-await fs.mkdir(path.join(input, "node_modules/.bin"), { recursive: true });
+await fs.mkdir("./node_modules/.bin", { recursive: true });
 await fs.cp(
   process.execPath,
-  path.join(input, "node_modules/.bin", path.basename(process.execPath)),
+  path.join("./node_modules/.bin", path.basename(process.execPath)),
 );
 
 const archive =
@@ -44,40 +26,35 @@ const archive =
     : archiver("tar", { gzip: true });
 const archiveStream = fsStream.createWriteStream(
   path.join(
-    input,
-    `../${path.basename(input)}.${
+    `../${path.basename(process.cwd())}.${
       process.platform === "win32" ? "zip" : "tar.gz"
     }`,
   ),
 );
 archive.pipe(archiveStream);
-archive.directory(
-  input,
-  `${path.basename(input)}/${path.basename(input)}--source`,
-);
+archive.directory(".", `${path.basename(process.cwd())}/_/`);
 if (process.platform === "win32")
   archive.append(
     batch`
       @echo off
-      set PACKAGE=%~dp0${path.basename(input)}--source
-      ${command
-        .map(
-          (commandPart) =>
-            `"${commandPart.replaceAll("$PACKAGE", "%PACKAGE%")}"`,
-        )
-        .join(" ")} %*
+      set PACKAGE=%~dp0_
+      "%PACKAGE%/node_modules/.bin/node" "%PACKAGE%/build/index.mjs" %*
     `,
-    { name: `${path.basename(input)}/${path.basename(input)}.cmd` },
+    {
+      name: `${path.basename(process.cwd())}/${path.basename(
+        process.cwd(),
+      )}.cmd`,
+    },
   );
 else
   archive.append(
     sh`
       #!/usr/bin/env sh
-      export PACKAGE="$(dirname "$0")/${path.basename(input)}--source"
-      exec ${command.map((commandPart) => `"${commandPart}"`).join(" ")} "$@"
+      export PACKAGE="$(dirname "$0")/_"
+      exec "$PACKAGE/node_modules/.bin/node" "$PACKAGE/build/index.mjs" "$@"
     `,
     {
-      name: `${path.basename(input)}/${path.basename(input)}`,
+      name: `${path.basename(process.cwd())}/${path.basename(process.cwd())}`,
       mode: 0o755,
     },
   );

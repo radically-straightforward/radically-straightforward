@@ -50,7 +50,7 @@ test(async () => {
     "command-line",
     "arguments",
   ]);
-  assert(output.env.PACKAGE.endsWith("example-application--source"));
+  assert(output.env.PACKAGE.endsWith("_"));
   assert.equal(output.env.EXAMPLE_PROGRAM, "true");
   assert.equal(
     output.image,
