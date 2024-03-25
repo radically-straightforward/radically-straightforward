@@ -8,8 +8,6 @@
 
 - Packages
   - build
-  - pacakge
-    - When calling `package` in examples, we have to escape `$PACKAGE`. Perhaps use something else for a placeholder, to avoid confusion?
   - Review other Courselore stuff
     - Documentation on setting up
     - Use SQLite as queue:

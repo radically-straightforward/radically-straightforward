@@ -4,7 +4,7 @@ import path from "node:path";
 import fs from "node:fs/promises";
 import childProcess from "node:child_process";
 import util from "node:util";
-import * as fsStream from "node:fs";
+import fsStream from "node:fs";
 import stream from "node:stream/promises";
 import archiver from "archiver";
 import batch from "dedent";
