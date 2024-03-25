@@ -5,6 +5,13 @@
   - Release a new version
 - caddy serving of `static/` files points to the wrong place
   - Does it help to change `package` such that `${path.basename(input)}--source` turns into `_` (a fixed name)?
+```
+url.fileURLToPath(new URL("./static/", import.meta.url))
+
+url.fileURLToPath(new URL("../data/", import.meta.url))
+OR
+path.join(process.cwd(), "data")
+```
 - Return to `build`’s documentation
 
 ---
