@@ -35,7 +35,7 @@ test(async () => {
       import css from "@radically-straightforward/css";
       import javascript from "@radically-straightforward/javascript";
 
-      const users = html\`<div css="\${css\`background-color:   pink;\`}" javascript="\${javascript\`console.log(  \${"Hello"}, \${"World"});\`}"></div><div css="\${css\`background-color: purple; &:hover { appearance: none; }\`}" javascript="\${javascript\`console.log("Users");\`}"></div>\`;
+      const users = html\`<div css="\${css\`background-color:   pink;\`}" javascript="\${javascript\`console.log(  \${"Bye"}, \${"World"});\`}"></div><div css="\${css\`background-color: purple; &:hover { appearance: none; }\`}" javascript="\${javascript\`console.log("Users");\`}"></div>\`;
     `,
   );
   await fs.mkdir("./static/", { recursive: true });
@@ -117,7 +117,7 @@ test(async () => {
   );
   assert.equal(
     await fs.readFile("./build/users.mjs", "utf-8"),
-    'import html from "@radically-straightforward/html";\nconst users = html`<div css="${"feozrypenksece"}" javascript="${JSON.stringify({\n  function: "bgtlnytmxenlex",\n  arguments: ["Hello", "World"]\n})}"></div><div css="${"dxsfkgtqanuneb"}" javascript="${JSON.stringify({\n  function: "fxnzyekoinlefh",\n  arguments: []\n})}"></div>`;\n//# sourceMappingURL=users.mjs.map',
+    'import html from "@radically-straightforward/html";\nconst users = html`<div css="${"feozrypenksece"}" javascript="${JSON.stringify({\n  function: "bgtlnytmxenlex",\n  arguments: ["Bye", "World"]\n})}"></div><div css="${"dxsfkgtqanuneb"}" javascript="${JSON.stringify({\n  function: "fxnzyekoinlefh",\n  arguments: []\n})}"></div>`;\n//# sourceMappingURL=users.mjs.map',
   );
   assert.equal(
     await fs.readFile(
