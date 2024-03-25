@@ -1,5 +1,8 @@
 # TODO
 
+- package
+  - Fix issue in Windows
+  - Release a new version
 - caddy serving of `static/` files points to the wrong place
   - Does it help to change `package` such that `${path.basename(input)}--source` turns into `_` (a fixed name)?
 - Return to `build`’s documentation
