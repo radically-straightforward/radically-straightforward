@@ -41,8 +41,7 @@ const baseIdentifier = baseX("abcdefghijklmnopqrstuvwxyz");
 for (const source of await globby("./build/**/*.mjs")) {
   const fileCSSSnippets = new Array<CSS>();
   const fileJavaScriptSnippets = new Array<JavaScript>();
-  let babelResult = await babel.transformFileAsync(source, {
-    ast: true,
+  await babel.transformFileAsync(source, {
     code: false,
     plugins: [
       {
@@ -80,12 +79,6 @@ for (const source of await globby("./build/**/*.mjs")) {
       },
     ],
   });
-  if (
-    babelResult === null ||
-    babelResult.ast === undefined ||
-    babelResult.ast === null
-  )
-    throw new Error("Babel transformation failed.");
   const cssIdentifiers = new Array<string>();
   for (let snippet of fileCSSSnippets) {
     snippet = await prettier.format(snippet, { parser: "css" });
@@ -111,8 +104,7 @@ for (const source of await globby("./build/**/*.mjs")) {
       `/********************************************************************************/\n\njavascript?.execute?.functions?.set?.("${identifier}", ${snippet.replace(/^async function PLACEHOLDER/, "async function")});\n\n`,
     );
   }
-  babelResult = await babel.transformFromAstAsync(babelResult.ast, undefined, {
-    cloneInputAst: false,
+  const babelResult = await babel.transformFileAsync(source, {
     compact: false,
     sourceMaps: true,
     plugins: [
