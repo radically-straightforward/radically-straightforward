@@ -1,8 +1,5 @@
 # TODO
 
-- Test sourcemaps
-  - CSS and browser JavaScript.
-    - Include server JavaScript source point of tagged template in comment that we use to separate snippets in extracted CSS/browser JavaScript
 - Investigate how to remove the `.example.example.example.example.example.example` hack that solves specificity issues
   - Use `@layer`
     - Relatively new and may not be polyfillable
