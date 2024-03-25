@@ -2,6 +2,9 @@
 
 - Test sourcemaps
   - Server JavaScript which had `` css`___` `` and `` javascript`___` `` removed.
+    - Generate sourcemap from intermediate JavaScript, but take its own sourcemap into account
+    - Add dummy whitespace and don’t generate sourcemaps
+      - But in edge cases the result may be bigger than the input, and we don’t have **negative spaces**
   - CSS and browser JavaScript.
     - Include server JavaScript source point of tagged template in comment that we use to separate snippets in extracted CSS/browser JavaScript
 - Investigate how to remove the `.example.example.example.example.example.example` hack that solves specificity issues
