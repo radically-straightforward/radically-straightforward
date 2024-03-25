@@ -23,7 +23,7 @@ test(async () => {
       path.join(os.tmpdir(), "radically-straightforward--package--test--"),
     ),
   );
-  await fs.rename(
+  await fs.copyFile(
     new URL(
       `../example-application.${
         process.platform === "win32" ? "zip" : "tar.gz"
@@ -31,6 +31,14 @@ test(async () => {
       import.meta.url,
     ),
     `example-application.${process.platform === "win32" ? "zip" : "tar.gz"}`,
+  );
+  await fs.unlink(
+    new URL(
+      `../example-application.${
+        process.platform === "win32" ? "zip" : "tar.gz"
+      }`,
+      import.meta.url,
+    ),
   );
   await util.promisify(childProcess.execFile)("tar", [
     "-xzf",
