@@ -1,13 +1,6 @@
 # TODO
 
-- caddy serving of `static/` files points to the wrong place
-```
-url.fileURLToPath(new URL("./static/", import.meta.url))
-
-url.fileURLToPath(new URL("../data/", import.meta.url))
-OR
-path.join(process.cwd(), "data")
-```
+- caddy static files paths
 - Return to `build`’s documentation
 
 ---
