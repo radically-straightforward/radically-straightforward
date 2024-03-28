@@ -1,6 +1,5 @@
 # TODO
 
-- caddy static files paths
 - Return to `build`’s documentation
 
 ---
