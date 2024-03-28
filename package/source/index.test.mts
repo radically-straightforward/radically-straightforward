@@ -44,19 +44,16 @@ test(async () => {
     "-xzf",
     `example-application.${process.platform === "win32" ? "zip" : "tar.gz"}`,
   ]);
-  process.chdir("./example-application/");
-  console.log(process.cwd());
   const result = await util
     .promisify(childProcess.execFile)(
-      `./example-application${process.platform === "win32" ? ".cmd" : ""}`,
+      path.join(
+        "./example-application/",
+        `example-application${process.platform === "win32" ? ".cmd" : ""}`,
+      ),
       ["examples", "of", "some", "extra", "command-line", "arguments"],
       { env: { ...process.env, EXAMPLE_PROGRAM: "true" } },
     )
     .catch((error) => error);
-  console.log("===========================>", result.code);
-  console.log("===========================>", result.stdout);
-  console.log("===========================>", result.stderr);
-  console.log("===========================>", result);
   assert.equal(result.code, 1);
   const output = JSON.parse(result.stdout);
   assert.deepEqual(output.argv.slice(2), [

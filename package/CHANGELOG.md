@@ -1,6 +1,6 @@
 # Changelog
 
-## 2.0.0 · 2024-03-25
+## 2.0.0 · 2024-03-28
 
 - **Breaking Change:** Removed command-line parameters.
 
