@@ -22,20 +22,25 @@ test(
       ),
     );
 
-    await fs.mkdir("static/", { recursive: true });
-    await fs.writeFile("static/example.css", `body { background-color: red; }`);
-
-    await fs.mkdir("data/files/", { recursive: true });
+    await fs.mkdir("./example-application/_/build/static/", {
+      recursive: true,
+    });
     await fs.writeFile(
-      "data/sensitive.txt",
+      "./example-application/_/build/static/example.css",
+      `body { background-color: red; }`,
+    );
+
+    await fs.mkdir("./data/files/", { recursive: true });
+    await fs.writeFile(
+      "./data/sensitive.txt",
       `EXAMPLE OF SENSITIVE FILE THAT MUST BE INACCESSIBLE`,
     );
     await fs.writeFile(
-      "data/files/example.txt",
+      "./data/files/example.txt",
       `EXAMPLE OF USER-GENERATED TXT FILE THAT MAY BE EMBEDDED`,
     );
     await fs.writeFile(
-      "data/files/example.html",
+      "./data/files/example.html",
       `
         <!DOCTYPE html>
         <html lang="en">
@@ -49,7 +54,7 @@ test(
       `,
     );
     await fs.writeFile(
-      "data/files/example--html.txt",
+      "./data/files/example--html.txt",
       `
         <!DOCTYPE html>
         <html lang="en">
@@ -74,7 +79,11 @@ test(
       ["run", "--adapter", "caddyfile", "--config", "-"],
       { stdio: [undefined, "ignore", "ignore"] },
     );
-    caddyServer.stdin.end(caddy.application());
+    caddyServer.stdin.end(
+      caddy.application({
+        trustedStaticFilesRoots: [`* "./example-application/_/build/static/"`],
+      }),
+    );
 
     await utilities.sleep(2 * 1000);
 

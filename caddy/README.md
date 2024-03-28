@@ -79,8 +79,14 @@ A [tagged template](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Refe
 ```typescript
 export function application({
   address = "localhost",
-  trustedStaticFilesRoots = ["* static/"],
-  untrustedStaticFilesRoots = ["/files/* data/"],
+  trustedStaticFilesRoots = [
+    `* "${url.fileURLToPath(
+      new URL("./build/static/", import.meta.url.split("/node_modules/")[0]),
+    )}"`,
+  ],
+  untrustedStaticFilesRoots = [
+    `/files/* "${path.join(process.cwd(), "data")}"`,
+  ],
   dynamicServerPorts = ["18000"],
   email = undefined,
   hstsPreload = false,
@@ -100,9 +106,11 @@ A Caddyfile template for an application.
 
 - `address`: The [`address` of the site block](https://caddyserver.com/docs/caddyfile/concepts#addresses). Usually the `address` is the [`hostname`](https://nodejs.org/api/url.html#url-strings-and-url-objects) part of the application’s URL, for example, `example.com` (notably, the `hostname` doesn’t include neither the protocol nor the port).
 
-- `trustedStaticFilesRoots`: [Caddy `root` directives](https://caddyserver.com/docs/caddyfile/directives/root) for **immutable** static files that are **trusted** by the application, for example, the application’s CSS and browser JavaScript.
+- `trustedStaticFilesRoots`: [Caddy `root` directives](https://caddyserver.com/docs/caddyfile/directives/root) for static files that are **trusted** by the application, for example, the application’s CSS and browser JavaScript.
 
-- `untrustedStaticFilesRoots`: Similar to `trustedStaticFilesRoots`, but for **immutable** static files that are **untrusted** by the application, for example, user-uploaded avatars and attachments to messages.
+- `untrustedStaticFilesRoots`: Similar to `trustedStaticFilesRoots`, but for static files that are **untrusted** by the application, for example, user-uploaded avatars, attachments to messages, and so forth.
+
+  > **Note:** Both `trustedStaticFilesRoots` and `untrustedStaticFilesRoots` must refer to **immutable** files. You may use [`@radically-straightforward/build`](https://github.com/radically-straightforward/radically-straightforward/tree/main/build) to build CSS, browser JavaScript, and other static files with immutable and unique file names. Your application should create immutable and unique file names for user-uploaded avatars, attachments to messages, and so forth.
 
 - `dynamicServerPorts`: Ports for the dynamic part of the application—usually several processes of a Node.js server.
 
