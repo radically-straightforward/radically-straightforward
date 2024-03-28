@@ -46,9 +46,7 @@ test(async () => {
   ]);
   const result = await util
     .promisify(childProcess.execFile)(
-      `example-application/example-application${
-        process.platform === "win32" ? ".cmd" : ""
-      }`,
+      `./example-application/example-application${process.platform === "win32" ? ".cmd" : ""}`,
       ["examples", "of", "some", "extra", "command-line", "arguments"],
       { env: { ...process.env, EXAMPLE_PROGRAM: "true" } },
     )
