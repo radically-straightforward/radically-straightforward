@@ -35,10 +35,10 @@ The package will be available as a sibling of the application directory, for exa
 
 When extracted, the package includes an executable entrypoint and the application source code, for example:
 
-- `example-application/example-application`
+- `example-application/example-application.cmd`(Windows) or `example-application/example-application` (macOS or Linux)
 - `example-application/_/`
 
-And the following is an example of calling the application:
+And the following is an example of calling the application in macOS or Linux:
 
 ```console
 $ ./example-application/example-application examples of some extra command-line arguments
