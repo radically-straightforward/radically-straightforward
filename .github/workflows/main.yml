@@ -36,45 +36,45 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
-  applications:
-    strategy:
-      matrix:
-        package:
-          - monitor
-        os:
-          - windows
-          - macos
-          - ubuntu
-    runs-on: ${{ matrix.os }}-latest
-    steps:
-      - uses: actions/checkout@main
-      - uses: actions/setup-node@main
-        with:
-          node-version: latest
-      - run: |
-          cd ./${{ matrix.package }}/
-          npm install-ci-test
-          npx package
-          cd ..
-          mv ./${{ matrix.package }}.${{ matrix.os == 'windows' && 'zip' || 'tar.gz' }} ./${{ matrix.package }}--${{ matrix.os }}--${{ startsWith(github.ref, format('refs/tags/{0}--', matrix.package)) && github.ref_name || github.sha }}.${{ matrix.os == 'windows' && 'zip' || 'tar.gz' }}
-      - uses: actions/upload-artifact@main
-        with:
-          path: ./${{ matrix.package }}--${{ matrix.os }}--${{ startsWith(github.ref, format('refs/tags/{0}--', matrix.package)) && github.ref_name || github.sha }}.${{ matrix.os == 'windows' && 'zip' || 'tar.gz' }}
-          name: ${{ matrix.package }}--${{ matrix.os }}--${{ startsWith(github.ref, format('refs/tags/{0}--', matrix.package)) && github.ref_name || github.sha }}.${{ matrix.os == 'windows' && 'zip' || 'tar.gz' }}
+  # applications:
+  #   strategy:
+  #     matrix:
+  #       package:
+  #         - monitor
+  #       os:
+  #         - windows
+  #         - macos
+  #         - ubuntu
+  #   runs-on: ${{ matrix.os }}-latest
+  #   steps:
+  #     - uses: actions/checkout@main
+  #     - uses: actions/setup-node@main
+  #       with:
+  #         node-version: latest
+  #     - run: |
+  #         cd ./${{ matrix.package }}/
+  #         npm install-ci-test
+  #         npx package
+  #         cd ..
+  #         mv ./${{ matrix.package }}.${{ matrix.os == 'windows' && 'zip' || 'tar.gz' }} ./${{ matrix.package }}--${{ matrix.os }}--${{ startsWith(github.ref, format('refs/tags/{0}--', matrix.package)) && github.ref_name || github.sha }}.${{ matrix.os == 'windows' && 'zip' || 'tar.gz' }}
+  #     - uses: actions/upload-artifact@main
+  #       with:
+  #         path: ./${{ matrix.package }}--${{ matrix.os }}--${{ startsWith(github.ref, format('refs/tags/{0}--', matrix.package)) && github.ref_name || github.sha }}.${{ matrix.os == 'windows' && 'zip' || 'tar.gz' }}
+  #         name: ${{ matrix.package }}--${{ matrix.os }}--${{ startsWith(github.ref, format('refs/tags/{0}--', matrix.package)) && github.ref_name || github.sha }}.${{ matrix.os == 'windows' && 'zip' || 'tar.gz' }}
 
-  applications--release:
-    strategy:
-      matrix:
-        package:
-          - monitor
-    needs: applications
-    runs-on: ubuntu-latest
-    steps:
-      - if: ${{ startsWith(github.ref, format('refs/tags/{0}--', matrix.package)) }}
-        uses: actions/download-artifact@main
-        with:
-          pattern: ${{ matrix.package }}--*
-      - if: ${{ startsWith(github.ref, format('refs/tags/{0}--', matrix.package)) }}
-        uses: softprops/action-gh-release@master
-        with:
-          files: ./**/*.*
+  # applications--release:
+  #   strategy:
+  #     matrix:
+  #       package:
+  #         - monitor
+  #   needs: applications
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - if: ${{ startsWith(github.ref, format('refs/tags/{0}--', matrix.package)) }}
+  #       uses: actions/download-artifact@main
+  #       with:
+  #         pattern: ${{ matrix.package }}--*
+  #     - if: ${{ startsWith(github.ref, format('refs/tags/{0}--', matrix.package)) }}
+  #       uses: softprops/action-gh-release@master
+  #       with:
+  #         files: ./**/*.*
