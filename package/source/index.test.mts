@@ -54,7 +54,10 @@ test(async () => {
     )
     .catch((error) => error);
   assert.equal(result.code, 1);
+  console.log("===========================>", result.code);
   console.log("===========================>", result.stdout);
+  console.log("===========================>", result.stderr);
+  console.log("===========================>", result);
   const output = JSON.parse(result.stdout);
   assert.deepEqual(output.argv.slice(2), [
     "examples",
