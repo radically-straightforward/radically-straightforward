@@ -22,7 +22,7 @@ $ node ./build/index.mjs
 
 > **Note:** If you need to run some other command to start your application, then create a startup script at `./build/index.mjs`.
 
-Then, use `package` to produce a package for distribution, for example:
+Then, use `@radically-straightforward/package` to produce a package for distribution, for example:
 
 ```console
 $ npx package
@@ -46,11 +46,11 @@ $ ./example-application/example-application examples of some extra command-line 
 
 ## How It Works
 
-First `package` cleans up development dependencies and duplicate dependencies with `env NODE_ENV=production npm dedupe`.
+First `@radically-straightforward/package` cleans up development dependencies and duplicate dependencies with `env NODE_ENV=production npm dedupe`.
 
-Then `package` copies the Node.js binary with which it was executed into the `node_modules/.bin/` directory, where npm installs binaries of dependencies.
+Then `@radically-straightforward/package` copies the Node.js binary with which it was executed into the `node_modules/.bin/` directory, where npm installs binaries of dependencies.
 
-Finally `package` creates a `.zip` (Windows) or a `.tar.gz` (macOS or Linux) file including your application’s source code and a shim executable. The shim executable starts your application and forwards command-line arguments, environment variables, standard input/output, signals, and return code.
+Finally `@radically-straightforward/package` creates a `.zip` (Windows) or a `.tar.gz` (macOS or Linux) file including your application’s source code and a shim executable. The shim executable starts your application and forwards command-line arguments, environment variables, standard input/output, signals, and return code.
 
 > **Note:** The `$PACKAGE` environment variable is set to the directory containing your application.
 
@@ -58,11 +58,11 @@ Finally `package` creates a `.zip` (Windows) or a `.tar.gz` (macOS or Linux) fil
 
 ### [`caxa`](https://www.npmjs.com/package/caxa)
 
-`package` is the evolution of `caxa`.
+`@radically-straightforward/package` is the evolution of `caxa`.
 
-The most notable difference between `caxa` and `package` is that `caxa` produces a binary which is a single file, while `package` produces a `.zip` (Windows) or a `.tar.gz` (macOS or Linux) containing a directory with the source code of the application and a shim executable. The principle behind the two is similar, because the binary produced by `caxa` is a self-extracting executable and what amounts to a shim executable, but there are some reasons to prefer the approach followed by `package`:
+The most notable difference between `caxa` and `@radically-straightforward/package` is that `caxa` produces a binary which is a single file, while `@radically-straightforward/package` produces a `.zip` (Windows) or a `.tar.gz` (macOS or Linux) containing a directory with the source code of the application and a shim executable. The principle behind the two is similar, because the binary produced by `caxa` is a self-extracting executable and what amounts to a shim executable, but there are some reasons to prefer the approach followed by `@radically-straightforward/package`:
 
-- `package` is more straightforward and less magical. The self-extracting executable created by `caxa` relies on a stub executable written in another language (Go, or shell script, and so forth), and a tarball that is appended to the end of the this stub executable file (notably, appending data to the end of an executable doesn’t corrupt it, which is a strange property that holds in executable formats across Windows, macOS, and Linux). This magic is amusing, but brittle, and has unfortunate side-effects, for example, triggering anti-virus software and prevent signing and notarization.
+- `@radically-straightforward/package` is more straightforward and less magical. The self-extracting executable created by `caxa` relies on a stub executable written in another language (Go, or shell script, and so forth), and a tarball that is appended to the end of the this stub executable file (notably, appending data to the end of an executable doesn’t corrupt it, which is a strange property that holds in executable formats across Windows, macOS, and Linux). This magic is amusing, but brittle, and has unfortunate side-effects, for example, triggering anti-virus software and complicating signing and notarization.
 
 - `caxa` has to extract the application from the binary. This is extra work that needs to happen on the first call to your application, which slows things down. And it’s non-trivial work too, which needs to take in account race conditions between multiple calls to the application, previously failed attempts of extraction, and so forth.
 
@@ -70,11 +70,11 @@ The most notable difference between `caxa` and `package` is that `caxa` produces
 
 - In macOS and Linux if you simply download an executable from the internet it doesn’t come with the permissions necessary to execute it—you must `chmod a+x example-application` first. Most applications solve this issue by distributing a tarball, which preserves the permissions of executables upon extraction, but this defeats the point of the self-extracting executable produced by `caxa` in the first place.
 
-`package` also improves upon `caxa` in a few other aspects:
+`@radically-straightforward/package` also improves upon `caxa` in a few other aspects:
 
-- `package` is simpler to use. It provides sensible defaults instead of asking for several command-line arguments. It doesn’t include obscure features of `caxa`, for example, the ability to generate a macOS Application Bundle (`.app`), and the ability to package from JavaScript as opposed to the command-line.
+- `@radically-straightforward/package` is simpler to use. It provides sensible defaults instead of asking for several command-line arguments. It doesn’t include obscure features of `caxa`, for example, the ability to generate a macOS Application Bundle (`.app`), and the ability to package from JavaScript as opposed to the command-line.
 
-- In macOS and Linux, `package` calls the underlying application with `exec`, replacing the current process instead of creating a child process. This simplifies the process tree and solves issues related to forwarding signals. Unfortunately Windows doesn’t support `exec`, so a child process is still used in that case.
+- In macOS and Linux, `@radically-straightforward/package` calls the underlying application with `exec`, replacing the current process instead of creating a child process. This simplifies the process tree and solves issues related to forwarding signals. Unfortunately Windows doesn’t support `exec`, so a child process is still used in that case.
 
 ### [`pkg`](https://www.npmjs.com/package/pkg)
 
