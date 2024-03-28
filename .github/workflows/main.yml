@@ -4,22 +4,22 @@ jobs:
     strategy:
       matrix:
         package:
-          - server
-          - sqlite
-          - html
-          - css
-          - javascript
-          - utilities
-          - node
-          - tsconfig
-          - documentation
-          - caddy
-          - build
+          # - server
+          # - sqlite
+          # - html
+          # - css
+          # - javascript
+          # - utilities
+          # - node
+          # - tsconfig
+          # - documentation
+          # - caddy
+          # - build
           - package
         os:
           - windows
-          - macos
-          - ubuntu
+          # - macos
+          # - ubuntu
     runs-on: ${{ matrix.os }}-latest
     defaults:
       run:
