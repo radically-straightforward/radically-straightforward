@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.3.0 · 2024-02-28
+
+- Fixed the default values of `application()`’s `trustedStaticFilesRoots` and `untrustedStaticFilesRoots`.
+
 ## 1.2.0 · 2024-02-23
 
 - In `application()`, renamed `hostname` into `address`.
