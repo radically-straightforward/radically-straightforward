@@ -5,10 +5,10 @@ jobs:
       matrix:
         package:
           - server
+          - sqlite
           - html
           - css
           - javascript
-          - sqlite
           - utilities
           - node
           - tsconfig
