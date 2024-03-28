@@ -1,10 +1,11 @@
 import path from "node:path";
+import url from "node:url";
 import fs from "node:fs/promises";
 
-if (process.cwd().includes("/node_modules/"))
+if (url.fileURLToPath(import.meta.url).includes("/node_modules/"))
   await fs.writeFile(
     path.join(
-      process.cwd().split(new RegExp("/node_modules/"))[0],
+      url.fileURLToPath(import.meta.url).split("/node_modules/")[0],
       "tsconfig.json",
     ),
     `{
