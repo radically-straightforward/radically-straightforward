@@ -139,3 +139,51 @@ $ npx build
 ## Related Work
 
 TODO
+
+---
+
+- Document CSS specificity
+  - `` `[css~="${identifier}"]`.repeat(6) ``
+  - Overwrite parent styles with the `&& { ... }` pattern:
+    ```html
+    <div
+      css="${css`
+        p {
+          background-color: green;
+        }
+      `}"
+    >
+      <p>Hello</p>
+      <p
+        css="${css`
+          && {
+            background-color: blue;
+          }
+        `}"
+      >
+        Hello
+      </p>
+      <p>Hello</p>
+    </div>
+    ```
+- Document that CSS extraction resolves interpolations at compile time, and browser JavaScript extraction resolves interpolations at run time.
+  - Conditional addition of whole blocks of CSS
+  - CSS variables in `style="___"`
+- Investigate how to remove the `` `[css~="${identifier}"]`.repeat(6) `` hack that solves specificity issues
+  - Use `@layer`
+    - Relatively new and may not be polyfillable
+  - esbuild’s CSS modules
+
+## Related Work
+
+- https://vanilla-extract.style
+- https://xstyled.dev/
+- https://linaria.dev/
+- https://www.npmjs.com/package/csjs
+- https://www.npmjs.com/package/radium
+
+---
+
+- https://github.com/CraigCav/css-zero
+- https://github.com/callstack/linaria/tree/master/packages/babel
+- https://github.com/sgtpep/csstag
