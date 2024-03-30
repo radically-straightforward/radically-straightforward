@@ -15,12 +15,17 @@ Author HTML, CSS, and browser JavaScript using [tagged templates](https://develo
 **`source/index.mts`**
 
 ```typescript
+import fs from "node:fs/promises";
 import server from "@radically-straightforward/server";
 import html from "@radically-straightforward/html";
 import css from "@radically-straightforward/css";
 import javascript from "@radically-straightforward/javascript";
 
 const application = server();
+
+const static = JSON.parse(
+  await fs.readFile(new URL("./static/paths.json", import.meta.url), "utf-8"),
+);
 
 css`
   @import "some-library";
@@ -47,7 +52,10 @@ application.push({
     response.end(html`
       <!doctype html>
       <html>
-        <head></head>
+        <head>
+          <link rel="stylesheet" href="${static["index.css"]}" />
+          <script src="${static["index.js"]}"></script>
+        </head>
         <body>
           <h1
             css="${css`
