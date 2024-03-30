@@ -259,14 +259,26 @@ someUserInput.match(invalidXMLCharacters); // Detect whether there are invalid X
 
 ## Related Work
 
+### [JSX](https://facebook.github.io/jsx/)
+
+- JSX requires you to deviate from plain HTML in some edge cases, for example, `class="___"` becomes `className="___"`, because the HTML embedded in JavaScript with JSX is turned into function calls and `class` is a reserved word in JavaScript. `@radically-straightforward/html` doesn’t run into this issue, because HTML is treated as strings.
+
+- According to some ad-hoc benchmarks, `@radically-straightforward/html` is one order of magnitude faster than [React’s `renderToStaticMarkup()`](https://react.dev/reference/react-dom/server/renderToStaticMarkup), which is significant because rendering HTML accounts for a good amount of the time spent responding to a request.
+
+- Embedding HTML in the JavaScript is only half of the battle: We also need to embed CSS and browser JavaScript in the embedded HTML itself. In JSX there are two solutions for this: 1. Represent CSS as a JavaScript object (for example, turning `background-color: red;` into `{ backgroundColor: "red" }`); or 2. Use tagged templates (for example, `` css`background-color: red;` ``). Solution 1 is awkward because it introduces one layer of indirection (you can’t, for example, copy-and-paste snippets of CSS you find on the internet). Solution 2 is awkward because is solves the same problem (embedding one language in another) in different ways (HTML turns into JSX, and CSS turns into tagged templates). `@radically-straightforward/html`, along with [`@radically-straightforward/css`](https://github.com/radically-straightforward/radically-straightforward/tree/main/css) and [`@radically-straightforward/javascript`](https://github.com/radically-straightforward/radically-straightforward/tree/main/javascript), presents a unified approach to solve the problem using tagged templates.
+
+- JSX requires an extra compilation step. Admittedly, so does idiomatic use of `@radically-straightforward/css` and `@radically-straightforward/javascript` through [`@radically-straightforward/build`](https://github.com/radically-straightforward/radically-straightforward/tree/main/build).
+
 ### [`html-template-tag`](https://www.npmjs.com/package/html-template-tag)
 
 - Was a major inspiration for this. Its design is simple and great. In particular, I love (and stole) the idea of using `$${___}` for opting out of sanitization.
+
 - [Doesn’t encode arrays by default](https://github.com/AntonioVdlC/html-template-tag/issues/10).
 
 ### [`common-tags`](https://www.npmjs.com/package/common-tags)
 
 - Doesn’t encode interpolated values by default.
+
 - Uses the `safeHtml` tag, which isn’t recognized by Prettier or the Visual Studio Code extension es6-string-html extension.
 
 ### [`escape-html-template-tag`](https://www.npmjs.com/package/escape-html-template-tag)
