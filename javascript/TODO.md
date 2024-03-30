@@ -13,7 +13,6 @@ response.send(html`
 
 ---
 
-
 Pulling client-side JavaScript into a `<script>` tag, as opposed to leaving it inline:
 
 Pros:
@@ -32,6 +31,7 @@ Cons:
 
 One (perhaps valuable) difference between `morph()` and other solutions like `morphdom`: `morph()` does’t destroy the `to` tree, while `morphdom` does.
 
+```css
 [live-navigation] * {
   cursor: wait !important;
 }
@@ -43,9 +43,10 @@ One (perhaps valuable) difference between `morph()` and other solutions like `mo
     cursor: wait !important;
   }
 }
-
+```
 
 - `key=""` may be understood to imply uniqueness at first glance
+
   - Perhaps it would be nicer to have more structure in the key besides just a string.
 
 - Currently `onload` may be adding a bunch of repeated JavaScript, adding to the size of the page. Perhaps we should do something similar to what we do in `local-css`?
@@ -295,3 +296,9 @@ One (perhaps valuable) difference between `morph()` and other solutions like `mo
   - https://github.com/facebook/jest/issues/4316
   - https://github.com/bowd/jest-same-file-tests
   - https://vitest.dev/guide/features.html#in-source-testing
+
+## Related Work
+
+- <https://github.com/patrick-steele-idem/morphdom>
+- <https://github.com/choojs/nanomorph>
+- <https://github.com/alpinejs/alpine/tree/main/packages/morph>
