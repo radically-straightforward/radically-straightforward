@@ -61,3 +61,8 @@
     - Syntax highlighting
     - IntelliSense
   - TypeScript on browser JavaScript
+
+---
+
+- <https://htmx.org/>
+- <https://html-first.com/>

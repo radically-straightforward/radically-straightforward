@@ -132,6 +132,8 @@ $ npx build
 
 - Uses [esbuild](https://esbuild.github.io/) to bundle the entrypoints at `static/index.css` and `static/index.mjs` along with the CSS and browser JavaScript extracted above. The result can be found in the `build/static/` directory. The file names contain hashes of their contents to make them immutable, and you may consult `build/static/paths.json` for a mapping between the names.
 
+  > **Note:** The bundling process includes transpiling features such as [CSS nesting](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_nesting), including CSS prefixes, minifying, and so forth.
+
 - Copies the files specified with `--file-to-copy-with-hash` and `--file-to-copy-without-hash`.
 
 ## Related Work
