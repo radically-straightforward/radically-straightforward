@@ -25,6 +25,18 @@ test(async () => {
       import css from "@radically-straightforward/css";
       import javascript from "@radically-straightforward/javascript";
 
+      css\`
+        @import "example-library/index.css";
+        body {
+          background-color: red;
+        }
+      \`;
+
+      javascript\`
+        import hi from "example-library/index.mjs";
+        console.log(hi);
+      \`;
+
       const template = html\`<div css="\${css\`background-color: pink;\`}" javascript="\${javascript\`console.log(\${"Hello"}, \${"World"});\`}"></div>\`;
     `,
   );
@@ -35,20 +47,20 @@ test(async () => {
       import css from "@radically-straightforward/css";
       import javascript from "@radically-straightforward/javascript";
 
+      css\`
+        .user {
+          background-color: green;
+        }
+      \`;
+
+      javascript\`
+        console.log("Global users");
+      \`;
+
       const users = html\`<div css="\${css\`background-color:   pink;\`}" javascript="\${javascript\`console.log(  \${"Bye"}, \${"World"});\`}"></div><div css="\${css\`background-color: purple; &:hover { appearance: none; }\`}" javascript="\${javascript\`console.log("Users");\`}"></div>\`;
     `,
   );
-  await fs.mkdir("./static/", { recursive: true });
   await fs.mkdir("./node_modules/example-library/", { recursive: true });
-  await fs.writeFile(
-    "./static/index.css",
-    css`
-      @import "example-library/index.css";
-      body {
-        background-color: red;
-      }
-    `,
-  );
   await fs.writeFile(
     "./node_modules/example-library/index.css",
     css`
@@ -58,18 +70,12 @@ test(async () => {
     `,
   );
   await fs.writeFile(
-    "./static/index.mjs",
-    javascript`
-      import hi from "example-library/index.mjs";
-      console.log(hi);
-    `,
-  );
-  await fs.writeFile(
     "./node_modules/example-library/index.mjs",
     javascript`
       export default hi = "Hi";
     `,
   );
+  await fs.mkdir("./static/", { recursive: true });
   await fs.writeFile("./static/example.txt", "Example");
   await fs.mkdir("./static/select-subdirectory/", { recursive: true });
   await fs.writeFile(

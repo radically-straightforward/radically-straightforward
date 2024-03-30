@@ -35,12 +35,16 @@ const {
   },
 });
 
-const cssSnippets = new Set<CSS>();
-const javascriptSnippets = new Set<JavaScript>();
+const globalCSSs = new Array<CSS>();
+const globalJavaScripts = new Array<JavaScript>();
+const inlineCSSs = new Set<CSS>();
+const inlineJavaScripts = new Set<JavaScript>();
 const baseIdentifier = baseX("abcdefghijklmnopqrstuvwxyz");
 for (const source of await globby("./build/**/*.mjs")) {
-  const fileCSSSnippets = new Array<CSS>();
-  const fileJavaScriptSnippets = new Array<JavaScript>();
+  const fileGlobalCSSs = new Array<CSS>();
+  const fileGlobalJavaScripts = new Array<JavaScript>();
+  const fileInlineCSSs = new Array<CSS>();
+  const fileInlineJavaScripts = new Array<JavaScript>();
   await babel.transformFileAsync(source, {
     code: false,
     plugins: [
@@ -48,30 +52,41 @@ for (const source of await globby("./build/**/*.mjs")) {
         visitor: {
           TaggedTemplateExpression: (path) => {
             if (path.node.tag.type !== "Identifier") return;
+            const isGlobal = path.parent.type === "ExpressionStatement";
             switch (path.node.tag.name) {
               case "css":
-                fileCSSSnippets.push(
-                  `PLACEHOLDER { ${new Function(
-                    "css",
-                    `return (${babelGenerator.default(path.node).code});`,
-                  )(css)} }`,
-                );
+                const code = new Function(
+                  "css",
+                  `return (${babelGenerator.default(path.node).code});`,
+                )(css);
+                if (isGlobal) fileGlobalCSSs.push(code);
+                else
+                  fileInlineCSSs.push(
+                    `__RADICALLY__STRAIGHTFORWARD__PLACEHOLDER__ { ${code} }`,
+                  );
                 break;
               case "javascript":
-                fileJavaScriptSnippets.push(
-                  `async function PLACEHOLDER(${[
-                    "event",
-                    ...path.node.quasi.expressions.map(
-                      (value, index) => `$$${index}`,
-                    ),
-                  ].join(", ")}) { ${path.node.quasi.quasis
-                    .map(
-                      (quasi, index) =>
-                        (index === 0 ? `` : `$$${index - 1}`) +
-                        quasi.value.cooked,
-                    )
-                    .join("")} }`,
-                );
+                if (isGlobal) {
+                  if (path.node.quasi.quasis.length !== 1)
+                    throw new Error(
+                      "Global browser JavaScript doesn’t support interpolation.",
+                    );
+                  fileGlobalJavaScripts.push(String(path.node.quasi.quasis[0]));
+                } else
+                  fileInlineJavaScripts.push(
+                    `async function __RADICALLY__STRAIGHTFORWARD__PLACEHOLDER__(${[
+                      "event",
+                      ...path.node.quasi.expressions.map(
+                        (value, index) => `$$${index}`,
+                      ),
+                    ].join(", ")}) { ${path.node.quasi.quasis
+                      .map(
+                        (quasi, index) =>
+                          (index === 0 ? `` : `$$${index - 1}`) +
+                          quasi.value.cooked,
+                      )
+                      .join("")} }`,
+                  );
                 break;
             }
           },
@@ -79,29 +94,46 @@ for (const source of await globby("./build/**/*.mjs")) {
       },
     ],
   });
-  const cssIdentifiers = new Array<string>();
-  for (let snippet of fileCSSSnippets) {
-    snippet = await prettier.format(snippet, { parser: "css" });
-    const identifier = baseIdentifier.encode(
-      xxhash.XXHash3.hash(Buffer.from(snippet)),
-    );
-    cssIdentifiers.push(identifier);
-    cssSnippets.add(
-      `/********************************************************************************/\n\n${snippet.replace(
-        /^PLACEHOLDER/,
-        `[css~="${identifier}"]`.repeat(6),
-      )}\n\n`,
+  for (let code of fileGlobalCSSs) {
+    code = await prettier.format(code, { parser: "css" });
+    globalCSSs.push(
+      `/********************************************************************************/\n\n${code}\n\n`,
     );
   }
-  const javascriptIdentifiers = new Array<string>();
-  for (let snippet of fileJavaScriptSnippets) {
-    snippet = await prettier.format(snippet, { parser: "babel" });
-    const identifier = baseIdentifier.encode(
-      xxhash.XXHash3.hash(Buffer.from(snippet)),
+  for (let code of fileGlobalJavaScripts) {
+    code = await prettier.format(code, { parser: "babel" });
+    globalJavaScripts.push(
+      `/********************************************************************************/\n\n${code}\n\n`,
     );
-    javascriptIdentifiers.push(identifier);
-    javascriptSnippets.add(
-      `/********************************************************************************/\n\njavascript?.execute?.functions?.set?.("${identifier}", ${snippet.replace(/^async function PLACEHOLDER/, "async function")});\n\n`,
+  }
+  const fileInlineCSSIdentifiers = new Array<string>();
+  for (let code of fileInlineCSSs) {
+    code = await prettier.format(code, { parser: "css" });
+    const identifier = baseIdentifier.encode(
+      xxhash.XXHash3.hash(Buffer.from(code)),
+    );
+    code = code.replace(
+      /^__RADICALLY__STRAIGHTFORWARD__PLACEHOLDER__/,
+      `[css~="${identifier}"]`.repeat(6),
+    );
+    fileInlineCSSIdentifiers.push(identifier);
+    inlineCSSs.add(
+      `/********************************************************************************/\n\n${code}\n\n`,
+    );
+  }
+  const fileInlineJavaScriptIdentifiers = new Array<string>();
+  for (let code of fileInlineJavaScripts) {
+    code = await prettier.format(code, { parser: "babel" });
+    const identifier = baseIdentifier.encode(
+      xxhash.XXHash3.hash(Buffer.from(code)),
+    );
+    code = `javascript?.execute?.functions?.set?.("${identifier}", ${code.replace(
+      /^async function __RADICALLY__STRAIGHTFORWARD__PLACEHOLDER__/,
+      "async function",
+    )});`;
+    fileInlineJavaScriptIdentifiers.push(identifier);
+    inlineJavaScripts.add(
+      `/********************************************************************************/\n\n${code}\n\n`,
     );
   }
   const babelResult = await babel.transformFileAsync(source, {
@@ -122,17 +154,21 @@ for (const source of await globby("./build/**/*.mjs")) {
           },
           TaggedTemplateExpression: (path) => {
             if (path.node.tag.type !== "Identifier") return;
+            if (path.parent.type === "ExpressionStatement") {
+              path.remove();
+              return;
+            }
             switch (path.node.tag.name) {
               case "css":
                 path.replaceWith(
-                  babel.types.stringLiteral(cssIdentifiers.shift()!),
+                  babel.types.stringLiteral(fileInlineCSSIdentifiers.shift()!),
                 );
                 break;
               case "javascript":
                 path.replaceWith(
                   babel.template.ast`
                     JSON.stringify({
-                      function: ${babel.types.stringLiteral(javascriptIdentifiers.shift()!)},
+                      function: ${babel.types.stringLiteral(fileInlineJavaScriptIdentifiers.shift()!)},
                       arguments: ${babel.types.arrayExpression(
                         path.node.quasi
                           .expressions as Array<babel.types.Expression>,
@@ -165,10 +201,15 @@ for (const source of await globby("./build/**/*.mjs")) {
   );
 }
 
-await fs.copyFile("./static/index.css", "./static/_index.css");
-await fs.copyFile("./static/index.mjs", "./static/_index.mjs");
-await fs.appendFile("./static/index.css", [...cssSnippets].join(""));
-await fs.appendFile("./static/index.mjs", [...javascriptSnippets].join(""));
+await fs.mkdir("./static/", { recursive: true });
+await fs.writeFile(
+  "./static/index.css",
+  [...globalCSSs, ...inlineCSSs].join(""),
+);
+await fs.writeFile(
+  "./static/index.mjs",
+  [...globalJavaScripts, ...inlineJavaScripts].join(""),
+);
 let esbuildResult: esbuild.BuildResult;
 try {
   esbuildResult = await esbuild.build({
@@ -185,8 +226,8 @@ try {
     metafile: true,
   });
 } finally {
-  await fs.rename("./static/_index.css", "./static/index.css");
-  await fs.rename("./static/_index.mjs", "./static/index.mjs");
+  await fs.unlink("./static/index.css");
+  await fs.unlink("./static/index.mjs");
 }
 
 const paths: { [key: string]: string } = {};
