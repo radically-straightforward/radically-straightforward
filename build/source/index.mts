@@ -67,11 +67,16 @@ for (const source of await globby("./build/**/*.mjs")) {
                 break;
               case "javascript":
                 if (isGlobal) {
-                  if (path.node.quasi.quasis.length !== 1)
+                  if (
+                    path.node.quasi.quasis.length !== 1 ||
+                    typeof path.node.quasi.quasis[0].value.cooked !== "string"
+                  )
                     throw new Error(
                       "Global browser JavaScript doesn’t support interpolation.",
                     );
-                  fileGlobalJavaScripts.push(String(path.node.quasi.quasis[0]));
+                  fileGlobalJavaScripts.push(
+                    path.node.quasi.quasis[0].value.cooked,
+                  );
                 } else
                   fileInlineJavaScripts.push(
                     `async function __RADICALLY__STRAIGHTFORWARD__PLACEHOLDER__(${[
