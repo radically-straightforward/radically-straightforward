@@ -35,5 +35,10 @@
 - Overarching story
   - Principles
     - Spaghetti code vs soup of unknown objects
+  - Related work
+    - <https://html-first.com/>
+    - <https://tailwindcss.com/>
+    - <https://htmx.org/>
+    - <https://alpinejs.dev/>
 - Logo
 - Dedicated website?
