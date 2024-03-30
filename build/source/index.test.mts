@@ -121,25 +121,25 @@ test(async () => {
 
   assert.equal(
     await fs.readFile("./build/index.mjs", "utf-8"),
-    'import html from "@radically-straightforward/html";\nconst template = html`<div css="${"feozrypenksece"}" javascript="${JSON.stringify({\n  function: "bgtlnytmxenlex",\n  arguments: ["Hello", "World"]\n})}"></div>`;\n//# sourceMappingURL=index.mjs.map',
+    'import html from "@radically-straightforward/html";\nconst template = html`<div css="${"idnnykdflodmu"}" javascript="${JSON.stringify({\n  function: "funyrgvdgmnyff",\n  arguments: ["Hello", "World"]\n})}"></div>`;\n//# sourceMappingURL=index.mjs.map',
   );
   assert.equal(
     await fs.readFile("./build/users.mjs", "utf-8"),
-    'import html from "@radically-straightforward/html";\nconst users = html`<div css="${"feozrypenksece"}" javascript="${JSON.stringify({\n  function: "bgtlnytmxenlex",\n  arguments: ["Bye", "World"]\n})}"></div><div css="${"dxsfkgtqanuneb"}" javascript="${JSON.stringify({\n  function: "fxnzyekoinlefh",\n  arguments: []\n})}"></div>`;\n//# sourceMappingURL=users.mjs.map',
+    'import html from "@radically-straightforward/html";\n() => {};\nconst users = html`<div css="${"idnnykdflodmu"}" javascript="${JSON.stringify({\n  function: "funyrgvdgmnyff",\n  arguments: ["Bye", "World"]\n})}"></div><div css="${"xbjbuzxiqpcpj"}" javascript="${JSON.stringify({\n  function: "ywdosramhnhmk",\n  arguments: []\n})}"></div>`;\n//# sourceMappingURL=users.mjs.map',
   );
   assert.equal(
     await fs.readFile(
       path.join("./build/static/", paths["index.css"]),
       "utf-8",
     ),
-    "p{background-color:#00f}body{background-color:red}[css~=feozrypenksece][css~=feozrypenksece][css~=feozrypenksece][css~=feozrypenksece][css~=feozrypenksece][css~=feozrypenksece]{background-color:pink}[css~=dxsfkgtqanuneb][css~=dxsfkgtqanuneb][css~=dxsfkgtqanuneb][css~=dxsfkgtqanuneb][css~=dxsfkgtqanuneb][css~=dxsfkgtqanuneb]{background-color:purple}[css~=dxsfkgtqanuneb][css~=dxsfkgtqanuneb][css~=dxsfkgtqanuneb][css~=dxsfkgtqanuneb][css~=dxsfkgtqanuneb][css~=dxsfkgtqanuneb]:hover{-webkit-appearance:none;appearance:none}\n/*# sourceMappingURL=index--ZNY57PGH.css.map */\n",
+    "p{background-color:#00f}body{background-color:red}.user{background-color:green}[css~=idnnykdflodmu][css~=idnnykdflodmu][css~=idnnykdflodmu][css~=idnnykdflodmu][css~=idnnykdflodmu][css~=idnnykdflodmu]{background-color:pink}[css~=xbjbuzxiqpcpj][css~=xbjbuzxiqpcpj][css~=xbjbuzxiqpcpj][css~=xbjbuzxiqpcpj][css~=xbjbuzxiqpcpj][css~=xbjbuzxiqpcpj]{background-color:purple}[css~=xbjbuzxiqpcpj][css~=xbjbuzxiqpcpj][css~=xbjbuzxiqpcpj][css~=xbjbuzxiqpcpj][css~=xbjbuzxiqpcpj][css~=xbjbuzxiqpcpj]:hover{-webkit-appearance:none;appearance:none}\n/*# sourceMappingURL=index--2ZLL6TZE.css.map */\n",
   );
   assert.equal(
     await fs.readFile(
       path.join("./build/static/", paths["index.mjs"]),
       "utf-8",
     ),
-    '(()=>{var e=hi="Hi";console.log(e);javascript?.execute?.functions?.set?.("bgtlnytmxenlex",async function(n,o,t){console.log(o,t)});javascript?.execute?.functions?.set?.("fxnzyekoinlefh",async function(n){console.log("Users")});})();\n//# sourceMappingURL=index--Y5KNWMCX.js.map\n',
+    '(()=>{var o=hi="Hi";console.log(o);console.log("Global users");javascript?.execute?.functions?.set?.("funyrgvdgmnyff",async function(e,n,s){console.log(n,s)});javascript?.execute?.functions?.set?.("ywdosramhnhmk",async function(e){console.log("Users")});})();\n//# sourceMappingURL=index--Z4UDJY4Q.js.map\n',
   );
   assert.equal(
     await fs.readFile(
