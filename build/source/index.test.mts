@@ -47,15 +47,17 @@ test(async () => {
       import css from "@radically-straightforward/css";
       import javascript from "@radically-straightforward/javascript";
 
-      css\`
-        .user {
-          background-color: green;
-        }
-      \`;
-
-      javascript\`
-        console.log("Global users");
-      \`;
+      () => {
+        css\`
+          .user {
+            background-color: green;
+          }
+        \`;
+  
+        javascript\`
+          console.log("Global users");
+        \`;
+      };
 
       const users = html\`<div css="\${css\`background-color:   pink;\`}" javascript="\${javascript\`console.log(  \${"Bye"}, \${"World"});\`}"></div><div css="\${css\`background-color: purple; &:hover { appearance: none; }\`}" javascript="\${javascript\`console.log("Users");\`}"></div>\`;
     `,
