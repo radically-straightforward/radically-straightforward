@@ -24,6 +24,7 @@
 - Guides
   - Setting up for development
   - Deployment
+  - Authoring
 - Developer experience
   - Better text editor support:
     - Syntax highlighting

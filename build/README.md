@@ -22,6 +22,24 @@ import javascript from "@radically-straightforward/javascript";
 
 const application = server();
 
+css`
+  @import "some-library";
+
+  body {
+    background-color: green;
+  }
+
+  /* Rest of global CSS, including ‘@font-face’s, typography, ‘.classes’, and so forth. */
+`;
+
+javascript`
+  import someLibrary from "some-library";
+
+  someLibrary.initialize();
+
+  /* Rest of global JavaScript, including library initialization, global functions, and so forth. */
+`;
+
 application.push({
   method: "GET",
   pathname: "/",
@@ -36,7 +54,7 @@ application.push({
               background-color: pink;
             `}"
             javascript="${javascript`
-              console.log(${"The value of ‘this’: "}, this);
+              console.log("Hello World");
             `}"
           >
             @radically-straightforward/build
@@ -51,30 +69,6 @@ application.push({
 Use [`@radically-straightforward/tsconfig`](https://github.com/radically-straightforward/radically-straightforward/tree/main/tsconfig) and compile with TypeScript, which generates JavaScript files in the `build/` directory.
 
 > **Note:** You may use other build processes, as long as they generate files at `build/**/*.mjs`.
-
-Create entrypoints for CSS and browser JavaScript, for example:
-
-**`static/index.css`**
-
-```css
-@import "some-library";
-
-body {
-  background-color: green;
-}
-
-/* Rest of global stylesheet, including `.classes`... */
-```
-
-**`static/index.mjs`**
-
-```javascript
-import someLibrary from "some-library";
-
-someLibrary.initialize();
-
-/* Rest of global JavaScript... */
-```
 
 Call `@radically-straightforward/build`:
 
@@ -93,7 +87,7 @@ $ npx build
 
 - Overwrites the input files at `build/**/*.mjs` (and their corresponding source maps) to extract the tagged templates with CSS and browser JavaScript.
 
-- Uses [esbuild](https://esbuild.github.io/) to bundle the entrypoints at `static/index.css` and `static/index.mjs` along with the CSS and browser JavaScript extracted above. The result can be found in the `build/static/` directory. The file names contain hashes of their contents to make them immutable, and you may consult `build/static/paths.json` for a mapping between the names.
+- Uses [esbuild](https://esbuild.github.io/) to create a bundle of CSS and browser JavaScript. The result can be found in the `build/static/` directory. The file names contain hashes of their contents to make them immutable, and you may consult `build/static/paths.json` for a mapping between the names.
 
   > **Note:** The bundling process includes transpiling features such as [CSS nesting](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_nesting), including CSS prefixes, minifying, and so forth.
 

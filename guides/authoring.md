@@ -21,6 +21,7 @@
   - Inline styles everywhere else
 - Extraction: Often it doesn’t make sense to extract CSS, because it doesn’t make sense without the corresponding HTML structure. It makes more sense to extract HTML & CSS into a function.
 - Document: Don’t use `#ids`, because of specificity (use `key=""`s instead, for compatibility with `@radically-straightforward/javascript`)
+- Use classes for everything, not just tag name selectors, because you may want an `<a>` to look like a button, and a `button` to look like a link.
 - Interpolation
   - What I think of as interpolation many libraries call “dynamic” properties/styles/etc.
   - Astroturf
