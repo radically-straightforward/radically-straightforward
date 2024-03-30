@@ -91,96 +91,11 @@ $ npx build
 
 `@radically-straightforward/build` does the following:
 
-- Overwrites the input files at `build/**/*.mjs` (and their corresponding source maps) to extract the tagged templates with CSS and browser JavaScript:
-
-  **`build/index.mjs`**
-
-  ```javascript
-  import server from "@radically-straightforward/server";
-  import html from "@radically-straightforward/html";
-
-  const application = server();
-
-  application.push({
-    method: "GET",
-    pathname: "/",
-    handler: (request, response) => {
-      response.end(html`
-        <!doctype html>
-        <html>
-          <head></head>
-          <body>
-            <h1
-              css="${"feozrypenksece"}"
-              javascript="${JSON.stringify({
-                function: "bjinlwvqrjhwxc",
-                arguments: ["The value of ‘this’: "],
-              })}"
-            >
-              @radically-straightforward/build
-            </h1>
-          </body>
-        </html>
-      `);
-    },
-  });
-  ```
+- Overwrites the input files at `build/**/*.mjs` (and their corresponding source maps) to extract the tagged templates with CSS and browser JavaScript.
 
 - Uses [esbuild](https://esbuild.github.io/) to bundle the entrypoints at `static/index.css` and `static/index.mjs` along with the CSS and browser JavaScript extracted above. The result can be found in the `build/static/` directory. The file names contain hashes of their contents to make them immutable, and you may consult `build/static/paths.json` for a mapping between the names.
 
-  > **Note:** The bundling process includes transpiling features such as [CSS nesting](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_nesting), including CSS prefixes, minifying, and so forth. In the following examples the code has been formatted to make it readable.
-
-  **`build/static/index.css`**
-
-  ```css
-  body {
-    background-color: green;
-  }
-
-  [css~="feozrypenksece"][css~="feozrypenksece"][css~="feozrypenksece"][css~="feozrypenksece"][css~="feozrypenksece"][css~="feozrypenksece"] {
-    background-color: pink;
-  }
-  ```
-
-  > **Advanced:** The selector `[css~="feozrypenksece"]` is repeated six times to avoid issues with [specificity](https://specifishity.com/) in cases like the following:
-  >
-  > ```javascript
-  > html`
-  >   <div
-  >     css="${css`
-  >       background-color: pink;
-  >
-  >       p {
-  >         color: blue;
-  >       }
-  >     `}"
-  >   >
-  >     <p
-  >       css="${css`
-  >         color: red;
-  >       `}"
-  >     >
-  >       @radically-straightforward/build
-  >     </p>
-  >   </div>
-  > `;
-  > ```
-  >
-  > You want the `color` of the `<p>` to be `red` as set by the nearest CSS in the `<p>` itself, not `blue` as set by the parent `<div>`, but `[css~="PARENT-DIV"] p` has a higher specificity (0-0-2) than `[css~="CHILD-P"]` (0-0-1), and by repeating the selector six times we increase its precedence to 0-0-6. There isn’t anything magical about the number 6—it just seems to be a good number to cover all practical cases while maintaining the repetition relatively contained.
-
-  **`build/static/index.mjs`**
-
-  ```javascript
-  (() => {
-    someLibrary.initialize();
-    javascript?.execute?.functions?.set?.(
-      "bjinlwvqrjhwxc",
-      async function (e, i) {
-        console.log(i, this);
-      },
-    );
-  })();
-  ```
+  > **Note:** The bundling process includes transpiling features such as [CSS nesting](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_nesting), including CSS prefixes, minifying, and so forth.
 
   > **Note:** See [`@radically-straightforward/javascript`](https://github.com/radically-straightforward/radically-straightforward/tree/main/javascript) for library support to use the extracted browser JavaScript.
 
@@ -237,3 +152,90 @@ TODO
 - https://github.com/CraigCav/css-zero
 - https://github.com/callstack/linaria/tree/master/packages/babel
 - https://github.com/sgtpep/csstag
+
+---
+
+**`build/index.mjs`**
+
+```javascript
+import server from "@radically-straightforward/server";
+import html from "@radically-straightforward/html";
+
+const application = server();
+
+application.push({
+  method: "GET",
+  pathname: "/",
+  handler: (request, response) => {
+    response.end(html`
+      <!doctype html>
+      <html>
+        <head></head>
+        <body>
+          <h1
+            css="${"feozrypenksece"}"
+            javascript="${JSON.stringify({
+              function: "bjinlwvqrjhwxc",
+              arguments: ["The value of ‘this’: "],
+            })}"
+          >
+            @radically-straightforward/build
+          </h1>
+        </body>
+      </html>
+    `);
+  },
+});
+```
+
+**`build/static/index.css`**
+
+```css
+body {
+  background-color: green;
+}
+
+[css~="feozrypenksece"][css~="feozrypenksece"][css~="feozrypenksece"][css~="feozrypenksece"][css~="feozrypenksece"][css~="feozrypenksece"] {
+  background-color: pink;
+}
+```
+
+> **Advanced:** The selector `[css~="feozrypenksece"]` is repeated six times to avoid issues with [specificity](https://specifishity.com/) in cases like the following:
+>
+> ```javascript
+> html`
+>   <div
+>     css="${css`
+>       background-color: pink;
+>
+>       p {
+>         color: blue;
+>       }
+>     `}"
+>   >
+>     <p
+>       css="${css`
+>         color: red;
+>       `}"
+>     >
+>       @radically-straightforward/build
+>     </p>
+>   </div>
+> `;
+> ```
+>
+> You want the `color` of the `<p>` to be `red` as set by the nearest CSS in the `<p>` itself, not `blue` as set by the parent `<div>`, but `[css~="PARENT-DIV"] p` has a higher specificity (0-0-2) than `[css~="CHILD-P"]` (0-0-1), and by repeating the selector six times we increase its precedence to 0-0-6. There isn’t anything magical about the number 6—it just seems to be a good number to cover all practical cases while maintaining the repetition relatively contained.
+
+**`build/static/index.mjs`**
+
+```javascript
+(() => {
+  someLibrary.initialize();
+  javascript?.execute?.functions?.set?.(
+    "bjinlwvqrjhwxc",
+    async function (e, i) {
+      console.log(i, this);
+    },
+  );
+})();
+```
