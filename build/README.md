@@ -114,11 +114,11 @@ $ npx build
 
 ### Interpolation
 
-In CSS, interpolation is resolved at build time, which means that expressions must be self-contained and not refer to variables in scope, for example:
+In CSS, interpolation is resolved at build time, which means that expressions must be self-contained and not refer to variables in scope.
+
+For example, the following works:
 
 ```javascript
-// The following works:
-
 css`
   ${["red", "green", "blue"].map(
     (color) => css`
@@ -128,9 +128,11 @@ css`
     `,
   )}
 `;
+```
 
-// The following does not work, because ‘colors’ can’t be resolved at build time:
+But the following does **not** work, because `colors` can’t be resolved at build time:
 
+```javascript
 const colors = ["red", "green", "blue"];
 css`
   ${colors.map(
@@ -143,7 +145,9 @@ css`
 `;
 ```
 
-In some situations you may need to modify the CSS at run time, depending on user data. There are two solutions for this, in order of preference:
+---
+
+In some situations you may need to control the CSS at run time, depending on user data. There are two solutions for this, in order of preference:
 
 1. Apply entire snippets of CSS conditionally, for example:
 
@@ -174,11 +178,13 @@ In some situations you may need to modify the CSS at run time, depending on user
    `;
    ```
 
-In browser JavaScript, interpolation is resolved at run time, and the values are transmitted as JSON, for example:
+---
+
+In browser JavaScript, interpolation is resolved at run time, and the values are transmitted from the server to the browser as JSON.
+
+For example, the following works:
 
 ```javascript
-// The following works:
-
 html`
   <div
     javascript="${javascript`
@@ -186,9 +192,11 @@ html`
     `}"
   ></div>
 `;
+```
 
-// The following does not work, because global browser JavaScript does not allow for interpolation:
+But the following does **not** work, because global browser JavaScript does not allow for interpolation:
 
+```javascript
 javascript`
   console.log(${["Hello", 2]});
 `;
