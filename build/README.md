@@ -26,7 +26,7 @@ import * as caddy from "@radically-straightforward/caddy";
 const application = server();
 
 const staticPaths = JSON.parse(
-  await fs.readFile(new URL("./static.json", import.meta.url), "utf-8")
+  await fs.readFile(new URL("./static.json", import.meta.url), "utf-8"),
 );
 
 css`
@@ -52,7 +52,7 @@ application.push({
   pathname: "/",
   handler: (request, response) => {
     response.end(html`
-      <!DOCTYPE html>
+      <!doctype html>
       <html>
         <head>
           <link rel="stylesheet" href="/${staticPaths["index.css"]}" />
@@ -78,7 +78,7 @@ application.push({
 const caddyServer = childProcess.spawn(
   "./node_modules/.bin/caddy",
   ["run", "--adapter", "caddyfile", "--config", "-"],
-  { stdio: [undefined, "inherit", "inherit"] }
+  { stdio: [undefined, "inherit", "inherit"] },
 );
 caddyServer.stdin.end(caddy.application());
 ```
@@ -89,7 +89,7 @@ Use [`@radically-straightforward/tsconfig`](https://github.com/radically-straigh
 
 Call `@radically-straightforward/build`:
 
-> **Note:** `@radically-straightforward/build` overwrites the input files at `build/**/*.mjs`.
+> **Note:** `@radically-straightforward/build` overwrites the files at `build/**/*.mjs`.
 
 ```console
 $ npx build
@@ -102,9 +102,9 @@ $ npx build
 
 `@radically-straightforward/build` does the following:
 
-- Overwrites the input files at `build/**/*.mjs` (and their corresponding source maps) to extract the tagged templates with CSS and browser JavaScript.
+- Overwrites the files at `build/**/*.mjs` (and their corresponding source maps) to extract the tagged templates with CSS and browser JavaScript.
 
-- Uses [esbuild](https://esbuild.github.io/) to create a bundle of CSS and browser JavaScript. The result can be found in the `build/static/` directory. The file names contain hashes of their contents to make them immutable, and you may consult `build/static.json` for a mapping between the names.
+- Uses [esbuild](https://esbuild.github.io/) to create a bundle of CSS and browser JavaScript. The result can be found in the `build/static/` directory. The file names contain hashes of their contents to make them immutable, and you may consult `build/static.json` for a mapping between the names—the entrypoint of the CSS is at `index.css` and the entrypoint of the browser JavaScript is at `index.mjs`.
 
   > **Note:** The bundling process includes transpiling features such as [CSS nesting](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_nesting), including CSS prefixes, minifying, and so forth.
 
@@ -112,43 +112,37 @@ $ npx build
 
 - Copies the files specified with `--file-to-copy-with-hash` and `--file-to-copy-without-hash`.
 
-## Related Work
+### Interpolation
 
-TODO
+- CSS extraction resolves interpolations at compile time, and browser JavaScript extraction resolves interpolations at run time.
+  - Conditional addition of whole blocks of CSS
+  - CSS variables in `style="___"`
 
----
+### Specificity
 
-- Document CSS specificity
-  - `` `[css~="${identifier}"]`.repeat(6) ``
-  - Overwrite parent styles with the `&& { ... }` pattern:
-    ```html
-    <div
+- What problem does `` `[css~="${identifier}"]`.repeat(6) `` solve, again?
+- Overwrite parent styles with the `&& { ... }` pattern:
+  ```html
+  <div
+    css="${css`
+      p {
+        background-color: green;
+      }
+    `}"
+  >
+    <p>Hello</p>
+    <p
       css="${css`
-        p {
-          background-color: green;
+        && {
+          background-color: blue;
         }
       `}"
     >
-      <p>Hello</p>
-      <p
-        css="${css`
-          && {
-            background-color: blue;
-          }
-        `}"
-      >
-        Hello
-      </p>
-      <p>Hello</p>
-    </div>
-    ```
-- Document that CSS extraction resolves interpolations at compile time, and browser JavaScript extraction resolves interpolations at run time.
-  - Conditional addition of whole blocks of CSS
-  - CSS variables in `style="___"`
-- Investigate how to remove the `` `[css~="${identifier}"]`.repeat(6) `` hack that solves specificity issues
-  - Use `@layer`
-    - Relatively new and may not be polyfillable
-  - esbuild’s CSS modules
+      Hello
+    </p>
+    <p>Hello</p>
+  </div>
+  ```
 
 ## Related Work
 
@@ -163,90 +157,3 @@ TODO
 - https://github.com/CraigCav/css-zero
 - https://github.com/callstack/linaria/tree/master/packages/babel
 - https://github.com/sgtpep/csstag
-
----
-
-**`build/index.mjs`**
-
-```javascript
-import server from "@radically-straightforward/server";
-import html from "@radically-straightforward/html";
-
-const application = server();
-
-application.push({
-  method: "GET",
-  pathname: "/",
-  handler: (request, response) => {
-    response.end(html`
-      <!doctype html>
-      <html>
-        <head></head>
-        <body>
-          <h1
-            css="${"feozrypenksece"}"
-            javascript="${JSON.stringify({
-              function: "bjinlwvqrjhwxc",
-              arguments: ["The value of ‘this’: "],
-            })}"
-          >
-            @radically-straightforward/build
-          </h1>
-        </body>
-      </html>
-    `);
-  },
-});
-```
-
-**`build/static/index.css`**
-
-```css
-body {
-  background-color: green;
-}
-
-[css~="feozrypenksece"][css~="feozrypenksece"][css~="feozrypenksece"][css~="feozrypenksece"][css~="feozrypenksece"][css~="feozrypenksece"] {
-  background-color: pink;
-}
-```
-
-> **Advanced:** The selector `[css~="feozrypenksece"]` is repeated six times to avoid issues with [specificity](https://specifishity.com/) in cases like the following:
->
-> ```javascript
-> html`
->   <div
->     css="${css`
->       background-color: pink;
->
->       p {
->         color: blue;
->       }
->     `}"
->   >
->     <p
->       css="${css`
->         color: red;
->       `}"
->     >
->       @radically-straightforward/build
->     </p>
->   </div>
-> `;
-> ```
->
-> You want the `color` of the `<p>` to be `red` as set by the nearest CSS in the `<p>` itself, not `blue` as set by the parent `<div>`, but `[css~="PARENT-DIV"] p` has a higher specificity (0-0-2) than `[css~="CHILD-P"]` (0-0-1), and by repeating the selector six times we increase its precedence to 0-0-6. There isn’t anything magical about the number 6—it just seems to be a good number to cover all practical cases while maintaining the repetition relatively contained.
-
-**`build/static/index.mjs`**
-
-```javascript
-(() => {
-  someLibrary.initialize();
-  javascript?.execute?.functions?.set?.(
-    "bjinlwvqrjhwxc",
-    async function (e, i) {
-      console.log(i, this);
-    },
-  );
-})();
-```
