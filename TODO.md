@@ -2,8 +2,6 @@
 
 ## Features
 
-- `build`
-  - Documentation
 - `javascript`
   - Browser JavaScript
   - Documentation
