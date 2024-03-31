@@ -194,31 +194,55 @@ javascript`
 `;
 ```
 
-### Specificity
+### CSS Selector Specificity
 
-- What problem does `` `[css~="${identifier}"]`.repeat(6) `` solve, again? I think it may be ``class="example" css="${css`background-color: red;`}"``
-- Overwrite parent styles with the `&& { ... }` pattern:
-  ```html
+There are situations in which a parent sets a style for a child and the child needs to overwrite it, for example:
+
+```javascript
+html`
   <div
     css="${css`
-      p {
-        background-color: green;
+      h1 {
+        background-color: red;
       }
     `}"
   >
-    <p>Hello</p>
-    <p
+    <h1
       css="${css`
-        && {
-          background-color: blue;
-        }
+        background-color: pink;
       `}"
     >
-      Hello
-    </p>
-    <p>Hello</p>
+      We’d like for this background to be pink.
+    </h1>
   </div>
-  ```
+`;
+```
+
+The solution is to use the `&:is(&) { ___ }` pattern to increase the selector specificity, for example:
+
+```javascript
+html` <div
+  css="${css`
+    h1 {
+      background-color: red;
+    }
+  `}"
+>
+  <h1
+    css="${css`
+      &:is(&) {
+        background-color: pink;
+      }
+    `}"
+  >
+    @radically-straightforward/build
+  </h1>
+</div>`;
+```
+
+---
+
+- What problem does `` `[css~="${identifier}"]`.repeat(6) `` solve, again? I think it may be ``class="example" css="${css`background-color: red;`}"``
 
 ## Related Work
 
