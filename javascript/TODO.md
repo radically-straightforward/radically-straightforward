@@ -302,3 +302,14 @@ One (perhaps valuable) difference between `morph()` and other solutions like `mo
 - <https://github.com/patrick-steele-idem/morphdom>
 - <https://github.com/choojs/nanomorph>
 - <https://github.com/alpinejs/alpine/tree/main/packages/morph>
+
+## Transitions
+
+  - https://barba.js.org
+  - https://swup.js.org/getting-started
+  - https://unpoly.com
+  - https://youtube.github.io/spfjs/
+
+## Pre-Fetching
+
+- https://getquick.link/

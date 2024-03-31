@@ -34,12 +34,24 @@
 ## Documentation
 
 - Overarching story
-  - Principles
-    - Spaghetti code vs soup of unknown objects
+  - Colocation (Tailwind, https://vuejs.org/guide/scaling-up/sfc.html, and so forth)
+  - Avoid DSLs
+  - Avoid distributed applications (a frontend that’s almost a separate application **is** a distributed application)
+  - Avoid external processes (for example, Redis)
+  - Avoid multiple files
+  - Resist the urge to abstract early, because may have the wrong abstraction, and a wrong abstraction is a bigger issue than no abstraction (repetition is okay, DRY isn’t always the way)
+  - Spaghetti code vs soup of unknown objects
   - Related work
     - <https://html-first.com/>
     - <https://tailwindcss.com/>
     - <https://htmx.org/>
     - <https://alpinejs.dev/>
+    - <https://hotwire.dev>
+    - <https://github.com/defunkt/jquery-pjax>
+    - <https://laravel-livewire.com>
+    - <https://github.com/phoenixframework/phoenix_live_view>
+    - <https://cableready.stimulusreflex.com/>
+    - <https://sockpuppet.argpar.se/>
+    - <https://github.com/servicetitan/Stl.Fusion>
 - Logo
 - Dedicated website?
