@@ -1,6 +1,10 @@
 # Changelog
 
-## 1.3.0 · 2024-02-28
+## 1.3.1 · 2024-03-31
+
+- Fixed the default value of `application()`’s `trustedStaticFilesRoots`.
+
+## 1.3.0 · 2024-03-31
 
 - Fixed the default values of `application()`’s `trustedStaticFilesRoots` and `untrustedStaticFilesRoots`.
 
