@@ -119,7 +119,7 @@ for (const source of await globby("./build/**/*.mjs")) {
     );
     code = code.replace(
       /^__RADICALLY__STRAIGHTFORWARD__PLACEHOLDER__/,
-      `[css~="${identifier}"]`.repeat(6),
+      `[css~="${identifier}"]`,
     );
     fileInlineCSSIdentifiers.push(identifier);
     inlineCSSs.add(
@@ -209,7 +209,12 @@ for (const source of await globby("./build/**/*.mjs")) {
 await fs.mkdir("./static/", { recursive: true });
 await fs.writeFile(
   "./static/index.css",
-  [...globalCSSs, ...inlineCSSs].join(""),
+  css`
+    ${[...globalCSSs].join("")}
+    @layer __RADICALLY_STRAIGHTFORWARD__INLINE__ {
+      ${[...inlineCSSs].join("")}
+    }
+  `,
 );
 await fs.writeFile(
   "./static/index.mjs",
@@ -242,6 +247,20 @@ for (const [output, { entryPoint }] of Object.entries(
 ))
   if (entryPoint === "index.css" || entryPoint === "index.mjs")
     paths[entryPoint] = output.slice("../build/static/".length);
+
+await fs.writeFile(
+  path.join("./build/static/", paths["index.css"]),
+  "@layer __RADICALLY_STRAIGHTFORWARD__GLOBAL__{" +
+    (
+      await fs.readFile(
+        path.join("./build/static/", paths["index.css"]),
+        "utf-8",
+      )
+    ).replace(
+      "@layer __RADICALLY_STRAIGHTFORWARD__INLINE__",
+      "}@layer __RADICALLY_STRAIGHTFORWARD__INLINE__",
+    ),
+);
 
 const baseFileHash = baseX("ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789");
 for (const source of await globby(filesToCopyWithHash!)) {
