@@ -59,7 +59,7 @@ test(async () => {
         \`;
       };
 
-      const users = html\`<div css="\${css\`background-color:   pink;\`}" javascript="\${javascript\`console.log(  \${"Bye"}, \${"World"});\`}"></div><div css="\${css\`background-color: purple; &:hover { appearance: none; }\`}" javascript="\${javascript\`console.log("Users");\`}"></div>\`;
+      const users = html\`<div css="\${css\`background-color:   \${"pink"};\`}" javascript="\${javascript\`console.log(  \${"Bye"}, \${"World"});\`}"></div><div css="\${css\`background-color: purple; &:hover { appearance: none; }\`}" javascript="\${javascript\`console.log("Users");\`}"></div>\`;
     `,
   );
   await fs.mkdir("./node_modules/example-library/", { recursive: true });

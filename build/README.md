@@ -114,13 +114,89 @@ $ npx build
 
 ### Interpolation
 
-- CSS extraction resolves interpolations at compile time, and browser JavaScript extraction resolves interpolations at run time.
-  - Conditional addition of whole blocks of CSS
-  - CSS variables in `style="___"`
+In CSS, interpolation is resolved at build time, which means that expressions must be self-contained and not refer to variables in scope, for example:
+
+```javascript
+// The following works:
+
+css`
+  ${["red", "green", "blue"].map(
+    (color) => css`
+      .text--${color} {
+        color: ${color};
+      }
+    `,
+  )}
+`;
+
+// The following does not work, because ‘colors’ can’t be resolved at build time:
+
+const colors = ["red", "green", "blue"];
+css`
+  ${colors.map(
+    (color) => css`
+      .text--${color} {
+        color: ${color};
+      }
+    `,
+  )}
+`;
+```
+
+In some situations you may need to modify the CSS at run time, depending on user data. There are two solutions for this, in order of preference:
+
+1. Apply entire snippets of CSS conditionally, for example:
+
+   ```javascript
+   html`
+     <div
+       css="${userIsSignedIn
+         ? css`
+             background-color: green;
+           `
+         : css`
+             background-color: red;
+           `}"
+     ></div>
+   `;
+   ```
+
+2. When that isn’t viable either, use CSS variables in `style="___"`, for example:
+
+   ```javascript
+   html`
+     <div
+       style="--background-color: ${userIsSignedIn ? "green" : "red"};"
+       css="${css`
+         background-color: var(--background-color);
+       `}"
+     ></div>
+   `;
+   ```
+
+In browser JavaScript, interpolation is resolved at run time, and the values are transmitted as JSON, for example:
+
+```javascript
+// The following works:
+
+html`
+  <div
+    javascript="${javascript`
+      console.log(${["Hello", 2]});
+    `}"
+  ></div>
+`;
+
+// The following does not work, because global browser JavaScript does not allow for interpolation:
+
+javascript`
+  console.log(${["Hello", 2]});
+`;
+```
 
 ### Specificity
 
-- What problem does `` `[css~="${identifier}"]`.repeat(6) `` solve, again?
+- What problem does `` `[css~="${identifier}"]`.repeat(6) `` solve, again? I think it may be ``class="example" css="${css`background-color: red;`}"``
 - Overwrite parent styles with the `&& { ... }` pattern:
   ```html
   <div
