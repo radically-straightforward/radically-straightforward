@@ -130,7 +130,7 @@ test(async () => {
       path.join("./build/static/", paths["index.css"]),
       "utf-8",
     ),
-    "@layer __RADICALLY_STRAIGHTFORWARD__GLOBAL__{p{background-color:#00f}body{background-color:red}.user{background-color:green}}@layer __RADICALLY_STRAIGHTFORWARD__INLINE__{[css~=idnnykdflodmu]{background-color:pink}[css~=xbjbuzxiqpcpj]{background-color:purple}[css~=xbjbuzxiqpcpj]:hover{-webkit-appearance:none;appearance:none}}\n/*# sourceMappingURL=index--KXADS5YO.css.map */\n",
+    "@layer __RADICALLY_STRAIGHTFORWARD__GLOBAL__{p{background-color:#00f}body{background-color:red}.user{background-color:green}}@layer __RADICALLY_STRAIGHTFORWARD__INLINE__{@layer idnnykdflodmu{[css~=idnnykdflodmu]{background-color:pink}}@layer xbjbuzxiqpcpj{[css~=xbjbuzxiqpcpj]{background-color:purple}[css~=xbjbuzxiqpcpj]:hover{-webkit-appearance:none;appearance:none}}}\n/*# sourceMappingURL=index--EG3PQTT3.css.map */\n",
   );
   assert.equal(
     await fs.readFile(

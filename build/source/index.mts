@@ -123,7 +123,7 @@ for (const source of await globby("./build/**/*.mjs")) {
     );
     fileInlineCSSIdentifiers.push(identifier);
     inlineCSSs.add(
-      `/********************************************************************************/\n\n${code}\n\n`,
+      `/********************************************************************************/\n\n@layer ${identifier} {\n${code}\n}\n\n`,
     );
   }
   const fileInlineJavaScriptIdentifiers = new Array<string>();

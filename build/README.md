@@ -194,52 +194,6 @@ javascript`
 `;
 ```
 
-### CSS Selector Specificity
-
-There are situations in which a parent sets a style for a child and the child needs to overwrite it, for example:
-
-```javascript
-html`
-  <div
-    css="${css`
-      h1 {
-        background-color: red;
-      }
-    `}"
-  >
-    <h1
-      css="${css`
-        background-color: green;
-      `}"
-    >
-      We’d like for this background to be green.
-    </h1>
-  </div>
-`;
-```
-
-The solution is to use the `&:is(&) { ___ }` pattern to increase the selector specificity, for example:
-
-```javascript
-html` <div
-  css="${css`
-    h1 {
-      background-color: red;
-    }
-  `}"
->
-  <h1
-    css="${css`
-      &:is(&) {
-        background-color: green;
-      }
-    `}"
-  >
-    We’d like for this background to be green.
-  </h1>
-</div>`;
-```
-
 ## Related Work
 
 - https://vanilla-extract.style
