@@ -204,14 +204,6 @@ javascript`
 
 ## Related Work
 
-- https://vanilla-extract.style
-- https://xstyled.dev/
-- https://linaria.dev/
-- https://www.npmjs.com/package/csjs
-- https://www.npmjs.com/package/radium
+### [vanilla-extract](https://vanilla-extract.style/), [Linaria](https://linaria.dev/), [CSJS](https://www.npmjs.com/package/csjs) with [csjs-extractify](https://www.npmjs.com/package/csjs-extractify), [Radium](https://www.npmjs.com/package/radium), [CSS-Zero](https://www.npmjs.com/package/css-zero), [csstag](https://www.npmjs.com/package/csstag) and so forth
 
----
-
-- https://github.com/CraigCav/css-zero
-- https://github.com/callstack/linaria/tree/master/packages/babel
-- https://github.com/sgtpep/csstag
+These libraries only cover CSS, not browser JavaScript, some of them are tied to other libraries, for example, React, and some of them aren’t maintained anymore.
