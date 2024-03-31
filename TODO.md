@@ -2,6 +2,9 @@
 
 ## Features
 
+- Fix tests that hang forever upon failure
+  - `caddy`
+  - `server`
 - `javascript`
   - Browser JavaScript
   - Documentation
