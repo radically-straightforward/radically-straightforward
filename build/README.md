@@ -16,33 +16,35 @@ Author HTML, CSS, and browser JavaScript using [tagged templates](https://develo
 
 ```typescript
 import fs from "node:fs/promises";
+import childProcess from "node:child_process";
 import server from "@radically-straightforward/server";
 import html from "@radically-straightforward/html";
 import css from "@radically-straightforward/css";
 import javascript from "@radically-straightforward/javascript";
+import * as caddy from "@radically-straightforward/caddy";
 
 const application = server();
 
-const static = JSON.parse(
-  await fs.readFile(new URL("./static/paths.json", import.meta.url), "utf-8"),
+const staticPaths = JSON.parse(
+  await fs.readFile(new URL("./static.json", import.meta.url), "utf-8")
 );
 
 css`
-  @import "some-library";
+  /* Global CSS, including ‘@font-face’s, typography, ‘.classes’, and so forth. */
+
+  @import "@radically-straightforward/css/static/index.css";
 
   body {
     background-color: green;
   }
-
-  /* Rest of global CSS, including ‘@font-face’s, typography, ‘.classes’, and so forth. */
 `;
 
 javascript`
-  import someLibrary from "some-library";
+  /* Global JavaScript, including library initialization, global functions, and so forth. */
 
-  someLibrary.initialize();
+  import * as javascript from "@radically-straightforward/javascript/static/index.mjs";
 
-  /* Rest of global JavaScript, including library initialization, global functions, and so forth. */
+  console.log(javascript);
 `;
 
 application.push({
@@ -50,11 +52,11 @@ application.push({
   pathname: "/",
   handler: (request, response) => {
     response.end(html`
-      <!doctype html>
+      <!DOCTYPE html>
       <html>
         <head>
-          <link rel="stylesheet" href="${static["index.css"]}" />
-          <script src="${static["index.js"]}"></script>
+          <link rel="stylesheet" href="/${staticPaths["index.css"]}" />
+          <script src="/${staticPaths["index.mjs"]}"></script>
         </head>
         <body>
           <h1
@@ -72,6 +74,13 @@ application.push({
     `);
   },
 });
+
+const caddyServer = childProcess.spawn(
+  "./node_modules/.bin/caddy",
+  ["run", "--adapter", "caddyfile", "--config", "-"],
+  { stdio: [undefined, "inherit", "inherit"] }
+);
+caddyServer.stdin.end(caddy.application());
 ```
 
 Use [`@radically-straightforward/tsconfig`](https://github.com/radically-straightforward/radically-straightforward/tree/main/tsconfig) and compile with TypeScript, which generates JavaScript files in the `build/` directory.
