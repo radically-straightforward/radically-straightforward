@@ -81,7 +81,10 @@ export function application({
   address = "localhost",
   trustedStaticFilesRoots = [
     `* "${url.fileURLToPath(
-      new URL("./build/static/", import.meta.url.split("/node_modules/")[0]),
+      new URL(
+        "./build/static/",
+        import.meta.url.split("/node_modules/")[0] + "/",
+      ),
     )}"`,
   ],
   untrustedStaticFilesRoots = [
