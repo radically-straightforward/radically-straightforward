@@ -211,6 +211,7 @@ await fs.writeFile(
   "./static/index.css",
   css`
     ${[...globalCSSs].join("")}
+
     @layer __RADICALLY_STRAIGHTFORWARD__INLINE__ {
       ${[...inlineCSSs].join("")}
     }
