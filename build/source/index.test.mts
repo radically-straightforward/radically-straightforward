@@ -115,9 +115,7 @@ test(async () => {
     "--file-to-copy-without-hash",
     "./outside-static/outside-static--example.txt",
   ]);
-  const paths = JSON.parse(
-    await fs.readFile("./build/static/paths.json", "utf-8"),
-  );
+  const paths = JSON.parse(await fs.readFile("./build/static.json", "utf-8"));
 
   assert.equal(
     await fs.readFile("./build/index.mjs", "utf-8"),

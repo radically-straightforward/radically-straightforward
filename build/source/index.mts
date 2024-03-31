@@ -257,10 +257,7 @@ for (const source of await globby(filesToCopyWithHash!)) {
   await fs.copyFile(source, destination);
 }
 
-await fs.writeFile(
-  "./build/static/paths.json",
-  JSON.stringify(paths, undefined, 2),
-);
+await fs.writeFile("./build/static.json", JSON.stringify(paths, undefined, 2));
 
 for (const source of await globby(filesToCopyWithoutHash!)) {
   const destination = path.join(
