@@ -1,5 +1,14 @@
 # TODO
 
+- Live Connection
+  - Detect that you’re offline.
+  - Detect a server version update. (Trigger a reload in that case)
+  - Live Reload in development.
+  - Live Update when there’s a new version of the page.
+
+
+---
+
 - It’d be nice to allow for client-side templating from within server-side templating:
 
 ```javascript
