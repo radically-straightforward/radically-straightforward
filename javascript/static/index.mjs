@@ -861,7 +861,6 @@ import utilities from "@radically-straightforward/utilities";
 //   ).padStart(2, "0")}:${String(date.getUTCMinutes()).padStart(2, "0")} UTC`;
 // }
 
-
 /**
  * Returns a string with the week day in English, for example, `Monday`.
  */
