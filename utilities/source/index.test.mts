@@ -87,6 +87,13 @@ test("emailRegExp", () => {
   assert.doesNotMatch("leandro@lea_fac.com", utilities.emailRegExp);
 });
 
+test("capitalize()", () => {
+  assert.equal(
+    utilities.capitalize("leandro Facchinetti"),
+    "Leandro Facchinetti",
+  );
+});
+
 test("intern()", () => {
   // @ts-expect-error
   assert(([1] === [1]) === false);

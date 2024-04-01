@@ -159,6 +159,13 @@ export class JSONLinesTransformStream extends TransformStream {
 export const emailRegExp = /^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$/i;
 
 /**
+ * Capitalizes the first letter of a string. It’s different from [Lodash’s `capitalize()`](https://lodash.com/docs/4.17.15#capitalize) in that it doesn’t lowercase the rest of the string.
+ */
+export function capitalize(text: string): string {
+  return text.length === 0 ? text : `${text[0].toUpperCase()}${text.slice(1)}`;
+}
+
+/**
  * Utility type for `intern()`.
  */
 export type Intern<Type> = Readonly<Type & { [internSymbol]: true }>;

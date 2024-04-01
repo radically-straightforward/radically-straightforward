@@ -870,10 +870,6 @@
 //   return (dateString) => dateTimeFormat.format(new Date(dateString.trim()));
 // })();
 
-// export function capitalize(text) {
-//   return text.length === 0 ? text : `${text[0].toUpperCase()}${text.slice(1)}`;
-// }
-
 // export function stringToElement(string) {
 //   const element = document.createElement("div");
 //   element.innerHTML = string;
