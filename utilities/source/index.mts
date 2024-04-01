@@ -156,8 +156,19 @@ export class JSONLinesTransformStream extends TransformStream {
 /**
  * Capitalizes the first letter of a string. It’s different from [Lodash’s `capitalize()`](https://lodash.com/docs/4.17.15#capitalize) in that it doesn’t lowercase the rest of the string.
  */
-export function capitalize(text: string): string {
-  return text.length === 0 ? text : `${text[0].toUpperCase()}${text.slice(1)}`;
+export function capitalize(string: string): string {
+  return string.length === 0
+    ? string
+    : `${string[0].toUpperCase()}${string.slice(1)}`;
+}
+
+/**
+ * Determine whether the given `string` is a valid `Date`, that is, it’s in ISO format and corresponds to an existing date, for example, it is **not** April 32nd.
+ */
+export function isDate(string: string): boolean {
+  return (
+    string.match(ISODateRegExp) !== null && !isNaN(new Date(string).getTime())
+  );
 }
 
 /**

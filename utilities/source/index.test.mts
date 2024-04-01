@@ -85,6 +85,12 @@ test("capitalize()", () => {
   );
 });
 
+test("isDate()", () => {
+  assert(utilities.isDate("2024-04-01T14:57:46.638Z"));
+  assert(!utilities.isDate("2024-04-01T14:57:46.68Z"));
+  assert(!utilities.isDate("2024-04-32T14:57:46.638Z"));
+});
+
 test("emailRegExp", () => {
   assert.match("leandro@leafac.com", utilities.emailRegExp);
   assert.doesNotMatch("leandro@leafac.c", utilities.emailRegExp);

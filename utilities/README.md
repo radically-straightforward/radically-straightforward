@@ -129,10 +129,18 @@ const reader = new Blob([
 ### `capitalize()`
 
 ```typescript
-export function capitalize(text: string): string;
+export function capitalize(string: string): string;
 ```
 
 Capitalizes the first letter of a string. It’s different from [Lodash’s `capitalize()`](https://lodash.com/docs/4.17.15#capitalize) in that it doesn’t lowercase the rest of the string.
+
+### `isDate()`
+
+```typescript
+export function isDate(string: string): boolean;
+```
+
+Determine whether the given `string` is a valid `Date`, that is, it’s in ISO format and corresponds to an existing date, for example, it is **not** April 32nd.
 
 ### `emailRegExp`
 
