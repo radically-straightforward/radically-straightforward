@@ -876,20 +876,23 @@ import utilities from "@radically-straightforward/utilities";
 //   return element;
 // }
 
-// export function execute({
-//   event = undefined,
-//   element = undefined,
-//   elements = element.querySelectorAll("[javascript]"),
-// }) {
-//   for (const element of elements) {
-//     const javascript_ = JSON.parse(element.getAttribute("javascript"));
-//     execute.functions
-//       .get(javascript_.function)
-//       .call(element, event, ...javascript_.arguments);
-//   }
-// }
+/**
+ * Execute the function defined by the `javascript="___"` attribute, which is set by [`@radically-straightforward/build`](https://github.com/radically-straightforward/radically-straightforward/tree/main/build) when extracting browser JavaScript.
+ */
+export function execute({
+  event = undefined,
+  element = undefined,
+  elements = element.querySelectorAll("[javascript]"),
+}) {
+  for (const element of elements) {
+    const javascript = JSON.parse(element.getAttribute("javascript"));
+    execute.functions
+      .get(javascript.function)
+      .call(element, event, ...javascript.arguments);
+  }
+}
 
-// execute.functions = new Map();
+execute.functions = new Map();
 
 /**
  * Returns an array of ancestors, including `element` itself. It knows how to navigate up Tippy.js’s tippys that aren’t mounted.
