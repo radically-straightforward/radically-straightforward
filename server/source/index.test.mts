@@ -915,6 +915,7 @@ Interact with the test server and run manual tests with ‘node ./build/index.te
 ============================================
 `,
     );
-    process.kill(process.pid);
+    if (process.platform === "win32") process.exit(0);
+    else process.kill(process.pid);
   }
 });
