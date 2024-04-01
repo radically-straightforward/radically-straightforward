@@ -830,6 +830,12 @@ import utilities from "@radically-straightforward/utilities";
 //     return "Invalid date & time. Match the pattern YYYY-MM-DD HH:MM.";
 //   element.value = date.toISOString();
 // }
+// export function UTCizeDateTime(dateString) {
+//   if (dateString.match(utilities.localizedDateRegExp) === null) return;
+//   const date = new Date(dateString.trim().replace(" ", "T"));
+//   if (isNaN(date.getTime())) return;
+//   return date;
+// }
 
 // export function localizeDate(dateString) {
 //   const date = new Date(dateString.trim());
@@ -855,20 +861,15 @@ import utilities from "@radically-straightforward/utilities";
 //   ).padStart(2, "0")}:${String(date.getUTCMinutes()).padStart(2, "0")} UTC`;
 // }
 
-// export function UTCizeDateTime(dateString) {
-//   if (dateString.match(utilities.localizedDateRegExp) === null) return;
-//   const date = new Date(dateString.trim().replace(" ", "T"));
-//   if (isNaN(date.getTime())) return;
-//   return date;
-// }
 
-// export const weekday = (() => {
-//   const dateTimeFormat = new Intl.DateTimeFormat("en-US", {
-//     weekday: "long",
-//   });
-
-//   return (dateString) => dateTimeFormat.format(new Date(dateString.trim()));
-// })();
+/**
+ * Returns a string with the week day in English, for example, `Monday`.
+ */
+export function weekday(dateString) {
+  return new Intl.DateTimeFormat("en-US", { weekday: "long" }).format(
+    new Date(dateString.trim()),
+  );
+}
 
 /**
  * Convert a string into a DOM element. The string may have multiple siblings without a common parent, so `stringToElement()` returns a `<div>` containing the elements.
