@@ -74,6 +74,7 @@ test(async () => {
   await fs.writeFile(
     "./node_modules/example-library/index.mjs",
     javascript`
+      if (process !== undefined) await import("some-node-library");
       export default hi = "Hi";
     `,
   );
@@ -137,7 +138,7 @@ test(async () => {
       path.join("./build/static/", paths["index.mjs"]),
       "utf-8",
     ),
-    '(()=>{var o=hi="Hi";console.log(o);console.log("Global users");javascript?.execute?.functions?.set?.("funyrgvdgmnyff",async function(e,n,s){console.log(n,s)});javascript?.execute?.functions?.set?.("ywdosramhnhmk",async function(e){console.log("Users")});})();\n//# sourceMappingURL=index--Z4UDJY4Q.js.map\n',
+    '(()=>{var e=hi="Hi";console.log(e);console.log("Global users");javascript?.execute?.functions?.set?.("funyrgvdgmnyff",async function(o,n,s){console.log(n,s)});javascript?.execute?.functions?.set?.("ywdosramhnhmk",async function(o){console.log("Users")});})();\n//# sourceMappingURL=index--UI4IQZJ3.js.map\n',
   );
   assert.equal(
     await fs.readFile(

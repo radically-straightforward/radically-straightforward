@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.1 · 2024-04-01
+
+- In esbuild, [`define`d](https://esbuild.github.io/api/#define) `process` to be `undefined`, which lets packages (for example, `@radically-straightforward/utilities`) differentiate between Node.js and the browser.
+
 ## 1.0.0 · 2024-03-31
 
 - Initial release with support for extracting CSS and browser JavaScript, creating a bundle (with esbuild), and copying files adding hashes to their names.
