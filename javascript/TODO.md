@@ -4,6 +4,7 @@
   - Custom form validation
     - `<form novalidate>`
     - `onvalidate` (return error message in string)
+  - Warn about losing inputs
 
 ---
 
@@ -12,7 +13,6 @@
   - Detect a server version update. (Trigger a reload in that case)
   - Live Reload in development.
   - Live Update when there’s a new version of the page.
-
 
 ---
 
@@ -321,10 +321,10 @@ One (perhaps valuable) difference between `morph()` and other solutions like `mo
 
 ## Transitions
 
-  - https://barba.js.org
-  - https://swup.js.org/getting-started
-  - https://unpoly.com
-  - https://youtube.github.io/spfjs/
+- https://barba.js.org
+- https://swup.js.org/getting-started
+- https://unpoly.com
+- https://youtube.github.io/spfjs/
 
 ## Pre-Fetching
 

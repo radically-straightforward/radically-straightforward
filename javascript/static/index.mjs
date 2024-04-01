@@ -1,31 +1,6 @@
 import fastMyersDiff from "fast-myers-diff";
 import tippy, * as tippyStatic from "tippy.js";
 
-export function warnAboutLosingInputs() {
-  let isSubmittingForm = false;
-
-  window.addEventListener("DOMContentLoaded", () => {
-    isSubmittingForm = false;
-  });
-
-  document.addEventListener("submit", () => {
-    isSubmittingForm = true;
-  });
-
-  window.onbeforeunload = (event) => {
-    if (isSubmittingForm || !isModified(document.querySelector("body"))) return;
-    event.preventDefault();
-    event.returnValue = "";
-  };
-
-  window.onbeforelivenavigate = () =>
-    isSubmittingForm ||
-    !isModified(document.querySelector("body")) ||
-    confirm(
-      "Your changes will be lost if you leave this page. Do you wish to continue?",
-    );
-}
-
 export function tippySetDefaultProps(extraProps = {}) {
   tippy.setDefaultProps({
     arrow: tippyStatic.roundArrow + tippyStatic.roundArrow,
@@ -688,6 +663,28 @@ export function isModified(element) {
       if (element.value !== element.defaultValue) return true;
   }
   return false;
+}
+{
+  let isSubmittingForm = false;
+  window.addEventListener("DOMContentLoaded", () => {
+    isSubmittingForm = false;
+  });
+  document.addEventListener("submit", () => {
+    isSubmittingForm = true;
+  });
+
+  window.onbeforeunload = (event) => {
+    if (!isModified(document.querySelector("body")) || isSubmittingForm) return;
+    event.preventDefault();
+    event.returnValue = "";
+  };
+
+  window.onbeforelivenavigate = () =>
+    !isModified(document.querySelector("body")) ||
+    isSubmittingForm ||
+    confirm(
+      "Your changes will be lost if you leave this page. Do you wish to continue?",
+    );
 }
 
 export function serialize(element) {
