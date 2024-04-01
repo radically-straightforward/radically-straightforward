@@ -946,19 +946,29 @@ export const isSafari = /Version\/([0-9\._]+).*Safari/.test(
   navigator.userAgent,
 );
 
-// export let isPhysicalKeyboard = false;
-// export let shiftKey = false;
-// window.addEventListener("keydown", keyboardEventListener);
-// window.addEventListener("keyup", keyboardEventListener);
-// function keyboardEventListener(event) {
-//   isPhysicalKeyboard =
-//     isPhysicalKeyboard ||
-//     event.altKey ||
-//     event.ctrlKey ||
-//     event.metaKey ||
-//     event.shiftKey;
-//   shiftKey = event.shiftKey;
-// }
+/**
+ * Whether the user has a physical keyboard or a virtual keyboard on a phone screen. This isn’t 100% reliable, because works by detecting presses of modifiers keys (for example, `control`), but it works well enough.
+ */
+export let isPhysicalKeyboard = false;
+
+/**
+ * Whether the shift key is being held. Useful for events such as `paste`, which don’t include the state of modifier keys.
+ */
+export let shiftKey = false;
+
+{
+  const eventListener = (event) => {
+    isPhysicalKeyboard =
+      isPhysicalKeyboard ||
+      event.altKey ||
+      event.ctrlKey ||
+      event.metaKey ||
+      event.shiftKey;
+    shiftKey = event.shiftKey;
+  };
+  window.addEventListener("keydown", eventListener);
+  window.addEventListener("keyup", eventListener);
+}
 
 // export const regExps = {
 //   email: /^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$/i,

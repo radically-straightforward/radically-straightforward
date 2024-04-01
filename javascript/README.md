@@ -65,6 +65,22 @@ export const isSafari;
 
 Source: <https://github.com/DamonOehlman/detect-browser/blob/546e6f1348375d8a486f21da07b20717267f6c49/src/index.ts#L166>
 
+### `isPhysicalKeyboard`
+
+```typescript
+export let isPhysicalKeyboard;
+```
+
+Whether the user has a physical keyboard or a virtual keyboard on a phone screen. This isn’t 100% reliable, because works by detecting presses of modifiers keys (for example, `control`), but it works well enough.
+
+### `shiftKey`
+
+```typescript
+export let shiftKey;
+```
+
+Whether the shift key is being held. Useful for events such as `paste`, which don’t include the state of modifier keys.
+
 <!-- DOCUMENTATION END: ./static/index.mjs -->
 
 ## Live Navigation
