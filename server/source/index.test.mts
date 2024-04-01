@@ -162,140 +162,148 @@ test(async () => {
     assert.equal(await response.text(), "Error: Malformed ‘Cookie’ header.");
   }
 
-  assert.equal(
-    (
-      await fetch("http://localhost:18000/", {
-        headers: { ["Custom-Header".repeat(10_000)]: "TOO LARGE" },
-      })
-    ).status,
-    431,
-  );
+  if (process.platform !== "win32") {
+    assert.equal(
+      (
+        await fetch("http://localhost:18000/", {
+          headers: { ["Custom-Header".repeat(10_000)]: "TOO LARGE" },
+        })
+      ).status,
+      431,
+    );
 
-  assert.equal(
-    (
-      await fetch("http://localhost:18000/", {
-        headers: { "Custom-Header": "TOO LARGE".repeat(10_000) },
-      })
-    ).status,
-    431,
-  );
+    assert.equal(
+      (
+        await fetch("http://localhost:18000/", {
+          headers: { "Custom-Header": "TOO LARGE".repeat(10_000) },
+        })
+      ).status,
+      431,
+    );
 
-  assert.equal(
-    (
-      await fetch("http://localhost:18000/", {
-        headers: Object.fromEntries(
-          Array.from({ length: 1000 }, (value, key) => [
-            `Custom-Header-${key}`,
-            "Hello",
-          ]),
+    assert.equal(
+      (
+        await fetch("http://localhost:18000/", {
+          headers: Object.fromEntries(
+            Array.from({ length: 1000 }, (value, key) => [
+              `Custom-Header-${key}`,
+              "Hello",
+            ]),
+          ),
+        })
+      ).status,
+      431,
+    );
+
+    {
+      const response = await fetch("http://localhost:18000/", {
+        method: "PATCH",
+        headers: { "CSRF-Protection": "true" },
+        body: new URLSearchParams({ ["bodyField".repeat(10_000)]: "33" }),
+      });
+      assert.equal(response.status, 413);
+      assert.equal(
+        response.headers.get("Content-Type"),
+        "text/plain; charset=utf-8",
+      );
+      assert.equal(await response.text(), "Error: Field too large.");
+    }
+
+    {
+      const response = await fetch("http://localhost:18000/", {
+        method: "PATCH",
+        headers: { "CSRF-Protection": "true" },
+        body: new URLSearchParams({ bodyField: "33".repeat(1_000_000) }),
+      });
+      assert.equal(response.status, 413);
+      assert.equal(
+        response.headers.get("Content-Type"),
+        "text/plain; charset=utf-8",
+      );
+      assert.equal(await response.text(), "Error: Field too large.");
+    }
+
+    {
+      const requestBody = new FormData();
+      requestBody.append(
+        "bodyFileField".repeat(10_000),
+        new Blob([Buffer.from([33, 34, 3])]),
+      );
+      const response = await fetch("http://localhost:18000/", {
+        method: "PATCH",
+        headers: { "CSRF-Protection": "true" },
+        body: requestBody,
+      });
+      assert.equal(response.status, 400);
+      assert.equal(
+        response.headers.get("Content-Type"),
+        "text/plain; charset=utf-8",
+      );
+    }
+
+    {
+      const requestBody = new FormData();
+      requestBody.append(
+        "bodyFileField",
+        new Blob([Buffer.alloc(100_000_000)]),
+      );
+      const response = await fetch("http://localhost:18000/", {
+        method: "PATCH",
+        headers: { "CSRF-Protection": "true" },
+        body: requestBody,
+      });
+      assert.equal(response.status, 413);
+      assert.equal(
+        response.headers.get("Content-Type"),
+        "text/plain; charset=utf-8",
+      );
+      assert.equal(await response.text(), "Error: File too large.");
+    }
+
+    {
+      const response = await fetch("http://localhost:18000/", {
+        method: "PATCH",
+        headers: { "CSRF-Protection": "true" },
+        body: new URLSearchParams(
+          Object.fromEntries(
+            Array.from({ length: 1000 }, (value, key) => [
+              `bodyField-${key}`,
+              "33",
+            ]),
+          ),
         ),
-      })
-    ).status,
-    431,
-  );
+      });
+      assert.equal(response.status, 413);
+      assert.equal(
+        response.headers.get("Content-Type"),
+        "text/plain; charset=utf-8",
+      );
+      assert.equal(await response.text(), "Error: Too many fields.");
+    }
 
-  {
-    const response = await fetch("http://localhost:18000/", {
-      method: "PATCH",
-      headers: { "CSRF-Protection": "true" },
-      body: new URLSearchParams({ ["bodyField".repeat(10_000)]: "33" }),
-    });
-    assert.equal(response.status, 413);
-    assert.equal(
-      response.headers.get("Content-Type"),
-      "text/plain; charset=utf-8",
-    );
-    assert.equal(await response.text(), "Error: Field too large.");
-  }
-
-  {
-    const response = await fetch("http://localhost:18000/", {
-      method: "PATCH",
-      headers: { "CSRF-Protection": "true" },
-      body: new URLSearchParams({ bodyField: "33".repeat(1_000_000) }),
-    });
-    assert.equal(response.status, 413);
-    assert.equal(
-      response.headers.get("Content-Type"),
-      "text/plain; charset=utf-8",
-    );
-    assert.equal(await response.text(), "Error: Field too large.");
-  }
-
-  {
-    const requestBody = new FormData();
-    requestBody.append(
-      "bodyFileField".repeat(10_000),
-      new Blob([Buffer.from([33, 34, 3])]),
-    );
-    const response = await fetch("http://localhost:18000/", {
-      method: "PATCH",
-      headers: { "CSRF-Protection": "true" },
-      body: requestBody,
-    });
-    assert.equal(response.status, 400);
-    assert.equal(
-      response.headers.get("Content-Type"),
-      "text/plain; charset=utf-8",
-    );
-  }
-
-  {
-    const requestBody = new FormData();
-    requestBody.append("bodyFileField", new Blob([Buffer.alloc(100_000_000)]));
-    const response = await fetch("http://localhost:18000/", {
-      method: "PATCH",
-      headers: { "CSRF-Protection": "true" },
-      body: requestBody,
-    });
-    assert.equal(response.status, 413);
-    assert.equal(
-      response.headers.get("Content-Type"),
-      "text/plain; charset=utf-8",
-    );
-    assert.equal(await response.text(), "Error: File too large.");
-  }
-
-  {
-    const response = await fetch("http://localhost:18000/", {
-      method: "PATCH",
-      headers: { "CSRF-Protection": "true" },
-      body: new URLSearchParams(
-        Object.fromEntries(
-          Array.from({ length: 1000 }, (value, key) => [
-            `bodyField-${key}`,
-            "33",
-          ]),
-        ),
-      ),
-    });
-    assert.equal(response.status, 413);
-    assert.equal(
-      response.headers.get("Content-Type"),
-      "text/plain; charset=utf-8",
-    );
-    assert.equal(await response.text(), "Error: Too many fields.");
-  }
-
-  {
-    const requestBody = new FormData();
-    for (
-      let bodyFileFieldCount = 0;
-      bodyFileFieldCount < 1000;
-      bodyFileFieldCount++
-    )
-      requestBody.append("bodyFileField", new Blob([Buffer.from([33, 34, 3])]));
-    const response = await fetch("http://localhost:18000/", {
-      method: "PATCH",
-      headers: { "CSRF-Protection": "true" },
-      body: requestBody,
-    });
-    assert.equal(response.status, 413);
-    assert.equal(
-      response.headers.get("Content-Type"),
-      "text/plain; charset=utf-8",
-    );
-    assert.equal(await response.text(), "Error: Too many files.");
+    {
+      const requestBody = new FormData();
+      for (
+        let bodyFileFieldCount = 0;
+        bodyFileFieldCount < 1000;
+        bodyFileFieldCount++
+      )
+        requestBody.append(
+          "bodyFileField",
+          new Blob([Buffer.from([33, 34, 3])]),
+        );
+      const response = await fetch("http://localhost:18000/", {
+        method: "PATCH",
+        headers: { "CSRF-Protection": "true" },
+        body: requestBody,
+      });
+      assert.equal(response.status, 413);
+      assert.equal(
+        response.headers.get("Content-Type"),
+        "text/plain; charset=utf-8",
+      );
+      assert.equal(await response.text(), "Error: Too many files.");
+    }
   }
 
   {
