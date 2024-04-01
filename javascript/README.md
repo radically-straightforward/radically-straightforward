@@ -49,6 +49,14 @@ javascript`
 
 <!-- DOCUMENTATION END: ./source/index.mts -->
 
+### Browser JavaScript
+
+```javascript
+import * as javascript from "@radically-straightforward/javascript/static/index.mjs";
+```
+
+<!-- DOCUMENTATION: ./static/index.mjs -->
+
 ## Live Navigation
 
 TODO: `@radically-straightforward/server` refers to this.
