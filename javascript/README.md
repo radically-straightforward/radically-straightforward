@@ -55,7 +55,17 @@ javascript`
 import * as javascript from "@radically-straightforward/javascript/static/index.mjs";
 ```
 
-<!-- DOCUMENTATION: ./static/index.mjs -->
+<!-- DOCUMENTATION START: ./static/index.mjs -->
+
+### `isSafari`
+
+```typescript
+export const isSafari;
+```
+
+Source: <https://github.com/DamonOehlman/detect-browser/blob/546e6f1348375d8a486f21da07b20717267f6c49/src/index.ts#L166>
+
+<!-- DOCUMENTATION END: ./static/index.mjs -->
 
 ## Live Navigation
 
