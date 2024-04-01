@@ -944,7 +944,7 @@ export const isSafari = /Version\/([0-9\._]+).*Safari/.test(
 );
 
 /**
- * Whether the user has a physical keyboard or a virtual keyboard on a phone screen. This isn’t 100% reliable, because works by detecting presses of modifiers keys (for example, `control`), but it works well enough.
+ * Whether the user has a physical keyboard or a virtual keyboard on a phone screen. This isn’t 100% reliable, because it works by detecting presses of modifiers keys (for example, `control`), but it works well enough.
  */
 export let isPhysicalKeyboard = false;
 

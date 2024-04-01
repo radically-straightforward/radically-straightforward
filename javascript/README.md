@@ -71,7 +71,7 @@ Source: <https://github.com/DamonOehlman/detect-browser/blob/546e6f1348375d8a486
 export let isPhysicalKeyboard;
 ```
 
-Whether the user has a physical keyboard or a virtual keyboard on a phone screen. This isn’t 100% reliable, because works by detecting presses of modifiers keys (for example, `control`), but it works well enough.
+Whether the user has a physical keyboard or a virtual keyboard on a phone screen. This isn’t 100% reliable, because it works by detecting presses of modifiers keys (for example, `control`), but it works well enough.
 
 ### `shiftKey`
 
