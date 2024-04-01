@@ -767,7 +767,7 @@
 //                     ? localizeDate(dateString)
 //                     : localizeDateTime(dateString)
 //                 }`;
-//     return shouldCapitalize ? capitalize(relativeDateTime) : relativeDateTime;
+//     return shouldCapitalize ? utilities.capitalize(relativeDateTime) : relativeDateTime;
 //   };
 // })();
 
