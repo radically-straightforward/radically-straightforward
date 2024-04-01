@@ -936,12 +936,15 @@ export function previousSiblings(element) {
   return siblings;
 }
 
-// export function isConnected(element) {
-//   return ancestors(element).some(
-//     (ancestor) =>
-//       ancestor.forceIsConnected === true || ancestor.matches("html"),
-//   );
-// }
+/**
+ * Check whether the `element` is still connected to the document, which includes Tippy.js’s tippys that aren’t mounted but whose `target` is connected. You may force an element to be connected by setting `element.forceIsConnected = true`.
+ */
+export function isConnected(element) {
+  return ancestors(element).some(
+    (ancestor) =>
+      ancestor.forceIsConnected === true || ancestor.matches("html"),
+  );
+}
 
 /**
  * Source: <https://github.com/ccampbell/mousetrap/blob/2f9a476ba6158ba69763e4fcf914966cc72ef433/mousetrap.js#L135>
