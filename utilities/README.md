@@ -126,6 +126,14 @@ const reader = new Blob([
 (await reader.read()).value; // => undefined
 ```
 
+### `emailRegExp`
+
+```typescript
+export const emailRegExp;
+```
+
+A regular expression that detects valid email addresses. This regular expression is more restrictive than the RFC—it rejects some email addresses that technically are valid, for example, `example@localhost`. But it strikes a good tradeoff for practical purposes, for example, signing up in a web application.
+
 ### `Intern`
 
 ```typescript

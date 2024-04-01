@@ -1,3 +1,4 @@
+// import utilities from "@radically-straightforward/utilities";
 // import fastMyersDiff from "fast-myers-diff";
 // import tippy, * as tippyStatic from "tippy.js";
 
@@ -626,7 +627,7 @@
 //     if (
 //       element.matches(`[type="email"]`) &&
 //       element.value.trim() !== "" &&
-//       element.value.match(regExps.email) === null
+//       element.value.match(utilities.emailRegExp) === null
 //     )
 //       return "Please enter an email address.";
 
@@ -855,7 +856,7 @@
 // }
 
 // export function UTCizeDateTime(dateString) {
-//   if (dateString.match(regExps.localizedDateTime) === null) return;
+//   if (dateString.match(/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}$/) === null) return;
 //   const date = new Date(dateString.trim().replace(" ", "T"));
 //   if (isNaN(date.getTime())) return;
 //   return date;
@@ -969,8 +970,3 @@ export let shiftKey = false;
   window.addEventListener("keydown", eventListener);
   window.addEventListener("keyup", eventListener);
 }
-
-// export const regExps = {
-//   email: /^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$/i,
-//   localizedDateTime: /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}$/,
-// };

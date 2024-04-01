@@ -78,6 +78,15 @@ test("JSONLinesTransformStream", async () => {
   }
 });
 
+test("emailRegExp", () => {
+  assert.match("leandro@leafac.com", utilities.emailRegExp);
+  assert.doesNotMatch("leandro@leafac.c", utilities.emailRegExp);
+  assert.doesNotMatch("leandro@localhost", utilities.emailRegExp);
+  assert.doesNotMatch("leafac.com", utilities.emailRegExp);
+  assert.doesNotMatch("'hello'@leafac.com", utilities.emailRegExp);
+  assert.doesNotMatch("leandro@lea_fac.com", utilities.emailRegExp);
+});
+
 test("intern()", () => {
   // @ts-expect-error
   assert(([1] === [1]) === false);

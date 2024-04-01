@@ -154,6 +154,11 @@ export class JSONLinesTransformStream extends TransformStream {
 }
 
 /**
+ * A regular expression that detects valid email addresses. This regular expression is more restrictive than the RFC—it rejects some email addresses that technically are valid, for example, `example@localhost`. But it strikes a good tradeoff for practical purposes, for example, signing up in a web application.
+ */
+export const emailRegExp = /^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$/i;
+
+/**
  * Utility type for `intern()`.
  */
 export type Intern<Type> = Readonly<Type & { [internSymbol]: true }>;
