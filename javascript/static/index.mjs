@@ -129,7 +129,7 @@ import utilities from "@radically-straightforward/utilities";
 //       elements: [...document.querySelectorAll("[javascript]")].filter(
 //         (element) =>
 //           element.closest("[data-tippy-root]") === null &&
-//           !ancestors(element)
+//           !parents(element)
 //             .slice(1)
 //             .some((element) => element.partialParentElement),
 //       ),
@@ -506,7 +506,7 @@ import utilities from "@radically-straightforward/utilities";
 //         ["style", "hidden", "disabled", ...inputAttributes].includes(
 //           attribute,
 //         ) &&
-//         ancestors(from).every(
+//         parents(from).every(
 //           (element) =>
 //             element.onbeforemorphattribute?.(event, attribute) !== true,
 //         )
@@ -553,13 +553,13 @@ import utilities from "@radically-straightforward/utilities";
 // }
 
 // export function validate(element) {
-//   const elementsToValidate = descendants(element);
+//   const elementsToValidate = children(element);
 //   const elementsToReset = new Map();
 
 //   for (const element of elementsToValidate) {
 //     if (
 //       element.closest("[disabled]") !== null ||
-//       ancestors(element).some((element) => element.isValid === true)
+//       parents(element).some((element) => element.isValid === true)
 //     )
 //       continue;
 //     const valueInputByUser = element.value;
@@ -646,14 +646,14 @@ import utilities from "@radically-straightforward/utilities";
 // );
 
 // export function isModified(element) {
-//   const elementsToCheck = descendants(element);
+//   const elementsToCheck = children(element);
 //   for (const element of elementsToCheck) {
 //     if (
-//       ancestors(element).some((element) => element.isModified === false) ||
+//       parents(element).some((element) => element.isModified === false) ||
 //       element.closest("[disabled]") !== null
 //     )
 //       continue;
-//     if (ancestors(element).some((element) => element.isModified === true))
+//     if (parents(element).some((element) => element.isModified === true))
 //       return true;
 //     if (["radio", "checkbox"].includes(element.type)) {
 //       if (element.checked !== element.defaultChecked) return true;
@@ -690,7 +690,7 @@ import utilities from "@radically-straightforward/utilities";
 
 // export function serialize(element) {
 //   const urlSearchParams = new URLSearchParams();
-//   const elementsToCheck = descendants(element);
+//   const elementsToCheck = children(element);
 //   for (const element of elementsToCheck) {
 //     const name = element.getAttribute("name");
 //     if (typeof name !== "string" || element.closest("[disabled]") !== null)
@@ -706,7 +706,7 @@ import utilities from "@radically-straightforward/utilities";
 // }
 
 // export function reset(element) {
-//   const elementsToCheck = descendants(element);
+//   const elementsToCheck = children(element);
 //   for (const element of elementsToCheck) {
 //     if (element.value !== element.defaultValue) {
 //       element.value = element.defaultValue;
@@ -852,14 +852,14 @@ import utilities from "@radically-straightforward/utilities";
 //   ).padStart(2, "0")}`;
 // }
 
-// export function formatUTCDateTime(dateString) {
-//   const date = new Date(dateString.trim());
-//   return `${String(date.getUTCFullYear())}-${String(
-//     date.getUTCMonth() + 1,
-//   ).padStart(2, "0")}-${String(date.getUTCDate()).padStart(2, "0")} ${String(
-//     date.getUTCHours(),
-//   ).padStart(2, "0")}:${String(date.getUTCMinutes()).padStart(2, "0")} UTC`;
-// }
+export function formatUTCDateTime(dateString) {
+  const date = new Date(dateString.trim());
+  return `${String(date.getUTCFullYear())}-${String(
+    date.getUTCMonth() + 1,
+  ).padStart(2, "0")}-${String(date.getUTCDate()).padStart(2, "0")} ${String(
+    date.getUTCHours(),
+  ).padStart(2, "0")}:${String(date.getUTCMinutes()).padStart(2, "0")} UTC`;
+}
 
 /**
  * Returns a string with the week day in English, for example, `Monday`.
@@ -897,23 +897,23 @@ export function execute({
 execute.functions = new Map();
 
 /**
- * Returns an array of ancestors, including `element` itself. It knows how to navigate up Tippy.js’s tippys that aren’t mounted.
+ * Returns an array of parents, including `element` itself. It knows how to navigate up Tippy.js’s tippys that aren’t mounted.
  */
-export function ancestors(element) {
-  const ancestors = [];
+export function parents(element) {
+  const parents = [];
   while (element !== null) {
-    if (element.nodeType === element.ELEMENT_NODE) ancestors.push(element);
+    if (element.nodeType === element.ELEMENT_NODE) parents.push(element);
     element = element.matches?.("[data-tippy-root]")
       ? element._tippy.reference
       : element.parentElement;
   }
-  return ancestors;
+  return parents;
 }
 
 /**
- * Returns an array of descendants, including `element` itself.
+ * Returns an array of children, including `element` itself.
  */
-export function descendants(element) {
+export function children(element) {
   return element === null ? [] : [element, ...element.querySelectorAll("*")];
 }
 
@@ -945,7 +945,7 @@ export function previousSiblings(element) {
  * Check whether the `element` is still connected to the document, which includes Tippy.js’s tippys that aren’t mounted but whose `target` is connected. You may force an element to be connected by setting `element.forceIsConnected = true`.
  */
 export function isConnected(element) {
-  return ancestors(element).some(
+  return parents(element).some(
     (ancestor) =>
       ancestor.forceIsConnected === true || ancestor.matches("html"),
   );
