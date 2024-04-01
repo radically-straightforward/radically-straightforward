@@ -1,4 +1,4 @@
-// import utilities from "@radically-straightforward/utilities";
+import utilities from "@radically-straightforward/utilities";
 // import fastMyersDiff from "fast-myers-diff";
 // import tippy, * as tippyStatic from "tippy.js";
 
