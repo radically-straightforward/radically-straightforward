@@ -894,7 +894,6 @@ export function execute({
       .call(element, event, ...javascript.arguments);
   }
 }
-
 execute.functions = new Map();
 
 /**
