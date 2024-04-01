@@ -28,7 +28,6 @@
     - Syntax highlighting
     - IntelliSense
   - TypeScript on browser JavaScript?
-- Courselore `helpers.mts`
 
 ## Documentation
 
