@@ -2,8 +2,12 @@
 
 ## 1.2.2 · 2024-04-01
 
-- Added `emailRegExp`.
-- Added `capitalize()`.
+- Added:
+  - `capitalize()`
+  - `isDate()`
+  - `emailRegExp`
+  - `ISODateRegExp`
+  - `localizedDateRegExp`
 
 ## 1.2.1 · 2024-03-12
 
