@@ -891,38 +891,50 @@ import utilities from "@radically-straightforward/utilities";
 
 // execute.functions = new Map();
 
-// export function ancestors(element) {
-//   const ancestors = [];
-//   while (element !== null) {
-//     if (element.nodeType === element.ELEMENT_NODE) ancestors.push(element);
-//     element = element.matches?.("[data-tippy-root]")
-//       ? element._tippy.reference
-//       : element.parentElement;
-//   }
-//   return ancestors;
-// }
+/**
+ * Returns an array of ancestors, including `element` itself. It knows how to navigate up Tippy.js’s tippys that aren’t mounted.
+ */
+export function ancestors(element) {
+  const ancestors = [];
+  while (element !== null) {
+    if (element.nodeType === element.ELEMENT_NODE) ancestors.push(element);
+    element = element.matches?.("[data-tippy-root]")
+      ? element._tippy.reference
+      : element.parentElement;
+  }
+  return ancestors;
+}
 
-// export function descendants(element) {
-//   return element === null ? [] : [element, ...element.querySelectorAll("*")];
-// }
+/**
+ * Returns an array of descendants, including `element` itself.
+ */
+export function descendants(element) {
+  return element === null ? [] : [element, ...element.querySelectorAll("*")];
+}
 
-// export function nextSiblings(element) {
-//   const siblings = [];
-//   while (element !== null) {
-//     siblings.push(element);
-//     element = element.nextElementSibling;
-//   }
-//   return siblings;
-// }
+/**
+ * Returns an array of sibling elements, including `element` itself.
+ */
+export function nextSiblings(element) {
+  const siblings = [];
+  while (element !== null) {
+    siblings.push(element);
+    element = element.nextElementSibling;
+  }
+  return siblings;
+}
 
-// export function previousSiblings(element) {
-//   const siblings = [];
-//   while (element !== null) {
-//     siblings.push(element);
-//     element = element.previousElementSibling;
-//   }
-//   return siblings;
-// }
+/**
+ * Returns an array of sibling elements, including `element` itself.
+ */
+export function previousSiblings(element) {
+  const siblings = [];
+  while (element !== null) {
+    siblings.push(element);
+    element = element.previousElementSibling;
+  }
+  return siblings;
+}
 
 // export function isConnected(element) {
 //   return ancestors(element).some(
