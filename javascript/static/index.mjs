@@ -11,7 +11,7 @@ export function customFormValidation() {
       event.preventDefault();
       event.stopImmediatePropagation();
     },
-    { capture: true }
+    { capture: true },
   );
 }
 
@@ -36,7 +36,7 @@ export function warnAboutLosingInputs() {
     isSubmittingForm ||
     !isModified(document.querySelector("body")) ||
     confirm(
-      "Your changes will be lost if you leave this page. Do you wish to continue?"
+      "Your changes will be lost if you leave this page. Do you wish to continue?",
     );
 }
 
@@ -100,7 +100,7 @@ export function liveNavigation() {
       });
 
       const externalRedirect = response.headers.get(
-        "Live-Navigation-External-Redirect"
+        "Live-Navigation-External-Redirect",
       );
       if (typeof externalRedirect === "string") {
         window.location.assign(externalRedirect);
@@ -169,14 +169,14 @@ export function liveNavigation() {
           element.closest("[data-tippy-root]") === null &&
           !ancestors(element)
             .slice(1)
-            .some((element) => element.partialParentElement)
+            .some((element) => element.partialParentElement),
       ),
     });
   });
 
   document.onclick = async (event) => {
     const link = event.target.closest(
-      'a[href]:not([target^="_"]):not([download])'
+      'a[href]:not([target^="_"]):not([download])',
     );
     if (
       event.button !== 0 ||
@@ -264,7 +264,7 @@ export async function liveConnection({
       clearTimeout(heartbeatTimeout);
       abortController.abort();
     },
-    { once: true }
+    { once: true },
   );
 
   while (true) {
@@ -313,7 +313,7 @@ export async function liveConnection({
         serverVersion !== newServerVersion
       ) {
         console.error(
-          `NEW SERVER VERSION: ${serverVersion} → ${newServerVersion}`
+          `NEW SERVER VERSION: ${serverVersion} → ${newServerVersion}`,
         );
         setTippy({
           element: body,
@@ -399,7 +399,7 @@ export async function liveConnection({
     await new Promise((resolve) => {
       window.setTimeout(
         resolve,
-        reconnectTimeout + Math.random() * reconnectTimeout * 0.2
+        reconnectTimeout + Math.random() * reconnectTimeout * 0.2,
       );
     });
   }
@@ -413,11 +413,11 @@ export function loadDocument(documentString, event) {
     new DOMParser()
       .parseFromString(documentString, "text/html")
       .querySelector("html"),
-    event
+    event,
   );
 
   window.dispatchEvent(
-    new CustomEvent("DOMContentLoaded", { detail: event?.detail })
+    new CustomEvent("DOMContentLoaded", { detail: event?.detail }),
   );
 
   if (!event?.detail?.liveUpdate)
@@ -542,11 +542,11 @@ export function morph(from, to, event = undefined) {
       if (
         event?.detail?.liveUpdate &&
         ["style", "hidden", "disabled", ...inputAttributes].includes(
-          attribute
+          attribute,
         ) &&
         ancestors(from).every(
           (element) =>
-            element.onbeforemorphattribute?.(event, attribute) !== true
+            element.onbeforemorphattribute?.(event, attribute) !== true,
         )
       )
         continue;
@@ -609,7 +609,7 @@ export function validate(element) {
       element.value = valueInputByUser;
     const target =
       element.closest(
-        "[hidden], .visually-hidden, .visually-hidden--interactive:not(:focus):not(:focus-within):not(:active)"
+        "[hidden], .visually-hidden, .visually-hidden--interactive:not(:focus):not(:focus-within):not(:active)",
       )?.parentElement ?? element;
     setTippy({
       element: target,
@@ -659,7 +659,7 @@ export function validate(element) {
       element.value.length < Number(element.getAttribute("minlength"))
     )
       return `This field must have at least ${element.getAttribute(
-        "minlength"
+        "minlength",
       )} characters.`;
 
     if (
@@ -742,7 +742,7 @@ export const relativizeDateTime = (() => {
       preposition = undefined,
       dateOnly = true,
       capitalize: shouldCapitalize = false,
-    } = {}
+    } = {},
   ) => {
     const dateTimeDifference =
       new Date(dateString.trim()).getTime() - Date.now();
@@ -755,20 +755,25 @@ export const relativizeDateTime = (() => {
       absoluteDateTimeDifference < minute
         ? "just now"
         : absoluteDateTimeDifference < hour
-        ? relativeTimeFormat.format(
-            Math.trunc(dateTimeDifference / minute),
-            "minutes"
-          )
-        : absoluteDateTimeDifference < day
-        ? relativeTimeFormat.format(
-            Math.trunc(dateTimeDifference / hour),
-            "hours"
-          )
-        : absoluteDateDifference < month
-        ? relativeTimeFormat.format(Math.trunc(dateDifference / day), "days")
-        : `${preposition === undefined ? "" : `${preposition} `}${
-            dateOnly ? localizeDate(dateString) : localizeDateTime(dateString)
-          }`;
+          ? relativeTimeFormat.format(
+              Math.trunc(dateTimeDifference / minute),
+              "minutes",
+            )
+          : absoluteDateTimeDifference < day
+            ? relativeTimeFormat.format(
+                Math.trunc(dateTimeDifference / hour),
+                "hours",
+              )
+            : absoluteDateDifference < month
+              ? relativeTimeFormat.format(
+                  Math.trunc(dateDifference / day),
+                  "days",
+                )
+              : `${preposition === undefined ? "" : `${preposition} `}${
+                  dateOnly
+                    ? localizeDate(dateString)
+                    : localizeDateTime(dateString)
+                }`;
     return shouldCapitalize ? capitalize(relativeDateTime) : relativeDateTime;
   };
 })();
@@ -785,14 +790,14 @@ export function relativizeDateTimeElement(element, options = {}) {
       tippyProps: {
         touch: false,
         content: `${localizeDateTime(dateTime)} (${formatUTCDateTime(
-          dateTime
+          dateTime,
         )})`,
       },
     });
     element.textContent = relativizeDateTime(dateTime, options);
     element.relativizeDateTimeElementTimeout = window.setTimeout(
       update,
-      10 * 1000 + Math.random() * 2 * 1000
+      10 * 1000 + Math.random() * 2 * 1000,
     );
   })();
 }
@@ -806,8 +811,8 @@ export function relativizeDate(dateString) {
   return date === today
     ? "Today"
     : date === yesterday
-    ? "Yesterday"
-    : `${date} · ${weekday(date)}`;
+      ? "Yesterday"
+      : `${date} · ${weekday(date)}`;
 }
 
 export function relativizeDateElement(element) {
@@ -817,7 +822,7 @@ export function relativizeDateElement(element) {
     element.textContent = relativizeDate(element.getAttribute("datetime"));
     element.relativizeDateElementTimeout = window.setTimeout(
       update,
-      60 * 1000 + Math.random() * 5 * 1000
+      60 * 1000 + Math.random() * 5 * 1000,
     );
   })();
 }
@@ -837,23 +842,23 @@ export function localizeDate(dateString) {
   const date = new Date(dateString.trim());
   return `${String(date.getFullYear())}-${String(date.getMonth() + 1).padStart(
     2,
-    "0"
+    "0",
   )}-${String(date.getDate()).padStart(2, "0")}`;
 }
 
 export function localizeTime(dateString) {
   const date = new Date(dateString.trim());
   return `${String(date.getHours()).padStart(2, "0")}:${String(
-    date.getMinutes()
+    date.getMinutes(),
   ).padStart(2, "0")}`;
 }
 
 export function formatUTCDateTime(dateString) {
   const date = new Date(dateString.trim());
   return `${String(date.getUTCFullYear())}-${String(
-    date.getUTCMonth() + 1
+    date.getUTCMonth() + 1,
   ).padStart(2, "0")}-${String(date.getUTCDate()).padStart(2, "0")} ${String(
-    date.getUTCHours()
+    date.getUTCHours(),
   ).padStart(2, "0")}:${String(date.getUTCMinutes()).padStart(2, "0")} UTC`;
 }
 
@@ -932,7 +937,8 @@ export function previousSiblings(element) {
 
 export function isConnected(element) {
   return ancestors(element).some(
-    (ancestor) => ancestor.forceIsConnected === true || ancestor.matches("html")
+    (ancestor) =>
+      ancestor.forceIsConnected === true || ancestor.matches("html"),
   );
 }
 
@@ -941,7 +947,7 @@ export const isAppleDevice = /Mac|iPod|iPhone|iPad/.test(navigator.platform);
 
 // https://github.com/DamonOehlman/detect-browser/blob/546e6f1348375d8a486f21da07b20717267f6c49/src/index.ts#L166
 export const isSafari = /Version\/([0-9\._]+).*Safari/.test(
-  navigator.userAgent
+  navigator.userAgent,
 );
 
 export let isPhysicalKeyboard = false;
