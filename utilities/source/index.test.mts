@@ -78,6 +78,13 @@ test("JSONLinesTransformStream", async () => {
   }
 });
 
+test("capitalize()", () => {
+  assert.equal(
+    utilities.capitalize("leandro Facchinetti"),
+    "Leandro Facchinetti",
+  );
+});
+
 test("emailRegExp", () => {
   assert.match("leandro@leafac.com", utilities.emailRegExp);
   assert.doesNotMatch("leandro@leafac.c", utilities.emailRegExp);
@@ -87,10 +94,16 @@ test("emailRegExp", () => {
   assert.doesNotMatch("leandro@lea_fac.com", utilities.emailRegExp);
 });
 
-test("capitalize()", () => {
-  assert.equal(
-    utilities.capitalize("leandro Facchinetti"),
-    "Leandro Facchinetti",
+test("ISODateRegExp", () => {
+  assert.match("2024-04-01T14:19:48.162Z", utilities.ISODateRegExp);
+  assert.doesNotMatch("2024-04-01 15:20", utilities.ISODateRegExp);
+});
+
+test("localizedDateRegExp", () => {
+  assert.match("2024-04-01 15:20", utilities.localizedDateRegExp);
+  assert.doesNotMatch(
+    "2024-04-01T14:19:48.162Z",
+    utilities.localizedDateRegExp,
   );
 });
 

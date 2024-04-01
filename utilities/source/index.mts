@@ -83,14 +83,14 @@ export function backgroundJob(
     stop: () => {
       clearTimeout(timeout);
       state = "stopped";
-      process?.off?.("gracefulTermination", gracefulTerminationListener);
+      process?.off?.("gracefulTermination", gracefulTerminationEventListener);
     },
   };
   scheduler.run();
-  const gracefulTerminationListener = () => {
+  const gracefulTerminationEventListener = () => {
     scheduler.stop();
   };
-  process?.once?.("gracefulTermination", gracefulTerminationListener);
+  process?.once?.("gracefulTermination", gracefulTerminationEventListener);
   return scheduler;
 }
 
@@ -154,16 +154,27 @@ export class JSONLinesTransformStream extends TransformStream {
 }
 
 /**
- * A regular expression that detects valid email addresses. This regular expression is more restrictive than the RFC—it rejects some email addresses that technically are valid, for example, `example@localhost`. But it strikes a good tradeoff for practical purposes, for example, signing up in a web application.
- */
-export const emailRegExp = /^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$/i;
-
-/**
  * Capitalizes the first letter of a string. It’s different from [Lodash’s `capitalize()`](https://lodash.com/docs/4.17.15#capitalize) in that it doesn’t lowercase the rest of the string.
  */
 export function capitalize(text: string): string {
   return text.length === 0 ? text : `${text[0].toUpperCase()}${text.slice(1)}`;
 }
+
+/**
+ * A regular expression that matches valid email addresses. This regular expression is more restrictive than the RFC—it doesn’t match some email addresses that technically are valid, for example, `example@localhost`. But it strikes a good tradeoff for practical purposes, for example, signing up in a web application.
+ */
+export const emailRegExp: RegExp = /^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$/i;
+
+/**
+ * A regular expression that matches ISO dates, for example, `2024-04-01T14:19:48.162Z`.
+ */
+export const ISODateRegExp: RegExp =
+  /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/;
+
+/**
+ * A regular expression that matches localized dates, for example, `2024-04-01 15:20`.
+ */
+export const localizedDateRegExp: RegExp = /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}$/;
 
 /**
  * Utility type for `intern()`.

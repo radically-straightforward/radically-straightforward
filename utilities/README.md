@@ -126,14 +126,6 @@ const reader = new Blob([
 (await reader.read()).value; // => undefined
 ```
 
-### `emailRegExp`
-
-```typescript
-export const emailRegExp;
-```
-
-A regular expression that detects valid email addresses. This regular expression is more restrictive than the RFC—it rejects some email addresses that technically are valid, for example, `example@localhost`. But it strikes a good tradeoff for practical purposes, for example, signing up in a web application.
-
 ### `capitalize()`
 
 ```typescript
@@ -141,6 +133,30 @@ export function capitalize(text: string): string;
 ```
 
 Capitalizes the first letter of a string. It’s different from [Lodash’s `capitalize()`](https://lodash.com/docs/4.17.15#capitalize) in that it doesn’t lowercase the rest of the string.
+
+### `emailRegExp`
+
+```typescript
+export const emailRegExp: RegExp;
+```
+
+A regular expression that matches valid email addresses. This regular expression is more restrictive than the RFC—it doesn’t match some email addresses that technically are valid, for example, `example@localhost`. But it strikes a good tradeoff for practical purposes, for example, signing up in a web application.
+
+### `ISODateRegExp`
+
+```typescript
+export const ISODateRegExp: RegExp;
+```
+
+A regular expression that matches ISO dates, for example, `2024-04-01T14:19:48.162Z`.
+
+### `localizedDateRegExp`
+
+```typescript
+export const localizedDateRegExp: RegExp;
+```
+
+A regular expression that matches localized dates, for example, `2024-04-01 15:20`.
 
 ### `Intern`
 

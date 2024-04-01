@@ -856,7 +856,7 @@
 // }
 
 // export function UTCizeDateTime(dateString) {
-//   if (dateString.match(/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}$/) === null) return;
+//   if (dateString.match(utilities.localizedDateRegExp) === null) return;
 //   const date = new Date(dateString.trim().replace(" ", "T"));
 //   if (isNaN(date.getTime())) return;
 //   return date;
