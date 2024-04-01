@@ -1,5 +1,3 @@
-// This file is here for now because it’s still under development. It should be moved to https://github.com/leafac/javascript/
-
 import fastMyersDiff from "fast-myers-diff";
 import tippy, * as tippyStatic from "tippy.js";
 
