@@ -870,11 +870,14 @@ import utilities from "@radically-straightforward/utilities";
 //   return (dateString) => dateTimeFormat.format(new Date(dateString.trim()));
 // })();
 
-// export function stringToElement(string) {
-//   const element = document.createElement("div");
-//   element.innerHTML = string;
-//   return element;
-// }
+/**
+ * Convert a string into a DOM element. The string may have multiple siblings without a common parent, so `stringToElement()` returns a `<div>` containing the elements.
+ */
+export function stringToElement(string) {
+  const element = document.createElement("div");
+  element.innerHTML = string;
+  return element;
+}
 
 /**
  * Execute the function defined by the `javascript="___"` attribute, which is set by [`@radically-straightforward/build`](https://github.com/radically-straightforward/radically-straightforward/tree/main/build) when extracting browser JavaScript.
