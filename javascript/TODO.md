@@ -1,5 +1,12 @@
 # TODO
 
+- Document browser JavaScript
+  - Custom form validation
+    - `<form novalidate>`
+    - `onvalidate` (return error message in string)
+
+---
+
 - Live Connection
   - Detect that you’re offline.
   - Detect a server version update. (Trigger a reload in that case)

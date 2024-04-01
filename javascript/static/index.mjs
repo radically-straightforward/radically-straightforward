@@ -1,18 +1,6 @@
 import fastMyersDiff from "fast-myers-diff";
 import tippy, * as tippyStatic from "tippy.js";
 
-export function customFormValidation() {
-  document.addEventListener(
-    "submit",
-    (event) => {
-      if (validate(event.target)) return;
-      event.preventDefault();
-      event.stopImmediatePropagation();
-    },
-    { capture: true },
-  );
-}
-
 export function warnAboutLosingInputs() {
   let isSubmittingForm = false;
 
@@ -588,6 +576,15 @@ export function setTippy({
   return element[elementProperty];
 }
 
+document.addEventListener(
+  "submit",
+  (event) => {
+    if (validate(event.target)) return;
+    event.preventDefault();
+    event.stopImmediatePropagation();
+  },
+  { capture: true },
+);
 export function validate(element) {
   const elementsToValidate = descendants(element);
   const elementsToReset = new Map();
