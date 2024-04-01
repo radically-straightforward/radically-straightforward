@@ -6,7 +6,12 @@ import timers from "node:timers/promises";
 import server from "@radically-straightforward/server";
 import * as serverTypes from "@radically-straightforward/server";
 
-test({ timeout: process.stdin.isTTY ? undefined : 30 * 1000 }, async () => {
+if (!process.stdin.isTTY)
+  setTimeout(() => {
+    process.exit(1);
+  }, 60 * 1000).unref();
+
+test(async () => {
   const application = server();
 
   {
