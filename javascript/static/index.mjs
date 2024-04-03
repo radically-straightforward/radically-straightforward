@@ -548,6 +548,7 @@ execute.functions = new Map();
 //   }
 // }
 
+// TODO: Test `relativizeDateTimeElement()`’s use of `setTippy()`.
 // export function setTippy({
 //   event = undefined,
 //   element,
@@ -753,6 +754,9 @@ execute.functions = new Map();
 // }
 
 /**
+ * Given an `element` with the `datetime` attribute, `relativizeDateTimeElement()` keeps it updated with a relative datetime. See `relativizeDateTime()`, which provides the relative datetime, and `elementBackgroundJob()`, which provides the background job management.
+ *
+ * **Example**
  *
  * ```javascript
  * html`
