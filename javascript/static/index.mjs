@@ -673,6 +673,10 @@ execute.functions = new Map();
 //   if (isNaN(date.getTime())) return;
 //   return date;
 // }
+// /**
+//  * A regular expression that matches localized dates, for example, `2024-04-01 15:20`.
+//  */
+// export const localizedDateTimeRegExp = /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}$/;
 
 // export function isModified(element) {
 //   const elementsToCheck = children(element);
@@ -754,7 +758,6 @@ export function relativizeDateTime(dateString, { preposition = false } = {}) {
   const day = 24 * hour;
   const month = 30 * day;
   const relativeTimeFormat = new Intl.RelativeTimeFormat("en-US", {
-    localeMatcher: "lookup",
     numeric: "auto",
   });
   const dateTimeDifference = new Date(dateString.trim()).getTime() - Date.now();
@@ -804,57 +807,6 @@ export function relativizeDateTime(dateString, { preposition = false } = {}) {
 // }
 
 /**
- * Returns a date relative to today, for example, `Today`, `Yesterday`, `Tomorrow`, or `2024-04-03 · Wednesday`.
- */
-export function relativizeDate(dateString) {
-  const date = localizeDate(dateString);
-  return date === localizeDate(new Date().toISOString())
-    ? "Today"
-    : date ===
-        localizeDate(
-          (() => {
-            const date = new Date();
-            date.setDate(date.getDate() - 1);
-            return date;
-          })().toISOString(),
-        )
-      ? "Yesterday"
-      : date ===
-          localizeDate(
-            (() => {
-              const date = new Date();
-              date.setDate(date.getDate() + 1);
-              return date;
-            })().toISOString(),
-          )
-        ? "Tomorrow"
-        : `${date} · ${weekday(date)}`;
-}
-
-/**
- * Keep an updated relative date on the `element` while it’s connected to the document based on the `datetime` attribute, for example, `<time datetime="2024-04-03T14:51:45.604Z" javascript="${javascript`javascript.relativizeDateElement(this);`}"></time>`.
- */
-export function relativizeDateElement(element) {
-  backgroundJob(
-    element,
-    "relativizeDateElementBackgroundJob",
-    { interval: 60 * 1000 },
-    () => {
-      element.textContent = relativizeDate(element.getAttribute("datetime"));
-    },
-  );
-}
-
-/**
- * Returns a string with the week day in English, for example, `Monday`.
- */
-export function weekday(dateString) {
-  return new Intl.DateTimeFormat("en-US", { weekday: "long" }).format(
-    new Date(dateString.trim()),
-  );
-}
-
-/**
  * Returns a localized datetime, for example, `2024-04-03 15:20`.
  */
 export function localizeDateTime(dateString) {
@@ -881,11 +833,6 @@ export function localizeTime(dateString) {
     date.getMinutes(),
   ).padStart(2, "0")}`;
 }
-
-/**
- * A regular expression that matches localized dates, for example, `2024-04-01 15:20`.
- */
-export const localizedDateTimeRegExp = /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}$/;
 
 /**
  * Format a datetime into a representation that is user friendly.
