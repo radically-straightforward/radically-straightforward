@@ -856,12 +856,11 @@ export function relativizeDate(dateString) {
  * Keep an updated relative date on the `element` while it’s connected to the document based on the `datetime` attribute, for example, `<time datetime="2024-04-03T14:51:45.604Z" javascript="${javascript`javascript.relativizeDateElement(this);`}"></time>`.
  */
 export function relativizeDateElement(element) {
-  element.relativizeDateElementBackgroundJob?.stop();
-  element.relativizeDateElementBackgroundJob = utilities.backgroundJob(
+  backgroundJob(
+    element,
+    "relativizeDateElementBackgroundJob",
     { interval: 60 * 1000 },
     () => {
-      if (!isConnected(element))
-        element.relativizeDateElementBackgroundJob.stop();
       element.textContent = relativizeDate(element.getAttribute("datetime"));
     },
   );
@@ -982,7 +981,7 @@ export function previousSiblings(element) {
  *
  * 2. You may force an element to be connected by setting `element.forceIsConnected = true` on the `element` itself or on one of its parents.
  *
- * This is useful, for example, for elements that periodically update their own contents, for example, a text field that displays relative time, for example, “three hours ago”. You can check that the element has been disconnected from the document and stop the periodic updates.
+ * This is useful, for example, for elements that periodically update their own contents, for example, a text field that displays relative dates, for example, “yesterday”. You can check that the element has been disconnected from the document and stop the periodic updates. See `backgroundJob()`, which uses `isConnected()`, and `relativizeDateElement()`, which uses `backgroundJob()`.
  */
 export function isConnected(element) {
   return parents(element).some(
@@ -994,9 +993,9 @@ export function isConnected(element) {
 /**
  * Similar to [`@radically-straightforward/utilities`’s `backgroundJob()`](https://github.com/radically-straightforward/radically-straightforward/tree/main/utilities), but with the following differences:
  *
- * 1. If called multiple times, it `stop()`s the previous background jobs so that at most one background job is active at once.
+ * 1. If called multiple times, it `stop()`s the previous background job so that at most one background job is active at once.
  *
- * 2. When an element is disconnected from the document, the background job is `stop()`ed.
+ * 2. When an element is disconnected from the document, the background job is `stop()`ped.
  *
  * The background job object returned by `@radically-straightforward/utilities`’s `backgroundJob()` is available at `element[name]`.
  */
