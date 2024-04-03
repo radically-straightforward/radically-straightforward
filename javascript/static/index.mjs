@@ -752,35 +752,37 @@ execute.functions = new Map();
 //   }
 // }
 
+/**
+ * Returns a relative datetime, for example, `just now`, `3 minutes ago`, `in 3 minutes`, `3 hours ago`, `in 3 hours`, `yesterday`, `tomorrow`, `3 days ago`, `in 3 days`, `on 2024-04-03`, and so forth.
+ *
+ * - **`preposition`:** Whether to return `2024-04-03` or `on 2024-04-03`.
+ */
 export function relativizeDateTime(dateString, { preposition = false } = {}) {
-  const minute = 60 * 1000;
-  const hour = 60 * minute;
-  const day = 24 * hour;
-  const month = 30 * day;
+  const minutes = Math.trunc(
+    (new Date(dateString.trim()).getTime() - Date.now()) / (60 * 1000),
+  );
+  const hours = Math.trunc(
+    (new Date(dateString.trim()).getTime() - Date.now()) / (60 * 60 * 1000),
+  );
+  const days =
+    (new Date(localizeDate(dateString)) -
+      new Date(localizeDate(new Date().toISOString()))) /
+    (24 * 60 * 60 * 1000);
   const relativeTimeFormat = new Intl.RelativeTimeFormat("en-US", {
     numeric: "auto",
   });
-  const dateTimeDifference = new Date(dateString.trim()).getTime() - Date.now();
-  const dateDifference =
-    new Date(localizeDate(dateString)) -
-    new Date(localizeDate(new Date().toISOString()));
-  return Math.abs(dateTimeDifference) < minute
+  return Math.abs(minutes) < 1
     ? "just now"
-    : Math.abs(dateTimeDifference) < hour
-      ? relativeTimeFormat.format(
-          Math.trunc(dateTimeDifference / minute),
-          "minutes",
-        )
-      : Math.abs(dateTimeDifference) < day
-        ? relativeTimeFormat.format(
-            Math.trunc(dateTimeDifference / hour),
-            "hours",
-          )
-        : Math.abs(dateDifference) < month
-          ? relativeTimeFormat.format(Math.trunc(dateDifference / day), "days")
+    : Math.abs(hours) < 1
+      ? relativeTimeFormat.format(minutes, "minutes")
+      : Math.abs(days) < 1
+        ? relativeTimeFormat.format(hours, "hours")
+        : Math.abs(days) < 7
+          ? relativeTimeFormat.format(days, "days")
           : `${preposition ? "on " : ""}${localizeDate(dateString)}`;
 }
 
+// <time datetime="2024-04-03T14:51:45.604Z" javascript="${javascript`javascript.relativizeDateElement(this);`}" ></time>
 // export function relativizeDateTimeElement(element, options = {}) {
 //   // TODO: capitalize = false
 //   const target = options.target ?? element;
