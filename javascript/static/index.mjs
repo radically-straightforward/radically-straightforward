@@ -848,25 +848,40 @@ execute.functions = new Map();
 //   element.value = date.toISOString();
 // }
 // export function UTCizeDateTime(dateString) {
-//   if (dateString.match(utilities.localizedDateRegExp) === null) return;
+//   if (dateString.match(localizedDateRegExp) === null) return;
 //   const date = new Date(dateString.trim().replace(" ", "T"));
 //   if (isNaN(date.getTime())) return;
 //   return date;
 // }
 
-// export function localizeDate(dateString) {
-//   const date = new Date(dateString.trim());
-//   return `${String(date.getFullYear())}-${String(date.getMonth() + 1).padStart(
-//     2,
-//     "0",
-//   )}-${String(date.getDate()).padStart(2, "0")}`;
-// }
+/**
+ * Returns a localized time, for example, `2024-04-03`.
+ */
+export function localizeDate(dateString) {
+  const date = new Date(dateString.trim());
+  return `${String(date.getFullYear())}-${String(date.getMonth() + 1).padStart(
+    2,
+    "0",
+  )}-${String(date.getDate()).padStart(2, "0")}`;
+}
 
+/**
+ * Returns a localized time, for example, `15:20`.
+ */
 export function localizeTime(dateString) {
   const date = new Date(dateString.trim());
   return `${String(date.getHours()).padStart(2, "0")}:${String(
     date.getMinutes(),
   ).padStart(2, "0")}`;
+}
+
+/**
+ * Returns a string with the week day in English, for example, `Monday`.
+ */
+export function weekday(dateString) {
+  return new Intl.DateTimeFormat("en-US", { weekday: "long" }).format(
+    new Date(dateString.trim()),
+  );
 }
 
 /**
@@ -884,15 +899,6 @@ export function formatUTCDateTime(dateString) {
   ).padStart(2, "0")}-${String(date.getUTCDate()).padStart(2, "0")} ${String(
     date.getUTCHours(),
   ).padStart(2, "0")}:${String(date.getUTCMinutes()).padStart(2, "0")} UTC`;
-}
-
-/**
- * Returns a string with the week day in English, for example, `Monday`.
- */
-export function weekday(dateString) {
-  return new Intl.DateTimeFormat("en-US", { weekday: "long" }).format(
-    new Date(dateString.trim()),
-  );
 }
 
 /**
