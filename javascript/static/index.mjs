@@ -901,31 +901,17 @@ export function previousSiblings(element) {
 }
 
 /**
- * Check whether the `element` is connected to the document. This is different from the [`isConnected` property](https://developer.mozilla.org/en-US/docs/Web/API/Node/isConnected) in the following ways:
- *
- * 1. It uses `parents()`, so it supports Tippy.js’s tippys that aren’t mounted but whose `target`s are connected.
- *
- * 2. You may force an element to be connected by setting `element.forceIsConnected = true` on the `element` itself or on one of its parents.
- *
- * This is useful, for example, for elements that periodically update their own contents, for example, a text field that displays relative dates, for example, “yesterday”. You can check that the element has been disconnected from the document and stop the periodic updates. See `backgroundJob()`, which uses `isConnected()`, and `relativizeDateElement()`, which uses `backgroundJob()`.
- */
-export function isConnected(element) {
-  return parents(element).some(
-    (ancestor) =>
-      ancestor.forceIsConnected === true || ancestor.matches("html"),
-  );
-}
-
-/**
  * Similar to [`@radically-straightforward/utilities`’s `backgroundJob()`](https://github.com/radically-straightforward/radically-straightforward/tree/main/utilities), but with the following differences:
  *
- * 1. If called multiple times, it `stop()`s the previous background job so that at most one background job is active at once.
+ * 1. If called multiple times, `elementBackgroundJob()` `stop()`s the previous background job so that at most one background job is active at any given time.
  *
- * 2. When an element is disconnected from the document, the background job is `stop()`ped.
+ * 2. When the `element` is disconnected from the document, the background job is `stop()`ped. See `isConnected()`.
  *
  * The background job object returned by `@radically-straightforward/utilities`’s `backgroundJob()` is available at `element[name]`.
+ *
+ * See, for example, `relativizeDateTimeElement()`, which uses `elementBackgroundJob()` to periodically update a relative datetime, for example, “2 hours ago”.
  */
-export function backgroundJob(element, name, options, job) {
+export function elementBackgroundJob(element, name, options, job) {
   element[name]?.stop();
   element[name] = utilities.backgroundJob(options, async () => {
     if (!isConnected(element)) {
@@ -934,6 +920,22 @@ export function backgroundJob(element, name, options, job) {
     }
     await job();
   });
+}
+
+/**
+ * Check whether the `element` is connected to the document. This is different from the [`isConnected` property](https://developer.mozilla.org/en-US/docs/Web/API/Node/isConnected) in the following ways:
+ *
+ * 1. It uses `parents()`, so it supports Tippy.js’s tippys that aren’t mounted but whose `target`s are connected.
+ *
+ * 2. You may force an element to be connected by setting `element.forceIsConnected = true` on the `element` itself or on one of its parents.
+ *
+ * See, for example, `elementBackgroundJob()`, which uses `isConnected()`.
+ */
+export function isConnected(element) {
+  return parents(element).some(
+    (ancestor) =>
+      ancestor.forceIsConnected === true || ancestor.matches("html"),
+  );
 }
 
 /**
