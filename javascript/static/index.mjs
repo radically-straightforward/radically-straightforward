@@ -668,7 +668,7 @@ execute.functions = new Map();
 //   element.value = date.toISOString();
 // }
 // export function UTCizeDateTime(dateString) {
-//   if (dateString.match(localizedDateRegExp) === null) return;
+//   if (dateString.match(localizedDateTimeRegExp) === null) return;
 //   const date = new Date(dateString.trim().replace(" ", "T"));
 //   if (isNaN(date.getTime())) return;
 //   return date;
@@ -824,18 +824,33 @@ execute.functions = new Map();
 //   })();
 // }
 
-// export function relativizeDate(dateString) {
-//   const date = localizeDate(dateString);
-//   const today = localizeDate(new Date().toISOString());
-//   const yesterdayDate = new Date();
-//   yesterdayDate.setDate(yesterdayDate.getDate() - 1);
-//   const yesterday = localizeDate(yesterdayDate.toISOString());
-//   return date === today
-//     ? "Today"
-//     : date === yesterday
-//       ? "Yesterday"
-//       : `${date} · ${weekday(date)}`;
-// }
+/**
+ * Returns a date relative to today, for example, `Today`, `Yesterday`, `Tomorrow`, or `2024-04-03 · Wednesday`.
+ */
+export function relativizeDate(dateString) {
+  const date = localizeDate(dateString);
+  return date === localizeDate(new Date().toISOString())
+    ? "Today"
+    : date ===
+        localizeDate(
+          (() => {
+            const date = new Date();
+            date.setDate(date.getDate() - 1);
+            return date;
+          })().toISOString(),
+        )
+      ? "Yesterday"
+      : date ===
+          localizeDate(
+            (() => {
+              const date = new Date();
+              date.setDate(date.getDate() + 1);
+              return date;
+            })().toISOString(),
+          )
+        ? "Tomorrow"
+        : `${date} · ${weekday(date)}`;
+}
 
 // export function relativizeDateElement(element) {
 //   window.clearTimeout(element.relativizeDateElementTimeout);
@@ -848,6 +863,15 @@ execute.functions = new Map();
 //     );
 //   })();
 // }
+
+/**
+ * Returns a string with the week day in English, for example, `Monday`.
+ */
+export function weekday(dateString) {
+  return new Intl.DateTimeFormat("en-US", { weekday: "long" }).format(
+    new Date(dateString.trim()),
+  );
+}
 
 /**
  * Returns a localized datetime, for example, `2024-04-03 15:20`.
@@ -878,18 +902,9 @@ export function localizeTime(dateString) {
 }
 
 /**
- * Returns a string with the week day in English, for example, `Monday`.
- */
-export function weekday(dateString) {
-  return new Intl.DateTimeFormat("en-US", { weekday: "long" }).format(
-    new Date(dateString.trim()),
-  );
-}
-
-/**
  * A regular expression that matches localized dates, for example, `2024-04-01 15:20`.
  */
-export const localizedDateRegExp = /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}$/;
+export const localizedDateTimeRegExp = /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}$/;
 
 /**
  * Format a datetime into a representation that is user friendly.
