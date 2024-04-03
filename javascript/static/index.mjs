@@ -749,14 +749,14 @@ execute.functions = new Map();
 // }
 
 export function relativizeDateTime(dateString, { preposition = false } = {}) {
-  const relativeTimeFormat = new Intl.RelativeTimeFormat("en-US", {
-    localeMatcher: "lookup",
-    numeric: "auto",
-  });
   const minute = 60 * 1000;
   const hour = 60 * minute;
   const day = 24 * hour;
   const month = 30 * day;
+  const relativeTimeFormat = new Intl.RelativeTimeFormat("en-US", {
+    localeMatcher: "lookup",
+    numeric: "auto",
+  });
   const dateTimeDifference = new Date(dateString.trim()).getTime() - Date.now();
   const dateDifference =
     new Date(localizeDate(dateString)) -
