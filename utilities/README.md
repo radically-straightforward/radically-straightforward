@@ -142,6 +142,14 @@ export function isDate(string: string): boolean;
 
 Determine whether the given `string` is a valid `Date`, that is, it’s in ISO format and corresponds to an existing date, for example, it is **not** April 32nd.
 
+### `weekday()`
+
+```typescript
+export function weekday(dateString: string): string;
+```
+
+Returns a string with the week day in English, for example, `Monday`.
+
 ### `emailRegExp`
 
 ```typescript

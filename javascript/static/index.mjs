@@ -805,7 +805,7 @@ import utilities from "@radically-straightforward/utilities";
 //     ? "Today"
 //     : date === yesterday
 //       ? "Yesterday"
-//       : `${date} · ${weekday(date)}`;
+//       : `${date} · ${utilities.weekday(date)}`;
 // }
 
 // export function relativizeDateElement(element) {
@@ -859,15 +859,6 @@ export function formatUTCDateTime(dateString) {
   ).padStart(2, "0")}-${String(date.getUTCDate()).padStart(2, "0")} ${String(
     date.getUTCHours(),
   ).padStart(2, "0")}:${String(date.getUTCMinutes()).padStart(2, "0")} UTC`;
-}
-
-/**
- * Returns a string with the week day in English, for example, `Monday`.
- */
-export function weekday(dateString) {
-  return new Intl.DateTimeFormat("en-US", { weekday: "long" }).format(
-    new Date(dateString.trim()),
-  );
 }
 
 /**

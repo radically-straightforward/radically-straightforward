@@ -172,6 +172,15 @@ export function isDate(string: string): boolean {
 }
 
 /**
+ * Returns a string with the week day in English, for example, `Monday`.
+ */
+export function weekday(dateString: string): string {
+  return new Intl.DateTimeFormat("en-US", { weekday: "long" }).format(
+    new Date(dateString.trim()),
+  );
+}
+
+/**
  * A regular expression that matches valid email addresses. This regular expression is more restrictive than the RFC—it doesn’t match some email addresses that technically are valid, for example, `example@localhost`. But it strikes a good tradeoff for practical purposes, for example, signing up in a web application.
  */
 export const emailRegExp: RegExp = /^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$/i;
