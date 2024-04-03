@@ -202,6 +202,23 @@ import utilities from "@radically-straightforward/utilities";
 //   };
 // }
 
+/**
+ * Execute the functions defined by the `javascript="___"` attribute, which is set by [`@radically-straightforward/build`](https://github.com/radically-straightforward/radically-straightforward/tree/main/build) when extracting browser JavaScript. You must call this when you insert new elements in the DOM, for example, when loading a partial.
+ */
+export function execute({
+  event = undefined,
+  element = undefined,
+  elements = element.querySelectorAll("[javascript]"),
+}) {
+  for (const element of elements) {
+    const javascript = JSON.parse(element.getAttribute("javascript"));
+    execute.functions
+      .get(javascript.function)
+      .call(element, event, ...javascript.arguments);
+  }
+}
+execute.functions = new Map();
+
 // export async function liveConnection({
 //   nonce,
 //   newServerVersionMessage = "There has been an update. Please reload the page.",
@@ -883,23 +900,6 @@ export function stringToElement(string) {
 }
 
 /**
- * Execute the functions defined by the `javascript="___"` attribute, which is set by [`@radically-straightforward/build`](https://github.com/radically-straightforward/radically-straightforward/tree/main/build) when extracting browser JavaScript. You must call this when you insert new elements in the DOM, for example, when loading a partial.
- */
-export function execute({
-  event = undefined,
-  element = undefined,
-  elements = element.querySelectorAll("[javascript]"),
-}) {
-  for (const element of elements) {
-    const javascript = JSON.parse(element.getAttribute("javascript"));
-    execute.functions
-      .get(javascript.function)
-      .call(element, event, ...javascript.arguments);
-  }
-}
-execute.functions = new Map();
-
-/**
  * Returns an array of parents, including `element` itself. It knows how to navigate up Tippy.js’s tippys that aren’t mounted.
  */
 export function parents(element) {
@@ -947,9 +947,11 @@ export function previousSiblings(element) {
 /**
  * Check whether the `element` is connected to the document. This is different from the [`isConnected` property](https://developer.mozilla.org/en-US/docs/Web/API/Node/isConnected) in the following ways:
  *
- * 1. It uses `parents()`, so it supports Tippy.js’s tippys that aren’t mounted but whose `target` is connected.
+ * 1. It uses `parents()`, so it supports Tippy.js’s tippys that aren’t mounted but whose `target`s are connected.
  *
  * 2. You may force an element to be connected by setting `element.forceIsConnected = true` on the `element` itself or on one of its parents.
+ *
+ * This is useful, for example, for elements that periodically update their own contents, for example, a text field that displays relative time, for example, “three hours ago”. You can check that the element has been disconnected from the document and stop the periodic updates.
  */
 export function isConnected(element) {
   return parents(element).some(
