@@ -57,6 +57,82 @@ import * as javascript from "@radically-straightforward/javascript/static/index.
 
 <!-- DOCUMENTATION START: ./static/index.mjs -->
 
+### `weekday()`
+
+```typescript
+export function weekday(dateString);
+```
+
+Returns a string with the week day in English, for example, `Monday`.
+
+### `stringToElement()`
+
+```typescript
+export function stringToElement(string);
+```
+
+Convert a string into a DOM element. The string may have multiple siblings without a common parent, so `stringToElement()` returns a `<div>` containing the elements.
+
+### `execute()`
+
+```typescript
+export function execute({
+  event = undefined,
+  element = undefined,
+  elements = element.querySelectorAll("[javascript]"),
+});
+```
+
+Execute the functions defined by the `javascript="___"` attribute, which is set by [`@radically-straightforward/build`](https://github.com/radically-straightforward/radically-straightforward/tree/main/build) when extracting browser JavaScript. You must call this when you insert new elements in the DOM, for example, when loading a partial.
+
+### `parents()`
+
+```typescript
+export function parents(element);
+```
+
+Returns an array of parents, including `element` itself. It knows how to navigate up Tippy.js’s tippys that aren’t mounted.
+
+### `children()`
+
+```typescript
+export function children(element);
+```
+
+Returns an array of children, including `element` itself.
+
+### `nextSiblings()`
+
+```typescript
+export function nextSiblings(element);
+```
+
+Returns an array of sibling elements, including `element` itself.
+
+### `previousSiblings()`
+
+```typescript
+export function previousSiblings(element);
+```
+
+Returns an array of sibling elements, including `element` itself.
+
+### `isConnected()`
+
+```typescript
+export function isConnected(element);
+```
+
+Check whether the `element` is still connected to the document, which includes Tippy.js’s tippys that aren’t mounted but whose `target` is connected. You may force an element to be connected by setting `element.forceIsConnected = true`.
+
+### `isAppleDevice`
+
+```typescript
+export const isAppleDevice;
+```
+
+Source: <https://github.com/ccampbell/mousetrap/blob/2f9a476ba6158ba69763e4fcf914966cc72ef433/mousetrap.js#L135>
+
 ### `isSafari`
 
 ```typescript
