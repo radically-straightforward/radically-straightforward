@@ -799,7 +799,7 @@ execute.functions = new Map();
 //       elementProperty: "relativizeDateTimeElementTooltip",
 //       tippyProps: {
 //         touch: false,
-//         content: `${localizeDateTime(dateTime)} (${utilities.formatUTCDateTime(
+//         content: `${localizeDateTime(dateTime)} (${formatUTCDateTime(
 //           dateTime,
 //         )})`,
 //       },
@@ -822,7 +822,7 @@ execute.functions = new Map();
 //     ? "Today"
 //     : date === yesterday
 //       ? "Yesterday"
-//       : `${date} · ${utilities.weekday(date)}`;
+//       : `${date} · ${weekday(date)}`;
 // }
 
 // export function relativizeDateElement(element) {
@@ -862,12 +862,17 @@ execute.functions = new Map();
 //   )}-${String(date.getDate()).padStart(2, "0")}`;
 // }
 
-// export function localizeTime(dateString) {
-//   const date = new Date(dateString.trim());
-//   return `${String(date.getHours()).padStart(2, "0")}:${String(
-//     date.getMinutes(),
-//   ).padStart(2, "0")}`;
-// }
+export function localizeTime(dateString) {
+  const date = new Date(dateString.trim());
+  return `${String(date.getHours()).padStart(2, "0")}:${String(
+    date.getMinutes(),
+  ).padStart(2, "0")}`;
+}
+
+/**
+ * A regular expression that matches localized dates, for example, `2024-04-01 15:20`.
+ */
+export const localizedDateRegExp = /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}$/;
 
 /**
  * Format a datetime into a representation that is user friendly.

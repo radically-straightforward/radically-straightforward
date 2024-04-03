@@ -105,14 +105,6 @@ test("ISODateRegExp", () => {
   assert.doesNotMatch("2024-04-01 15:20", utilities.ISODateRegExp);
 });
 
-test("localizedDateRegExp", () => {
-  assert.match("2024-04-01 15:20", utilities.localizedDateRegExp);
-  assert.doesNotMatch(
-    "2024-04-01T14:19:48.162Z",
-    utilities.localizedDateRegExp,
-  );
-});
-
 test("intern()", () => {
   // @ts-expect-error
   assert(([1] === [1]) === false);

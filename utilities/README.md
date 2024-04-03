@@ -158,14 +158,6 @@ export const ISODateRegExp: RegExp;
 
 A regular expression that matches ISO dates, for example, `2024-04-01T14:19:48.162Z`.
 
-### `localizedDateRegExp`
-
-```typescript
-export const localizedDateRegExp: RegExp;
-```
-
-A regular expression that matches localized dates, for example, `2024-04-01 15:20`.
-
 ### `Intern`
 
 ```typescript

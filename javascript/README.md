@@ -73,18 +73,6 @@ export function stringToElement(string);
 
 Convert a string into a DOM element. The string may have multiple siblings without a common parent, so `stringToElement()` returns a `<div>` containing the elements.
 
-### `execute()`
-
-```typescript
-export function execute({
-  event = undefined,
-  element = undefined,
-  elements = element.querySelectorAll("[javascript]"),
-});
-```
-
-Execute the functions defined by the `javascript="___"` attribute, which is set by [`@radically-straightforward/build`](https://github.com/radically-straightforward/radically-straightforward/tree/main/build) when extracting browser JavaScript. You must call this when you insert new elements in the DOM, for example, when loading a partial.
-
 ### `parents()`
 
 ```typescript
@@ -123,7 +111,13 @@ Returns an array of sibling elements, including `element` itself.
 export function isConnected(element);
 ```
 
-Check whether the `element` is still connected to the document, which includes Tippy.js’s tippys that aren’t mounted but whose `target` is connected. You may force an element to be connected by setting `element.forceIsConnected = true`.
+Check whether the `element` is connected to the document. This is different from the [`isConnected` property](https://developer.mozilla.org/en-US/docs/Web/API/Node/isConnected) in the following ways:
+
+1. It uses `parents()`, so it supports Tippy.js’s tippys that aren’t mounted but whose `target`s are connected.
+
+2. You may force an element to be connected by setting `element.forceIsConnected = true` on the `element` itself or on one of its parents.
+
+This is useful, for example, for elements that periodically update their own contents, for example, a text field that displays relative time, for example, “three hours ago”. You can check that the element has been disconnected from the document and stop the periodic updates.
 
 ### `isAppleDevice`
 

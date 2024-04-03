@@ -183,11 +183,6 @@ export const ISODateRegExp: RegExp =
   /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/;
 
 /**
- * A regular expression that matches localized dates, for example, `2024-04-01 15:20`.
- */
-export const localizedDateRegExp: RegExp = /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}$/;
-
-/**
  * Utility type for `intern()`.
  */
 export type Intern<Type> = Readonly<Type & { [internSymbol]: true }>;
