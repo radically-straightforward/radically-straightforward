@@ -782,7 +782,7 @@ import utilities from "@radically-straightforward/utilities";
 //       elementProperty: "relativizeDateTimeElementTooltip",
 //       tippyProps: {
 //         touch: false,
-//         content: `${localizeDateTime(dateTime)} (${formatUTCDateTime(
+//         content: `${localizeDateTime(dateTime)} (${utilities.formatUTCDateTime(
 //           dateTime,
 //         )})`,
 //       },
@@ -851,15 +851,6 @@ import utilities from "@radically-straightforward/utilities";
 //     date.getMinutes(),
 //   ).padStart(2, "0")}`;
 // }
-
-export function formatUTCDateTime(dateString) {
-  const date = new Date(dateString.trim());
-  return `${String(date.getUTCFullYear())}-${String(
-    date.getUTCMonth() + 1,
-  ).padStart(2, "0")}-${String(date.getUTCDate()).padStart(2, "0")} ${String(
-    date.getUTCHours(),
-  ).padStart(2, "0")}:${String(date.getUTCMinutes()).padStart(2, "0")} UTC`;
-}
 
 /**
  * Convert a string into a DOM element. The string may have multiple siblings without a common parent, so `stringToElement()` returns a `<div>` containing the elements.

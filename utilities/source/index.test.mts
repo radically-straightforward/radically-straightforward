@@ -96,6 +96,13 @@ test("weekday()", () => {
   assert.equal(utilities.weekday("2024-04-04"), "Thursday");
 });
 
+test("formatUTCDateTime()", () => {
+  assert.equal(
+    utilities.formatUTCDateTime("2024-04-01T14:57:46.638Z"),
+    "2024-04-01 14:57 UTC",
+  );
+});
+
 test("emailRegExp", () => {
   assert.match("leandro@leafac.com", utilities.emailRegExp);
   assert.doesNotMatch("leandro@leafac.c", utilities.emailRegExp);

@@ -142,6 +142,14 @@ export function isDate(string: string): boolean;
 
 Determine whether the given `string` is a valid `Date`, that is, it’s in ISO format and corresponds to an existing date, for example, it is **not** April 32nd.
 
+### `formatUTCDateTime()`
+
+```typescript
+export function formatUTCDateTime(dateString: string): string;
+```
+
+Formats a date into a representation that is user friendly.
+
 ### `weekday()`
 
 ```typescript

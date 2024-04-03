@@ -172,6 +172,18 @@ export function isDate(string: string): boolean {
 }
 
 /**
+ * Formats a datetime into a representation that is user friendly.
+ */
+export function formatUTCDateTime(dateString: string): string {
+  const date = new Date(dateString.trim());
+  return `${String(date.getUTCFullYear())}-${String(
+    date.getUTCMonth() + 1,
+  ).padStart(2, "0")}-${String(date.getUTCDate()).padStart(2, "0")} ${String(
+    date.getUTCHours(),
+  ).padStart(2, "0")}:${String(date.getUTCMinutes()).padStart(2, "0")} UTC`;
+}
+
+/**
  * Returns a string with the week day in English, for example, `Monday`.
  */
 export function weekday(dateString: string): string {
