@@ -992,6 +992,26 @@ export function isConnected(element) {
 }
 
 /**
+ * Similar to [`@radically-straightforward/utilities`’s `backgroundJob()`](https://github.com/radically-straightforward/radically-straightforward/tree/main/utilities), but with the following differences:
+ *
+ * 1. If called multiple times, it `stop()`s the previous background jobs so that at most one background job is active at once.
+ *
+ * 2. When an element is disconnected from the document, the background job is `stop()`ed.
+ *
+ * The background job object returned by `@radically-straightforward/utilities`’s `backgroundJob()` is available at `element[name]`.
+ */
+export function backgroundJob(element, name, options, job) {
+  element[name]?.stop();
+  element[name] = utilities.backgroundJob(options, async () => {
+    if (!isConnected(element)) {
+      element[name].stop();
+      return;
+    }
+    await job();
+  });
+}
+
+/**
  * Source: <https://github.com/ccampbell/mousetrap/blob/2f9a476ba6158ba69763e4fcf914966cc72ef433/mousetrap.js#L135>
  */
 export const isAppleDevice = /Mac|iPod|iPhone|iPad/.test(navigator.platform);
