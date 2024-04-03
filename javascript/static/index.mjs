@@ -661,6 +661,18 @@ execute.functions = new Map();
 //   },
 //   { capture: true },
 // );
+// export function validateLocalizedDateTime(element) {
+//   const date = UTCizeDateTime(element.value);
+//   if (date === undefined)
+//     return "Invalid date & time. Match the pattern YYYY-MM-DD HH:MM.";
+//   element.value = date.toISOString();
+// }
+// export function UTCizeDateTime(dateString) {
+//   if (dateString.match(localizedDateRegExp) === null) return;
+//   const date = new Date(dateString.trim().replace(" ", "T"));
+//   if (isNaN(date.getTime())) return;
+//   return date;
+// }
 
 // export function isModified(element) {
 //   const elementsToCheck = children(element);
@@ -837,25 +849,15 @@ execute.functions = new Map();
 //   })();
 // }
 
-// export function localizeDateTime(dateString) {
-//   return `${localizeDate(dateString)} ${localizeTime(dateString)}`;
-// }
-
-// export function validateLocalizedDateTime(element) {
-//   const date = UTCizeDateTime(element.value);
-//   if (date === undefined)
-//     return "Invalid date & time. Match the pattern YYYY-MM-DD HH:MM.";
-//   element.value = date.toISOString();
-// }
-// export function UTCizeDateTime(dateString) {
-//   if (dateString.match(localizedDateRegExp) === null) return;
-//   const date = new Date(dateString.trim().replace(" ", "T"));
-//   if (isNaN(date.getTime())) return;
-//   return date;
-// }
+/**
+ * Returns a localized datetime, for example, `2024-04-03 15:20`.
+ */
+export function localizeDateTime(dateString) {
+  return `${localizeDate(dateString)} ${localizeTime(dateString)}`;
+}
 
 /**
- * Returns a localized time, for example, `2024-04-03`.
+ * Returns a localized date, for example, `2024-04-03`.
  */
 export function localizeDate(dateString) {
   const date = new Date(dateString.trim());
