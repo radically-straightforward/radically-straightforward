@@ -748,57 +748,49 @@ execute.functions = new Map();
 //   }
 // }
 
-// export const relativizeDateTime = (() => {
-//   const relativeTimeFormat = new Intl.RelativeTimeFormat("en-US", {
-//     localeMatcher: "lookup",
-//     numeric: "auto",
-//   });
-//   const minute = 60 * 1000;
-//   const hour = 60 * minute;
-//   const day = 24 * hour;
-//   const month = 30 * day;
-
-//   return (
-//     dateString,
-//     {
-//       preposition = undefined,
-//       dateOnly = true,
-//       capitalize: shouldCapitalize = false,
-//     } = {},
-//   ) => {
-//     const dateTimeDifference =
-//       new Date(dateString.trim()).getTime() - Date.now();
-//     const absoluteDateTimeDifference = Math.abs(dateTimeDifference);
-//     const dateDifference =
-//       new Date(localizeDate(dateString)) -
-//       new Date(localizeDate(new Date().toISOString()));
-//     const absoluteDateDifference = Math.abs(dateDifference);
-//     const relativeDateTime =
-//       absoluteDateTimeDifference < minute
-//         ? "just now"
-//         : absoluteDateTimeDifference < hour
-//           ? relativeTimeFormat.format(
-//               Math.trunc(dateTimeDifference / minute),
-//               "minutes",
-//             )
-//           : absoluteDateTimeDifference < day
-//             ? relativeTimeFormat.format(
-//                 Math.trunc(dateTimeDifference / hour),
-//                 "hours",
-//               )
-//             : absoluteDateDifference < month
-//               ? relativeTimeFormat.format(
-//                   Math.trunc(dateDifference / day),
-//                   "days",
-//                 )
-//               : `${preposition === undefined ? "" : `${preposition} `}${
-//                   dateOnly
-//                     ? localizeDate(dateString)
-//                     : localizeDateTime(dateString)
-//                 }`;
-//     return shouldCapitalize ? utilities.capitalize(relativeDateTime) : relativeDateTime;
-//   };
-// })();
+export function relativizeDateTime(
+  dateString,
+  { preposition = undefined, dateOnly = true, capitalize = false } = {},
+) {
+  const relativeTimeFormat = new Intl.RelativeTimeFormat("en-US", {
+    localeMatcher: "lookup",
+    numeric: "auto",
+  });
+  const minute = 60 * 1000;
+  const hour = 60 * minute;
+  const day = 24 * hour;
+  const month = 30 * day;
+  const dateTimeDifference = new Date(dateString.trim()).getTime() - Date.now();
+  const absoluteDateTimeDifference = Math.abs(dateTimeDifference);
+  const dateDifference =
+    new Date(localizeDate(dateString)) -
+    new Date(localizeDate(new Date().toISOString()));
+  const absoluteDateDifference = Math.abs(dateDifference);
+  const relativeDateTime =
+    absoluteDateTimeDifference < minute
+      ? "just now"
+      : absoluteDateTimeDifference < hour
+        ? relativeTimeFormat.format(
+            Math.trunc(dateTimeDifference / minute),
+            "minutes",
+          )
+        : absoluteDateTimeDifference < day
+          ? relativeTimeFormat.format(
+              Math.trunc(dateTimeDifference / hour),
+              "hours",
+            )
+          : absoluteDateDifference < month
+            ? relativeTimeFormat.format(
+                Math.trunc(dateDifference / day),
+                "days",
+              )
+            : `${preposition === undefined ? "" : `${preposition} `}${
+                dateOnly
+                  ? localizeDate(dateString)
+                  : localizeDateTime(dateString)
+              }`;
+  return capitalize ? utilities.capitalize(relativeDateTime) : relativeDateTime;
+}
 
 // export function relativizeDateTimeElement(element, options = {}) {
 //   const target = options.target ?? element;
