@@ -753,6 +753,49 @@ execute.functions = new Map();
 // }
 
 /**
+ *
+ * ```javascript
+ * html`
+ *   <time
+ *     datetime="2024-04-03T14:51:45.604Z"
+ *     javascript="${javascript`
+ *       javascript.relativizeDateTimeElement(this);
+ *     `}"
+ *   ></time>
+ * `;
+ * ```
+ */
+export function relativizeDateTimeElement(
+  element,
+  { target = element, capitalize = false, ...relativizeDateTimeOptions } = {},
+) {
+  const dateString = element.getAttribute("datetime");
+  setTippy({
+    element: target,
+    elementProperty: "relativizeDateTimeElementTooltip",
+    tippyProps: {
+      touch: false,
+      content: `${localizeDateTime(dateString)} (${formatUTCDateTime(
+        dateString,
+      )})`,
+    },
+  });
+  elementBackgroundJob(
+    element,
+    "relativizeDateTimeElementBackgroundJob",
+    { interval: 10 * 1000 },
+    () => {
+      element.textContent = relativizeDateTime(
+        dateString,
+        relativizeDateTimeOptions,
+      );
+      if (capitalize)
+        element.textContent = utilities.capitalize(element.textContent);
+    },
+  );
+}
+
+/**
  * Returns a relative datetime, for example, `just now`, `3 minutes ago`, `in 3 minutes`, `3 hours ago`, `in 3 hours`, `yesterday`, `tomorrow`, `3 days ago`, `in 3 days`, `on 2024-04-03`, and so forth.
  *
  * - **`preposition`:** Whether to return `2024-04-03` or `on 2024-04-03`.
@@ -781,32 +824,6 @@ export function relativizeDateTime(dateString, { preposition = false } = {}) {
           ? relativeTimeFormat.format(days, "days")
           : `${preposition ? "on " : ""}${localizeDate(dateString)}`;
 }
-
-// <time datetime="2024-04-03T14:51:45.604Z" javascript="${javascript`javascript.relativizeDateElement(this);`}" ></time>
-// export function relativizeDateTimeElement(element, options = {}) {
-//   // TODO: capitalize = false
-//   const target = options.target ?? element;
-//   window.clearTimeout(element.relativizeDateTimeElementTimeout);
-//   (function update() {
-//     if (!isConnected(element)) return;
-//     const dateTime = element.getAttribute("datetime");
-//     setTippy({
-//       element: target,
-//       elementProperty: "relativizeDateTimeElementTooltip",
-//       tippyProps: {
-//         touch: false,
-//         content: `${localizeDateTime(dateTime)} (${formatUTCDateTime(
-//           dateTime,
-//         )})`,
-//       },
-//     });
-//     element.textContent = relativizeDateTime(dateTime, options);
-//     element.relativizeDateTimeElementTimeout = window.setTimeout(
-//       update,
-//       10 * 1000 + Math.random() * 2 * 1000,
-//     );
-//   })();
-// }
 
 /**
  * Returns a localized datetime, for example, `2024-04-03 15:20`.
@@ -868,11 +885,11 @@ export function stringToElement(string) {
  *
  * See, for example, `relativizeDateTimeElement()`, which uses `elementBackgroundJob()` to periodically update a relative datetime, for example, “2 hours ago”.
  */
-export function elementBackgroundJob(element, name, options, job) {
-  element[name]?.stop();
-  element[name] = utilities.backgroundJob(options, async () => {
+export function elementBackgroundJob(element, elementProperty, options, job) {
+  element[elementProperty]?.stop();
+  element[elementProperty] = utilities.backgroundJob(options, async () => {
     if (!isConnected(element)) {
-      element[name].stop();
+      element[elementProperty].stop();
       return;
     }
     await job();
