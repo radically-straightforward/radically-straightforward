@@ -853,6 +853,27 @@ import utilities from "@radically-straightforward/utilities";
 // }
 
 /**
+ * Formats a datetime into a representation that is user friendly.
+ */
+export function formatUTCDateTime(dateString) {
+  const date = new Date(dateString.trim());
+  return `${String(date.getUTCFullYear())}-${String(
+    date.getUTCMonth() + 1,
+  ).padStart(2, "0")}-${String(date.getUTCDate()).padStart(2, "0")} ${String(
+    date.getUTCHours(),
+  ).padStart(2, "0")}:${String(date.getUTCMinutes()).padStart(2, "0")} UTC`;
+}
+
+/**
+ * Returns a string with the week day in English, for example, `Monday`.
+ */
+export function weekday(dateString) {
+  return new Intl.DateTimeFormat("en-US", { weekday: "long" }).format(
+    new Date(dateString.trim()),
+  );
+}
+
+/**
  * Convert a string into a DOM element. The string may have multiple siblings without a common parent, so `stringToElement()` returns a `<div>` containing the elements.
  */
 export function stringToElement(string) {
