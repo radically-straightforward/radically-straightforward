@@ -852,17 +852,20 @@ export function relativizeDate(dateString) {
         : `${date} · ${weekday(date)}`;
 }
 
-// export function relativizeDateElement(element) {
-//   window.clearTimeout(element.relativizeDateElementTimeout);
-//   (function update() {
-//     if (!isConnected(element)) return;
-//     element.textContent = relativizeDate(element.getAttribute("datetime"));
-//     element.relativizeDateElementTimeout = window.setTimeout(
-//       update,
-//       60 * 1000 + Math.random() * 5 * 1000,
-//     );
-//   })();
-// }
+/**
+ * Keep an updated relative date on the `element` while it’s connected to the document based on the `datetime` attribute, for example, `<time datetime="2024-04-03T14:51:45.604Z" javascript="${javascript`javascript.relativizeDateElement(this);`}"></time>`.
+ */
+export function relativizeDateElement(element) {
+  element.relativizeDateElementBackgroundJob?.stop();
+  element.relativizeDateElementBackgroundJob = utilities.backgroundJob(
+    { interval: 60 * 1000 },
+    () => {
+      if (!isConnected(element))
+        element.relativizeDateElementBackgroundJob.stop();
+      element.textContent = relativizeDate(element.getAttribute("datetime"));
+    },
+  );
+}
 
 /**
  * Returns a string with the week day in English, for example, `Monday`.
