@@ -739,19 +739,22 @@ execute.functions = new Map();
 //   return urlSearchParams;
 // }
 
-// export function reset(element) {
-//   const elementsToCheck = children(element);
-//   for (const element of elementsToCheck) {
-//     if (element.value !== element.defaultValue) {
-//       element.value = element.defaultValue;
-//       element.onchange?.();
-//     }
-//     if (element.checked !== element.defaultChecked) {
-//       element.checked = element.defaultChecked;
-//       element.onchange?.();
-//     }
-//   }
-// }
+/**
+ * Reset form fields from `element` and its `children()` based on the `defaultValue` and `defaultChecked` properties, including calling `onchange()` when necessary.
+ */
+export function reset(element) {
+  const elementsToCheck = children(element);
+  for (const element of elementsToCheck) {
+    if (element.value !== element.defaultValue) {
+      element.value = element.defaultValue;
+      element.onchange?.();
+    }
+    if (element.checked !== element.defaultChecked) {
+      element.checked = element.defaultChecked;
+      element.onchange?.();
+    }
+  }
+}
 
 /**
  * Given an `element` with the `datetime` attribute, `relativizeDateTimeElement()` keeps it updated with a relative datetime. See `relativizeDateTime()`, which provides the relative datetime, and `elementBackgroundJob()`, which provides the background job management.
