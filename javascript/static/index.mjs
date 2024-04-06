@@ -879,7 +879,7 @@ export function stringToElement(string) {
 }
 
 /**
- * Similar to [`@radically-straightforward/utilities`’s `backgroundJob()`](https://github.com/radically-straightforward/radically-straightforward/tree/main/utilities), but with the following differences:
+ * Similar to [`@radically-straightforward/utilities`’s](https://github.com/radically-straightforward/radically-straightforward/tree/main/utilities) `backgroundJob()`, but with the following differences:
  *
  * 1. If called multiple times, `elementBackgroundJob()` `stop()`s the previous background job so that at most one background job is active at any given time.
  *
@@ -911,8 +911,7 @@ export function elementBackgroundJob(element, elementProperty, options, job) {
  */
 export function isConnected(element) {
   return parents(element).some(
-    (ancestor) =>
-      ancestor.forceIsConnected === true || ancestor.matches("html"),
+    (parent) => parent.forceIsConnected === true || parent.matches("html"),
   );
 }
 
