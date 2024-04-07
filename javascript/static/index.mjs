@@ -740,7 +740,7 @@ execute.functions = new Map();
 // }
 
 /**
- * Reset form fields from `element` and its `children()` based on the `defaultValue` and `defaultChecked` properties, including calling `onchange()` when necessary.
+ * Reset form fields from `element` and its `children()` using the `defaultValue` and `defaultChecked` properties, including calling `onchange()` when necessary.
  */
 export function reset(element) {
   const elementsToCheck = children(element);
