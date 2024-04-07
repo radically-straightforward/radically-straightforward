@@ -744,16 +744,16 @@ execute.functions = new Map();
  */
 export function reset(element) {
   const elementsToCheck = children(element);
-  for (const element of elementsToCheck) {
-    if (element.value !== element.defaultValue) {
+  for (const element of elementsToCheck)
+    if (element.type === "radio" || element.type === "checkbox") {
+      if (element.checked !== element.defaultChecked) {
+        element.checked = element.defaultChecked;
+        element.onchange?.();
+      }
+    } else if (element.value !== element.defaultValue) {
       element.value = element.defaultValue;
       element.onchange?.();
     }
-    if (element.checked !== element.defaultChecked) {
-      element.checked = element.defaultChecked;
-      element.onchange?.();
-    }
-  }
 }
 
 /**
