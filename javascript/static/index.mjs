@@ -407,12 +407,12 @@ execute.functions = new Map();
 //   morph(parentElement, partialString);
 
 //   parentElement.partialParentElement = true;
-//   parentElement.forceIsConnected = true;
+//   parentElement.isAttached = true;
 //   execute({ element: parentElement });
 //   const parentElementTippy = parentElement.closest("[data-tippy-root]")?._tippy;
 //   if (parentElementTippy !== undefined)
 //     parentElementTippy.setContent(parentElementTippy.props.content);
-//   parentElement.forceIsConnected = false;
+//   parentElement.isAttached = false;
 // }
 
 // export function morph(from, to, event = undefined) {
@@ -888,7 +888,7 @@ export function stringToElement(string) {
  *
  * 1. If called multiple times, `elementBackgroundJob()` `stop()`s the previous background job so that at most one background job is active at any given time.
  *
- * 2. When the `element` is disconnected from the document, the background job is `stop()`ped. See `isConnected()`.
+ * 2. When the `element` is detached from the document, the background job is `stop()`ped. See `isAttached()`.
  *
  * The background job object returned by `@radically-straightforward/utilities`’s `backgroundJob()` is available at `element[name]`.
  *
@@ -897,7 +897,7 @@ export function stringToElement(string) {
 export function elementBackgroundJob(element, elementProperty, options, job) {
   element[elementProperty]?.stop();
   element[elementProperty] = utilities.backgroundJob(options, async () => {
-    if (!isConnected(element)) {
+    if (!isAttached(element)) {
       element[elementProperty].stop();
       return;
     }
@@ -906,17 +906,17 @@ export function elementBackgroundJob(element, elementProperty, options, job) {
 }
 
 /**
- * Check whether the `element` is connected to the document. This is different from the [`isConnected` property](https://developer.mozilla.org/en-US/docs/Web/API/Node/isConnected) in the following ways:
+ * Check whether the `element` is attached to the document. This is different from the [`isConnected` property](https://developer.mozilla.org/en-US/docs/Web/API/Node/isConnected) in the following ways:
  *
- * 1. It uses `parents()`, so it supports Tippy.js’s tippys that aren’t mounted but whose `target`s are connected.
+ * 1. It uses `parents()`, so it supports Tippy.js’s tippys that aren’t mounted but whose `target`s are attached.
  *
- * 2. You may force an element to be connected by setting `element.forceIsConnected = true` on the `element` itself or on one of its parents.
+ * 2. You may force an element to be attached by setting `element.isAttached = true` on the `element` itself or on one of its parents.
  *
- * See, for example, `elementBackgroundJob()`, which uses `isConnected()`.
+ * See, for example, `elementBackgroundJob()`, which uses `isAttached()`.
  */
-export function isConnected(element) {
+export function isAttached(element) {
   return parents(element).some(
-    (parent) => parent.forceIsConnected === true || parent.matches("html"),
+    (parent) => parent.isAttached === true || parent.matches("html"),
   );
 }
 
