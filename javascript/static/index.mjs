@@ -687,16 +687,20 @@ export class ValidationError extends Error {}
  * ```javascript
  * html`
  *   <input
+ *     type="hidden"
+ *     name="datetime"
+ *     value="${new Date().toISOString()}"
+ *   />
+ *   <input
  *     type="text"
  *     required
  *     javascript="${javascript`
- *       this.value = javascript.localizeDateTime(this.nextElementSibling.value);
+ *       this.value = javascript.localizeDateTime(this.previousElementSibling.value);
  *       this.onvalidate = () => {
- *         this.nextElementSibling.value = javascript.validateLocalizedDateTime(this);
+ *         this.previousElementSibling.value = javascript.validateLocalizedDateTime(this);
  *       };
  *     `}"
  *   />
- *   <input type="hidden" name="datetime" value="${new Date().toISOString()}" />
  * `;
  * ```
  */
