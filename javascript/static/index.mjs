@@ -580,10 +580,10 @@ export function validate(element) {
       parents(element).some((element) => element.isValid === true)
     )
       continue;
-    const valueInputByUser = element.value;
+    const value = element.value;
     const error = validateElement(element);
-    if (element.value !== valueInputByUser)
-      elementsToReset.set(element, valueInputByUser);
+    if (element.value !== value)
+      elementsToReset.set(element, value);
     if (typeof error !== "string") continue;
     for (const [element, valueInputByUser] of elementsToReset)
       element.value = valueInputByUser;
