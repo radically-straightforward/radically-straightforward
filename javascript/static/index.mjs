@@ -680,6 +680,9 @@ execute.functions = new Map();
 //  */
 // export const localizedDateTimeRegExp = /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}$/;
 
+/**
+ * Detects whether there are form fields in `element` and its `children()` that are modified with respect to the `defaultValue` and `defaultChecked` properties. You may set `element.isModified = <true/false>` to force the result of `isModified()` for `element` and its `children()`.
+ */
 export function isModified(element) {
   const elements = children(element);
   for (const element of elements) {
