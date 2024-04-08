@@ -690,7 +690,7 @@ export function isModified(element) {
       continue;
     if (parents(element).some((element) => element.isModified === true))
       return true;
-    if (["radio", "checkbox"].includes(element.type)) {
+    if (element.type === "radio" || element.type === "checkbox") {
       if (element.checked !== element.defaultChecked) return true;
     } else if (
       typeof element.value === "string" &&
