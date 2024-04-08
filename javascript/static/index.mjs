@@ -728,19 +728,19 @@ export function isModified(element) {
 }
 {
   let isSubmittingForm = false;
+  document.addEventListener("submit", () => {
+    isSubmittingForm = true;
+  });
   // TODO
-  //   window.addEventListener("DOMContentLoaded", () => {
-  //     isSubmittingForm = false;
-  //   });
-  //   document.addEventListener("submit", () => {
-  //     isSubmittingForm = true;
-  //   });
   //   window.onbeforelivenavigate = () =>
   //     !isModified(document.querySelector("body")) ||
   //     isSubmittingForm ||
   //     confirm(
   //       "Your changes will be lost if you leave this page. Do you wish to continue?",
   //     );
+  //   window.addEventListener("DOMContentLoaded", () => {
+  //     isSubmittingForm = false;
+  //   });
   window.onbeforeunload = (event) => {
     if (!isModified(document.querySelector("body")) || isSubmittingForm) return;
     event.preventDefault();
