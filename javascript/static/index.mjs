@@ -578,13 +578,14 @@ function setTippy(options) {
 // TODO: Do we want a method to combine `validate()`, `serialize()`, and a `fetch()` to submit the form?
 /**
  * Use `<form novalidate>`.
- * Use `isValid` to force valid.
+ * Use `element.isValid = true` to force valid.
  * Use `onvalidate` and `throw new ValidationError()` for custom validation.
  */
 export function validate(element) {
   const elements = children(element);
   for (const element of elements) {
     if (
+      !element.matches("input, textarea") ||
       element.closest("[disabled]") !== null ||
       parents(element).some((element) => element.isValid === true)
     )
@@ -592,15 +593,15 @@ export function validate(element) {
     try {
       if (element.matches("[required]")) {
         if (
+          element.value.trim() === "" ||
           ((element.type === "radio" || element.type === "checkbox") &&
             element
               .closest("form")
-              .querySelector(`[name="${element.name}"]:checked`) === null) ||
-          (!(element.type === "radio" || element.type === "checkbox") &&
-            element.value.trim() === "")
+              .querySelector(`[name="${element.name}"]:checked`) === null)
         )
           throw new ValidationError("Required field.");
-      } else if (element.value.trim() === "") continue;
+      }
+      if (element.value.trim() === "") continue;
       if (
         element.matches("[minlength]") &&
         element.value.length < Number(element.getAttribute("minlength"))
@@ -680,9 +681,9 @@ export function serialize(element) {
     )
       continue;
     if (
+      !(element.type === "radio" || element.type === "checkbox") ||
       ((element.type === "radio" || element.type === "checkbox") &&
-        element.checked) ||
-      !(element.type === "radio" || element.type === "checkbox")
+        element.checked)
     )
       urlSearchParams.append(element.getAttribute("name"), element.value);
   }
