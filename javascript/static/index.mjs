@@ -703,28 +703,27 @@ export function isModified(element) {
   }
   return false;
 }
-// {
-//   let isSubmittingForm = false;
-//   window.addEventListener("DOMContentLoaded", () => {
-//     isSubmittingForm = false;
-//   });
-//   document.addEventListener("submit", () => {
-//     isSubmittingForm = true;
-//   });
-
-//   window.onbeforeunload = (event) => {
-//     if (!isModified(document.querySelector("body")) || isSubmittingForm) return;
-//     event.preventDefault();
-//     event.returnValue = "";
-//   };
-
-//   window.onbeforelivenavigate = () =>
-//     !isModified(document.querySelector("body")) ||
-//     isSubmittingForm ||
-//     confirm(
-//       "Your changes will be lost if you leave this page. Do you wish to continue?",
-//     );
-// }
+{
+  let isSubmittingForm = false;
+  // TODO
+  //   window.addEventListener("DOMContentLoaded", () => {
+  //     isSubmittingForm = false;
+  //   });
+  //   document.addEventListener("submit", () => {
+  //     isSubmittingForm = true;
+  //   });
+  //   window.onbeforelivenavigate = () =>
+  //     !isModified(document.querySelector("body")) ||
+  //     isSubmittingForm ||
+  //     confirm(
+  //       "Your changes will be lost if you leave this page. Do you wish to continue?",
+  //     );
+  window.onbeforeunload = (event) => {
+    if (!isModified(document.querySelector("body")) || isSubmittingForm) return;
+    event.preventDefault();
+    event.returnValue = "";
+  };
+}
 
 /**
  * Produce a `URLSearchParams` from the `element` and its `children()`. You may set the `disabled` attribute on any element to disable the whole subtree under it. Other than that, `serialize()` follows as best as possible the behavior of the `URLSearchParams` produced by a browser form submission.

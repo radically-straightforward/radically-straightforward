@@ -1,10 +1,6 @@
 # TODO
 
-- Document browser JavaScript
-  - Custom form validation
-    - `<form novalidate>`
-    - `onvalidate` (return error message in string)
-  - Warn about losing inputs
+- `TODO` in `index.mjs`
 
 ---
 
