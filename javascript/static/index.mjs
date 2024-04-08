@@ -731,12 +731,9 @@ window.addEventListener("DOMContentLoaded", () => {
     if (isModified(document.querySelector("body"))) event.preventDefault();
   };
 });
-// document.addEventListener("submit", () => {
-//   console.log(window.onbeforeunload);
-//   delete window.onbeforeunload;
-//   console.log(window.onbeforeunload);
-//   alert("SUBMIT");
-// });
+document.addEventListener("submit", () => {
+  window.onbeforeunload = () => {};
+});
 // TODO
 //   window.onbeforelivenavigate = () =>
 //     !isModified(document.querySelector("body")) ||
