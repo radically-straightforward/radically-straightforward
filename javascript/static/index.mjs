@@ -726,27 +726,23 @@ export function isModified(element) {
       return true;
   return false;
 }
-{
-  let isSubmittingForm = false;
-  document.addEventListener("submit", () => {
-    isSubmittingForm = true;
-  });
-  // TODO
-  //   window.onbeforelivenavigate = () =>
-  //     !isModified(document.querySelector("body")) ||
-  //     isSubmittingForm ||
-  //     confirm(
-  //       "Your changes will be lost if you leave this page. Do you wish to continue?",
-  //     );
-  //   window.addEventListener("DOMContentLoaded", () => {
-  //     isSubmittingForm = false;
-  //   });
+window.addEventListener("DOMContentLoaded", () => {
   window.onbeforeunload = (event) => {
     if (!isModified(document.querySelector("body")) || isSubmittingForm) return;
     event.preventDefault();
     event.returnValue = "";
   };
-}
+});
+document.addEventListener("submit", () => {
+  delete window.onbeforeunload;
+});
+// TODO
+//   window.onbeforelivenavigate = () =>
+//     !isModified(document.querySelector("body")) ||
+//     isSubmittingForm ||
+//     confirm(
+//       "Your changes will be lost if you leave this page. Do you wish to continue?",
+//     );
 
 /**
  * Given an `element` with the `datetime` attribute, `relativizeDateTimeElement()` keeps it updated with a relative datetime. See `relativizeDateTime()`, which provides the relative datetime, and `elementBackgroundJob()`, which provides the background job management.
