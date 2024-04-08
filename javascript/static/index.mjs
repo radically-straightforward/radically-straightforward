@@ -1,6 +1,6 @@
 import * as utilities from "@radically-straightforward/utilities";
 // import fastMyersDiff from "fast-myers-diff";
-// import tippy, * as tippyStatic from "tippy.js";
+import tippy, * as tippyStatic from "tippy.js";
 
 // TODO: Do we want a method to combine `validate()`, `serialize()`, and a `fetch()` to submit the form?
 
@@ -550,32 +550,25 @@ execute.functions = new Map();
 //   }
 // }
 
+// TODO: Remove this
+function morph(element, content, event) {
+  element.innerHTML = content;
+}
+
 // TODO: Test `relativizeDateTimeElement()`’s use of `setTippy()`.
 // TODO: Test `validate()`’s use of `setTippy()`.
-// export function setTippy({
-//   event = undefined,
-//   element,
-//   elementProperty = "tooltip",
-//   tippyProps: { content: tippyContent, ...tippyProps },
-// }) {
-//   element[elementProperty] ??= tippy(element, {
-//     content: stringToElement(""),
-//   });
-//   element[elementProperty].setProps(tippyProps);
-
-//   const tippyContentElement = element[elementProperty].props.content;
-//   morph(tippyContentElement, tippyContent, event);
-//   execute({
-//     event,
-//     element: tippyContentElement,
-//   });
-
-//   return element[elementProperty];
-// }
-
-function setTippy(options) {
-  console.log(options);
-  return { show: () => {} };
+export function setTippy({
+  event = undefined,
+  element,
+  elementProperty = "tooltip",
+  tippyProps: { content: tippyContent, ...tippyProps },
+}) {
+  element[elementProperty] ??= tippy(element, { content: stringToElement("") });
+  element[elementProperty].setProps(tippyProps);
+  const tippyContentElement = element[elementProperty].props.content;
+  morph(tippyContentElement, tippyContent, event);
+  execute({ event, element: tippyContentElement });
+  return element[elementProperty];
 }
 
 /**

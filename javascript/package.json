@@ -34,7 +34,8 @@
     "test": "npm run prepare && node --test && prettier --check \"./README.md\" --check \"./CHANGELOG.md\" --check \"./package.json\" --check \"./tsconfig.json\" --check \"./source/**/*.mts\" --check \"./static/**/*.mjs\""
   },
   "dependencies": {
-    "@radically-straightforward/utilities": "^1.2.2"
+    "@radically-straightforward/utilities": "^1.2.2",
+    "tippy.js": "^6.3.7"
   },
   "devDependencies": {
     "@radically-straightforward/documentation": "^1.0.1",
