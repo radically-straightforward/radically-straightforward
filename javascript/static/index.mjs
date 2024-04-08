@@ -680,26 +680,26 @@ execute.functions = new Map();
 //  */
 // export const localizedDateTimeRegExp = /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}$/;
 
-// export function isModified(element) {
-//   const elementsToCheck = children(element);
-//   for (const element of elementsToCheck) {
-//     if (
-//       parents(element).some((element) => element.isModified === false) ||
-//       element.closest("[disabled]") !== null
-//     )
-//       continue;
-//     if (parents(element).some((element) => element.isModified === true))
-//       return true;
-//     if (["radio", "checkbox"].includes(element.type)) {
-//       if (element.checked !== element.defaultChecked) return true;
-//     } else if (
-//       typeof element.value === "string" &&
-//       typeof element.defaultValue === "string"
-//     )
-//       if (element.value !== element.defaultValue) return true;
-//   }
-//   return false;
-// }
+export function isModified(element) {
+  const elements = children(element);
+  for (const element of elements) {
+    if (
+      parents(element).some((element) => element.isModified === false) ||
+      element.closest("[disabled]") !== null
+    )
+      continue;
+    if (parents(element).some((element) => element.isModified === true))
+      return true;
+    if (["radio", "checkbox"].includes(element.type)) {
+      if (element.checked !== element.defaultChecked) return true;
+    } else if (
+      typeof element.value === "string" &&
+      typeof element.defaultValue === "string"
+    )
+      if (element.value !== element.defaultValue) return true;
+  }
+  return false;
+}
 // {
 //   let isSubmittingForm = false;
 //   window.addEventListener("DOMContentLoaded", () => {
@@ -728,8 +728,8 @@ execute.functions = new Map();
  */
 export function serialize(element) {
   const urlSearchParams = new URLSearchParams();
-  const elementsToCheck = children(element);
-  for (const element of elementsToCheck) {
+  const elements = children(element);
+  for (const element of elements) {
     const name = element.getAttribute("name");
     if (typeof name !== "string" || element.closest("[disabled]") !== null)
       continue;
@@ -745,8 +745,8 @@ export function serialize(element) {
  * Reset form fields from `element` and its `children()` using the `defaultValue` and `defaultChecked` properties, including calling `element.onchange()` when necessary.
  */
 export function reset(element) {
-  const elementsToCheck = children(element);
-  for (const element of elementsToCheck)
+  const elements = children(element);
+  for (const element of elements)
     if (element.type === "radio" || element.type === "checkbox") {
       if (element.checked !== element.defaultChecked) {
         element.checked = element.defaultChecked;
