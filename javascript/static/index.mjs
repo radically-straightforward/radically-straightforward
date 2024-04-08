@@ -730,10 +730,8 @@ export function serialize(element) {
     const name = element.getAttribute("name");
     if (typeof name !== "string" || element.closest("[disabled]") !== null)
       continue;
-    if (element.type === "radio") {
-      if (element.checked) urlSearchParams.set(name, element.value);
-    } else if (element.type === "checkbox") {
-      if (element.checked) urlSearchParams.append(name, element.value ?? "on");
+    if (element.type === "radio" || element.type === "checkbox") {
+      if (element.checked) urlSearchParams.append(name, element.value);
     } else if (element.matches("input, textarea"))
       urlSearchParams.set(name, element.value);
   }
@@ -741,7 +739,7 @@ export function serialize(element) {
 }
 
 /**
- * Reset form fields from `element` and its `children()` using the `defaultValue` and `defaultChecked` properties, including calling `onchange()` when necessary.
+ * Reset form fields from `element` and its `children()` using the `defaultValue` and `defaultChecked` properties, including calling `element.onchange()` when necessary.
  */
 export function reset(element) {
   const elementsToCheck = children(element);
