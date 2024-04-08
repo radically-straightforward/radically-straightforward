@@ -571,89 +571,88 @@ execute.functions = new Map();
 // }
 
 // TODO: Do we want a method to combine `validate()`, `serialize()`, and a `fetch()` to submit the form?
-// export function validate(element) {
-//   const elementsToValidate = children(element);
-//   const elementsToReset = new Map();
+export function validate(element) {
+  const elementsToReset = new Map();
+  const elements = children(element);
+  for (const element of elements) {
+    if (
+      element.closest("[disabled]") !== null ||
+      parents(element).some((element) => element.isValid === true)
+    )
+      continue;
+    const valueInputByUser = element.value;
+    const error = validateElement(element);
+    if (element.value !== valueInputByUser)
+      elementsToReset.set(element, valueInputByUser);
+    if (typeof error !== "string") continue;
+    for (const [element, valueInputByUser] of elementsToReset)
+      element.value = valueInputByUser;
+    const target =
+      element.closest(
+        "[hidden], .visually-hidden, .visually-hidden--interactive:not(:focus):not(:focus-within):not(:active)",
+      )?.parentElement ?? element;
+    setTippy({
+      element: target,
+      elementProperty: "validationErrorTooltip",
+      tippyProps: {
+        theme: "error",
+        trigger: "manual",
+        content: error,
+      },
+    });
+    target.validationErrorTooltip.show();
+    target.focus();
+    return false;
+  }
+  return true;
 
-//   for (const element of elementsToValidate) {
-//     if (
-//       element.closest("[disabled]") !== null ||
-//       parents(element).some((element) => element.isValid === true)
-//     )
-//       continue;
-//     const valueInputByUser = element.value;
-//     const error = validateElement(element);
-//     if (element.value !== valueInputByUser)
-//       elementsToReset.set(element, valueInputByUser);
-//     if (typeof error !== "string") continue;
-//     for (const [element, valueInputByUser] of elementsToReset)
-//       element.value = valueInputByUser;
-//     const target =
-//       element.closest(
-//         "[hidden], .visually-hidden, .visually-hidden--interactive:not(:focus):not(:focus-within):not(:active)",
-//       )?.parentElement ?? element;
-//     setTippy({
-//       element: target,
-//       elementProperty: "validationErrorTooltip",
-//       tippyProps: {
-//         theme: "error",
-//         trigger: "manual",
-//         content: error,
-//       },
-//     });
-//     target.validationErrorTooltip.show();
-//     target.focus();
-//     return false;
-//   }
-//   return true;
+  function validateElement(element) {
+    if (element.closest("[required]"))
+      switch (element.type) {
+        case "radio":
+          if (
+            element
+              .closest("form")
+              .querySelector(`[name="${element.name}"]:checked`) === null
+          )
+            return "Please select one of these options.";
+          break;
+        case "checkbox":
+          const checkboxes = [
+            ...element
+              .closest("form")
+              .querySelectorAll(`[name="${element.name}"]`),
+          ];
+          if (!checkboxes.some((checkbox) => checkbox.checked))
+            return checkboxes.length === 1
+              ? "Please check this checkbox."
+              : "Please select at least one of these options.";
+          break;
+        default:
+          if (element.value.trim() === "") return "Please fill out this field.";
+          break;
+      }
 
-//   function validateElement(element) {
-//     if (element.closest("[required]"))
-//       switch (element.type) {
-//         case "radio":
-//           if (
-//             element
-//               .closest("form")
-//               .querySelector(`[name="${element.name}"]:checked`) === null
-//           )
-//             return "Please select one of these options.";
-//           break;
-//         case "checkbox":
-//           const checkboxes = [
-//             ...element
-//               .closest("form")
-//               .querySelectorAll(`[name="${element.name}"]`),
-//           ];
-//           if (!checkboxes.some((checkbox) => checkbox.checked))
-//             return checkboxes.length === 1
-//               ? "Please check this checkbox."
-//               : "Please select at least one of these options.";
-//           break;
-//         default:
-//           if (element.value.trim() === "") return "Please fill out this field.";
-//           break;
-//       }
+    if (
+      element.matches("[minlength]") &&
+      element.value.trim() !== "" &&
+      element.value.length < Number(element.getAttribute("minlength"))
+    )
+      return `This field must have at least ${element.getAttribute(
+        "minlength",
+      )} characters.`;
 
-//     if (
-//       element.matches("[minlength]") &&
-//       element.value.trim() !== "" &&
-//       element.value.length < Number(element.getAttribute("minlength"))
-//     )
-//       return `This field must have at least ${element.getAttribute(
-//         "minlength",
-//       )} characters.`;
+    if (
+      element.matches(`[type="email"]`) &&
+      element.value.trim() !== "" &&
+      element.value.match(utilities.emailRegExp) === null
+    )
+      return "Please enter an email address.";
 
-//     if (
-//       element.matches(`[type="email"]`) &&
-//       element.value.trim() !== "" &&
-//       element.value.match(utilities.emailRegExp) === null
-//     )
-//       return "Please enter an email address.";
-
-//     const error = element.onvalidate?.();
-//     if (typeof error === "string") return error;
-//   }
-// }
+    const error = element.onvalidate?.();
+    if (typeof error === "string") return error;
+  }
+}
 // document.addEventListener(
 //   "submit",
 //   (event) => {
@@ -722,8 +721,8 @@ export function isModified(element) {
   const elements = children(element);
   for (const element of elements) {
     if (
-      parents(element).some((element) => element.isModified === false) ||
-      element.closest("[disabled]") !== null
+      element.closest("[disabled]") !== null ||
+      parents(element).some((element) => element.isModified === false)
     )
       continue;
     if (parents(element).some((element) => element.isModified === true))
