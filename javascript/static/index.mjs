@@ -571,8 +571,10 @@ execute.functions = new Map();
 // }
 
 // TODO: Do we want a method to combine `validate()`, `serialize()`, and a `fetch()` to submit the form?
+// TODO: Inline `validateElement()`
+// TODO: Use `throw` to communicate validation error.
 export function validate(element) {
-  const elementsToReset = new Map();
+  const originalValues = [];
   const elements = children(element);
   for (const element of elements) {
     if (
@@ -582,11 +584,9 @@ export function validate(element) {
       continue;
     const value = element.value;
     const error = validateElement(element);
-    if (element.value !== value)
-      elementsToReset.set(element, value);
+    if (element.value !== value) originalValues.push({ element, value });
     if (typeof error !== "string") continue;
-    for (const [element, valueInputByUser] of elementsToReset)
-      element.value = valueInputByUser;
+    for (const { element, value } of originalValues) element.value = value;
     const target =
       element.closest(
         "[hidden], .visually-hidden, .visually-hidden--interactive:not(:focus):not(:focus-within):not(:active)",
