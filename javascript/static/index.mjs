@@ -681,6 +681,41 @@ execute.functions = new Map();
 // export const localizedDateTimeRegExp = /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}$/;
 
 /**
+ * Produce a `URLSearchParams` from the `element` and its `children()`. You may set the `disabled` attribute on any element to disable the whole subtree under it. Other than that, `serialize()` follows as best as possible the behavior of the `URLSearchParams` produced by a browser form submission.
+ */
+export function serialize(element) {
+  const urlSearchParams = new URLSearchParams();
+  const elements = children(element);
+  for (const element of elements) {
+    const name = element.getAttribute("name");
+    if (typeof name !== "string" || element.closest("[disabled]") !== null)
+      continue;
+    if (element.type === "radio" || element.type === "checkbox") {
+      if (element.checked) urlSearchParams.append(name, element.value);
+    } else if (element.matches("input, textarea"))
+      urlSearchParams.set(name, element.value);
+  }
+  return urlSearchParams;
+}
+
+/**
+ * Reset form fields from `element` and its `children()` using the `defaultValue` and `defaultChecked` properties, including calling `element.onchange()` when necessary.
+ */
+export function reset(element) {
+  const elements = children(element);
+  for (const element of elements)
+    if (element.type === "radio" || element.type === "checkbox") {
+      if (element.checked !== element.defaultChecked) {
+        element.checked = element.defaultChecked;
+        element.onchange?.();
+      }
+    } else if (element.value !== element.defaultValue) {
+      element.value = element.defaultValue;
+      element.onchange?.();
+    }
+}
+
+/**
  * Detects whether there are form fields in `element` and its `children()` that are modified with respect to the `defaultValue` and `defaultChecked` properties. You may set `element.isModified = <true/false>` to force the result of `isModified()` for `element` and its `children()`.
  */
 export function isModified(element) {
@@ -723,41 +758,6 @@ export function isModified(element) {
     event.preventDefault();
     event.returnValue = "";
   };
-}
-
-/**
- * Produce a `URLSearchParams` from the `element` and its `children()`. You may set the `disabled` attribute on any element to disable the whole subtree under it. Other than that, `serialize()` follows as best as possible the behavior of the `URLSearchParams` produced by a browser form submission.
- */
-export function serialize(element) {
-  const urlSearchParams = new URLSearchParams();
-  const elements = children(element);
-  for (const element of elements) {
-    const name = element.getAttribute("name");
-    if (typeof name !== "string" || element.closest("[disabled]") !== null)
-      continue;
-    if (element.type === "radio" || element.type === "checkbox") {
-      if (element.checked) urlSearchParams.append(name, element.value);
-    } else if (element.matches("input, textarea"))
-      urlSearchParams.set(name, element.value);
-  }
-  return urlSearchParams;
-}
-
-/**
- * Reset form fields from `element` and its `children()` using the `defaultValue` and `defaultChecked` properties, including calling `element.onchange()` when necessary.
- */
-export function reset(element) {
-  const elements = children(element);
-  for (const element of elements)
-    if (element.type === "radio" || element.type === "checkbox") {
-      if (element.checked !== element.defaultChecked) {
-        element.checked = element.defaultChecked;
-        element.onchange?.();
-      }
-    } else if (element.value !== element.defaultValue) {
-      element.value = element.defaultValue;
-      element.onchange?.();
-    }
 }
 
 /**
