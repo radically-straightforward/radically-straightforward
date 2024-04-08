@@ -549,6 +549,7 @@ execute.functions = new Map();
 // }
 
 // TODO: Test `relativizeDateTimeElement()`’s use of `setTippy()`.
+// TODO: Test `validate()`’s use of `setTippy()`.
 // export function setTippy({
 //   event = undefined,
 //   element,
@@ -571,10 +572,11 @@ execute.functions = new Map();
 // }
 
 // TODO: Do we want a method to combine `validate()`, `serialize()`, and a `fetch()` to submit the form?
-// TODO: Inline `validateElement()`
-// TODO: Use `throw` to communicate validation error.
+/**
+ * Use `novalidate`.
+ * Use `isValid` to force valid.
+ */
 export function validate(element) {
-  const originalValues = [];
   const elements = children(element);
   for (const element of elements) {
     if (
@@ -582,77 +584,53 @@ export function validate(element) {
       parents(element).some((element) => element.isValid === true)
     )
       continue;
-    const value = element.value;
-    const error = validateElement(element);
-    if (element.value !== value) originalValues.push({ element, value });
-    if (typeof error !== "string") continue;
-    for (const { element, value } of originalValues) element.value = value;
-    const target =
-      element.closest(
-        "[hidden], .visually-hidden, .visually-hidden--interactive:not(:focus):not(:focus-within):not(:active)",
-      )?.parentElement ?? element;
-    setTippy({
-      element: target,
-      elementProperty: "validationErrorTooltip",
-      tippyProps: {
-        theme: "error",
-        trigger: "manual",
-        content: error,
-      },
-    });
-    target.validationErrorTooltip.show();
-    target.focus();
-    return false;
-  }
-  return true;
-
-  function validateElement(element) {
-    if (element.closest("[required]"))
-      switch (element.type) {
-        case "radio":
-          if (
+    try {
+      if (element.matches("[required]")) {
+        if (
+          ((element.type === "radio" || element.type === "checkbox") &&
             element
               .closest("form")
-              .querySelector(`[name="${element.name}"]:checked`) === null
-          )
-            return "Please select one of these options.";
-          break;
-        case "checkbox":
-          const checkboxes = [
-            ...element
-              .closest("form")
-              .querySelectorAll(`[name="${element.name}"]`),
-          ];
-          if (!checkboxes.some((checkbox) => checkbox.checked))
-            return checkboxes.length === 1
-              ? "Please check this checkbox."
-              : "Please select at least one of these options.";
-          break;
-        default:
-          if (element.value.trim() === "") return "Please fill out this field.";
-          break;
-      }
-
-    if (
-      element.matches("[minlength]") &&
-      element.value.trim() !== "" &&
-      element.value.length < Number(element.getAttribute("minlength"))
-    )
-      return `This field must have at least ${element.getAttribute(
-        "minlength",
-      )} characters.`;
-
-    if (
-      element.matches(`[type="email"]`) &&
-      element.value.trim() !== "" &&
-      element.value.match(utilities.emailRegExp) === null
-    )
-      return "Please enter an email address.";
-
-    const error = element.onvalidate?.();
-    if (typeof error === "string") return error;
+              .querySelector(`[name="${element.name}"]:checked`) === null) ||
+          (!(element.type === "radio" || element.type === "checkbox") &&
+            element.value.trim() === "")
+        )
+          throw new ValidationError("Required field.");
+      } else if (element.value.trim() === "") continue;
+      if (
+        element.matches("[minlength]") &&
+        element.value.length < Number(element.getAttribute("minlength"))
+      )
+        throw new ValidationError(
+          `Minimum ${element.getAttribute("minlength")} characters.`,
+        );
+      if (
+        element.matches(`[type="email"]`) &&
+        element.value.match(utilities.emailRegExp) === null
+      )
+        throw new ValidationError("Invalid email address.");
+      element.onvalidate?.();
+    } catch (error) {
+      if (!(error instanceof ValidationError)) throw error;
+      const target =
+        element.closest(
+          "[hidden], .visually-hidden, .visually-hidden--interactive:not(:focus):not(:focus-within):not(:active)",
+        )?.parentElement ?? element;
+      setTippy({
+        element: target,
+        elementProperty: "validationErrorTooltip",
+        tippyProps: {
+          theme: "error",
+          trigger: "manual",
+          content: error,
+        },
+      }).show();
+      target.focus();
+      return false;
+    }
   }
+  return true;
 }
+export class ValidationError extends Error {}
 // document.addEventListener(
 //   "submit",
 //   (event) => {
