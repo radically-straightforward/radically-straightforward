@@ -570,6 +570,7 @@ execute.functions = new Map();
 //   return element[elementProperty];
 // }
 
+// TODO: Do we want a method to combine `validate()`, `serialize()`, and a `fetch()` to submit the form?
 // export function validate(element) {
 //   const elementsToValidate = children(element);
 //   const elementsToReset = new Map();
@@ -722,22 +723,22 @@ execute.functions = new Map();
 //     );
 // }
 
-// export function serialize(element) {
-//   const urlSearchParams = new URLSearchParams();
-//   const elementsToCheck = children(element);
-//   for (const element of elementsToCheck) {
-//     const name = element.getAttribute("name");
-//     if (typeof name !== "string" || element.closest("[disabled]") !== null)
-//       continue;
-//     if (element.type === "radio") {
-//       if (element.checked) urlSearchParams.set(name, element.value);
-//     } else if (element.type === "checkbox") {
-//       if (element.checked) urlSearchParams.append(name, element.value ?? "on");
-//     } else if (element.matches("input, textarea"))
-//       urlSearchParams.set(name, element.value);
-//   }
-//   return urlSearchParams;
-// }
+export function serialize(element) {
+  const urlSearchParams = new URLSearchParams();
+  const elementsToCheck = children(element);
+  for (const element of elementsToCheck) {
+    const name = element.getAttribute("name");
+    if (typeof name !== "string" || element.closest("[disabled]") !== null)
+      continue;
+    if (element.type === "radio") {
+      if (element.checked) urlSearchParams.set(name, element.value);
+    } else if (element.type === "checkbox") {
+      if (element.checked) urlSearchParams.append(name, element.value ?? "on");
+    } else if (element.matches("input, textarea"))
+      urlSearchParams.set(name, element.value);
+  }
+  return urlSearchParams;
+}
 
 /**
  * Reset form fields from `element` and its `children()` using the `defaultValue` and `defaultChecked` properties, including calling `onchange()` when necessary.
