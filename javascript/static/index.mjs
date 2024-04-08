@@ -2,6 +2,8 @@ import * as utilities from "@radically-straightforward/utilities";
 // import fastMyersDiff from "fast-myers-diff";
 // import tippy, * as tippyStatic from "tippy.js";
 
+// TODO: Do we want a method to combine `validate()`, `serialize()`, and a `fetch()` to submit the form?
+
 // export function tippySetDefaultProps(extraProps = {}) {
 //   tippy.setDefaultProps({
 //     arrow: tippyStatic.roundArrow + tippyStatic.roundArrow,
@@ -576,11 +578,38 @@ function setTippy(options) {
   return { show: () => {} };
 }
 
-// TODO: Do we want a method to combine `validate()`, `serialize()`, and a `fetch()` to submit the form?
 /**
- * Use `<form novalidate>`.
- * Use `element.isValid = true` to force valid.
- * Use `onvalidate` and `throw new ValidationError()` for custom validation.
+ * Validate `element` (usually a `<form>`) and its `children()`.
+ *
+ * Validation errors are reported with Tippy.js tippys with the `error` theme.
+ *
+ * Use `<form novalidate>` to disable the native browser validation, which is too permissive on email addresses, is more limited in custom validation, and so forth.
+ *
+ * You may set the `disabled` attribute on a parent element to disable an entire subtree.
+ *
+ * Use `element.isValid = true` to force a subtree to be valid.
+ *
+ * `validate()` supports the `required` and `minlength` attributes, the `type="email"` input type, and custom validation.
+ *
+ * For custom validation, use the `onvalidate` event and `throw new ValidationError()`, for example:
+ *
+ * ```javascript
+ * html`
+ *   <input
+ *     type="text"
+ *     name="name"
+ *     required
+ *     javascript="${javascript`
+ *       this.onvalidate = () => {
+ *         if (this.value !== "Leandro")
+ *           throw new javascript.ValidationError("Invalid name.");
+ *       };
+ *     `}"
+ *   />
+ * `;
+ * ```
+ *
+ * `validate()` powers the custom validation that `@radically-straightforward/javascript` enables by default.
  */
 export function validate(element) {
   const elements = children(element);
@@ -648,7 +677,7 @@ document.addEventListener(
 );
 
 /**
- * Auxiliary error class for `validate()`.
+ * Custom error class for `validate()`.
  */
 export class ValidationError extends Error {}
 // export function validateLocalizedDateTime(element) {
@@ -669,7 +698,11 @@ export class ValidationError extends Error {}
 // export const localizedDateTimeRegExp = /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}$/;
 
 /**
- * Produce a `URLSearchParams` from the `element` and its `children()`. You may set the `disabled` attribute on any element to disable the whole subtree under it. Other than that, `serialize()` follows as best as possible the behavior of the `URLSearchParams` produced by a browser form submission.
+ * Produce a `URLSearchParams` from the `element` and its `children()`.
+ *
+ * You may set the `disabled` attribute on a parent element to disable an entire subtree.
+ *
+ * Other than that, `serialize()` follows as best as possible the behavior of the `URLSearchParams` produced by a browser form submission.
  */
 export function serialize(element) {
   const urlSearchParams = new URLSearchParams();
@@ -692,7 +725,7 @@ export function serialize(element) {
 }
 
 /**
- * Reset form fields from `element` and its `children()` using the `defaultValue` and `defaultChecked` properties, including calling `element.onchange()` when necessary.
+ * Reset form fields from `element` and its `children()` using their `defaultValue` and `defaultChecked` properties, including calling `element.onchange()` when necessary.
  */
 export function reset(element) {
   const elements = children(element);
@@ -710,7 +743,13 @@ export function reset(element) {
 }
 
 /**
- * Detects whether there are form fields in `element` and its `children()` that are modified with respect to the `defaultValue` and `defaultChecked` properties. You may set `element.isModified = <true/false>` to force the result of `isModified()` for `element` and its `children()`.
+ * Detects whether there are form fields in `element` and its `children()` that are modified with respect to their `defaultValue` and `defaultChecked` properties.
+ *
+ * You may set `element.isModified = <true/false>` to force the result of `isModified()` for `element` and its `children()`.
+ *
+ * You may set the `disabled` attribute on a parent element to disable an entire subtree.
+ *
+ * `isModified()` powers the “your changes may be lost, do you wish to leave this page?” dialog that `@radically-straightforward/javascript` enables by default.
  */
 export function isModified(element) {
   const elements = children(element);
