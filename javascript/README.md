@@ -55,6 +55,7 @@ javascript`
 import * as javascript from "@radically-straightforward/javascript/static/index.mjs";
 ```
 
+- Form validation.
 - Warn before leaving page with unsubmitted form.
 
 <!-- DOCUMENTATION START: ./static/index.mjs -->

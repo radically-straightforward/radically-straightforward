@@ -571,6 +571,10 @@ execute.functions = new Map();
 //   return element[elementProperty];
 // }
 
+function setTippy(options) {
+  console.log(options);
+}
+
 // TODO: Do we want a method to combine `validate()`, `serialize()`, and a `fetch()` to submit the form?
 /**
  * Use `<form novalidate>`.
@@ -631,16 +635,20 @@ export function validate(element) {
   }
   return true;
 }
+document.addEventListener(
+  "submit",
+  (event) => {
+    if (validate(event.target)) return;
+    event.preventDefault();
+    event.stopImmediatePropagation();
+  },
+  { capture: true },
+);
+
+/**
+ * Auxiliary error class for `validate()`.
+ */
 export class ValidationError extends Error {}
-// document.addEventListener(
-//   "submit",
-//   (event) => {
-//     if (validate(event.target)) return;
-//     event.preventDefault();
-//     event.stopImmediatePropagation();
-//   },
-//   { capture: true },
-// );
 // export function validateLocalizedDateTime(element) {
 //   const date = UTCizeDateTime(element.value);
 //   if (date === undefined)
