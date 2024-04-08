@@ -573,6 +573,7 @@ execute.functions = new Map();
 
 function setTippy(options) {
   console.log(options);
+  return { show: () => {} };
 }
 
 // TODO: Do we want a method to combine `validate()`, `serialize()`, and a `fetch()` to submit the form?
