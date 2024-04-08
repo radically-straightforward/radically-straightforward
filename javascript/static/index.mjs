@@ -573,8 +573,9 @@ execute.functions = new Map();
 
 // TODO: Do we want a method to combine `validate()`, `serialize()`, and a `fetch()` to submit the form?
 /**
- * Use `novalidate`.
+ * Use `<form novalidate>`.
  * Use `isValid` to force valid.
+ * Use `onvalidate` and `throw new ValidationError()` for custom validation.
  */
 export function validate(element) {
   const elements = children(element);
