@@ -680,22 +680,33 @@ document.addEventListener(
  * Custom error class for `validate()`.
  */
 export class ValidationError extends Error {}
-// export function validateLocalizedDateTime(element) {
-//   const date = UTCizeDateTime(element.value);
-//   if (date === undefined)
-//     return "Invalid date & time. Match the pattern YYYY-MM-DD HH:MM.";
-//   element.value = date.toISOString();
-// }
-// export function UTCizeDateTime(dateString) {
-//   if (dateString.match(localizedDateTimeRegExp) === null) return;
-//   const date = new Date(dateString.trim().replace(" ", "T"));
-//   if (isNaN(date.getTime())) return;
-//   return date;
-// }
-// /**
-//  * A regular expression that matches localized dates, for example, `2024-04-01 15:20`.
-//  */
-// export const localizedDateTimeRegExp = /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}$/;
+
+/**
+ * Validate a form field that used `localizeDateTime()`. The error is reported on the `element` itself, but the UTC datetime that must be sent to the server is returned as a string that must be assigned to another form field, for example:
+ *
+ * ```javascript
+ * html`
+ *   <input
+ *     type="text"
+ *     required
+ *     javascript="${javascript`
+ *       this.value = javascript.localizeDateTime(${new Date().toISOString()});
+ *       this.onvalidate = () => {
+ *         this.nextElementSibling.value = javascript.validateLocalizedDateTime(this);
+ *       };
+ *     `}"
+ *   />
+ *   <input type="hidden" name="datetime" />
+ * `;
+ * ```
+ */
+export function validateLocalizedDateTime(element) {
+  if (element.value.match(/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}$/) === null)
+    throw new ValidationError("Match the pattern YYYY-MM-DD HH:MM.");
+  const date = new Date(element.value.trim().replace(" ", "T"));
+  if (isNaN(date.getTime())) throw new ValidationError("Invalid datetime.");
+  return date.toISOString();
+}
 
 /**
  * Produce a `URLSearchParams` from the `element` and its `children()`.
