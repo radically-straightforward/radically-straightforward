@@ -600,7 +600,7 @@ export function validate(element) {
               .closest("form")
               .querySelector(`[name="${element.name}"]:checked`) === null)
         )
-          throw new ValidationError("Required field.");
+          throw new ValidationError("Required.");
       }
       if (element.value.trim() === "") continue;
       if (
@@ -614,7 +614,7 @@ export function validate(element) {
         element.matches(`[type="email"]`) &&
         element.value.match(utilities.emailRegExp) === null
       )
-        throw new ValidationError("Invalid email address.");
+        throw new ValidationError("Invalid email.");
       element.onvalidate?.();
     } catch (error) {
       if (!(error instanceof ValidationError)) throw error;
@@ -628,7 +628,7 @@ export function validate(element) {
         tippyProps: {
           theme: "error",
           trigger: "manual",
-          content: error,
+          content: error.message,
         },
       }).show();
       target.focus();
