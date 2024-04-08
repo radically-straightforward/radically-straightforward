@@ -682,7 +682,7 @@ document.addEventListener(
 export class ValidationError extends Error {}
 
 /**
- * Validate a form field that used `localizeDateTime()`. The error is reported on the `element` itself, but the UTC datetime that must be sent to the server is returned as a string that must be assigned to another form field, for example:
+ * Validate a form field that used `localizeDateTime()`. The error is reported on the `element`, but the UTC datetime that must be sent to the server is returned as a string that must be assigned to another form field, for example:
  *
  * ```javascript
  * html`
@@ -690,13 +690,13 @@ export class ValidationError extends Error {}
  *     type="text"
  *     required
  *     javascript="${javascript`
- *       this.value = javascript.localizeDateTime(${new Date().toISOString()});
+ *       this.value = javascript.localizeDateTime(this.nextElementSibling.value);
  *       this.onvalidate = () => {
  *         this.nextElementSibling.value = javascript.validateLocalizedDateTime(this);
  *       };
  *     `}"
  *   />
- *   <input type="hidden" name="datetime" />
+ *   <input type="hidden" name="datetime" value="${new Date().toISOString()}" />
  * `;
  * ```
  */
