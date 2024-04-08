@@ -723,6 +723,9 @@ execute.functions = new Map();
 //     );
 // }
 
+/**
+ * Produce a `URLSearchParams` from the `element` and its `children()`. You may set the `disabled` attribute on any element to disable the whole subtree under it. Other than that, `serialize()` follows as best as possible the behavior of the `URLSearchParams` produced by a browser form submission.
+ */
 export function serialize(element) {
   const urlSearchParams = new URLSearchParams();
   const elementsToCheck = children(element);
