@@ -673,13 +673,18 @@ export function serialize(element) {
   const urlSearchParams = new URLSearchParams();
   const elements = children(element);
   for (const element of elements) {
-    const name = element.getAttribute("name");
-    if (typeof name !== "string" || element.closest("[disabled]") !== null)
+    if (
+      !element.matches("input, textarea") ||
+      element.closest("[disabled]") !== null ||
+      typeof element.getAttribute("name") !== "string"
+    )
       continue;
-    if (element.type === "radio" || element.type === "checkbox") {
-      if (element.checked) urlSearchParams.append(name, element.value);
-    } else if (element.matches("input, textarea"))
-      urlSearchParams.set(name, element.value);
+    if (
+      ((element.type === "radio" || element.type === "checkbox") &&
+        element.checked) ||
+      !(element.type === "radio" || element.type === "checkbox")
+    )
+      urlSearchParams.append(element.getAttribute("name"), element.value);
   }
   return urlSearchParams;
 }
@@ -689,16 +694,17 @@ export function serialize(element) {
  */
 export function reset(element) {
   const elements = children(element);
-  for (const element of elements)
-    if (element.type === "radio" || element.type === "checkbox") {
-      if (element.checked !== element.defaultChecked) {
-        element.checked = element.defaultChecked;
-        element.onchange?.();
-      }
-    } else if (element.value !== element.defaultValue) {
+  for (const element of elements) {
+    if (!element.matches("input, textarea")) continue;
+    if (element.value !== element.defaultValue) {
       element.value = element.defaultValue;
       element.onchange?.();
     }
+    if (element.checked !== element.defaultChecked) {
+      element.checked = element.defaultChecked;
+      element.onchange?.();
+    }
+  }
 }
 
 /**
@@ -706,22 +712,16 @@ export function reset(element) {
  */
 export function isModified(element) {
   const elements = children(element);
-  for (const element of elements) {
+  for (const element of elements)
     if (
-      element.closest("[disabled]") !== null ||
-      parents(element).some((element) => element.isModified === false)
+      parents(element).some((element) => element.isModified === true) ||
+      (element.matches("input, textarea") &&
+        element.closest("[disabled]") === null &&
+        !parents(element).some((element) => element.isModified === false) &&
+        (element.value !== element.defaultValue ||
+          element.checked !== element.defaultChecked))
     )
-      continue;
-    if (parents(element).some((element) => element.isModified === true))
       return true;
-    if (element.type === "radio" || element.type === "checkbox") {
-      if (element.checked !== element.defaultChecked) return true;
-    } else if (
-      typeof element.value === "string" &&
-      typeof element.defaultValue === "string"
-    )
-      if (element.value !== element.defaultValue) return true;
-  }
   return false;
 }
 {
