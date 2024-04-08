@@ -728,18 +728,19 @@ export function isModified(element) {
 }
 window.addEventListener("DOMContentLoaded", () => {
   window.onbeforeunload = (event) => {
-    if (!isModified(document.querySelector("body")) || isSubmittingForm) return;
-    event.preventDefault();
-    event.returnValue = "";
+    if (isModified(document.querySelector("body"))) event.preventDefault();
   };
 });
-document.addEventListener("submit", () => {
-  delete window.onbeforeunload;
-});
+// document.addEventListener("submit", () => {
+//   console.log(window.onbeforeunload);
+//   delete window.onbeforeunload;
+//   console.log(window.onbeforeunload);
+//   alert("SUBMIT");
+// });
 // TODO
 //   window.onbeforelivenavigate = () =>
 //     !isModified(document.querySelector("body")) ||
-//     isSubmittingForm ||
+//     isSubmittingForm [THIS VARIABLE HAS BEEN REMOVED] ||
 //     confirm(
 //       "Your changes will be lost if you leave this page. Do you wish to continue?",
 //     );
