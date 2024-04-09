@@ -413,41 +413,52 @@ execute.functions = new Map();
 export function morph(from, to, event = undefined) {
   if (from.onbeforemorph?.(event) === false) return;
   if (typeof to === "string") to = stringToElement(to);
-  const getKey = (node) =>
-    `${node.nodeType}--${
+  const key = (node) => ({
+    node,
+    key: `${node.nodeType}--${
       node.nodeType === node.ELEMENT_NODE
         ? `${node.tagName}--${node.getAttribute("key")}`
         : node.nodeValue
-    }`;
-  const fromKeys = [...from.childNodes].map(getKey);
-  const toKeys = [...to.childNodes].map(getKey);
+    }`,
+  });
+  const fromChildNodes = [...from.childNodes].map(key);
+  const toChildNodes = [...to.childNodes].map(key);
   const diff = [
     [0, 0, 0, 0],
-    ...fastMyersDiff.diff(fromKeys, toKeys),
+    ...fastMyersDiff.diff(
+      fromChildNodes.map(({ key }) => key),
+      toChildNodes.map(({ key }) => key),
+    ),
     [
-      from.childNodes.length,
-      from.childNodes.length,
-      to.childNodes.length,
-      to.childNodes.length,
+      fromChildNodes.length,
+      fromChildNodes.length,
+      toChildNodes.length,
+      toChildNodes.length,
     ],
-  ];
+  ].map(([fromStart, fromEnd, toStart, toEnd]) => ({
+    from: { start: fromStart, end: fromEnd },
+    to: { start: toStart, end: toEnd },
+  }));
   const toRemove = [];
   const moveCandidates = new Map();
-  for (const [fromStart, fromEnd, toStart, toEnd] of diff)
-    for (let nodeIndex = fromStart; nodeIndex < fromEnd; nodeIndex++) {
+  for (const diffEntry of diff)
+    for (const fromChildNode of fromChildNodes.slice(
+      diffEntry.from.start,
+      diffEntry.from.end,
+    )) {
       if (
-        event?.detail?.liveConnectionUpdate &&
-        (from.childNodes[nodeIndex].onbeforeremove?.(event) === false ||
-          from.childNodes[nodeIndex].matches?.("[data-tippy-root]"))
+        fromChildNode.node.onbeforeremove?.(event) === false ||
+        (event?.detail?.liveConnectionUpdate &&
+          fromChildNode.node.matches?.("[data-tippy-root]"))
       )
         continue;
-      toRemove.push(from.childNodes[nodeIndex]);
-      if (!moveCandidates.has(fromKeys[nodeIndex]))
-        moveCandidates.set(fromKeys[nodeIndex], []);
-      moveCandidates.get(fromKeys[nodeIndex]).push(from.childNodes[nodeIndex]);
+      toRemove.push(fromChildNode.node);
+      if (!moveCandidates.has(fromChildNode.key))
+        moveCandidates.set(fromChildNode.key, []);
+      moveCandidates.get(fromChildNode.key).push(fromChildNode.node);
     }
-  const toMorph = [];
   const toAdd = [];
+  const toMorph = [];
   for (let diffIndex = 1; diffIndex < diff.length; diffIndex++) {
     const [previousFromStart, previousFromEnd, previousToStart, previousToEnd] =
       diff[diffIndex - 1];
@@ -465,7 +476,7 @@ export function morph(from, to, event = undefined) {
     const nodes = [];
     for (let nodeIndex = toStart; nodeIndex < toEnd; nodeIndex++) {
       const toChildNode = to.childNodes[nodeIndex];
-      let node = moveCandidates.get(toKeys[nodeIndex])?.shift();
+      let node = moveCandidates.get(toChildNodes[nodeIndex])?.shift();
       if (node === undefined) node = document.importNode(toChildNode, true);
       else toMorph.push({ from: node, to: toChildNode });
       nodes.push(node);
