@@ -6,11 +6,9 @@
     "lib": ["ESNext", "DOM", "DOM.Iterable"],
     "skipLibCheck": true,
     "target": "ESNext",
-
     "declaration": true,
     "declarationMap": true,
     "sourceMap": true,
-
     "strict": true
   }
 }
