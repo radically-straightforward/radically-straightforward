@@ -1,6 +1,5 @@
 # TODO
 
-- Update dependencies.
 - Fix CI error.
 
 ---
