@@ -186,7 +186,7 @@ export function application({
 /**
  * A mapping from static file names to their hashed names, as produced by [`@radically-straightforward/build`](https://github.com/radically-straightforward/radically-straightforward/tree/main/build) and found in `./build/static.json`.
  */
-export const staticPaths: { [key: string]: string } = JSON.parse(
+export const staticFiles: { [key: string]: string } = JSON.parse(
   await fs
     .readFile(
       path.join(

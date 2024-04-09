@@ -160,10 +160,10 @@ A Caddyfile template for an application.
 - <https://owasp.org/www-project-secure-headers/>
 - <https://helmetjs.github.io/>
 
-### `staticPaths`
+### `staticFiles`
 
 ```typescript
-export const staticPaths: {
+export const staticFiles: {
   [key: string]: string;
 };
 ```

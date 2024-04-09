@@ -1,5 +1,11 @@
 # TODO
 
+- `caddy.staticPaths`
+  - Test 
+  - Document in `caddy` and `build`
+
+---
+
 `@radically-straightforward/utilities`’s `intern` performance benchmark:
 
 ```typescript
