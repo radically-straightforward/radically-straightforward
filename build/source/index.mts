@@ -231,7 +231,6 @@ try {
     assetNames: "[dir]/[name]--[hash]",
     loader: { ".woff2": "file", ".woff": "file", ".ttf": "file" },
     target: ["chrome100", "safari14", "edge100", "firefox100", "ios14"],
-    define: { process: "undefined" },
     bundle: true,
     minify: true,
     sourcemap: true,

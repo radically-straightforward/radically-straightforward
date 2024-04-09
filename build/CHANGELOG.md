@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.2 · 2024-04-09
+
+- Removed the `define`d `process` from esbuild’s configuration. It led to issues with Tippy.js.
+
 ## 1.0.1 · 2024-04-01
 
 - In esbuild, [`define`d](https://esbuild.github.io/api/#define) `process` to be `undefined`, which lets packages (for example, `@radically-straightforward/utilities`) differentiate between Node.js and the browser.
