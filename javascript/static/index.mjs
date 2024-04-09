@@ -411,7 +411,7 @@ execute.functions = new Map();
 
 // TODO: Test `morph()` within a tippy.
 export function morph(from, to, event = undefined) {
-  if (from.onbeforemorph?.(event) === false) return;
+  if (from.onmorph?.(event) === false) return;
   if (typeof to === "string") to = stringToElement(to);
   const key = (node) => ({
     node,
@@ -446,7 +446,7 @@ export function morph(from, to, event = undefined) {
       diffEntry.from.end,
     ))
       if (
-        fromChildNode.node.onbeforeremove?.(event) !== false &&
+        fromChildNode.node.onmorphremove?.(event) !== false &&
         !(
           event?.detail?.liveConnectionUpdate &&
           fromChildNode.node.matches?.("[data-tippy-root]")
@@ -456,34 +456,37 @@ export function morph(from, to, event = undefined) {
   const toAdd = new Set();
   const toMorph = new Set();
   for (let diffIndex = 1; diffIndex < diff.length; diffIndex++) {
-    const [previousFromStart, previousFromEnd, previousToStart, previousToEnd] =
-      diff[diffIndex - 1];
-    const [fromStart, fromEnd, toStart, toEnd] = diff[diffIndex];
+    const previousDiffEntry = diff[diffIndex - 1];
+    const diffEntry = diff[diffIndex];
     for (
       let nodeIndexOffset = 0;
-      nodeIndexOffset < fromStart - previousFromEnd;
+      nodeIndexOffset < diffEntry.from.start - previousDiffEntry.from.end;
       nodeIndexOffset++
     )
       toMorph.add({
-        from: from.childNodes[previousFromEnd + nodeIndexOffset],
-        to: to.childNodes[previousToEnd + nodeIndexOffset],
+        from: fromChildNodes[previousDiffEntry.from.end + nodeIndexOffset].node,
+        to: toChildNodes[previousDiffEntry.to.end + nodeIndexOffset].node,
       });
-    if (toStart === toEnd) continue;
-    const nodes = [];
-    for (let nodeIndex = toStart; nodeIndex < toEnd; nodeIndex++) {
-      const toChildNode = to.childNodes[nodeIndex];
-      let node = moveCandidates.get(toChildNodes[nodeIndex])?.shift();
-      if (node === undefined) node = document.importNode(toChildNode, true);
-      else toMorph.add({ from: node, to: toChildNode });
-      nodes.push(node);
+    for (const toChildNode of toChildNodes.slice(
+      diffEntry.to.start,
+      diffEntry.to.end,
+    )) {
+      const fromChildNode = [...toRemove].find(
+        (fromChildNode) => toChildNode.key === fromChildNode.key,
+      );
+      if (fromChildNode !== undefined) {
+        toRemove.delete(fromChildNode);
+        toMorph.add({ from: fromChildNode.node, to: toChildNode.node });
+      }
+      toAdd.add({
+        node:
+          fromChildNode?.node ?? document.importNode(toChildNode.node, true),
+        nodeAfter: fromChildNodes[diffEntry.from.end]?.node ?? null,
+      });
     }
-    toAdd.add({ nodes, nodeAfter: from.childNodes[fromEnd] });
   }
   for (const { node } of toRemove) from.removeChild(node);
-  for (const { nodeAfter, nodes } of toAdd)
-    if (nodeAfter !== undefined)
-      for (const node of nodes) from.insertBefore(node, nodeAfter);
-    else for (const node of nodes) from.appendChild(node);
+  for (const { node, nodeAfter } of toAdd) from.insertBefore(node, nodeAfter);
   for (const { from, to } of toMorph) {
     if (from.nodeType !== from.ELEMENT_NODE) continue;
     for (const attribute of new Set([
@@ -492,16 +495,15 @@ export function morph(from, to, event = undefined) {
       ...(from.matches("input, textarea") ? ["value", "checked"] : []),
     ])) {
       if (
-        event?.detail?.liveConnectionUpdate &&
-        (attribute === "style" ||
-          attribute === "hidden" ||
-          attribute === "disabled" ||
-          attribute === "value" ||
-          attribute === "checked") &&
-        parents(from).every(
-          (element) =>
-            element.onbeforemorphattribute?.(event, attribute) !== true,
-        )
+        parents(from).some(
+          (element) => element.onmorphattribute?.(event, attribute) === true,
+        ) ||
+        (event?.detail?.liveConnectionUpdate &&
+          (attribute === "style" ||
+            attribute === "hidden" ||
+            attribute === "disabled" ||
+            attribute === "value" ||
+            attribute === "checked"))
       )
         continue;
       if (to.getAttribute(attribute) === null) from.removeAttribute(attribute);
