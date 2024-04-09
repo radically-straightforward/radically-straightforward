@@ -1,6 +1,6 @@
 import * as utilities from "@radically-straightforward/utilities";
+import fastMyersDiff from "fast-myers-diff";
 import tippy, * as tippyStatic from "tippy.js";
-// import fastMyersDiff from "fast-myers-diff";
 
 // TODO: Do we want a method to combine `validate()`, `serialize()`, and a `fetch()` to submit the form?
 
@@ -417,20 +417,16 @@ export function morph(from, to, event = undefined) {
     (event?.detail?.liveConnectionUpdate && from.partialParentElement === true)
   )
     return;
-
   const fromChildNodes = from.childNodes;
   const toChildNodes = to.childNodes;
-
   const getKey = (node) =>
     `${node.nodeType}--${
       node.nodeType === node.ELEMENT_NODE
         ? `${node.tagName}--${node.getAttribute("key")}`
         : node.nodeValue
     }`;
-
   const fromKeys = [...fromChildNodes].map(getKey);
   const toKeys = [...toChildNodes].map(getKey);
-
   const diff = [
     [0, 0, 0, 0],
     ...fastMyersDiff.diff(fromKeys, toKeys),
@@ -441,7 +437,6 @@ export function morph(from, to, event = undefined) {
       toChildNodes.length,
     ],
   ];
-
   const toRemove = [];
   const moveCandidates = new Map();
   for (let diffIndex = 1; diffIndex < diff.length; diffIndex++) {
@@ -449,26 +444,22 @@ export function morph(from, to, event = undefined) {
     for (let nodeIndex = fromStart; nodeIndex < fromEnd; nodeIndex++) {
       const node = fromChildNodes[nodeIndex];
       const key = fromKeys[nodeIndex];
-
       if (
         event?.detail?.liveConnectionUpdate &&
         (node.onbeforeremove?.(event) === false ||
           node.matches?.("[data-tippy-root]"))
       )
         continue;
-
       toRemove.push(node);
       moveCandidates.get(key)?.push(node) ?? moveCandidates.set(key, [node]);
     }
   }
-
   const toAdd = [];
   const toMorph = [];
   for (let diffIndex = 1; diffIndex < diff.length; diffIndex++) {
     const [previousFromStart, previousFromEnd, previousToStart, previousToEnd] =
       diff[diffIndex - 1];
     const [fromStart, fromEnd, toStart, toEnd] = diff[diffIndex];
-
     for (
       let nodeIndexOffset = 0;
       nodeIndexOffset < fromStart - previousFromEnd;
@@ -478,35 +469,26 @@ export function morph(from, to, event = undefined) {
         from: fromChildNodes[previousFromEnd + nodeIndexOffset],
         to: toChildNodes[previousToEnd + nodeIndexOffset],
       });
-
     if (toStart === toEnd) continue;
-
     const nodes = [];
     for (let nodeIndex = toStart; nodeIndex < toEnd; nodeIndex++) {
       const toChildNode = toChildNodes[nodeIndex];
-
       let node = moveCandidates.get(toKeys[nodeIndex])?.shift();
       if (node === undefined) node = document.importNode(toChildNode, true);
       else toMorph.push({ from: node, to: toChildNode });
-
       nodes.push(node);
     }
     toAdd.push({ nodes, nodeAfter: fromChildNodes[fromEnd] });
   }
-
   for (const node of toRemove) from.removeChild(node);
-
   for (const { nodeAfter, nodes } of toAdd)
     if (nodeAfter !== undefined)
       for (const node of nodes) from.insertBefore(node, nodeAfter);
     else for (const node of nodes) from.appendChild(node);
-
   for (const { from, to } of toMorph) {
     if (from.nodeType !== from.ELEMENT_NODE) continue;
-
     const isInput = ["input", "textarea"].includes(from.tagName.toLowerCase());
     const inputAttributes = ["value", "checked"];
-
     for (const attribute of new Set([
       ...from.getAttributeNames(),
       ...to.getAttributeNames(),
@@ -523,21 +505,17 @@ export function morph(from, to, event = undefined) {
         )
       )
         continue;
-
       const fromAttribute = from.getAttribute(attribute);
       const toAttribute = to.getAttribute(attribute);
-
       if (toAttribute === null) from.removeAttribute(attribute);
       else if (fromAttribute !== toAttribute)
         from.setAttribute(attribute, toAttribute);
-
       if (
         inputAttributes.includes(attribute) &&
         from[attribute] !== to[attribute]
       )
         from[attribute] = to[attribute];
     }
-
     morph(from, to, event);
   }
 }
