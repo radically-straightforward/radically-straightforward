@@ -400,7 +400,7 @@ execute.functions = new Map();
 // export function loadPartial(parentElement, partialString) {
 //   morph(parentElement, partialString);
 
-//   parentElement.partialParentElement = true;
+//   parentElement.partialParentElement = true; // TODO: Change this into parentElement.onbeforemorph = (event) => !event?.detail?.liveConnectionUpdate;
 //   parentElement.isAttached = true;
 //   execute({ element: parentElement });
 //   const parentElementTippy = parentElement.closest("[data-tippy-root]")?._tippy;
@@ -411,11 +411,7 @@ execute.functions = new Map();
 
 // TODO: Test `morph()` within a tippy.
 export function morph(from, to, event = undefined) {
-  if (
-    from.onbeforemorph?.(event) === false ||
-    (event?.detail?.liveConnectionUpdate && from.partialParentElement === true)
-  )
-    return;
+  if (from.onbeforemorph?.(event) === false) return;
   if (typeof to === "string") to = stringToElement(to);
   const getKey = (node) =>
     `${node.nodeType}--${
