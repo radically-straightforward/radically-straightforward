@@ -1,11 +1,11 @@
-# Radically Straightforward · TSConfig
+# Radically Straightforward · TypeScript
 
 **✅ TypeScript configuration**
 
 ## Installation
 
 ```console
-$ npm install --save-dev @radically-straightforward/tsconfig
+$ npm install --save-dev @radically-straightforward/typescript
 ```
 
 ## Usage
@@ -14,13 +14,15 @@ $ npm install --save-dev @radically-straightforward/tsconfig
 
 ```json
 {
-  "extends": "@radically-straightforward/tsconfig",
+  "extends": "@radically-straightforward/typescript",
   "compilerOptions": {
     "rootDir": "./source/",
     "outDir": "./build/"
   }
 }
 ```
+
+> **Note:** The installation of `@radically-straightforward/typescript` should create `tsconfig.json` in the appropriate location.
 
 ## Related Work
 
