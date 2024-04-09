@@ -440,23 +440,19 @@ export function morph(from, to, event = undefined) {
     to: { start: toStart, end: toEnd },
   }));
   const toRemove = new Set();
-  const moveCandidates = new Map();
   for (const diffEntry of diff)
     for (const fromChildNode of fromChildNodes.slice(
       diffEntry.from.start,
       diffEntry.from.end,
-    )) {
+    ))
       if (
-        fromChildNode.node.onbeforeremove?.(event) === false ||
-        (event?.detail?.liveConnectionUpdate &&
-          fromChildNode.node.matches?.("[data-tippy-root]"))
+        fromChildNode.node.onbeforeremove?.(event) !== false &&
+        !(
+          event?.detail?.liveConnectionUpdate &&
+          fromChildNode.node.matches?.("[data-tippy-root]")
+        )
       )
-        continue;
-      toRemove.add(fromChildNode.node);
-      if (!moveCandidates.has(fromChildNode.key))
-        moveCandidates.set(fromChildNode.key, []);
-      moveCandidates.get(fromChildNode.key).push(fromChildNode.node);
-    }
+        toRemove.add(fromChildNode);
   const toAdd = new Set();
   const toMorph = new Set();
   for (let diffIndex = 1; diffIndex < diff.length; diffIndex++) {
@@ -483,7 +479,7 @@ export function morph(from, to, event = undefined) {
     }
     toAdd.add({ nodes, nodeAfter: from.childNodes[fromEnd] });
   }
-  for (const node of toRemove) from.removeChild(node);
+  for (const { node } of toRemove) from.removeChild(node);
   for (const { nodeAfter, nodes } of toAdd)
     if (nodeAfter !== undefined)
       for (const node of nodes) from.insertBefore(node, nodeAfter);
