@@ -452,8 +452,8 @@ export function morph(from, to, event = undefined) {
       moveCandidates.get(fromKeys[nodeIndex]).push(from.childNodes[nodeIndex]);
     }
   }
-  const toAdd = [];
   const toMorph = [];
+  const toAdd = [];
   for (let diffIndex = 1; diffIndex < diff.length; diffIndex++) {
     const [previousFromStart, previousFromEnd, previousToStart, previousToEnd] =
       diff[diffIndex - 1];
