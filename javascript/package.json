@@ -34,15 +34,15 @@
     "test": "npm run prepare && node --test && prettier --check \"./README.md\" --check \"./CHANGELOG.md\" --check \"./package.json\" --check \"./tsconfig.json\" --check \"./source/**/*.mts\" --check \"./static/**/*.mjs\""
   },
   "dependencies": {
-    "@radically-straightforward/utilities": "^1.2.2",
+    "@radically-straightforward/utilities": "^2.0.0",
     "tippy.js": "^6.3.7"
   },
   "devDependencies": {
-    "@radically-straightforward/documentation": "^1.0.1",
+    "@radically-straightforward/documentation": "^1.0.4",
     "@radically-straightforward/tsconfig": "^1.0.1",
-    "@types/node": "^20.11.28",
+    "@types/node": "^20.12.6",
     "prettier": "^3.2.5",
-    "typescript": "^5.4.2"
+    "typescript": "^5.4.4"
   },
   "prettier": {}
 }
