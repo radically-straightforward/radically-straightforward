@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.0.0 · 2024-04-09
+
+- **Breaking Change:** Made `@radically-straightforward/utilities` truly independent of platform by extracting the Node.js especial treatment into `@radically-straightforward/node`.
+
 ## 1.2.2 · 2024-04-01
 
 - Added:
