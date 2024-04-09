@@ -6,6 +6,7 @@ import stream from "node:stream/promises";
 import timers from "node:timers/promises";
 import busboy from "busboy";
 import "@radically-straightforward/node";
+import * as node from "@radically-straightforward/node";
 import * as utilities from "@radically-straightforward/utilities";
 
 /**
@@ -83,7 +84,7 @@ export type RequestBodyFile = busboy.FileInfo & { path: string };
 /**
  * Information about a Live Connection that is available under `request.liveConnection`.
  *
- * - **`establish`:** Whether the connection is just being established. In other words, whether it’s the first time that the `handler`s are being called for this request. You may use this, for example, to start a [`backgroundJob()`](https://github.com/radically-straightforward/radically-straightforward/tree/main/utilities#backgroundjob) which updates a timestamp of when a user has last been seen online.
+ * - **`establish`:** Whether the connection is just being established. In other words, whether it’s the first time that the `handler`s are being called for this request. You may use this, for example, to start a [`backgroundJob()`](https://github.com/radically-straightforward/radically-straightforward/tree/main/node#backgroundjob) which updates a timestamp of when a user has last been seen online.
  *
  * - **`skipUpdateOnEstablish`:** Whether it’s necessary to send an update with a new version of the page upon establishing the Live Connection. An update may be skipped if the page hasn’t been marked as modified since the last update was sent. You must only check this variable if `establish` is `true`.
  */
@@ -463,7 +464,7 @@ export default function server({
                 "application/json-lines; charset=utf-8",
               );
 
-              const heartbeat = utilities.backgroundJob(
+              const heartbeat = node.backgroundJob(
                 { interval: 30 * 1000 },
                 () => {
                   response.write("\n");
@@ -473,7 +474,7 @@ export default function server({
                 heartbeat.stop();
               });
 
-              const periodicUpdates = utilities.backgroundJob(
+              const periodicUpdates = node.backgroundJob(
                 { interval: 5 * 60 * 1000 },
                 () => {
                   request.liveConnection!.update?.();
