@@ -1,6 +1,7 @@
 # TODO
 
 - Rename `@radically-straightforward/tsconfig` into `@radically-straightforward/typescript`.
+- Update dependencies.
 
 ---
 
