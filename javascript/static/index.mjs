@@ -457,8 +457,8 @@ export function morph(from, to, event = undefined) {
         moveCandidates.set(fromChildNode.key, []);
       moveCandidates.get(fromChildNode.key).push(fromChildNode.node);
     }
-  const toAdd = [];
-  const toMorph = [];
+  const toAdd = new Set();
+  const toMorph = new Set();
   for (let diffIndex = 1; diffIndex < diff.length; diffIndex++) {
     const [previousFromStart, previousFromEnd, previousToStart, previousToEnd] =
       diff[diffIndex - 1];
@@ -468,7 +468,7 @@ export function morph(from, to, event = undefined) {
       nodeIndexOffset < fromStart - previousFromEnd;
       nodeIndexOffset++
     )
-      toMorph.push({
+      toMorph.add({
         from: from.childNodes[previousFromEnd + nodeIndexOffset],
         to: to.childNodes[previousToEnd + nodeIndexOffset],
       });
@@ -478,10 +478,10 @@ export function morph(from, to, event = undefined) {
       const toChildNode = to.childNodes[nodeIndex];
       let node = moveCandidates.get(toChildNodes[nodeIndex])?.shift();
       if (node === undefined) node = document.importNode(toChildNode, true);
-      else toMorph.push({ from: node, to: toChildNode });
+      else toMorph.add({ from: node, to: toChildNode });
       nodes.push(node);
     }
-    toAdd.push({ nodes, nodeAfter: from.childNodes[fromEnd] });
+    toAdd.add({ nodes, nodeAfter: from.childNodes[fromEnd] });
   }
   for (const node of toRemove) from.removeChild(node);
   for (const { nodeAfter, nodes } of toAdd)
