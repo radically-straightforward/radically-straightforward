@@ -160,6 +160,16 @@ A Caddyfile template for an application.
 - <https://owasp.org/www-project-secure-headers/>
 - <https://helmetjs.github.io/>
 
+### `staticPaths`
+
+```typescript
+export const staticPaths: {
+  [key: string]: string;
+};
+```
+
+A mapping from static file names to their hashed names, as produced by [`@radically-straightforward/build`](https://github.com/radically-straightforward/radically-straightforward/tree/main/build) and found in `./build/static.json`.
+
 <!-- DOCUMENTATION END: ./source/index.mts -->
 
 ## Related Work
