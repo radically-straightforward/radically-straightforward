@@ -60,13 +60,155 @@ import * as javascript from "@radically-straightforward/javascript/static/index.
 
 <!-- DOCUMENTATION START: ./static/index.mjs -->
 
-### `weekday()`
+### `validate()`
 
 ```typescript
-export function weekday(dateString);
+export function validate(element);
 ```
 
-Returns a string with the week day in English, for example, `Monday`.
+Validate `element` (usually a `<form>`) and its `children()`.
+
+Validation errors are reported with Tippy.js tippys with the `error` theme.
+
+Use `<form novalidate>` to disable the native browser validation, which is too permissive on email addresses, is more limited in custom validation, and so forth.
+
+You may set the `disabled` attribute on a parent element to disable an entire subtree.
+
+Use `element.isValid = true` to force a subtree to be valid.
+
+`validate()` supports the `required` and `minlength` attributes, the `type="email"` input type, and custom validation.
+
+For custom validation, use the `onvalidate` event and `throw new ValidationError()`, for example:
+
+```javascript
+html`
+  <input
+    type="text"
+    name="name"
+    required
+    javascript="${javascript`
+      this.onvalidate = () => {
+        if (this.value !== "Leandro")
+          throw new javascript.ValidationError("Invalid name.");
+      };
+    `}"
+  />
+`;
+```
+
+`validate()` powers the custom validation that `@radically-straightforward/javascript` enables by default.
+
+### `ValidationError`
+
+```typescript
+export class ValidationError extends Error;
+```
+
+Custom error class for `validate()`.
+
+### `validateLocalizedDateTime()`
+
+```typescript
+export function validateLocalizedDateTime(element);
+```
+
+Validate a form field that used `localizeDateTime()`. The error is reported on the `element`, but the UTC datetime that must be sent to the server is returned as a string that must be assigned to another form field, for example:
+
+```javascript
+html`
+  <input
+    type="hidden"
+    name="datetime"
+    value="${new Date().toISOString()}"
+  />
+  <input
+    type="text"
+    required
+    javascript="${javascript`
+      this.value = javascript.localizeDateTime(this.previousElementSibling.value);
+      this.onvalidate = () => {
+        this.previousElementSibling.value = javascript.validateLocalizedDateTime(this);
+      };
+    `}"
+  />
+`;
+```
+
+### `serialize()`
+
+```typescript
+export function serialize(element);
+```
+
+Produce a `URLSearchParams` from the `element` and its `children()`.
+
+You may set the `disabled` attribute on a parent element to disable an entire subtree.
+
+Other than that, `serialize()` follows as best as possible the behavior of the `URLSearchParams` produced by a browser form submission.
+
+### `reset()`
+
+```typescript
+export function reset(element);
+```
+
+Reset form fields from `element` and its `children()` using their `defaultValue` and `defaultChecked` properties, including calling `element.onchange()` when necessary.
+
+### `isModified()`
+
+```typescript
+export function isModified(element);
+```
+
+Detects whether there are form fields in `element` and its `children()` that are modified with respect to their `defaultValue` and `defaultChecked` properties.
+
+You may set `element.isModified = <true/false>` to force the result of `isModified()` for `element` and its `children()`.
+
+You may set the `disabled` attribute on a parent element to disable an entire subtree.
+
+`isModified()` powers the “your changes may be lost, do you wish to leave this page?” dialog that `@radically-straightforward/javascript` enables by default.
+
+### `relativizeDateTime()`
+
+```typescript
+export function relativizeDateTime(dateString, { preposition = false } = {});
+```
+
+Returns a relative datetime, for example, `just now`, `3 minutes ago`, `in 3 minutes`, `3 hours ago`, `in 3 hours`, `yesterday`, `tomorrow`, `3 days ago`, `in 3 days`, `on 2024-04-03`, and so forth.
+
+- **`preposition`:** Whether to return `2024-04-03` or `on 2024-04-03`.
+
+### `localizeDateTime()`
+
+```typescript
+export function localizeDateTime(dateString);
+```
+
+Returns a localized datetime, for example, `2024-04-03 15:20`.
+
+### `localizeDate()`
+
+```typescript
+export function localizeDate(dateString);
+```
+
+Returns a localized date, for example, `2024-04-03`.
+
+### `localizeTime()`
+
+```typescript
+export function localizeTime(dateString);
+```
+
+Returns a localized time, for example, `15:20`.
+
+### `formatUTCDateTime()`
+
+```typescript
+export function formatUTCDateTime(dateString);
+```
+
+Format a datetime into a representation that is user friendly.
 
 ### `stringToElement()`
 
@@ -75,6 +217,36 @@ export function stringToElement(string);
 ```
 
 Convert a string into a DOM element. The string may have multiple siblings without a common parent, so `stringToElement()` returns a `<div>` containing the elements.
+
+### `elementBackgroundJob()`
+
+```typescript
+export function elementBackgroundJob(element, elementProperty, options, job);
+```
+
+Similar to [`@radically-straightforward/utilities`’s](https://github.com/radically-straightforward/radically-straightforward/tree/main/utilities) `backgroundJob()`, but with the following differences:
+
+1. If called multiple times, `elementBackgroundJob()` `stop()`s the previous background job so that at most one background job is active at any given time.
+
+2. When the `element` is detached from the document, the background job is `stop()`ped. See `isAttached()`.
+
+The background job object returned by `@radically-straightforward/utilities`’s `backgroundJob()` is available at `element[name]`.
+
+See, for example, `relativizeDateTimeElement()`, which uses `elementBackgroundJob()` to periodically update a relative datetime, for example, “2 hours ago”.
+
+### `isAttached()`
+
+```typescript
+export function isAttached(element);
+```
+
+Check whether the `element` is attached to the document. This is different from the [`isConnected` property](https://developer.mozilla.org/en-US/docs/Web/API/Node/isConnected) in the following ways:
+
+1. It uses `parents()`, so it supports Tippy.js’s tippys that aren’t mounted but whose `target`s are attached.
+
+2. You may force an element to be attached by setting `element.isAttached = true` on the `element` itself or on one of its parents.
+
+See, for example, `elementBackgroundJob()`, which uses `isAttached()`.
 
 ### `parents()`
 
@@ -107,20 +279,6 @@ export function previousSiblings(element);
 ```
 
 Returns an array of sibling elements, including `element` itself.
-
-### `isConnected()`
-
-```typescript
-export function isConnected(element);
-```
-
-Check whether the `element` is connected to the document. This is different from the [`isConnected` property](https://developer.mozilla.org/en-US/docs/Web/API/Node/isConnected) in the following ways:
-
-1. It uses `parents()`, so it supports Tippy.js’s tippys that aren’t mounted but whose `target`s are connected.
-
-2. You may force an element to be connected by setting `element.forceIsConnected = true` on the `element` itself or on one of its parents.
-
-This is useful, for example, for elements that periodically update their own contents, for example, a text field that displays relative time, for example, “three hours ago”. You can check that the element has been disconnected from the document and stop the periodic updates.
 
 ### `isAppleDevice`
 
