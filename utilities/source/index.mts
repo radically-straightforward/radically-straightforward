@@ -1,99 +1,3 @@
-if (process !== undefined) await import("@radically-straightforward/node");
-
-/**
- * Start a background job that runs every `interval`.
- *
- * This is different from `setInterval()` in the following ways:
- *
- * 1. The interval counts **between** jobs, so slow background jobs don’t get called concurrently:
- *
- *    ```
- *    setInterval()
- *    | SLOW BACKGROUND JOB |
- *    | INTERVAL | SLOW BACKGROUND JOB |
- *               | INTERVAL | ...
- *
- *    backgroundJob()
- *    | SLOW BACKGROUND JOB | INTERVAL | SLOW BACKGROUND JOB | INTERVAL | ...
- *    ```
- *
- * 2. We introduce a random `intervalVariance` to avoid many background jobs from starting at the same time and overloading the machine.
- *
- * 3. You may use `backgroundJob.run()` to force the background job to run right away. If the background job is already running, calling `backgroundJob.run()` schedules it to run again as soon as possible (with a wait interval of 0).
- *
- * 4. You may use `backgroundJob.stop()` to stop the background job. If the background job is running, it will finish but it will not be scheduled to run again. This is similar to how an HTTP server may terminate gracefully by stopping accepting new requests but finishing responding to existing requests. After a job has been stopped, you may not `backgroundJob.run()` it again (calling `backgroundJob.run()` has no effect).
- *
- * 5. In Node.js the background job is stopped on [`"gracefulTermination"`](https://github.com/radically-straightforward/radically-straightforward/tree/main/node#graceful-termination).
- *
- * **Example**
- *
- * ```javascript
- * import * as utilities from "@radically-straightforward/utilities";
- *
- * const backgroundJob = utilities.backgroundJob(
- *   { interval: 3 * 1000 },
- *   async () => {
- *     console.log("backgroundJob(): Running background job...");
- *     await utilities.sleep(3 * 1000);
- *     console.log("backgroundJob(): ...finished running background job.");
- *   },
- * );
- * process.on("SIGTSTP", () => {
- *   backgroundJob.run();
- * });
- * console.log(
- *   "backgroundJob(): Press ⌃Z to force background job to run and ⌃C to continue...",
- * );
- * ```
- */
-export function backgroundJob(
-  {
-    interval,
-    intervalVariance = 0.1,
-  }: { interval: number; intervalVariance?: number },
-  job: () => void | Promise<void>,
-): { run: () => void; stop: () => void } {
-  let state: "sleeping" | "running" | "runningAndMarkedForRerun" | "stopped" =
-    "sleeping";
-  let timeout: any = undefined;
-  const scheduler = {
-    run: async () => {
-      switch (state) {
-        case "sleeping":
-          clearTimeout(timeout);
-          state = "running";
-          await job();
-          if (state === "running" || state === "runningAndMarkedForRerun") {
-            timeout = setTimeout(
-              () => {
-                scheduler.run();
-              },
-              (state as any) === "runningAndMarkedForRerun"
-                ? 0
-                : interval + interval * intervalVariance * Math.random(),
-            );
-            state = "sleeping";
-          }
-          break;
-        case "running":
-          state = "runningAndMarkedForRerun";
-          break;
-      }
-    },
-    stop: () => {
-      clearTimeout(timeout);
-      state = "stopped";
-      process?.off?.("gracefulTermination", gracefulTerminationEventListener);
-    },
-  };
-  scheduler.run();
-  const gracefulTerminationEventListener = () => {
-    scheduler.stop();
-  };
-  process?.once?.("gracefulTermination", gracefulTerminationEventListener);
-  return scheduler;
-}
-
 /**
  * A promisified version of `setTimeout()`. Bare-bones: It doesn’t even offer a way to `clearTimeout()`. Useful in JavaScript that may run in the browser—if you’re only targeting Node.js then you’re better served by [`timersPromises.setTimeout()`](https://nodejs.org/api/timers.html#timerspromisessettimeoutdelay-value-options).
  */
@@ -363,3 +267,79 @@ intern.finalizationRegistry = new FinalizationRegistry<{
 }>(({ type, key }) => {
   intern.pool[type].delete(key);
 });
+
+/**
+ * > **Note:** This is a lower level utility. See `@radically-straightforward/node`’s and `@radically-straightforward/javascript`’s extensions to `backgroundJob()` that are better suited for their specific environments.
+ *
+ * Start a background job that runs every `interval`.
+ *
+ * `backgroundJob()` is different from `setInterval()` in the following ways:
+ *
+ * 1. The interval counts **between** jobs, so slow background jobs don’t get called concurrently:
+ *
+ *    ```
+ *    setInterval()
+ *    | SLOW BACKGROUND JOB |
+ *    | INTERVAL | SLOW BACKGROUND JOB |
+ *               | INTERVAL | ...
+ *
+ *    backgroundJob()
+ *    | SLOW BACKGROUND JOB | INTERVAL | SLOW BACKGROUND JOB | INTERVAL | ...
+ *    ```
+ *
+ * 2. You may use `backgroundJob.run()` to force the background job to run right away. If the background job is already running, calling `backgroundJob.run()` schedules it to run again as soon as possible (with a wait interval of `0`).
+ *
+ * 3. You may use `backgroundJob.stop()` to stop the background job. If the background job is in the middle of running, it will finish but it will not be scheduled to run again. This is similar to how an HTTP server may terminate gracefully by stopping accepting new requests but finishing responding to existing requests. After a job has been stopped, you may not `backgroundJob.run()` it again (calling `backgroundJob.run()` has no effect).
+ *
+ * 4. We introduce a random interval variance of 10% on top of the given `interval` to avoid many background jobs from starting at the same time and overloading the machine.
+ */
+export function backgroundJob(
+  {
+    interval,
+    onStop = () => {},
+  }: {
+    interval: number;
+    onStop?: () => void | Promise<void>;
+  },
+  job: () => void | Promise<void>,
+): {
+  run: () => Promise<void>;
+  stop: () => Promise<void>;
+} {
+  let state: "sleeping" | "running" | "runningAndMarkedForRerun" | "stopped" =
+    "sleeping";
+  let timeout = setTimeout(() => {});
+  const scheduler = {
+    run: async () => {
+      switch (state) {
+        case "sleeping":
+          clearTimeout(timeout);
+          state = "running";
+          await job();
+          if (state === "running" || state === "runningAndMarkedForRerun") {
+            timeout = setTimeout(
+              () => {
+                scheduler.run();
+              },
+              (state as "running" | "runningAndMarkedForRerun") ===
+                "runningAndMarkedForRerun"
+                ? 0
+                : interval * (1 + 0.1 * Math.random()),
+            );
+            state = "sleeping";
+          }
+          break;
+        case "running":
+          state = "runningAndMarkedForRerun";
+          break;
+      }
+    },
+    stop: async () => {
+      clearTimeout(timeout);
+      state = "stopped";
+      await onStop();
+    },
+  };
+  scheduler.run();
+  return scheduler;
+}

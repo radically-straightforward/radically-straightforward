@@ -3,40 +3,6 @@ import assert from "node:assert/strict";
 import * as utilities from "@radically-straightforward/utilities";
 import { intern as $ } from "@radically-straightforward/utilities";
 
-test(
-  "backgroundJob()",
-  {
-    skip: process.stdin.isTTY
-      ? false
-      : "Run interactive test with ‘node ./build/index.test.mjs’.",
-  },
-  async () => {
-    for (let iteration = 0; iteration < 1000; iteration++) {
-      const backgroundJob = utilities.backgroundJob(
-        { interval: 3 * 1000 },
-        () => {},
-      );
-      backgroundJob.stop();
-      // If background jobs leak ‘process.once("gracefulTermination")’ event listeners, then we get a warning in the console.
-    }
-
-    const backgroundJob = utilities.backgroundJob(
-      { interval: 3 * 1000 },
-      async () => {
-        console.log("backgroundJob(): Running background job...");
-        await utilities.sleep(3 * 1000);
-        console.log("backgroundJob(): ...finished running background job.");
-      },
-    );
-    process.on("SIGTSTP", () => {
-      backgroundJob.run();
-    });
-    console.log(
-      "backgroundJob(): Press ⌃Z to force background job to run and ⌃C to gracefully terminate...",
-    );
-  },
-);
-
 test("sleep()", async () => {
   const before = Date.now();
   await utilities.sleep(1000);
@@ -155,20 +121,30 @@ test("intern()", () => {
     // @ts-expect-error
     $([1])[0] = 2;
   });
-
-  {
-    const iterations = 1000;
-    console.time("intern()");
-    const objects = [];
-    for (let iteration = 0; iteration < iterations; iteration++) {
-      const entries = [];
-      for (let key = 0; key < Math.floor(Math.random() * 15); key++) {
-        entries.push([String(key + Math.floor(Math.random() * 15)), true]);
-      }
-      objects.push($(Object.fromEntries(entries)));
-      objects.push($(entries.flat()));
-    }
-    // console.log($.pool.record.size);
-    console.timeEnd("intern()");
-  }
 });
+
+test(
+  "backgroundJob()",
+  {
+    skip: process.stdin.isTTY
+      ? false
+      : "Run interactive test with ‘node ./build/index.test.mjs’.",
+  },
+  async () => {
+    const backgroundJob = utilities.backgroundJob(
+      { interval: 3 * 1000 },
+      async () => {
+        console.log("backgroundJob(): Running background job...");
+        await utilities.sleep(3 * 1000);
+        console.log("backgroundJob(): ...finished running background job.");
+      },
+    );
+    process.on("SIGTSTP", () => {
+      backgroundJob.run();
+    });
+    process.on("SIGINT", () => {
+      backgroundJob.stop();
+    });
+    console.log("backgroundJob(): Press ⌃Z to ‘run()’ and ⌃C to ‘stop()’...");
+  },
+);
