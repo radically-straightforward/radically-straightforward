@@ -27,14 +27,11 @@ for (const signal of [
  * import timers from "node:timers/promises";
  * import * as node from "@radically-straightforward/node";
  *
- * node.backgroundJob(
- *   { interval: 3 * 1000 },
- *   async () => {
- *     console.log("backgroundJob(): Running background job...");
- *     await timers.setTimeout(3 * 1000);
- *     console.log("backgroundJob(): ...finished running background job.");
- *   },
- * );
+ * node.backgroundJob({ interval: 3 * 1000 }, async () => {
+ *   console.log("backgroundJob(): Running background job...");
+ *   await timers.setTimeout(3 * 1000);
+ *   console.log("backgroundJob(): ...finished running background job.");
+ * });
  * ```
  */
 export function backgroundJob(
