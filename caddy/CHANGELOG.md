@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.3.2 · 2024-04-09
+
+- Added `staticFiles`.
+
 ## 1.3.1 · 2024-03-31
 
 - Fixed the default value of `application()`’s `trustedStaticFilesRoots`.
