@@ -2,12 +2,13 @@ import path from "node:path";
 import url from "node:url";
 import fs from "node:fs/promises";
 
-if (url.fileURLToPath(import.meta.url).includes("/node_modules/"))
+const tsconfig = path.join(
+  url.fileURLToPath(import.meta.url).split("/node_modules/")[0],
+  "tsconfig.json",
+);
+if ((await fs.access(tsconfig).catch(() => false)) === false)
   await fs.writeFile(
-    path.join(
-      url.fileURLToPath(import.meta.url).split("/node_modules/")[0],
-      "tsconfig.json",
-    ),
+    tsconfig,
     `{
   "extends": "@radically-straightforward/typescript",
   "compilerOptions": {
