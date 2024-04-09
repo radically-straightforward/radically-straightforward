@@ -6,8 +6,8 @@ import fs from "node:fs/promises";
 import url from "node:url";
 import http from "node:http";
 import childProcess from "node:child_process";
+import timers from "node:timers/promises";
 import * as caddy from "@radically-straightforward/caddy";
-import * as utilities from "@radically-straightforward/utilities";
 
 test(
   {
@@ -85,7 +85,7 @@ test(
       }),
     );
 
-    await utilities.sleep(2 * 1000);
+    await timers.setTimeout(2 * 1000);
 
     {
       const response = await fetch("https://localhost/example.css");
@@ -193,7 +193,7 @@ test(
 
     dynamicServer.close();
 
-    await utilities.sleep(2 * 1000);
+    await timers.setTimeout(2 * 1000);
 
     {
       const response = await fetch("https://localhost/");
