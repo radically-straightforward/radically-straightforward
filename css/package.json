@@ -32,11 +32,11 @@
     "test": "npm run prepare && node --test && prettier --check \"./README.md\" --check \"./CHANGELOG.md\" --check \"./package.json\" --check \"./tsconfig.json\" --check \"./source/**/*.mts\" --check \"./static/**/*.css\""
   },
   "devDependencies": {
-    "@radically-straightforward/documentation": "^1.0.1",
+    "@radically-straightforward/documentation": "^1.0.4",
     "@radically-straightforward/typescript": "^1.0.0",
-    "@types/node": "^20.9.3",
-    "prettier": "^3.1.0",
-    "typescript": "^5.3.2"
+    "@types/node": "^20.12.6",
+    "prettier": "^3.2.5",
+    "typescript": "^5.4.4"
   },
   "prettier": {}
 }

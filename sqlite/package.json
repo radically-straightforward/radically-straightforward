@@ -30,14 +30,14 @@
   },
   "dependencies": {
     "@types/better-sqlite3": "^7.6.9",
-    "better-sqlite3": "^9.3.0"
+    "better-sqlite3": "^9.4.5"
   },
   "devDependencies": {
-    "@radically-straightforward/documentation": "^1.0.1",
+    "@radically-straightforward/documentation": "^1.0.4",
     "@radically-straightforward/typescript": "^1.0.0",
-    "@types/node": "^20.11.6",
-    "prettier": "^3.2.4",
-    "typescript": "^5.3.3"
+    "@types/node": "^20.12.6",
+    "prettier": "^3.2.5",
+    "typescript": "^5.4.4"
   },
   "prettier": {}
 }

@@ -28,8 +28,8 @@
     "test": "npm run prepare && node --test && prettier --check \"./README.md\" --check \"./CHANGELOG.md\" --check \"./package.json\" --check \"./tsconfig.json\" --check \"./source/**/*.mts\""
   },
   "dependencies": {
-    "@babel/core": "^7.24.0",
-    "@babel/generator": "^7.23.6",
+    "@babel/core": "^7.24.4",
+    "@babel/generator": "^7.24.4",
     "@radically-straightforward/css": "^1.0.0",
     "@radically-straightforward/javascript": "^0.0.1",
     "base-x": "^4.0.0",
@@ -42,8 +42,8 @@
     "@radically-straightforward/typescript": "^1.0.0",
     "@types/babel__core": "^7.20.5",
     "@types/babel__generator": "^7.6.8",
-    "@types/node": "^20.11.28",
-    "typescript": "^5.4.2"
+    "@types/node": "^20.12.6",
+    "typescript": "^5.4.4"
   },
   "prettier": {}
 }

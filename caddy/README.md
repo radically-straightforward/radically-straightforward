@@ -80,12 +80,7 @@ A [tagged template](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Refe
 export function application({
   address = "localhost",
   trustedStaticFilesRoots = [
-    `* "${url.fileURLToPath(
-      new URL(
-        "./build/static/",
-        import.meta.url.split("/node_modules/")[0] + "/",
-      ),
-    )}"`,
+    `* "${url.fileURLToPath(new URL("./build/static/", import.meta.url.split("/node_modules/")[0] + "/"))}"`,
   ],
   untrustedStaticFilesRoots = [
     `/files/* "${path.join(process.cwd(), "data")}"`,

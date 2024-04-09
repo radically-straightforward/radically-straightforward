@@ -27,15 +27,15 @@
     "test": "npm run prepare && node --test && prettier --check \"./README.md\" --check \"./CHANGELOG.md\" --check \"./package.json\" --check \"./tsconfig.json\" --check \"./source/**/*.mts\""
   },
   "dependencies": {
-    "archiver": "^6.0.1",
+    "archiver": "^7.0.1",
     "dedent": "^1.5.1"
   },
   "devDependencies": {
     "@radically-straightforward/typescript": "^1.0.0",
-    "@types/archiver": "^6.0.1",
-    "@types/node": "^20.9.2",
-    "prettier": "^3.1.0",
-    "typescript": "^5.2.2"
+    "@types/archiver": "^6.0.2",
+    "@types/node": "^20.12.6",
+    "prettier": "^3.2.5",
+    "typescript": "^5.4.4"
   },
   "prettier": {}
 }
