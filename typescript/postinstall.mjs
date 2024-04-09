@@ -9,7 +9,7 @@ if (url.fileURLToPath(import.meta.url).includes("/node_modules/"))
       "tsconfig.json",
     ),
     `{
-  "extends": "@radically-straightforward/tsconfig",
+  "extends": "@radically-straightforward/typescript",
   "compilerOptions": {
     "rootDir": "./source/",
     "outDir": "./build/"

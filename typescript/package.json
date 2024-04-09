@@ -1,6 +1,6 @@
 {
-  "name": "@radically-straightforward/tsconfig",
-  "version": "1.0.1",
+  "name": "@radically-straightforward/typescript",
+  "version": "1.0.0",
   "description": "✅ TypeScript configuration",
   "keywords": [
     "typescript",

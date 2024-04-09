@@ -1,9 +1,5 @@
 # Changelog
 
-## 1.0.1 · 2024-03-17
+## 1.0.0 · 2024-04-09
 
-- Added a `postinstall` script that installs `tsconfig.json`.
-
-## 1.0.0 · 2023-11-20
-
-- Initial release, importing from several other projects.
+- Renamed from `@radically-straightforward/tsconfig`.
