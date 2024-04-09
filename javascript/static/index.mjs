@@ -417,24 +417,22 @@ export function morph(from, to, event = undefined) {
   )
     return;
   if (typeof to === "string") to = stringToElement(to);
-  const fromChildNodes = from.childNodes;
-  const toChildNodes = to.childNodes;
   const getKey = (node) =>
     `${node.nodeType}--${
       node.nodeType === node.ELEMENT_NODE
         ? `${node.tagName}--${node.getAttribute("key")}`
         : node.nodeValue
     }`;
-  const fromKeys = [...fromChildNodes].map(getKey);
-  const toKeys = [...toChildNodes].map(getKey);
+  const fromKeys = [...from.childNodes].map(getKey);
+  const toKeys = [...to.childNodes].map(getKey);
   const diff = [
     [0, 0, 0, 0],
     ...fastMyersDiff.diff(fromKeys, toKeys),
     [
-      fromChildNodes.length,
-      fromChildNodes.length,
-      toChildNodes.length,
-      toChildNodes.length,
+      from.childNodes.length,
+      from.childNodes.length,
+      to.childNodes.length,
+      to.childNodes.length,
     ],
   ];
   const toRemove = [];
@@ -442,7 +440,7 @@ export function morph(from, to, event = undefined) {
   for (let diffIndex = 1; diffIndex < diff.length; diffIndex++) {
     const [fromStart, fromEnd, toStart, toEnd] = diff[diffIndex];
     for (let nodeIndex = fromStart; nodeIndex < fromEnd; nodeIndex++) {
-      const node = fromChildNodes[nodeIndex];
+      const node = from.childNodes[nodeIndex];
       const key = fromKeys[nodeIndex];
       if (
         event?.detail?.liveConnectionUpdate &&
@@ -466,19 +464,19 @@ export function morph(from, to, event = undefined) {
       nodeIndexOffset++
     )
       toMorph.push({
-        from: fromChildNodes[previousFromEnd + nodeIndexOffset],
-        to: toChildNodes[previousToEnd + nodeIndexOffset],
+        from: from.childNodes[previousFromEnd + nodeIndexOffset],
+        to: to.childNodes[previousToEnd + nodeIndexOffset],
       });
     if (toStart === toEnd) continue;
     const nodes = [];
     for (let nodeIndex = toStart; nodeIndex < toEnd; nodeIndex++) {
-      const toChildNode = toChildNodes[nodeIndex];
+      const toChildNode = to.childNodes[nodeIndex];
       let node = moveCandidates.get(toKeys[nodeIndex])?.shift();
       if (node === undefined) node = document.importNode(toChildNode, true);
       else toMorph.push({ from: node, to: toChildNode });
       nodes.push(node);
     }
-    toAdd.push({ nodes, nodeAfter: fromChildNodes[fromEnd] });
+    toAdd.push({ nodes, nodeAfter: from.childNodes[fromEnd] });
   }
   for (const node of toRemove) from.removeChild(node);
   for (const { nodeAfter, nodes } of toAdd)
@@ -531,7 +529,9 @@ export function setTippy({
   elementProperty = "tooltip",
   tippyProps: { content: tippyContent, ...tippyProps },
 }) {
-  element[elementProperty] ??= tippy(element, { content: stringToElement("") });
+  element[elementProperty] ??= tippy(element, {
+    content: document.createElement("div"),
+  });
   element[elementProperty].setProps(tippyProps);
   morph(element[elementProperty].props.content, tippyContent, event);
   execute({ event, element: element[elementProperty].props.content });
