@@ -6,19 +6,19 @@
   },
   "dependencies": {
     "@radically-straightforward/html": "^1.0.0",
-    "@radically-straightforward/utilities": "^1.1.1",
-    "nodemailer": "^6.9.9"
+    "@radically-straightforward/utilities": "^2.0.0",
+    "nodemailer": "^6.9.13"
   },
   "devDependencies": {
-    "@radically-straightforward/package": "^1.0.0",
-    "@radically-straightforward/tsconfig": "^1.0.0",
-    "@types/node": "^20.11.19",
+    "@radically-straightforward/package": "^2.0.0",
+    "@radically-straightforward/tsconfig": "^1.0.1",
+    "@types/node": "^20.12.6",
     "@types/nodemailer": "^6.4.14",
     "concurrently": "^8.2.2",
     "maildev": "^2.1.0",
-    "nodemon": "^3.0.3",
+    "nodemon": "^3.1.0",
     "prettier": "^3.2.5",
-    "typescript": "^5.3.3"
+    "typescript": "^5.4.4"
   },
   "prettier": {}
 }
