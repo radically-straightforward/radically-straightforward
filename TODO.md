@@ -1,6 +1,5 @@
 # TODO
 
-- In `@radically-straightforward/utilities`, extract a generic `backgroundJob()` that is independent of Node.js vs browser.
 - In `@radically-straightforward/node`, introduce a `backgroundJob()` that’s aware of process termination.
 - Update everywhere where `backgroundJob()` is used.
 - Modify `@radically-straightforward/javascript` accordingly.
