@@ -1,5 +1,6 @@
 import path from "node:path";
 import url from "node:url";
+import fs from "node:fs/promises";
 
 /**
  * A type alias to make your type annotations more specific.
@@ -181,3 +182,20 @@ export function application({
     }
   `;
 }
+
+/**
+ * A mapping from static file names to their hashed names, as produced by [`@radically-straightforward/build`](https://github.com/radically-straightforward/radically-straightforward/tree/main/build) and found in `./build/static.json`.
+ */
+export const staticPaths: { [key: string]: string } = JSON.parse(
+  await fs
+    .readFile(
+      path.join(
+        url
+          .fileURLToPath(new URL(".", import.meta.url))
+          .split("/node_modules/")[0],
+        "./build/static.json",
+      ),
+      "utf-8",
+    )
+    .catch(() => JSON.stringify({})),
+);
