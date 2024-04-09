@@ -1,7 +1,8 @@
 # TODO
 
-- In `@radically-straightforward/node`, introduce a `backgroundJob()` that’s aware of process termination.
 - Update everywhere where `backgroundJob()` is used.
+  - `@radically-straightforward/monitor`
+  - `@radically-straightforward/server`
 - Modify `@radically-straightforward/javascript` accordingly.
 - Rename `@radically-straightforward/tsconfig` into `@radically-straightforward/typescript`.
 
