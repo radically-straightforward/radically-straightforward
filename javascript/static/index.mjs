@@ -1,6 +1,6 @@
 import * as utilities from "@radically-straightforward/utilities";
-// import fastMyersDiff from "fast-myers-diff";
 import tippy, * as tippyStatic from "tippy.js";
+// import fastMyersDiff from "fast-myers-diff";
 
 // TODO: Do we want a method to combine `validate()`, `serialize()`, and a `fetch()` to submit the form?
 
@@ -786,7 +786,7 @@ document.addEventListener("submit", () => {
 //     );
 
 /**
- * Given an `element` with the `datetime` attribute, `relativizeDateTimeElement()` keeps it updated with a relative datetime. See `relativizeDateTime()`, which provides the relative datetime, and `elementBackgroundJob()`, which provides the background job management.
+ * Given an `element` with the `datetime` attribute, `relativizeDateTimeElement()` keeps it updated with a relative datetime. See `relativizeDateTime()`, which provides the relative datetime, and `backgroundJob()`, which provides the background job management.
  *
  * **Example**
  *
@@ -816,9 +816,9 @@ export function relativizeDateTimeElement(
       )})`,
     },
   });
-  elementBackgroundJob(
+  backgroundJob(
     element,
-    "relativizeDateTimeElementBackgroundJob",
+    "relativizeDateTimeBackgroundJob",
     { interval: 10 * 1000 },
     () => {
       element.textContent = relativizeDateTime(
@@ -911,25 +911,33 @@ export function stringToElement(string) {
 }
 
 /**
- * Similar to [`@radically-straightforward/utilities`’s](https://github.com/radically-straightforward/radically-straightforward/tree/main/utilities) `backgroundJob()`, but with the following differences:
+ * This is an extension of [`@radically-straightforward/utilities`](https://github.com/radically-straightforward/radically-straightforward/tree/main/utilities)’s `backgroundJob()` with the following additions:
  *
- * 1. If called multiple times, `elementBackgroundJob()` `stop()`s the previous background job so that at most one background job is active at any given time.
+ * 1. If called multiple times, this version of `backgroundJob()` `stop()`s the previous background job so that at most one background job is active at any given time.
  *
  * 2. When the `element` is detached from the document, the background job is `stop()`ped. See `isAttached()`.
  *
- * The background job object returned by `@radically-straightforward/utilities`’s `backgroundJob()` is available at `element[name]`.
+ * The background job object which offers the `run()` and `stop()` methods is available at `element[name]`.
  *
- * See, for example, `relativizeDateTimeElement()`, which uses `elementBackgroundJob()` to periodically update a relative datetime, for example, “2 hours ago”.
+ * See, for example, `relativizeDateTimeElement()`, which uses `backgroundJob()` to periodically update a relative datetime, for example, “2 hours ago”.
  */
-export function elementBackgroundJob(element, elementProperty, options, job) {
+export function backgroundJob(
+  element,
+  elementProperty,
+  utilitiesBackgroundJobOptions,
+  job,
+) {
   element[elementProperty]?.stop();
-  element[elementProperty] = utilities.backgroundJob(options, async () => {
-    if (!isAttached(element)) {
-      element[elementProperty].stop();
-      return;
-    }
-    await job();
-  });
+  element[elementProperty] = utilities.backgroundJob(
+    utilitiesBackgroundJobOptions,
+    async () => {
+      if (!isAttached(element)) {
+        element[elementProperty].stop();
+        return;
+      }
+      await job();
+    },
+  );
 }
 
 /**
@@ -939,7 +947,7 @@ export function elementBackgroundJob(element, elementProperty, options, job) {
  *
  * 2. You may force an element to be attached by setting `element.isAttached = true` on the `element` itself or on one of its parents.
  *
- * See, for example, `elementBackgroundJob()`, which uses `isAttached()`.
+ * See, for example, `backgroundJob()`, which uses `isAttached()`.
  */
 export function isAttached(element) {
   return parents(element).some(
