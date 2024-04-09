@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.1.0 · 2024-04-09
+
+- Added `backgroundJob()`.
+
 ## 3.0.0 · 2024-02-21
 
 - Replaced `shouldTerminate()` with the `process.once("gracefulTermination")` event.
