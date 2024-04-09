@@ -1,8 +1,7 @@
 # TODO
 
 - `caddy.staticPaths`
-  - Test 
-  - Document in `caddy` and `build`
+  - Release new version
 
 ---
 

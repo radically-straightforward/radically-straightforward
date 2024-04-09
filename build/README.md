@@ -25,10 +25,6 @@ import * as caddy from "@radically-straightforward/caddy";
 
 const application = server();
 
-const staticPaths = JSON.parse(
-  await fs.readFile(new URL("./static.json", import.meta.url), "utf-8"),
-);
-
 css`
   /* Global CSS, including ‘@font-face’s, typography, ‘.classes’, and so forth. */
 
@@ -55,8 +51,8 @@ application.push({
       <!doctype html>
       <html>
         <head>
-          <link rel="stylesheet" href="/${staticPaths["index.css"]}" />
-          <script src="/${staticPaths["index.mjs"]}"></script>
+          <link rel="stylesheet" href="/${caddy.staticFiles["index.css"]}" />
+          <script src="/${caddy.staticFiles["index.mjs"]}"></script>
         </head>
         <body>
           <h1
@@ -97,14 +93,14 @@ $ npx build
 
 > **Parameters**
 >
-> - **`--file-to-copy-with-hash`:** [Globs](https://www.npmjs.com/package/globby) of files to be copied into `build/static/`, for example, images, videos, and audios. The file names are appended with a hash of their contents to generate immutable names, for example, `image.jpg` may turn into `image--JF98DJ2LL.jpg`. Consult `build/static.json` for a mapping between the names. The `--file-to-copy-with-hash` parameter may be provided multiple times for multiple globs.
+> - **`--file-to-copy-with-hash`:** [Globs](https://www.npmjs.com/package/globby) of files to be copied into `build/static/`, for example, images, videos, and audios. The file names are appended with a hash of their contents to generate immutable names, for example, `image.jpg` may turn into `image--JF98DJ2LL.jpg`. Consult `build/static.json` for a mapping between the names (or use [`@radically-straightforward/caddy`](https://github.com/radically-straightforward/radically-straightforward/tree/main/caddy)’s `staticFiles`, which reads from `build/static.json`). The `--file-to-copy-with-hash` parameter may be provided multiple times for multiple globs.
 > - **`--file-to-copy-without-hash`:** The same as `--file-to-copy-with-hash`, but the names of the files are preserved. This is useful for `favicon.ico` and other files which must have particular names.
 
 `@radically-straightforward/build` does the following:
 
 - Overwrites the files at `build/**/*.mjs` (and their corresponding source maps) to extract the tagged templates with CSS and browser JavaScript.
 
-- Uses [esbuild](https://esbuild.github.io/) to create a bundle of CSS and browser JavaScript. The result can be found in the `build/static/` directory. The file names contain hashes of their contents to make them immutable, and you may consult `build/static.json` for a mapping between the names—the entrypoint of the CSS is at `index.css` and the entrypoint of the browser JavaScript is at `index.mjs`.
+- Uses [esbuild](https://esbuild.github.io/) to create a bundle of CSS and browser JavaScript. The result can be found in the `build/static/` directory. The file names contain hashes of their contents to make them immutable, and you may consult `build/static.json` for a mapping between the names (or use [`@radically-straightforward/caddy`](https://github.com/radically-straightforward/radically-straightforward/tree/main/caddy)’s `staticFiles`, which reads from `build/static.json`). The entrypoint of the CSS is at `index.css` and the entrypoint of the browser JavaScript is at `index.mjs`.
 
   > **Note:** The bundling process includes transpiling features such as [CSS nesting](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_nesting), including CSS prefixes, minifying, and so forth.
 
