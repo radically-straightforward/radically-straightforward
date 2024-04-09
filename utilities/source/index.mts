@@ -309,7 +309,7 @@ export function backgroundJob(
   let state: "sleeping" | "running" | "runningAndMarkedForRerun" | "stopped" =
     "sleeping";
   let timeout = setTimeout(() => {});
-  const scheduler = {
+  const backgroundJob = {
     run: async () => {
       switch (state) {
         case "sleeping":
@@ -319,7 +319,7 @@ export function backgroundJob(
           if (state === "running" || state === "runningAndMarkedForRerun") {
             timeout = setTimeout(
               () => {
-                scheduler.run();
+                backgroundJob.run();
               },
               (state as "running" | "runningAndMarkedForRerun") ===
                 "runningAndMarkedForRerun"
@@ -340,6 +340,6 @@ export function backgroundJob(
       await onStop();
     },
   };
-  scheduler.run();
-  return scheduler;
+  backgroundJob.run();
+  return backgroundJob;
 }
