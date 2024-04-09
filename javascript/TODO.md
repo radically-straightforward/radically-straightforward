@@ -4,6 +4,14 @@
 
 ---
 
+```typescript
+css`
+  @import "@radically-straightforward/javascript/static/index.css";
+`;
+```
+
+---
+
 - Live Connection
   - Detect that you’re offline.
   - Detect a server version update. (Trigger a reload in that case)

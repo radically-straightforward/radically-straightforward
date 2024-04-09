@@ -26,6 +26,7 @@
   },
   "exports": {
     ".": "./build/index.mjs",
+    "./static/index.css": "./static/index.css",
     "./static/index.mjs": "./static/index.mjs"
   },
   "types": "./build/index.d.mts",
