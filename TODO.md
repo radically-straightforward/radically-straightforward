@@ -1,9 +1,5 @@
 # TODO
 
-- Fix CI error.
-
----
-
 `@radically-straightforward/utilities`’s `intern` performance benchmark:
 
 ```typescript
