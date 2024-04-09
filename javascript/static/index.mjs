@@ -679,11 +679,7 @@ export class ValidationError extends Error {}
  *
  * ```javascript
  * html`
- *   <input
- *     type="hidden"
- *     name="datetime"
- *     value="${new Date().toISOString()}"
- *   />
+ *   <input type="hidden" name="datetime" value="${new Date().toISOString()}" />
  *   <input
  *     type="text"
  *     required

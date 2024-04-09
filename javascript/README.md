@@ -116,11 +116,7 @@ Validate a form field that used `localizeDateTime()`. The error is reported on t
 
 ```javascript
 html`
-  <input
-    type="hidden"
-    name="datetime"
-    value="${new Date().toISOString()}"
-  />
+  <input type="hidden" name="datetime" value="${new Date().toISOString()}" />
   <input
     type="text"
     required
