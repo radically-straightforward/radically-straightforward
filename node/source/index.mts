@@ -19,26 +19,21 @@ for (const signal of [
   });
 
 /**
- * 5. In Node.js the background job is stopped on [`"gracefulTermination"`](https://github.com/radically-straightforward/radically-straightforward/tree/main/node#graceful-termination).
+ * This is an extension of [`@radically-straightforward/utilities`](https://github.com/radically-straightforward/radically-straightforward/tree/main/utilities)’s `backgroundJob()` which adds support for graceful termination.
  *
- *  * **Example**
+ * **Example**
  *
  * ```javascript
- * import * as utilities from "@radically-straightforward/utilities";
+ * import timers from "node:timers/promises";
+ * import * as node from "@radically-straightforward/node";
  *
- * const backgroundJob = utilities.backgroundJob(
+ * node.backgroundJob(
  *   { interval: 3 * 1000 },
  *   async () => {
  *     console.log("backgroundJob(): Running background job...");
- *     await utilities.sleep(3 * 1000);
+ *     await timers.setTimeout(3 * 1000);
  *     console.log("backgroundJob(): ...finished running background job.");
  *   },
- * );
- * process.on("SIGTSTP", () => {
- *   backgroundJob.run();
- * });
- * console.log(
- *   "backgroundJob(): Press ⌃Z to force background job to run and ⌃C to continue...",
  * );
  * ```
  */

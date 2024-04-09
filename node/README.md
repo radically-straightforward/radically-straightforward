@@ -11,7 +11,7 @@ $ npm install @radically-straightforward/node
 ## Usage
 
 ```typescript
-import "@radically-straightforward/node";
+import * as node from "@radically-straightforward/node";
 ```
 
 ### Graceful Termination
@@ -70,3 +70,37 @@ process.once("beforeExit", () => {
   console.log("gracefulTermination: Succeeded.");
 });
 ```
+
+<!-- DOCUMENTATION START: ./source/index.mts -->
+
+### `backgroundJob()`
+
+```typescript
+export function backgroundJob(
+  {
+    onStop,
+    ...utilitiesBackgroundJobOptions
+  }: Parameters<typeof utilities.backgroundJob>[0],
+  job: Parameters<typeof utilities.backgroundJob>[1],
+): ReturnType<typeof utilities.backgroundJob>;
+```
+
+This is an extension of [`@radically-straightforward/utilities`](https://github.com/radically-straightforward/radically-straightforward/tree/main/utilities)’s `backgroundJob()` which adds support for graceful termination.
+
+**Example**
+
+```javascript
+import timers from "node:timers/promises";
+import * as node from "@radically-straightforward/node";
+
+node.backgroundJob(
+  { interval: 3 * 1000 },
+  async () => {
+    console.log("backgroundJob(): Running background job...");
+    await timers.setTimeout(3 * 1000);
+    console.log("backgroundJob(): ...finished running background job.");
+  },
+);
+```
+
+<!-- DOCUMENTATION END: ./source/index.mts -->
