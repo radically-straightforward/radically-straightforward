@@ -440,16 +440,17 @@ export function morph(from, to, event = undefined) {
   for (let diffIndex = 1; diffIndex < diff.length; diffIndex++) {
     const [fromStart, fromEnd, toStart, toEnd] = diff[diffIndex];
     for (let nodeIndex = fromStart; nodeIndex < fromEnd; nodeIndex++) {
-      const node = from.childNodes[nodeIndex];
-      const key = fromKeys[nodeIndex];
       if (
         event?.detail?.liveConnectionUpdate &&
-        (node.onbeforeremove?.(event) === false ||
-          node.matches?.("[data-tippy-root]"))
+        (from.childNodes[nodeIndex].onbeforeremove?.(event) === false ||
+          from.childNodes[nodeIndex].matches?.("[data-tippy-root]"))
       )
         continue;
-      toRemove.push(node);
-      moveCandidates.get(key)?.push(node) ?? moveCandidates.set(key, [node]);
+      toRemove.push(from.childNodes[nodeIndex]);
+      moveCandidates
+        .get(fromKeys[nodeIndex])
+        ?.push(from.childNodes[nodeIndex]) ??
+        moveCandidates.set(fromKeys[nodeIndex], [from.childNodes[nodeIndex]]);
     }
   }
   const toAdd = [];
