@@ -214,21 +214,26 @@ export function stringToElement(string);
 
 Convert a string into a DOM element. The string may have multiple siblings without a common parent, so `stringToElement()` returns a `<div>` containing the elements.
 
-### `elementBackgroundJob()`
+### `backgroundJob()`
 
 ```typescript
-export function elementBackgroundJob(element, elementProperty, options, job);
+export function backgroundJob(
+  element,
+  elementProperty,
+  utilitiesBackgroundJobOptions,
+  job,
+);
 ```
 
-Similar to [`@radically-straightforward/utilities`’s](https://github.com/radically-straightforward/radically-straightforward/tree/main/utilities) `backgroundJob()`, but with the following differences:
+This is an extension of [`@radically-straightforward/utilities`](https://github.com/radically-straightforward/radically-straightforward/tree/main/utilities)’s `backgroundJob()` with the following additions:
 
-1. If called multiple times, `elementBackgroundJob()` `stop()`s the previous background job so that at most one background job is active at any given time.
+1. If called multiple times, this version of `backgroundJob()` `stop()`s the previous background job so that at most one background job is active at any given time.
 
 2. When the `element` is detached from the document, the background job is `stop()`ped. See `isAttached()`.
 
-The background job object returned by `@radically-straightforward/utilities`’s `backgroundJob()` is available at `element[name]`.
+The background job object which offers the `run()` and `stop()` methods is available at `element[name]`.
 
-See, for example, `relativizeDateTimeElement()`, which uses `elementBackgroundJob()` to periodically update a relative datetime, for example, “2 hours ago”.
+See, for example, `relativizeDateTimeElement()`, which uses `backgroundJob()` to periodically update a relative datetime, for example, “2 hours ago”.
 
 ### `isAttached()`
 
@@ -242,7 +247,7 @@ Check whether the `element` is attached to the document. This is different from 
 
 2. You may force an element to be attached by setting `element.isAttached = true` on the `element` itself or on one of its parents.
 
-See, for example, `elementBackgroundJob()`, which uses `isAttached()`.
+See, for example, `backgroundJob()`, which uses `isAttached()`.
 
 ### `parents()`
 

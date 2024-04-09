@@ -1,6 +1,5 @@
 # TODO
 
-- Modify `@radically-straightforward/javascript` accordingly.
 - Rename `@radically-straightforward/tsconfig` into `@radically-straightforward/typescript`.
 
 ---
