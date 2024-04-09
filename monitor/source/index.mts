@@ -1,5 +1,6 @@
 import url from "node:url";
 import nodemailer from "nodemailer";
+import * as node from "@radically-straightforward/node";
 import * as utilities from "@radically-straightforward/utilities";
 import html from "@radically-straightforward/html";
 
@@ -22,7 +23,7 @@ process.once("beforeExit", () => {
 });
 
 const alerts = new Set<(typeof configuration)["resources"][number]>();
-utilities.backgroundJob({ interval: 5 * 60 * 1000 }, async () => {
+node.backgroundJob({ interval: 5 * 60 * 1000 }, async () => {
   for (const resource of configuration.resources) {
     log("START");
 
