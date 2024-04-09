@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.1.1 · 2024-04-09
+
+- Updated dependencies.
+
 ## 2.1.0 · 2024-03-02
 
 - Send an alert when the resource is back online.
