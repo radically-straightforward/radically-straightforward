@@ -447,10 +447,9 @@ export function morph(from, to, event = undefined) {
       )
         continue;
       toRemove.push(from.childNodes[nodeIndex]);
-      moveCandidates
-        .get(fromKeys[nodeIndex])
-        ?.push(from.childNodes[nodeIndex]) ??
-        moveCandidates.set(fromKeys[nodeIndex], [from.childNodes[nodeIndex]]);
+      if (!moveCandidates.has(fromKeys[nodeIndex]))
+        moveCandidates.set(fromKeys[nodeIndex], []);
+      moveCandidates.get(fromKeys[nodeIndex]).push(from.childNodes[nodeIndex]);
     }
   }
   const toAdd = [];
