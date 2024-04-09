@@ -487,31 +487,29 @@ export function morph(from, to, event = undefined) {
     else for (const node of nodes) from.appendChild(node);
   for (const { from, to } of toMorph) {
     if (from.nodeType !== from.ELEMENT_NODE) continue;
-    const isInput = ["input", "textarea"].includes(from.tagName.toLowerCase());
-    const inputAttributes = ["value", "checked"];
     for (const attribute of new Set([
       ...from.getAttributeNames(),
       ...to.getAttributeNames(),
-      ...(isInput ? inputAttributes : []),
+      ...(from.matches("input, textarea") ? ["value", "checked"] : []),
     ])) {
       if (
         event?.detail?.liveConnectionUpdate &&
-        ["style", "hidden", "disabled", ...inputAttributes].includes(
-          attribute,
-        ) &&
+        (attribute === "style" ||
+          attribute === "hidden" ||
+          attribute === "disabled" ||
+          attribute === "value" ||
+          attribute === "checked") &&
         parents(from).every(
           (element) =>
             element.onbeforemorphattribute?.(event, attribute) !== true,
         )
       )
         continue;
-      const fromAttribute = from.getAttribute(attribute);
-      const toAttribute = to.getAttribute(attribute);
-      if (toAttribute === null) from.removeAttribute(attribute);
-      else if (fromAttribute !== toAttribute)
-        from.setAttribute(attribute, toAttribute);
+      if (to.getAttribute(attribute) === null) from.removeAttribute(attribute);
+      else if (from.getAttribute(attribute) !== to.getAttribute(attribute))
+        from.setAttribute(attribute, to.getAttribute(attribute));
       if (
-        inputAttributes.includes(attribute) &&
+        (attribute === "value" || attribute === "checked") &&
         from[attribute] !== to[attribute]
       )
         from[attribute] = to[attribute];
