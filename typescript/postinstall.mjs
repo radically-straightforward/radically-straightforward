@@ -3,7 +3,7 @@ import url from "node:url";
 import fs from "node:fs/promises";
 
 const tsconfig = path.join(
-  url.fileURLToPath(import.meta.url).split("/node_modules/")[0],
+  url.fileURLToPath(new URL(".", import.meta.url)).split("/node_modules/")[0],
   "tsconfig.json",
 );
 if ((await fs.access(tsconfig).catch(() => false)) === false)
