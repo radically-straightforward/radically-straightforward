@@ -437,8 +437,7 @@ export function morph(from, to, event = undefined) {
   ];
   const toRemove = [];
   const moveCandidates = new Map();
-  for (let diffIndex = 1; diffIndex < diff.length; diffIndex++) {
-    const [fromStart, fromEnd, toStart, toEnd] = diff[diffIndex];
+  for (const [fromStart, fromEnd, toStart, toEnd] of diff)
     for (let nodeIndex = fromStart; nodeIndex < fromEnd; nodeIndex++) {
       if (
         event?.detail?.liveConnectionUpdate &&
@@ -451,7 +450,6 @@ export function morph(from, to, event = undefined) {
         moveCandidates.set(fromKeys[nodeIndex], []);
       moveCandidates.get(fromKeys[nodeIndex]).push(from.childNodes[nodeIndex]);
     }
-  }
   const toMorph = [];
   const toAdd = [];
   for (let diffIndex = 1; diffIndex < diff.length; diffIndex++) {
