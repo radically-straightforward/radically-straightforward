@@ -194,6 +194,8 @@ import tippy, * as tippyStatic from "tippy.js";
 //   };
 // }
 
+// TODO: Test `execute()` within a tippy.
+
 /**
  * Execute the functions defined by the `javascript="___"` attribute, which is set by [`@radically-straightforward/build`](https://github.com/radically-straightforward/radically-straightforward/tree/main/build) when extracting browser JavaScript. You must call this when you insert new elements in the DOM, for example, when loading a partial.
  */
@@ -407,6 +409,7 @@ execute.functions = new Map();
 //   parentElement.isAttached = false;
 // }
 
+// TODO: Test `morph()` within a tippy.
 // export function morph(from, to, event = undefined) {
 //   if (typeof to === "string") to = stringToElement(to);
 
@@ -545,8 +548,13 @@ function morph(element, content, event) {
   element.innerHTML = content;
 }
 
-// TODO: Test `relativizeDateTimeElement()`’s use of `setTippy()`.
-// TODO: Test `validate()`’s use of `setTippy()`.
+/**
+ * Create a Tippy.js tippy. This is different from calling Tippy’s constructor in the following ways:
+ *
+ * 1. If called multiple times on the same `element` with the same `elementProperty`, then `setTippy()` doesn’t create new tippys, but `morph()`s the tippy contents.
+ *
+ * 2. `setTippy()` `execute()`s the contents of the tippy.
+ */
 export function setTippy({
   event = undefined,
   element,
@@ -555,9 +563,8 @@ export function setTippy({
 }) {
   element[elementProperty] ??= tippy(element, { content: stringToElement("") });
   element[elementProperty].setProps(tippyProps);
-  const tippyContentElement = element[elementProperty].props.content;
-  morph(tippyContentElement, tippyContent, event);
-  execute({ event, element: tippyContentElement });
+  morph(element[elementProperty].props.content, tippyContent, event);
+  execute({ event, element: element[elementProperty].props.content });
   return element[elementProperty];
 }
 tippy.setDefaultProps({
