@@ -1,7 +1,6 @@
 # TODO
 
 - Update everywhere where `backgroundJob()` is used.
-  - `@radically-straightforward/monitor`
   - `@radically-straightforward/server`
 - Modify `@radically-straightforward/javascript` accordingly.
 - Rename `@radically-straightforward/tsconfig` into `@radically-straightforward/typescript`.
