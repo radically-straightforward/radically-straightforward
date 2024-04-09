@@ -23,8 +23,6 @@
     "access": "public"
   },
   "bin": "./build/index.mjs",
-  "exports": "./build/static-paths.mjs",
-  "types": "./build/static-paths.d.mts",
   "scripts": {
     "prepare": "tsc",
     "test": "npm run prepare && node --test && prettier --check \"./README.md\" --check \"./CHANGELOG.md\" --check \"./package.json\" --check \"./tsconfig.json\" --check \"./source/**/*.mts\""
