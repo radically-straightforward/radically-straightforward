@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.1 · 2024-04-09
+
+- Update dependencies.
+
 ## 1.0.0 · 2024-03-17
 
 - Initial release with initial features:
