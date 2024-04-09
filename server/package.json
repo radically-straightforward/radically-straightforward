@@ -33,7 +33,7 @@
   },
   "devDependencies": {
     "@radically-straightforward/documentation": "^1.0.4",
-    "@radically-straightforward/tsconfig": "^1.0.1",
+    "@radically-straightforward/typescript": "^1.0.0",
     "@types/busboy": "^1.5.3",
     "@types/node": "^20.12.6",
     "prettier": "^3.2.5",

@@ -39,7 +39,7 @@
     "xxhash-addon": "^2.0.3"
   },
   "devDependencies": {
-    "@radically-straightforward/tsconfig": "^1.0.1",
+    "@radically-straightforward/typescript": "^1.0.0",
     "@types/babel__core": "^7.20.5",
     "@types/babel__generator": "^7.6.8",
     "@types/node": "^20.11.28",

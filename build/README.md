@@ -83,7 +83,7 @@ const caddyServer = childProcess.spawn(
 caddyServer.stdin.end(caddy.application());
 ```
 
-Use [`@radically-straightforward/tsconfig`](https://github.com/radically-straightforward/radically-straightforward/tree/main/tsconfig) and compile with TypeScript, which generates JavaScript files in the `build/` directory.
+Use [`@radically-straightforward/typescript`](https://github.com/radically-straightforward/radically-straightforward/tree/main/typescript) and compile with TypeScript, which generates JavaScript files in the `build/` directory.
 
 > **Note:** You may use other build processes, as long as they generate files at `build/**/*.mjs`.
 

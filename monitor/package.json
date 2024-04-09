@@ -12,7 +12,7 @@
   },
   "devDependencies": {
     "@radically-straightforward/package": "^2.0.0",
-    "@radically-straightforward/tsconfig": "^1.0.1",
+    "@radically-straightforward/typescript": "^1.0.0",
     "@types/node": "^20.12.6",
     "@types/nodemailer": "^6.4.14",
     "concurrently": "^8.2.2",
