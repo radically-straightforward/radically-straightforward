@@ -1,7 +1,6 @@
 # TODO
 
-- `caddy.staticPaths`
-  - Release new version
+- Deploy new version of `monitor`
 
 ---
 
