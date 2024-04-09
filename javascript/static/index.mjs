@@ -4,15 +4,12 @@ import tippy, * as tippyStatic from "tippy.js";
 
 // TODO: Do we want a method to combine `validate()`, `serialize()`, and a `fetch()` to submit the form?
 
-// export function tippySetDefaultProps(extraProps = {}) {
-//   tippy.setDefaultProps({
-//     arrow: tippyStatic.roundArrow + tippyStatic.roundArrow,
-//     duration: window.matchMedia("(prefers-reduced-motion: reduce)").matches
-//       ? 1
-//       : 150,
-//     ...extraProps,
-//   });
-// }
+tippy.setDefaultProps({
+  arrow: tippyStatic.roundArrow + tippyStatic.roundArrow,
+  duration: window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    ? 1
+    : 150,
+});
 
 // export function liveNavigation() {
 //   let abortController;
