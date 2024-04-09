@@ -439,7 +439,7 @@ export function morph(from, to, event = undefined) {
     from: { start: fromStart, end: fromEnd },
     to: { start: toStart, end: toEnd },
   }));
-  const toRemove = [];
+  const toRemove = new Set();
   const moveCandidates = new Map();
   for (const diffEntry of diff)
     for (const fromChildNode of fromChildNodes.slice(
@@ -452,7 +452,7 @@ export function morph(from, to, event = undefined) {
           fromChildNode.node.matches?.("[data-tippy-root]"))
       )
         continue;
-      toRemove.push(fromChildNode.node);
+      toRemove.add(fromChildNode.node);
       if (!moveCandidates.has(fromChildNode.key))
         moveCandidates.set(fromChildNode.key, []);
       moveCandidates.get(fromChildNode.key).push(fromChildNode.node);
