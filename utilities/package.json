@@ -27,9 +27,6 @@
     "prepare": "tsc && documentation",
     "test": "npm run prepare && node --test && prettier --check \"./README.md\" --check \"./CHANGELOG.md\" --check \"./package.json\" --check \"./tsconfig.json\" --check \"./source/**/*.mts\""
   },
-  "dependencies": {
-    "@radically-straightforward/node": "^3.0.0"
-  },
   "devDependencies": {
     "@radically-straightforward/documentation": "^1.0.1",
     "@radically-straightforward/tsconfig": "^1.0.0",
