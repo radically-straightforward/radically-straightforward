@@ -411,12 +411,12 @@ execute.functions = new Map();
 
 // TODO: Test `morph()` within a tippy.
 export function morph(from, to, event = undefined) {
-  if (typeof to === "string") to = stringToElement(to);
   if (
     from.onbeforemorph?.(event) === false ||
     (event?.detail?.liveConnectionUpdate && from.partialParentElement === true)
   )
     return;
+  if (typeof to === "string") to = stringToElement(to);
   const fromChildNodes = from.childNodes;
   const toChildNodes = to.childNodes;
   const getKey = (node) =>
