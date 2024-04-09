@@ -6,9 +6,10 @@ import * as node from "@radically-straightforward/node";
 test(
   "gracefulTermination",
   {
-    skip: process.stdin.isTTY
-      ? false
-      : "Run interactive test with ‘node ./build/index.test.mjs’.",
+    skip:
+      process.stdin.isTTY && process.argv[2] === "gracefulTermination"
+        ? false
+        : `Run interactive test with ‘node ./build/index.test.mjs "gracefulTermination"’.`,
   },
   async () => {
     const server = http
@@ -20,7 +21,6 @@ test(
       // If you comment the line below the application remains running for 10 seconds and then it is forcefully terminated.
       server.close();
     });
-
     console.log("gracefulTermination: Press ⌃C to gracefully terminate...");
     process.once("gracefulTermination", () => {
       console.log("gracefulTermination: Starting graceful termination...");
@@ -34,9 +34,10 @@ test(
 test(
   "backgroundJob()",
   {
-    skip: process.stdin.isTTY
-      ? false
-      : "Run interactive test with ‘node ./build/index.test.mjs’.",
+    skip:
+      process.stdin.isTTY && process.argv[2] === "backgroundJob()"
+        ? false
+        : `Run interactive test with ‘node ./build/index.test.mjs "backgroundJob()"’.`,
   },
   async () => {
     for (let iteration = 0; iteration < 1000; iteration++) {
@@ -59,8 +60,6 @@ test(
     process.on("SIGTSTP", () => {
       backgroundJob.run();
     });
-    console.log(
-      "backgroundJob(): Press ⌃Z to force background job to run and ⌃C to gracefully terminate...",
-    );
+    console.log("backgroundJob(): Press ⌃Z to ‘run()’ and ⌃C to ‘stop()’...");
   },
 );
