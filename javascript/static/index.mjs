@@ -400,7 +400,7 @@ execute.functions = new Map();
 // export function loadPartial(parentElement, partialString) {
 //   morph(parentElement, partialString);
 
-//   parentElement.partialParentElement = true; // TODO: Change this into parentElement.liveConnectionUpdate = false;
+//   parentElement.liveConnectionUpdate = false;
 //   parentElement.isAttached = true;
 //   execute({ element: parentElement });
 //   const parentElementTippy = parentElement.closest("[data-tippy-root]")?._tippy;
@@ -444,79 +444,67 @@ export function morph(from, to, event = undefined) {
   )
     return;
   if (typeof to === "string") to = stringToElement(to);
-  const key = (node) => ({
-    node,
-    key: `${node.nodeType}--${
+  const key = (node) =>
+    `${node.nodeType}--${
       node.nodeType === node.ELEMENT_NODE
         ? `${node.tagName}--${node.getAttribute("key")}`
         : node.nodeValue
-    }`,
-  });
-  const fromChildNodes = [...from.childNodes].map(key);
-  const toChildNodes = [...to.childNodes].map(key);
+    }`;
+  const fromChildNodesKeys = [...from.childNodes].map(key);
+  const toChildNodesKeys = [...to.childNodes].map(key);
   const diff = [
     [0, 0, 0, 0],
-    ...fastMyersDiff.diff(
-      fromChildNodes.map(({ key }) => key),
-      toChildNodes.map(({ key }) => key),
-    ),
+    ...fastMyersDiff.diff(fromChildNodesKeys, toChildNodesKeys),
     [
-      fromChildNodes.length,
-      fromChildNodes.length,
-      toChildNodes.length,
-      toChildNodes.length,
+      from.childNodes.length,
+      from.childNodes.length,
+      to.childNodes.length,
+      to.childNodes.length,
     ],
-  ].map(([fromStart, fromEnd, toStart, toEnd]) => ({
-    from: { start: fromStart, end: fromEnd },
-    to: { start: toStart, end: toEnd },
-  }));
-  const toRemove = new Set();
-  for (const diffEntry of diff)
-    for (const fromChildNode of fromChildNodes.slice(
-      diffEntry.from.start,
-      diffEntry.from.end,
-    ))
+  ];
+  const toRemove = new Map();
+  for (let diffIndex = 1; diffIndex < diff.length - 1; diffIndex++) {
+    const [fromStart, fromEnd, toStart, toEnd] = diff[diffIndex];
+    for (let nodeIndex = fromStart; nodeIndex < fromEnd; nodeIndex++) {
+      const node = from.childNodes[nodeIndex];
+      const key = fromChildNodesKeys[nodeIndex];
       if (
-        fromChildNode.node.onmorphremove?.(event) !== false &&
-        !(
-          event?.detail?.liveConnectionUpdate &&
-          fromChildNode.node.matches?.("[data-tippy-root]")
-        )
+        event?.detail?.liveConnectionUpdate &&
+        (node.liveConnectionUpdate === false ||
+          node.matches?.("[data-tippy-root]"))
       )
-        toRemove.add(fromChildNode);
+        continue;
+      toRemove.get(key)?.push(node) ?? toRemove.set(key, [node]);
+    }
+  }
   const toAdd = new Set();
   const toMorph = new Set();
   for (let diffIndex = 1; diffIndex < diff.length; diffIndex++) {
-    const previousDiffEntry = diff[diffIndex - 1];
-    const diffEntry = diff[diffIndex];
+    const [previousFromStart, previousFromEnd, previousToStart, previousToEnd] =
+      diff[diffIndex - 1];
+    const [fromStart, fromEnd, toStart, toEnd] = diff[diffIndex];
     for (
       let nodeIndexOffset = 0;
-      nodeIndexOffset < diffEntry.from.start - previousDiffEntry.from.end;
+      nodeIndexOffset < fromStart - previousFromEnd;
       nodeIndexOffset++
     )
       toMorph.add({
-        from: fromChildNodes[previousDiffEntry.from.end + nodeIndexOffset].node,
-        to: toChildNodes[previousDiffEntry.to.end + nodeIndexOffset].node,
+        from: from.childNodes[previousFromEnd + nodeIndexOffset],
+        to: to.childNodes[previousToEnd + nodeIndexOffset],
       });
-    for (const toChildNode of toChildNodes.slice(
-      diffEntry.to.start,
-      diffEntry.to.end,
-    )) {
-      const fromChildNode = [...toRemove].find(
-        (fromChildNode) => toChildNode.key === fromChildNode.key,
-      );
-      if (fromChildNode !== undefined) {
-        toRemove.delete(fromChildNode);
-        toMorph.add({ from: fromChildNode.node, to: toChildNode.node });
-      }
+    for (let nodeIndex = toStart; nodeIndex < toEnd; nodeIndex++) {
+      const fromChildNode = toRemove.get(toChildNodesKeys[nodeIndex])?.shift();
+      const toChildNode = to.childNodes[nodeIndex];
+      if (fromChildNode !== undefined)
+        toMorph.add({ from: fromChildNode, to: toChildNode });
       toAdd.add({
-        node:
-          fromChildNode?.node ?? document.importNode(toChildNode.node, true),
-        nodeAfter: fromChildNodes[diffEntry.from.end]?.node ?? null,
+        node: fromChildNode ?? document.importNode(toChildNode, true),
+        nodeAfter: from.childNodes[fromEnd] ?? null,
       });
     }
   }
-  for (const { node } of toRemove) from.removeChild(node);
+  for (const nodes of toRemove.values())
+    for (const node of nodes) from.removeChild(node);
   for (const { node, nodeAfter } of toAdd) from.insertBefore(node, nodeAfter);
   for (const { from, to } of toMorph) {
     if (from.nodeType !== from.ELEMENT_NODE) continue;
@@ -526,15 +514,15 @@ export function morph(from, to, event = undefined) {
       ...(from.matches("input, textarea") ? ["value", "checked"] : []),
     ])) {
       if (
-        parents(from).some(
-          (element) => element.onmorphattribute?.(event, attribute) === true,
-        ) ||
-        (event?.detail?.liveConnectionUpdate &&
-          (attribute === "style" ||
-            attribute === "hidden" ||
-            attribute === "disabled" ||
-            attribute === "value" ||
-            attribute === "checked"))
+        event?.detail?.liveConnectionUpdate &&
+        (attribute === "style" ||
+          attribute === "hidden" ||
+          attribute === "disabled" ||
+          attribute === "value" ||
+          attribute === "checked") &&
+        !parents(from).some((element) =>
+          element.liveConnectionUpdate?.includes?.(attribute),
+        )
       )
         continue;
       if (to.getAttribute(attribute) === null) from.removeAttribute(attribute);
