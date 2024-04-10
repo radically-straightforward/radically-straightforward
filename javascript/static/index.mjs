@@ -410,6 +410,33 @@ execute.functions = new Map();
 // }
 
 // TODO: Test `morph()` within a tippy.
+/**
+ * Morph the contents of the `from` container element into the contents of the `to` container element with minimal DOM manipulation by using a diffing algorithm.
+ * 
+ * If the `to` element is a string, then it’s converted with `stringToElement()`.
+ * 
+ * Elements may provide a `key="___"` attribute to help identify them with respect to the diffing algorithm. This is similar to [React’s `key`s](https://react.dev/learn/rendering-lists#keeping-list-items-in-order-with-key), but sibling elements may have the same `key` (at the risk of potentially getting them mixed up if they’re reordered).
+ * 
+ * The `event` is forwarded into event listeners, for example, `onmorph()`.
+ * 
+ * The `from` element may provide the `from.onmorph = (event) => { ___ };` event listener, which is called before morphing and may prevent it by returning `false`. This is useful for elements that have client-side state that must be preserved, for example, a lazily-loaded partial.
+ * 
+ * The children of the `from` element may provide the `fromChildNode.onmorphremove = (event) => { ___ };` event listener, which is called before a removal and may prevent it by returning `false`. This is useful for elements that should remain on the page but wouldn’t be sent by server again in a Live Connection update, for example, an indicator of unread messages.
+ * 
+ * Elements and their parents may provide the `element.onmorphattribute = (event, attribute) => { ___ };` event listener, which is called before morphing an attribute. TODO
+ * 
+ * **Related Work**
+ * 
+ * This is different from `from.innerHTML = to.innerHTML` because the elements are compared and only the minimal amount of DOM operations are performed, which helps preserve client-side state, for example, scrolling position, caret position, and so forth.
+ * 
+ * This is different form [`morphdom`](https://github.com/patrick-steele-idem/morphdom) and its derivatives in the following ways:
+ * 
+ * - `morph()` deals better with insertions/deletions/moves in the middle of a list. In some situations `morphdom` will touch all subsequent elements, while `morph()` tends to only touch the affected elements.
+ * 
+ * - `morph()` supports `key="___"` instead of `morphdom`’s `id="___"`s. `key`s don’t have to be unique across the document and don’t even have to be unique across the element siblings—they’re just a hint at the identity of the element that’s used in the diffing process.
+ * 
+ * - `morph()` preserves the `to` element, while `morphdom` modifies it in a destructive way.
+ */
 export function morph(from, to, event = undefined) {
   if (from.onmorph?.(event) === false) return;
   if (typeof to === "string") to = stringToElement(to);
