@@ -1,7 +1,5 @@
 # TODO
 
-- Deploy new version of `monitor`
-
 ---
 
 `@radically-straightforward/utilities`’s `intern` performance benchmark:
