@@ -410,7 +410,6 @@ execute.functions = new Map();
 //   parentElement.isAttached = false;
 // }
 
-// TODO: Test `morph()` within a tippy.
 /**
  * Morph the contents of the `from` container element into the contents of the `to` container element with minimal DOM manipulation by using a diffing algorithm.
  *
