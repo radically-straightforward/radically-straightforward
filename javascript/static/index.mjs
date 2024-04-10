@@ -482,7 +482,7 @@ export function morph(from, to, event = undefined) {
       toRemove.get(key)?.push(node) ?? toRemove.set(key, [node]);
     }
   }
-  const toAdd = new Set();
+  const toAdd = [];
   const toMorph = new Set();
   for (let diffIndex = 1; diffIndex < diff.length; diffIndex++) {
     const [previousFromStart, previousFromEnd, previousToStart, previousToEnd] =
@@ -502,7 +502,7 @@ export function morph(from, to, event = undefined) {
       const toChildNode = to.childNodes[nodeIndex];
       if (fromChildNode !== undefined)
         toMorph.add({ from: fromChildNode, to: toChildNode });
-      toAdd.add({
+      toAdd.push({
         node: fromChildNode ?? toChildNode,
         nodeAfter: from.childNodes[fromEnd] ?? null,
       });
