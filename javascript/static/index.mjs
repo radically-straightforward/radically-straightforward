@@ -75,7 +75,7 @@ import * as Tippy from "tippy.js";
 //       )
 //         window.history.pushState(undefined, "", responseURL.href);
 
-//       loadDocument(responseText, { detail });
+//       mountDocument(responseText, { detail });
 
 //       if (window.location.hash.trim() !== "")
 //         document
@@ -293,7 +293,7 @@ import * as Tippy from "tippy.js";
 //         if (bufferPart === undefined) continue;
 //         const bufferPartJSON = JSON.parse(bufferPart);
 //         if (inLiveNavigation) return;
-//         loadDocument(bufferPartJSON, {
+//         mountDocument(bufferPartJSON, {
 //           detail: {
 //             previousLocation: { ...window.location },
 //             liveConnectionUpdate: true,
@@ -336,22 +336,19 @@ import * as Tippy from "tippy.js";
 //   }
 // }
 
-// export function loadDocument(documentString, event) {
+// export function mountDocument(content, event) {
 //   if (!event?.detail?.liveConnectionUpdate) Tippy.hideAll();
-
 //   morph(
 //     document.querySelector("html"),
-//     TODO: importNode() or adoptNode() or something
+//     // TODO: importNode() or adoptNode() or something
 //     new DOMParser()
-//       .parseFromString(documentString, "text/html")
+//       .parseFromString(content, "text/html")
 //       .querySelector("html"),
 //     event,
 //   );
-
 //   window.dispatchEvent(
 //     new CustomEvent("DOMContentLoaded", { detail: event?.detail }),
 //   );
-
 //   if (!event?.detail?.liveConnectionUpdate)
 //     document.querySelector("[autofocus]")?.focus();
 // }
