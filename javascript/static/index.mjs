@@ -18,9 +18,9 @@ async function liveNavigate(request, event) {
       liveNavigate.previousLocation.hash !== requestURL.hash
     )
       window.history.pushState(undefined, "", requestURL.href);
-    window.dispatchEvent(new CustomEvent("livenavigateself", { detail }));
     if (window.location.hash.trim() !== "")
       document.getElementById(window.location.hash.slice(1))?.scrollIntoView();
+    window.onhashchange?.();
     liveNavigate.previousLocation = { ...window.location };
     return;
   }
