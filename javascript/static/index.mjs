@@ -337,7 +337,7 @@ import * as Tippy from "tippy.js";
 // }
 
 // export function loadDocument(documentString, event) {
-//   if (!event?.detail?.liveConnectionUpdate) Tippy.hideAll();
+//   if (!event.detail?.liveConnectionUpdate) Tippy.hideAll();
 
 //   morph(
 //     document.querySelector("html"),
@@ -349,10 +349,10 @@ import * as Tippy from "tippy.js";
 //   );
 
 //   window.dispatchEvent(
-//     new CustomEvent("DOMContentLoaded", { detail: event?.detail }),
+//     new CustomEvent("DOMContentLoaded", { detail: event.detail }),
 //   );
 
-//   if (!event?.detail?.liveConnectionUpdate)
+//   if (!event.detail?.liveConnectionUpdate)
 //     document.querySelector("[autofocus]")?.focus();
 // }
 
@@ -363,7 +363,7 @@ export function mount(element, content, event = undefined) {
   element.isAttached = true;
   delete element.liveConnectionUpdate;
   morph(element, content, event);
-  execute({ event, element });
+  execute(element, event);
   delete element.isAttached;
   element.liveConnectionUpdate = false;
 }
@@ -401,11 +401,8 @@ export function mount(element, content, event = undefined) {
  *
  * - `morph()` is aware of Live Connection updates, `tippy()`s, and so forth.
  */
-export function morph(from, to, event = undefined) {
-  if (
-    event?.detail?.liveConnectionUpdate &&
-    from.liveConnectionUpdate === false
-  )
+export function morph(from, to, event) {
+  if (event.detail?.liveConnectionUpdate && from.liveConnectionUpdate === false)
     return;
   if (typeof to === "string") to = stringToElement(to);
   const key = (node) =>
@@ -433,7 +430,7 @@ export function morph(from, to, event = undefined) {
       const node = from.childNodes[nodeIndex];
       const key = fromChildNodesKeys[nodeIndex];
       if (
-        event?.detail?.liveConnectionUpdate &&
+        event.detail?.liveConnectionUpdate &&
         (node.liveConnectionUpdate === false ||
           node.matches?.("[data-tippy-root]"))
       )
@@ -478,7 +475,7 @@ export function morph(from, to, event = undefined) {
       ...(from.matches("input, textarea") ? ["value", "checked"] : []),
     ])) {
       if (
-        event?.detail?.liveConnectionUpdate &&
+        event.detail?.liveConnectionUpdate &&
         (attribute === "style" ||
           attribute === "hidden" ||
           attribute === "disabled" ||
@@ -507,14 +504,11 @@ export function morph(from, to, event = undefined) {
  *
  * Execute the functions defined by the `javascript="___"` attribute, which is set by [`@radically-straightforward/build`](https://github.com/radically-straightforward/radically-straightforward/tree/main/build) when extracting browser JavaScript. You must call this when you insert new elements in the DOM, for example, when mounting content.
  */
-export function execute({
-  event = undefined,
-  element = document,
-  elements = element.querySelectorAll("[javascript]"),
-}) {
+export function execute(element, event) {
+  const elements = element.querySelectorAll("[javascript]");
   for (const element of elements) {
     if (
-      event?.detail?.liveConnectionUpdate &&
+      event.detail?.liveConnectionUpdate &&
       (element.closest("[data-tippy-root]") !== null ||
         parents(element)
           .slice(1)
@@ -529,7 +523,7 @@ export function execute({
 }
 execute.functions = new Map();
 window.addEventListener("DOMContentLoaded", (event) => {
-  execute({ event });
+  execute(document, event);
 });
 
 /**
