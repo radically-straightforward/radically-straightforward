@@ -55,10 +55,11 @@ javascript`
 import * as javascript from "@radically-straightforward/javascript/static/index.mjs";
 ```
 
+- Live Navigation.
+- `execute()`.
 - Form validation.
 - Warn before leaving page with unsubmitted form.
 - Tippy.js configuration.
-- `execute()`.
 
 <!-- DOCUMENTATION START: ./static/index.mjs -->
 

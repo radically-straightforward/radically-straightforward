@@ -2,7 +2,7 @@ import * as utilities from "@radically-straightforward/utilities";
 import fastMyersDiff from "fast-myers-diff";
 import * as Tippy from "tippy.js";
 
-const liveNavigate = async (request, event) => {
+async function liveNavigate(request, event) {
   const body = document.querySelector("body");
 
   if (event instanceof PopStateEvent) liveNavigate.abortController.abort();
@@ -110,7 +110,7 @@ const liveNavigate = async (request, event) => {
 
   liveNavigate.previousLocation = { ...window.location };
   body.removeAttribute("live-navigation");
-};
+}
 liveNavigate.abortController = new AbortController();
 liveNavigate.previousLocation = { ...window.location };
 document.onclick = async (event) => {
