@@ -509,10 +509,18 @@ export function morph(from, to, event = undefined) {
  */
 export function execute({
   event = undefined,
-  element = undefined,
+  element = document,
   elements = element.querySelectorAll("[javascript]"),
 }) {
   for (const element of elements) {
+    if (
+      event?.detail?.liveConnectionUpdate &&
+      (element.closest("[data-tippy-root]") !== null ||
+        parents(element)
+          .slice(1)
+          .some((element) => element.liveConnectionUpdate === false))
+    )
+      continue;
     const javascript = JSON.parse(element.getAttribute("javascript"));
     execute.functions
       .get(javascript.function)
@@ -521,16 +529,7 @@ export function execute({
 }
 execute.functions = new Map();
 window.addEventListener("DOMContentLoaded", (event) => {
-  execute({
-    event,
-    elements: [...document.querySelectorAll("[javascript]")].filter(
-      (element) =>
-        element.closest("[data-tippy-root]") === null &&
-        !parents(element)
-          .slice(1)
-          .some((element) => element.partialParentElement), // TODO: partialParentElement isn’t a thing anymore
-    ),
-  });
+  execute({ event });
 });
 
 /**

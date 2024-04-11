@@ -58,6 +58,7 @@ import * as javascript from "@radically-straightforward/javascript/static/index.
 - Form validation.
 - Warn before leaving page with unsubmitted form.
 - Tippy.js configuration.
+- `execute()`.
 
 <!-- DOCUMENTATION START: ./static/index.mjs -->
 
