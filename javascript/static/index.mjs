@@ -3,13 +3,10 @@ import fastMyersDiff from "fast-myers-diff";
 import * as Tippy from "tippy.js";
 
 {
-  let abortController;
-  let previousLocation = { ...window.location };
-
   const liveNavigate = async (request, event) => {
     const body = document.querySelector("body");
 
-    if (event instanceof PopStateEvent) abortController?.abort();
+    if (event instanceof PopStateEvent) liveNavigate.abortController?.abort();
     else if (body.getAttribute("live-navigation") !== null) return;
 
     request.headers.set("Live-Navigation", "true");
@@ -18,15 +15,15 @@ import * as Tippy from "tippy.js";
     if (!isGet) request.headers.set("CSRF-Protection", "true");
 
     const requestURL = new URL(request.url);
-    const detail = { request, previousLocation };
+    const detail = { request, previousLocation: liveNavigate.previousLocation };
     if (
       isGet &&
-      previousLocation.origin === requestURL.origin &&
-      previousLocation.pathname === requestURL.pathname &&
-      previousLocation.search === requestURL.search
+      liveNavigate.previousLocation.origin === requestURL.origin &&
+      liveNavigate.previousLocation.pathname === requestURL.pathname &&
+      liveNavigate.previousLocation.search === requestURL.search
     ) {
       if (
-        previousLocation.hash !== requestURL.hash &&
+        liveNavigate.previousLocation.hash !== requestURL.hash &&
         !(event instanceof PopStateEvent)
       )
         window.history.pushState(undefined, "", requestURL.href);
@@ -35,7 +32,7 @@ import * as Tippy from "tippy.js";
         document
           .getElementById(window.location.hash.slice(1))
           ?.scrollIntoView();
-      previousLocation = { ...window.location };
+      liveNavigate.previousLocation = { ...window.location };
       return;
     }
 
@@ -45,10 +42,10 @@ import * as Tippy from "tippy.js";
     window.onlivenavigate?.();
 
     try {
-      abortController = new AbortController();
+      liveNavigate.abortController = new AbortController();
       const response = await fetch(request, {
         cache: "no-store",
-        signal: abortController.signal,
+        signal: liveNavigate.abortController.signal,
       });
 
       const externalRedirect = response.headers.get(
@@ -76,7 +73,7 @@ import * as Tippy from "tippy.js";
         window.history.pushState(undefined, "", responseURL.href);
 
       Tippy.hideAll();
-      morph(document.querySelector("html"), documentStringToElement(content), {
+      morph(document.querySelector("html"), documentStringToElement(responseText), {
         detail,
       });
       window.dispatchEvent(new CustomEvent("DOMContentLoaded", { detail }));
@@ -112,9 +109,10 @@ import * as Tippy from "tippy.js";
       }
     }
 
-    previousLocation = { ...window.location };
+    liveNavigate.previousLocation = { ...window.location };
     body.removeAttribute("live-navigation");
   };
+  liveNavigate.previousLocation = { ...window.location };
   document.onclick = async (event) => {
     const link = event.target.closest(
       `a[href]:not([target^="_"]):not([download])`,
