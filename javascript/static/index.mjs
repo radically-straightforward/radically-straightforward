@@ -379,9 +379,6 @@ export function mount(element, content, event = undefined) {
   execute({ event, element });
   delete element.isAttached;
   element.liveConnectionUpdate = false;
-  const elementTippy = element.closest("[data-tippy-root]")?._tippy;
-  if (elementTippy !== undefined)
-    elementTippy.setContent(elementTippy.props.content);
 }
 
 /**
