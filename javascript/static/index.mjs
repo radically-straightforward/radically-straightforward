@@ -3,12 +3,11 @@ import fastMyersDiff from "fast-myers-diff";
 import * as Tippy from "tippy.js";
 
 async function liveNavigate(request, event) {
-  const body = document.querySelector("body");
-
   if (event instanceof PopStateEvent) liveNavigate.abortController.abort();
-  else if (body.getAttribute("live-navigation") !== null) return;
-
-  request.headers.set("Live-Navigation", "true");
+  else if (
+    document.querySelector("body").getAttribute("live-navigation") !== null
+  )
+    return;
 
   const isGet = ["GET", "HEAD", "OPTIONS", "TRACE"].includes(request.method);
   if (!isGet) request.headers.set("CSRF-Protection", "true");
@@ -41,7 +40,7 @@ async function liveNavigate(request, event) {
     )
   )
     return;
-  body.setAttribute("live-navigation", "true");
+  document.querySelector("body").setAttribute("live-navigation", "true");
   window.dispatchEvent(new CustomEvent("livenavigate", { detail }));
   window.onlivenavigate?.();
 
@@ -98,9 +97,9 @@ async function liveNavigate(request, event) {
 
       tippy({
         event,
-        element: body,
+        element: document.querySelector("body"),
         elementProperty: "liveNavigationErrorTooltip",
-        appendTo: body,
+        appendTo: document.querySelector("body"),
         trigger: "manual",
         hideOnClick: false,
         theme: "error",
@@ -109,14 +108,14 @@ async function liveNavigate(request, event) {
         content:
           "Something went wrong when trying to perform this action. Please try reloading the page.",
       });
-      body.liveNavigationErrorTooltip.show();
+      document.querySelector("body").liveNavigationErrorTooltip.show();
 
       window.onlivenavigateerror?.();
     }
   }
 
   liveNavigate.previousLocation = { ...window.location };
-  body.removeAttribute("live-navigation");
+  document.querySelector("body").removeAttribute("live-navigation");
 }
 liveNavigate.abortController = new AbortController();
 liveNavigate.previousLocation = { ...window.location };
