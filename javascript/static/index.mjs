@@ -3,6 +3,8 @@ import fastMyersDiff from "fast-myers-diff";
 import * as Tippy from "tippy.js";
 
 async function liveNavigate(request, event) {
+  console.log(request);
+  return;
   const body = document.querySelector("body");
 
   if (event instanceof PopStateEvent) liveNavigate.abortController.abort();
@@ -140,8 +142,7 @@ document.onclick = async (event) => {
 };
 document.onsubmit = async (event) => {
   const method = (
-    event.submitter?.getAttribute("formmethod") ??
-    event.target.getAttribute("method")
+    event.submitter?.getAttribute("formmethod") ?? event.target.method
   ).toUpperCase();
   const action =
     event.submitter?.getAttribute("formaction") ?? event.target.action;
