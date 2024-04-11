@@ -387,7 +387,7 @@ execute.functions = new Map();
 // }
 
 /**
- * `morph()` the `content` into the container `element`. Protect the `content` from changing in Live Connection updates. `execute()` the browser JavaScript in the `content`. If the `element` is within a Tippy.js tippy, force a reflow.
+ * `morph()` the `content` into the container `element`. Protect the `content` from changing in Live Connection updates. `execute()` the browser JavaScript in the `content`. If the `element` is within a `tippy()`, force a reflow.
  */
 export function mount(element, content) {
   morph(element, content);
@@ -429,7 +429,7 @@ export function mount(element, content) {
  *
  * - `morph()` preserves the `to` element, while `morphdom` modifies it in a destructive way.
  *
- * - `morph()` is aware of Live Connection updates, Tippy.js’s tippys, and so forth.
+ * - `morph()` is aware of Live Connection updates, `tippy()`s, and so forth.
  */
 export function morph(from, to, event = undefined) {
   if (
@@ -533,7 +533,7 @@ export function morph(from, to, event = undefined) {
 }
 
 /**
- * Create a Tippy.js tippy. This is different from calling Tippy’s constructor in the following ways:
+ * Create a [Tippy.js](https://atomiks.github.io/tippyjs/) tippy. This is different from calling Tippy’s constructor in the following ways:
  *
  * 1. If called multiple times on the same `element` with the same `elementProperty`, then `tippy()` doesn’t create new tippys, but `morph()`s the tippy contents.
  *
@@ -564,7 +564,7 @@ Tippy.default.setDefaultProps({
 /**
  * Validate `element` (usually a `<form>`) and its `children()`.
  *
- * Validation errors are reported with Tippy.js tippys with the `error` theme.
+ * Validation errors are reported with `tippy()`s with the `error` theme.
  *
  * Use `<form novalidate>` to disable the native browser validation, which is too permissive on email addresses, is more limited in custom validation, and so forth.
  *
@@ -929,7 +929,7 @@ export function backgroundJob(
 /**
  * Check whether the `element` is attached to the document. This is different from the [`isConnected` property](https://developer.mozilla.org/en-US/docs/Web/API/Node/isConnected) in the following ways:
  *
- * 1. It uses `parents()`, so it supports Tippy.js’s tippys that aren’t showing but whose `target`s are attached.
+ * 1. It uses `parents()`, so it supports `tippy()`s that aren’t showing but whose `target`s are attached.
  *
  * 2. You may force an element to be attached by setting `element.isAttached = true` on the `element` itself or on one of its parents.
  *
@@ -942,7 +942,7 @@ export function isAttached(element) {
 }
 
 /**
- * Returns an array of parents, including `element` itself. It knows how to navigate up Tippy.js’s tippys that aren’t showing.
+ * Returns an array of parents, including `element` itself. It knows how to navigate up `tippy()`s that aren’t showing.
  */
 export function parents(element) {
   const parents = [];
