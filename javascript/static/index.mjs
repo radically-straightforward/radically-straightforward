@@ -370,7 +370,7 @@ import * as Tippy from "tippy.js";
 // }
 
 /**
- * `morph()` the `content` into the container `element`. `execute()` the browser JavaScript in the `content`. Protect the `content` from changing in Live Connection updates. If the `element` is within a `tippy()`, force a reflow.
+ * `morph()` the `element` container to include `content`. `execute()` the browser JavaScript in the `element`. Protect the `element` from changing in Live Connection updates. If the `element` is within a `tippy()`, force a reflow.
  */
 export function mount(element, content, event = undefined) {
   element.isAttached = true;
