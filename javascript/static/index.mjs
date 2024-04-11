@@ -11,12 +11,10 @@ async function liveNavigate(request, event) {
   if (
     request.method === "GET" &&
     liveNavigate.previousLocation.pathname === requestURL.pathname &&
-    liveNavigate.previousLocation.search === requestURL.search
+    liveNavigate.previousLocation.search === requestURL.search &&
+    liveNavigate.previousLocation.hash !== requestURL.hash
   ) {
-    if (
-      !(event instanceof PopStateEvent) &&
-      liveNavigate.previousLocation.hash !== requestURL.hash
-    )
+    if (!(event instanceof PopStateEvent))
       window.history.pushState(undefined, "", requestURL.href);
     if (window.location.hash.trim() !== "")
       document.getElementById(window.location.hash.slice(1))?.scrollIntoView();
