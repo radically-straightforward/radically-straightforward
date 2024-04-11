@@ -9,8 +9,8 @@ css`
   @import "@radically-straightforward/javascript/static/index.css";
 
   .tippy-box {
-    --background-color: lightblue;
-    --border-color: darkblue;
+    --background-color: blue;
+    --border-color: red;
   }
 `;
 
