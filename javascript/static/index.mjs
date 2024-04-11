@@ -372,12 +372,12 @@ import * as Tippy from "tippy.js";
 /**
  * `morph()` the `content` into the container `element`. Protect the `content` from changing in Live Connection updates. `execute()` the browser JavaScript in the `content`. If the `element` is within a `tippy()`, force a reflow.
  */
-export function mount(element, content) {
-  morph(element, content);
-  element.liveConnectionUpdate = false;
+export function mount(element, content, event = undefined) {
   element.isAttached = true;
-  execute({ element });
+  morph(element, content, event);
+  execute({ event, element });
   delete element.isAttached;
+  element.liveConnectionUpdate = false;
   const elementTippy = element.closest("[data-tippy-root]")?._tippy;
   if (elementTippy !== undefined)
     elementTippy.setContent(elementTippy.props.content);
@@ -537,11 +537,7 @@ export function execute({
 execute.functions = new Map();
 
 /**
- * Create a [Tippy.js](https://atomiks.github.io/tippyjs/) tippy. This is different from calling Tippy’s constructor in the following ways:
- *
- * 1. If called multiple times on the same `element` with the same `elementProperty`, then `tippy()` doesn’t create new tippys, but `morph()`s the tippy contents.
- *
- * 2. `tippy()` `execute()`s the contents of the tippy.
+ * Create a [Tippy.js](https://atomiks.github.io/tippyjs/) tippy. This is different from calling Tippy’s constructor because if `tippy()` is called multiple times on the same `element` with the same `elementProperty`, then it doesn’t create new tippys but `mount()`s the `content`.
  */
 export function tippy({
   event = undefined,
@@ -554,8 +550,8 @@ export function tippy({
     content: document.createElement("div"),
   });
   element[elementProperty].setProps(tippyProps);
-  morph(element[elementProperty].props.content, content, event);
-  execute({ event, element: element[elementProperty].props.content });
+  mount(element[elementProperty].props.content, content, event);
+  delete element[elementProperty].props.content.liveConnectionUpdate;
   return element[elementProperty];
 }
 Tippy.default.setDefaultProps({
