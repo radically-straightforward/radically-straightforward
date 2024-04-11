@@ -340,10 +340,7 @@ import * as Tippy from "tippy.js";
 //   if (!event?.detail?.liveConnectionUpdate) Tippy.hideAll();
 //   morph(
 //     document.querySelector("html"),
-//     // TODO: importNode() or adoptNode() or something
-//     new DOMParser()
-//       .parseFromString(content, "text/html")
-//       .querySelector("html"),
+//     stringDocumentToElement(content),
 //     event,
 //   );
 //   window.dispatchEvent(
@@ -384,6 +381,8 @@ export function mount(element, content, event = undefined) {
  *
  * > **Note:** `to` is expected to already belong to the `document`. You may need to call [`importNode()`](https://developer.mozilla.org/en-US/docs/Web/API/Document/importNode) or [`adoptNode()`](https://developer.mozilla.org/en-US/docs/Web/API/Document/adoptNode) on a node before passing it to `morph()`.
  *
+ * > **Note:** `to` is mutated destructively in the process of morphing. Create a clone of `to` before passing it into `morph()` if you wish to continue using it.
+ *
  * **Related Work**
  *
  * `morph()` is different from `from.innerHTML = to.innerHTML` because setting `innerHTML` loses browser state, for example, form inputs, scrolling position, and so forth.
@@ -393,8 +392,6 @@ export function mount(element, content, event = undefined) {
  * - `morph()` deals better with insertions/deletions/moves in the middle of a list. In some situations `morphdom` touches all subsequent elements, while `morph()` tends to only touch the affected elements.
  *
  * - `morph()` supports `key="___"` instead of `morphdom`’s `id="___"`s. `key`s don’t have to be unique across the document and don’t even have to be unique across the element siblings—they’re just a hint at the identity of the element that’s used in the diffing process.
- *
- * - `morph()` preserves the `to` element, while `morphdom` modifies it in a destructive way.
  *
  * - `morph()` is aware of Live Connection updates, `tippy()`s, and so forth.
  */
@@ -883,6 +880,15 @@ export function stringToElement(string) {
   const element = document.createElement("div");
   element.innerHTML = string;
   return element;
+}
+
+/**
+ * Similar to `stringToElement()` but for a `string` which is a whole document, for example, starting `<!DOCTYPE html>`. [`document.adoptNode()`](https://developer.mozilla.org/en-US/docs/Web/API/Document/adoptNode) is used so that the resulting element belongs to the current `document`.
+ */
+export function stringDocumentToElement(string) {
+  return document.adoptNode(
+    new DOMParser().parseFromString(string, "text/html").querySelector("html"),
+  );
 }
 
 /**
