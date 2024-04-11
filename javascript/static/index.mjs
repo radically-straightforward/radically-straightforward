@@ -337,7 +337,7 @@ import * as Tippy from "tippy.js";
 // }
 
 // export function loadDocument(documentString, event) {
-//   if (!event.detail?.liveConnectionUpdate) Tippy.hideAll();
+//   if (!event?.detail?.liveConnectionUpdate) Tippy.hideAll();
 
 //   morph(
 //     document.querySelector("html"),
@@ -349,10 +349,10 @@ import * as Tippy from "tippy.js";
 //   );
 
 //   window.dispatchEvent(
-//     new CustomEvent("DOMContentLoaded", { detail: event.detail }),
+//     new CustomEvent("DOMContentLoaded", { detail: event?.detail }),
 //   );
 
-//   if (!event.detail?.liveConnectionUpdate)
+//   if (!event?.detail?.liveConnectionUpdate)
 //     document.querySelector("[autofocus]")?.focus();
 // }
 
@@ -377,7 +377,7 @@ export function mount(element, content, event = undefined) {
  *
  * Elements may provide a `key="___"` attribute to help identify them with respect to the diffing algorithm. This is similar to [React’s `key`s](https://react.dev/learn/rendering-lists#keeping-list-items-in-order-with-key), but sibling elements may have the same `key` (at the risk of potentially getting them mixed up if they’re reordered).
  *
- * When `morph()` is called to perform a Live Connection update (that is,`event.detail.liveConnectionUpdate`is `true`), elements may set a `liveConnectionUpdate` attribute, which controls the behavior of `morph()` in the following ways:
+ * When `morph()` is called to perform a Live Connection update (that is,`event?.detail.liveConnectionUpdate`is `true`), elements may set a `liveConnectionUpdate` attribute, which controls the behavior of `morph()` in the following ways:
  *
  * - When `from.liveConnectionUpdate` is `false`, `morph()` doesn’t do anything. This is useful for elements which contain browser state that must be preserved on Live Connection updates, for example, the container of dynamically-loaded content (see `mount()`).
  *
@@ -402,7 +402,10 @@ export function mount(element, content, event = undefined) {
  * - `morph()` is aware of Live Connection updates, `tippy()`s, and so forth.
  */
 export function morph(from, to, event) {
-  if (event.detail?.liveConnectionUpdate && from.liveConnectionUpdate === false)
+  if (
+    event?.detail?.liveConnectionUpdate &&
+    from.liveConnectionUpdate === false
+  )
     return;
   if (typeof to === "string") to = stringToElement(to);
   const key = (node) =>
@@ -430,7 +433,7 @@ export function morph(from, to, event) {
       const node = from.childNodes[nodeIndex];
       const key = fromChildNodesKeys[nodeIndex];
       if (
-        event.detail?.liveConnectionUpdate &&
+        event?.detail?.liveConnectionUpdate &&
         (node.liveConnectionUpdate === false ||
           node.matches?.("[data-tippy-root]"))
       )
@@ -475,7 +478,7 @@ export function morph(from, to, event) {
       ...(from.matches("input, textarea") ? ["value", "checked"] : []),
     ])) {
       if (
-        event.detail?.liveConnectionUpdate &&
+        event?.detail?.liveConnectionUpdate &&
         (attribute === "style" ||
           attribute === "hidden" ||
           attribute === "disabled" ||
@@ -508,7 +511,7 @@ export function execute(element, event) {
   const elements = element.querySelectorAll("[javascript]");
   for (const element of elements) {
     if (
-      event.detail?.liveConnectionUpdate &&
+      event?.detail?.liveConnectionUpdate &&
       (element.closest("[data-tippy-root]") !== null ||
         parents(element)
           .slice(1)
