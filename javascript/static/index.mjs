@@ -374,6 +374,7 @@ import * as Tippy from "tippy.js";
  */
 export function mount(element, content, event = undefined) {
   element.isAttached = true;
+  delete element.liveConnectionUpdate;
   morph(element, content, event);
   execute({ event, element });
   delete element.isAttached;
@@ -551,7 +552,6 @@ export function tippy({
   });
   element[elementProperty].setProps(tippyProps);
   mount(element[elementProperty].props.content, content, event);
-  delete element[elementProperty].props.content.liveConnectionUpdate;
   return element[elementProperty];
 }
 Tippy.default.setDefaultProps({
