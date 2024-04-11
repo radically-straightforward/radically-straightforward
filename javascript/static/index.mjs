@@ -2,180 +2,180 @@ import * as utilities from "@radically-straightforward/utilities";
 import fastMyersDiff from "fast-myers-diff";
 import * as Tippy from "tippy.js";
 
-{
-  let abortController;
-  let previousLocation = { ...window.location };
+// {
+//   let abortController;
+//   let previousLocation = { ...window.location };
 
-  const liveNavigate = async ({ request, event }) => {
-    const body = document.querySelector("body");
+//   const liveNavigate = async ({ request, event }) => {
+//     const body = document.querySelector("body");
 
-    if (event instanceof PopStateEvent) abortController?.abort();
-    else if (body.getAttribute("live-navigation") !== null) return;
+//     if (event instanceof PopStateEvent) abortController?.abort();
+//     else if (body.getAttribute("live-navigation") !== null) return;
 
-    request.headers.set("Live-Navigation", "true");
+//     request.headers.set("Live-Navigation", "true");
 
-    const isGet = ["GET", "HEAD", "OPTIONS", "TRACE"].includes(request.method);
-    if (!isGet) request.headers.set("CSRF-Protection", "true");
+//     const isGet = ["GET", "HEAD", "OPTIONS", "TRACE"].includes(request.method);
+//     if (!isGet) request.headers.set("CSRF-Protection", "true");
 
-    const requestURL = new URL(request.url);
-    const detail = { request, previousLocation };
-    if (
-      isGet &&
-      previousLocation.origin === requestURL.origin &&
-      previousLocation.pathname === requestURL.pathname &&
-      previousLocation.search === requestURL.search
-    ) {
-      if (
-        previousLocation.hash !== requestURL.hash &&
-        !(event instanceof PopStateEvent)
-      )
-        window.history.pushState(undefined, "", requestURL.href);
-      window.dispatchEvent(new CustomEvent("livenavigateself", { detail }));
-      if (window.location.hash.trim() !== "")
-        document
-          .getElementById(window.location.hash.slice(1))
-          ?.scrollIntoView();
-      previousLocation = { ...window.location };
-      return;
-    }
+//     const requestURL = new URL(request.url);
+//     const detail = { request, previousLocation };
+//     if (
+//       isGet &&
+//       previousLocation.origin === requestURL.origin &&
+//       previousLocation.pathname === requestURL.pathname &&
+//       previousLocation.search === requestURL.search
+//     ) {
+//       if (
+//         previousLocation.hash !== requestURL.hash &&
+//         !(event instanceof PopStateEvent)
+//       )
+//         window.history.pushState(undefined, "", requestURL.href);
+//       window.dispatchEvent(new CustomEvent("livenavigateself", { detail }));
+//       if (window.location.hash.trim() !== "")
+//         document
+//           .getElementById(window.location.hash.slice(1))
+//           ?.scrollIntoView();
+//       previousLocation = { ...window.location };
+//       return;
+//     }
 
-    if (window.onbeforelivenavigate?.() === false) return;
-    body.setAttribute("live-navigation", "true");
-    window.dispatchEvent(new CustomEvent("livenavigate", { detail }));
-    window.onlivenavigate?.();
+//     if (window.onbeforelivenavigate?.() === false) return;
+//     body.setAttribute("live-navigation", "true");
+//     window.dispatchEvent(new CustomEvent("livenavigate", { detail }));
+//     window.onlivenavigate?.();
 
-    try {
-      abortController = new AbortController();
-      const response = await fetch(request, {
-        cache: "no-store",
-        signal: abortController.signal,
-      });
+//     try {
+//       abortController = new AbortController();
+//       const response = await fetch(request, {
+//         cache: "no-store",
+//         signal: abortController.signal,
+//       });
 
-      const externalRedirect = response.headers.get(
-        "Live-Navigation-External-Redirect",
-      );
-      if (typeof externalRedirect === "string") {
-        window.location.assign(externalRedirect);
-        return;
-      }
+//       const externalRedirect = response.headers.get(
+//         "Live-Navigation-External-Redirect",
+//       );
+//       if (typeof externalRedirect === "string") {
+//         window.location.assign(externalRedirect);
+//         return;
+//       }
 
-      const responseText = await response.text();
-      const responseURL = new URL(response.url);
-      responseURL.hash = requestURL.hash;
+//       const responseText = await response.text();
+//       const responseURL = new URL(response.url);
+//       responseURL.hash = requestURL.hash;
 
-      if (
-        (isGet ||
-          window.location.origin !== responseURL.origin ||
-          window.location.pathname !== responseURL.pathname ||
-          window.location.search !== responseURL.search) &&
-        (!(event instanceof PopStateEvent) ||
-          requestURL.origin !== responseURL.origin ||
-          requestURL.pathname !== responseURL.pathname ||
-          requestURL.search !== responseURL.search)
-      )
-        window.history.pushState(undefined, "", responseURL.href);
+//       if (
+//         (isGet ||
+//           window.location.origin !== responseURL.origin ||
+//           window.location.pathname !== responseURL.pathname ||
+//           window.location.search !== responseURL.search) &&
+//         (!(event instanceof PopStateEvent) ||
+//           requestURL.origin !== responseURL.origin ||
+//           requestURL.pathname !== responseURL.pathname ||
+//           requestURL.search !== responseURL.search)
+//       )
+//         window.history.pushState(undefined, "", responseURL.href);
 
-      loadDocument(responseText, { detail });
+//       loadDocument(responseText, { detail });
 
-      if (window.location.hash.trim() !== "")
-        document
-          .getElementById(window.location.hash.slice(1))
-          ?.scrollIntoView();
-    } catch (error) {
-      if (error.name !== "AbortError") {
-        console.error(error);
+//       if (window.location.hash.trim() !== "")
+//         document
+//           .getElementById(window.location.hash.slice(1))
+//           ?.scrollIntoView();
+//     } catch (error) {
+//       if (error.name !== "AbortError") {
+//         console.error(error);
 
-        if (isGet && !(event instanceof PopStateEvent))
-          window.history.pushState(undefined, "", requestURL.href);
+//         if (isGet && !(event instanceof PopStateEvent))
+//           window.history.pushState(undefined, "", requestURL.href);
 
-        tippy({
-          event,
-          element: body,
-          elementProperty: "liveNavigationErrorTooltip",
-          appendTo: body,
-          trigger: "manual",
-          hideOnClick: false,
-          theme: "error",
-          arrow: false,
-          interactive: true,
-          content:
-            "Something went wrong when trying to perform this action. Please try reloading the page.",
-        });
-        body.liveNavigationErrorTooltip.show();
+//         tippy({
+//           event,
+//           element: body,
+//           elementProperty: "liveNavigationErrorTooltip",
+//           appendTo: body,
+//           trigger: "manual",
+//           hideOnClick: false,
+//           theme: "error",
+//           arrow: false,
+//           interactive: true,
+//           content:
+//             "Something went wrong when trying to perform this action. Please try reloading the page.",
+//         });
+//         body.liveNavigationErrorTooltip.show();
 
-        window.onlivenavigateerror?.();
-      }
-    }
+//         window.onlivenavigateerror?.();
+//       }
+//     }
 
-    previousLocation = { ...window.location };
-    body.removeAttribute("live-navigation");
-  };
+//     previousLocation = { ...window.location };
+//     body.removeAttribute("live-navigation");
+//   };
 
-  document.onclick = async (event) => {
-    const link = event.target.closest(
-      'a[href]:not([target^="_"]):not([download])',
-    );
-    if (
-      event.button !== 0 ||
-      event.altKey ||
-      event.ctrlKey ||
-      event.metaKey ||
-      event.shiftKey ||
-      event.target.isContentEditable ||
-      link === null ||
-      link.hostname !== window.location.hostname ||
-      link.onbeforelivenavigate?.() === false
-    )
-      return;
+//   document.onclick = async (event) => {
+//     const link = event.target.closest(
+//       'a[href]:not([target^="_"]):not([download])',
+//     );
+//     if (
+//       event.button !== 0 ||
+//       event.altKey ||
+//       event.ctrlKey ||
+//       event.metaKey ||
+//       event.shiftKey ||
+//       event.target.isContentEditable ||
+//       link === null ||
+//       link.hostname !== window.location.hostname ||
+//       link.onbeforelivenavigate?.() === false
+//     )
+//       return;
 
-    event.preventDefault();
-    liveNavigate({ request: new Request(link.href), event });
-  };
+//     event.preventDefault();
+//     liveNavigate({ request: new Request(link.href), event });
+//   };
 
-  document.onsubmit = async (event) => {
-    if (
-      event.submitter?.onbeforelivenavigate?.() === false ||
-      event.target.onbeforelivenavigate?.() === false
-    )
-      return;
+//   document.onsubmit = async (event) => {
+//     if (
+//       event.submitter?.onbeforelivenavigate?.() === false ||
+//       event.target.onbeforelivenavigate?.() === false
+//     )
+//       return;
 
-    const method = (
-      event.submitter?.getAttribute("formmethod") ??
-      event.target.getAttribute("method")
-    ).toUpperCase();
-    const action =
-      event.submitter?.getAttribute("formaction") ?? event.target.action;
-    if (new URL(action).hostname !== window.location.hostname) return;
-    const enctype =
-      event.submitter?.getAttribute("formenctype") ?? event.target.enctype;
-    const body =
-      enctype === "multipart/form-data"
-        ? new FormData(event.target)
-        : new URLSearchParams(new FormData(event.target));
-    const submitterName = event.submitter?.getAttribute("name");
-    if (typeof submitterName === "string")
-      body.set(submitterName, event.submitter?.value ?? "");
+//     const method = (
+//       event.submitter?.getAttribute("formmethod") ??
+//       event.target.getAttribute("method")
+//     ).toUpperCase();
+//     const action =
+//       event.submitter?.getAttribute("formaction") ?? event.target.action;
+//     if (new URL(action).hostname !== window.location.hostname) return;
+//     const enctype =
+//       event.submitter?.getAttribute("formenctype") ?? event.target.enctype;
+//     const body =
+//       enctype === "multipart/form-data"
+//         ? new FormData(event.target)
+//         : new URLSearchParams(new FormData(event.target));
+//     const submitterName = event.submitter?.getAttribute("name");
+//     if (typeof submitterName === "string")
+//       body.set(submitterName, event.submitter?.value ?? "");
 
-    event.preventDefault();
+//     event.preventDefault();
 
-    const request = ["GET", "HEAD", "OPTIONS", "TRACE"].includes(method)
-      ? (() => {
-          const actionURL = new URL(action);
-          for (const [name, value] of body)
-            actionURL.searchParams.append(name, value);
-          return new Request(actionURL.href, { method });
-        })()
-      : new Request(action, { method, body });
-    liveNavigate({ request, event });
-  };
+//     const request = ["GET", "HEAD", "OPTIONS", "TRACE"].includes(method)
+//       ? (() => {
+//           const actionURL = new URL(action);
+//           for (const [name, value] of body)
+//             actionURL.searchParams.append(name, value);
+//           return new Request(actionURL.href, { method });
+//         })()
+//       : new Request(action, { method, body });
+//     liveNavigate({ request, event });
+//   };
 
-  window.onpopstate = async (event) => {
-    liveNavigate({
-      request: new Request(window.location),
-      event,
-    });
-  };
-}
+//   window.onpopstate = async (event) => {
+//     liveNavigate({
+//       request: new Request(window.location),
+//       event,
+//     });
+//   };
+// }
 
 // export async function liveConnection({
 //   nonce,
