@@ -77,10 +77,8 @@ async function liveNavigate(request, event) {
   } catch (error) {
     if (error.name !== "AbortError") {
       console.error(error);
-
       if (request.method === "GET" && !(event instanceof PopStateEvent))
         window.history.pushState(undefined, "", requestURL.href);
-
       tippy({
         event,
         element: document.querySelector("body"),
@@ -91,12 +89,8 @@ async function liveNavigate(request, event) {
         theme: "error",
         arrow: false,
         interactive: true,
-        content:
-          "Something went wrong when trying to perform this action. Please try reloading the page.",
-      });
-      document.querySelector("body").liveNavigationErrorTooltip.show();
-
-      window.onlivenavigateerror?.();
+        content: "Something went wrong. Please try reloading the page.",
+      }).show();
     }
   }
   liveNavigate.inProgress = false;
