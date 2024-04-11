@@ -119,7 +119,7 @@ import * as Tippy from "tippy.js";
 //           element.closest("[data-tippy-root]") === null &&
 //           !parents(element)
 //             .slice(1)
-//             .some((element) => element.partialParentElement),
+//             .some((element) => element.partialParentElement), // TODO: partialParentElement isn’t a thing anymore
 //       ),
 //     });
 //   });
@@ -189,23 +189,6 @@ import * as Tippy from "tippy.js";
 //     });
 //   };
 // }
-
-/**
- * Execute the functions defined by the `javascript="___"` attribute, which is set by [`@radically-straightforward/build`](https://github.com/radically-straightforward/radically-straightforward/tree/main/build) when extracting browser JavaScript. You must call this when you insert new elements in the DOM, for example, when loading a partial.
- */
-export function execute({
-  event = undefined,
-  element = undefined,
-  elements = element.querySelectorAll("[javascript]"),
-}) {
-  for (const element of elements) {
-    const javascript = JSON.parse(element.getAttribute("javascript"));
-    execute.functions
-      .get(javascript.function)
-      .call(element, event, ...javascript.arguments);
-  }
-}
-execute.functions = new Map();
 
 // export async function liveConnection({
 //   nonce,
@@ -531,6 +514,23 @@ export function morph(from, to, event = undefined) {
     morph(from, to, event);
   }
 }
+
+/**
+ * Execute the functions defined by the `javascript="___"` attribute, which is set by [`@radically-straightforward/build`](https://github.com/radically-straightforward/radically-straightforward/tree/main/build) when extracting browser JavaScript. You must call this when you insert new elements in the DOM, for example, when mounting content. This is a low-level function—in most cases you want to call `mount()` instead.
+ */
+export function execute({
+  event = undefined,
+  element = undefined,
+  elements = element.querySelectorAll("[javascript]"),
+}) {
+  for (const element of elements) {
+    const javascript = JSON.parse(element.getAttribute("javascript"));
+    execute.functions
+      .get(javascript.function)
+      .call(element, event, ...javascript.arguments);
+  }
+}
+execute.functions = new Map();
 
 /**
  * Create a [Tippy.js](https://atomiks.github.io/tippyjs/) tippy. This is different from calling Tippy’s constructor in the following ways:
