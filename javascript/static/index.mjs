@@ -33,7 +33,14 @@ async function liveNavigate(request, event) {
     return;
   }
 
-  if (window.onbeforelivenavigate?.() === false) return;
+  if (
+    isModified(document.querySelector("body")) &&
+    request.method !== "GET" &&
+    !confirm(
+      "Your changes will be lost if you leave this page. Do you wish to continue?",
+    )
+  )
+    return;
   body.setAttribute("live-navigation", "true");
   window.dispatchEvent(new CustomEvent("livenavigate", { detail }));
   window.onlivenavigate?.();
@@ -119,25 +126,19 @@ document.onclick = async (event) => {
   );
   if (
     event.button !== 0 ||
-    event.altKey ||
-    event.ctrlKey ||
-    event.metaKey ||
     event.shiftKey ||
-    event.target.isContentEditable ||
+    event.ctrlKey ||
+    event.altKey ||
+    event.metaKey ||
     link === null ||
     link.hostname !== window.location.hostname ||
-    link.onbeforelivenavigate?.() === false
+    link.liveNavigate === false
   )
     return;
   event.preventDefault();
   liveNavigate(new Request(link.href), event);
 };
 document.onsubmit = async (event) => {
-  if (
-    event.submitter?.onbeforelivenavigate?.() === false ||
-    event.target.onbeforelivenavigate?.() === false
-  )
-    return;
   const method = (
     event.submitter?.getAttribute("formmethod") ??
     event.target.getAttribute("method")
@@ -735,13 +736,6 @@ window.addEventListener("DOMContentLoaded", () => {
 document.addEventListener("submit", () => {
   window.onbeforeunload = () => {};
 });
-// TODO
-//   window.onbeforelivenavigate = () =>
-//     !isModified(document.querySelector("body")) ||
-//     isSubmittingForm [THIS VARIABLE HAS BEEN REMOVED] ||
-//     confirm(
-//       "Your changes will be lost if you leave this page. Do you wish to continue?",
-//     );
 
 /**
  * Given an `element` with the `datetime` attribute, `relativizeDateTimeElement()` keeps it updated with a relative datetime. See `relativizeDateTime()`, which provides the relative datetime, and `backgroundJob()`, which provides the background job management.
