@@ -398,17 +398,19 @@ execute.functions = new Map();
 //     document.querySelector("[autofocus]")?.focus();
 // }
 
-// export function loadPartial(parentElement, partialString) {
-//   morph(parentElement, partialString);
-
-//   parentElement.liveConnectionUpdate = false;
-//   parentElement.isAttached = true;
-//   execute({ element: parentElement });
-//   const parentElementTippy = parentElement.closest("[data-tippy-root]")?._tippy;
-//   if (parentElementTippy !== undefined)
-//     parentElementTippy.setContent(parentElementTippy.props.content);
-//   parentElement.isAttached = false;
-// }
+/**
+ * `morph()` the `content` into the container `element`. `execute()` the browser JavaScript in the `content`. If the `element` is within a Tippy.js tippy, force a reflow.
+ */
+export function mount(element, content) {
+  morph(element, content);
+  element.liveConnectionUpdate = false;
+  element.isAttached = true;
+  execute({ element });
+  delete element.isAttached;
+  const elementTippy = element.closest("[data-tippy-root]")?._tippy;
+  if (elementTippy !== undefined)
+    elementTippy.setContent(elementTippy.props.content);
+}
 
 /**
  * Morph the contents of the `from` container element into the contents of the `to` container element with minimal DOM manipulation by using a diffing algorithm.
@@ -419,7 +421,7 @@ execute.functions = new Map();
  *
  * When `morph()` is called to perform a Live Connection update (that is,`event.detail.liveConnectionUpdate`is `true`), elements may set a `liveConnectionUpdate` attribute, which controls the behavior of `morph()` in the following ways:
  *
- * - When `from.liveConnectionUpdate` is `false`, `morph()` doesn’t do anything. This is useful for elements which contain browser state that must be preserved on Live Connection updates, for example, the container of a partial (see `loadPartial()`).
+ * - When `from.liveConnectionUpdate` is `false`, `morph()` doesn’t do anything. This is useful for elements which contain browser state that must be preserved on Live Connection updates, for example, the container of dynamically-loaded content (see `mount()`).
  *
  * - When `fromChildNode.liveConnectionUpdate` is `false`, `morph()` doesn’t remove that `fromChildNode` even if it’s missing among `to`’s child nodes. This is useful for elements that should remain on the page but wouldn’t be sent by server again in a Live Connection update, for example, an indicator of unread messages.
  *
@@ -942,7 +944,7 @@ export function backgroundJob(
 /**
  * Check whether the `element` is attached to the document. This is different from the [`isConnected` property](https://developer.mozilla.org/en-US/docs/Web/API/Node/isConnected) in the following ways:
  *
- * 1. It uses `parents()`, so it supports Tippy.js’s tippys that aren’t mounted but whose `target`s are attached.
+ * 1. It uses `parents()`, so it supports Tippy.js’s tippys that aren’t showing but whose `target`s are attached.
  *
  * 2. You may force an element to be attached by setting `element.isAttached = true` on the `element` itself or on one of its parents.
  *
@@ -955,7 +957,7 @@ export function isAttached(element) {
 }
 
 /**
- * Returns an array of parents, including `element` itself. It knows how to navigate up Tippy.js’s tippys that aren’t mounted.
+ * Returns an array of parents, including `element` itself. It knows how to navigate up Tippy.js’s tippys that aren’t showing.
  */
 export function parents(element) {
   const parents = [];
