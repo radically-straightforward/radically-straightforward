@@ -6,13 +6,12 @@ async function liveNavigate(request, event) {
   if (event instanceof PopStateEvent) liveNavigate.abortController.abort();
   else if (liveNavigate.inProgress) return;
 
-  const isGet = ["GET", "HEAD", "OPTIONS", "TRACE"].includes(request.method);
-  if (!isGet) request.headers.set("CSRF-Protection", "true");
+  if (request.method !== "GET") request.headers.set("CSRF-Protection", "true");
 
   const requestURL = new URL(request.url);
   const detail = { request, previousLocation: liveNavigate.previousLocation };
   if (
-    isGet &&
+    request.method === "GET" &&
     liveNavigate.previousLocation.origin === requestURL.origin &&
     liveNavigate.previousLocation.pathname === requestURL.pathname &&
     liveNavigate.previousLocation.search === requestURL.search
@@ -61,7 +60,7 @@ async function liveNavigate(request, event) {
     responseURL.hash = requestURL.hash;
 
     if (
-      (isGet ||
+      (request.method === "GET" ||
         window.location.origin !== responseURL.origin ||
         window.location.pathname !== responseURL.pathname ||
         window.location.search !== responseURL.search) &&
@@ -89,7 +88,7 @@ async function liveNavigate(request, event) {
     if (error.name !== "AbortError") {
       console.error(error);
 
-      if (isGet && !(event instanceof PopStateEvent))
+      if (request.method === "GET" && !(event instanceof PopStateEvent))
         window.history.pushState(undefined, "", requestURL.href);
 
       tippy({
