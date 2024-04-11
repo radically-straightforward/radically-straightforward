@@ -4,10 +4,7 @@ import * as Tippy from "tippy.js";
 
 async function liveNavigate(request, event) {
   if (event instanceof PopStateEvent) liveNavigate.abortController.abort();
-  else if (
-    document.querySelector("body").getAttribute("live-navigation") !== null
-  )
-    return;
+  else if (liveNavigate.inProgress) return;
 
   const isGet = ["GET", "HEAD", "OPTIONS", "TRACE"].includes(request.method);
   if (!isGet) request.headers.set("CSRF-Protection", "true");
@@ -40,7 +37,7 @@ async function liveNavigate(request, event) {
     )
   )
     return;
-  document.querySelector("body").setAttribute("live-navigation", "true");
+  liveNavigate.inProgress = true;
   window.dispatchEvent(new CustomEvent("livenavigate", { detail }));
   window.onlivenavigate?.();
 
@@ -115,9 +112,10 @@ async function liveNavigate(request, event) {
   }
 
   liveNavigate.previousLocation = { ...window.location };
-  document.querySelector("body").removeAttribute("live-navigation");
+  liveNavigate.inProgress = false;
 }
 liveNavigate.abortController = new AbortController();
+liveNavigate.inProgress = false;
 liveNavigate.previousLocation = { ...window.location };
 document.onclick = async (event) => {
   const link = event.target.closest(
