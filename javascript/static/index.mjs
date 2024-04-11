@@ -3,8 +3,6 @@ import fastMyersDiff from "fast-myers-diff";
 import * as Tippy from "tippy.js";
 
 async function liveNavigate(request, event) {
-  console.log(request);
-  return;
   const body = document.querySelector("body");
 
   if (event instanceof PopStateEvent) liveNavigate.abortController.abort();
