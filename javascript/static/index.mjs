@@ -100,9 +100,7 @@ liveNavigate.abortController = new AbortController();
 liveNavigate.inProgress = false;
 liveNavigate.previousLocation = { ...window.location };
 document.onclick = async (event) => {
-  const link = event.target.closest(
-    `a[href]:not([target^="_"]):not([download])`,
-  );
+  const link = event.target.closest(`a:not([target="_blank"])`);
   if (
     event.button !== 0 ||
     event.shiftKey ||
