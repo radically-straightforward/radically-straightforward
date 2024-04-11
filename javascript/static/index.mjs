@@ -6,7 +6,7 @@ import * as Tippy from "tippy.js";
   let abortController;
   let previousLocation = { ...window.location };
 
-  const liveNavigate = async ({ request, event }) => {
+  const liveNavigate = async (request, event) => {
     const body = document.querySelector("body");
 
     if (event instanceof PopStateEvent) abortController?.abort();
@@ -132,7 +132,7 @@ import * as Tippy from "tippy.js";
     )
       return;
     event.preventDefault();
-    liveNavigate({ request: new Request(link.href), event });
+    liveNavigate(new Request(link.href), event);
   };
   document.onsubmit = async (event) => {
     if (
@@ -165,13 +165,10 @@ import * as Tippy from "tippy.js";
           return new Request(actionURL.href, { method });
         })()
       : new Request(action, { method, body });
-    liveNavigate({ request, event });
+    liveNavigate(request, event);
   };
   window.onpopstate = async (event) => {
-    liveNavigate({
-      request: new Request(window.location),
-      event,
-    });
+    liveNavigate(new Request(window.location), event);
   };
 }
 
