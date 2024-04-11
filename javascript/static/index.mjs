@@ -5,9 +5,7 @@ import * as Tippy from "tippy.js";
 async function liveNavigate(request, event) {
   if (event instanceof PopStateEvent) liveNavigate.abortController.abort();
   else if (liveNavigate.inProgress) return;
-
   if (request.method !== "GET") request.headers.set("CSRF-Protection", "true");
-
   const requestURL = new URL(request.url);
   const detail = { request, previousLocation: liveNavigate.previousLocation };
   if (
