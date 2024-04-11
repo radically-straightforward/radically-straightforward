@@ -384,6 +384,8 @@ export function mount(element, content) {
 }
 
 /**
+ * **Note:** This is a low-level function—in most cases you want to call `mount()` instead.
+ *
  * Morph the contents of the `from` container element into the contents of the `to` container element with minimal DOM manipulation by using a diffing algorithm.
  *
  * If the `to` element is a string, then it’s first converted into an element with `stringToElement()`.
@@ -516,7 +518,9 @@ export function morph(from, to, event = undefined) {
 }
 
 /**
- * Execute the functions defined by the `javascript="___"` attribute, which is set by [`@radically-straightforward/build`](https://github.com/radically-straightforward/radically-straightforward/tree/main/build) when extracting browser JavaScript. You must call this when you insert new elements in the DOM, for example, when mounting content. This is a low-level function—in most cases you want to call `mount()` instead.
+ * **Note:** This is a low-level function—in most cases you want to call `mount()` instead.
+ *
+ * Execute the functions defined by the `javascript="___"` attribute, which is set by [`@radically-straightforward/build`](https://github.com/radically-straightforward/radically-straightforward/tree/main/build) when extracting browser JavaScript. You must call this when you insert new elements in the DOM, for example, when mounting content.
  */
 export function execute({
   event = undefined,
