@@ -111,19 +111,6 @@ import * as Tippy from "tippy.js";
     body.removeAttribute("live-navigation");
   };
 
-  window.addEventListener("DOMContentLoaded", (event) => {
-    execute({
-      event,
-      elements: [...document.querySelectorAll("[javascript]")].filter(
-        (element) =>
-          element.closest("[data-tippy-root]") === null &&
-          !parents(element)
-            .slice(1)
-            .some((element) => element.partialParentElement), // TODO: partialParentElement isn’t a thing anymore
-      ),
-    });
-  });
-
   document.onclick = async (event) => {
     const link = event.target.closest(
       'a[href]:not([target^="_"]):not([download])',
@@ -533,6 +520,18 @@ export function execute({
   }
 }
 execute.functions = new Map();
+window.addEventListener("DOMContentLoaded", (event) => {
+  execute({
+    event,
+    elements: [...document.querySelectorAll("[javascript]")].filter(
+      (element) =>
+        element.closest("[data-tippy-root]") === null &&
+        !parents(element)
+          .slice(1)
+          .some((element) => element.partialParentElement), // TODO: partialParentElement isn’t a thing anymore
+    ),
+  });
+});
 
 /**
  * Create a [Tippy.js](https://atomiks.github.io/tippyjs/) tippy. This is different from calling Tippy’s constructor because if `tippy()` is called multiple times on the same `element` with the same `elementProperty`, then it doesn’t create new tippys but `mount()`s the `content`.
