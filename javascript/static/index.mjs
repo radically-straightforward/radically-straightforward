@@ -340,7 +340,7 @@ import * as Tippy from "tippy.js";
 //   if (!event?.detail?.liveConnectionUpdate) Tippy.hideAll();
 //   morph(
 //     document.querySelector("html"),
-//     stringDocumentToElement(content),
+//     documentStringToElement(content),
 //     event,
 //   );
 //   window.dispatchEvent(
@@ -885,7 +885,7 @@ export function stringToElement(string) {
 /**
  * Similar to `stringToElement()` but for a `string` which is a whole document, for example, starting `<!DOCTYPE html>`. [`document.adoptNode()`](https://developer.mozilla.org/en-US/docs/Web/API/Document/adoptNode) is used so that the resulting element belongs to the current `document`.
  */
-export function stringDocumentToElement(string) {
+export function documentStringToElement(string) {
   return document.adoptNode(
     new DOMParser().parseFromString(string, "text/html").querySelector("html"),
   );
