@@ -6,7 +6,7 @@ import * as Tippy from "tippy.js";
   const liveNavigate = async (request, event) => {
     const body = document.querySelector("body");
 
-    if (event instanceof PopStateEvent) liveNavigate.abortController?.abort();
+    if (event instanceof PopStateEvent) liveNavigate.abortController.abort();
     else if (body.getAttribute("live-navigation") !== null) return;
 
     request.headers.set("Live-Navigation", "true");
@@ -73,9 +73,13 @@ import * as Tippy from "tippy.js";
         window.history.pushState(undefined, "", responseURL.href);
 
       Tippy.hideAll();
-      morph(document.querySelector("html"), documentStringToElement(responseText), {
-        detail,
-      });
+      morph(
+        document.querySelector("html"),
+        documentStringToElement(responseText),
+        {
+          detail,
+        },
+      );
       window.dispatchEvent(new CustomEvent("DOMContentLoaded", { detail }));
       document.querySelector("[autofocus]")?.focus();
 
@@ -112,6 +116,7 @@ import * as Tippy from "tippy.js";
     liveNavigate.previousLocation = { ...window.location };
     body.removeAttribute("live-navigation");
   };
+  liveNavigate.abortController = new AbortController();
   liveNavigate.previousLocation = { ...window.location };
   document.onclick = async (event) => {
     const link = event.target.closest(
