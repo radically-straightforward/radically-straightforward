@@ -1,3 +1,18 @@
 @import "tippy.js/dist/tippy.css";
 @import "tippy.js/dist/border.css";
 @import "tippy.js/dist/svg-arrow.css";
+
+.tippy-box {
+  --background-color: black;
+  --border-color: black;
+  background-color: var(--background-color);
+  border: 1px solid var(--border-color);
+  & > .tippy-svg-arrow > svg {
+    &:first-child {
+      fill: var(--border-color);
+    }
+    &:last-child {
+      fill: var(--background-color);
+    }
+  }
+}

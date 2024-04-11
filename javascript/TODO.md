@@ -10,17 +10,7 @@ css`
 
   .tippy-box {
     --background-color: lightblue;
-    background-color: var(--background-color);
     --border-color: darkblue;
-    border: 1px solid var(--border-color);
-    & > .tippy-svg-arrow > svg {
-      &:first-child {
-        fill: var(--border-color);
-      }
-      &:last-child {
-        fill: var(--background-color);
-      }
-    }
   }
 `;
 
