@@ -152,18 +152,18 @@ document.onsubmit = async (event) => {
     enctype === "multipart/form-data"
       ? new FormData(event.target)
       : new URLSearchParams(new FormData(event.target));
-  const submitterName = event.submitter?.getAttribute("name");
-  if (typeof submitterName === "string")
-    body.set(submitterName, event.submitter?.value ?? "");
+  if (typeof event.submitter?.getAttribute("name") === "string")
+    body.set(event.submitter.getAttribute("name"), event.submitter.value);
   event.preventDefault();
-  const request = ["GET", "HEAD", "OPTIONS", "TRACE"].includes(method)
-    ? (() => {
-        const actionURL = new URL(action);
-        for (const [name, value] of body)
-          actionURL.searchParams.append(name, value);
-        return new Request(actionURL.href, { method });
-      })()
-    : new Request(action, { method, body });
+  const request =
+    method === "GET"
+      ? (() => {
+          const actionURL = new URL(action);
+          for (const [name, value] of body)
+            actionURL.searchParams.append(name, value);
+          return new Request(actionURL.href);
+        })()
+      : new Request(action, { method, body });
   liveNavigate(request, event);
 };
 window.onpopstate = async (event) => {
