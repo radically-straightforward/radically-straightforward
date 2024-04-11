@@ -24,10 +24,9 @@ async function liveNavigate(request, event) {
     liveNavigate.previousLocation = { ...window.location };
     return;
   }
-
   if (
+    request.method === "GET" &&
     isModified(document.querySelector("body")) &&
-    request.method !== "GET" &&
     !confirm(
       "Your changes will be lost if you leave this page. Do you wish to continue?",
     )
