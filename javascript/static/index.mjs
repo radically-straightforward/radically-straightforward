@@ -2,8 +2,6 @@ import * as utilities from "@radically-straightforward/utilities";
 import fastMyersDiff from "fast-myers-diff";
 import tippy, * as tippyStatic from "tippy.js";
 
-// TODO: Do we want a method to combine `validate()`, `serialize()`, and a `fetch()` to submit the form?
-
 // export function liveNavigation() {
 //   let abortController;
 //   let previousLocation = { ...window.location };
@@ -193,8 +191,6 @@ import tippy, * as tippyStatic from "tippy.js";
 //     });
 //   };
 // }
-
-// TODO: Test `execute()` within a tippy.
 
 /**
  * Execute the functions defined by the `javascript="___"` attribute, which is set by [`@radically-straightforward/build`](https://github.com/radically-straightforward/radically-straightforward/tree/main/build) when extracting browser JavaScript. You must call this when you insert new elements in the DOM, for example, when loading a partial.
