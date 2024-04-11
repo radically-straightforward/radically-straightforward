@@ -31,9 +31,7 @@ async function liveNavigate(request, event) {
   )
     return;
   liveNavigate.inProgress = true;
-  window.dispatchEvent(new CustomEvent("livenavigate", { detail }));
   window.onlivenavigate?.();
-
   try {
     liveNavigate.abortController = new AbortController();
     const response = await fetch(request, {
@@ -101,9 +99,8 @@ async function liveNavigate(request, event) {
       window.onlivenavigateerror?.();
     }
   }
-
-  liveNavigate.previousLocation = { ...window.location };
   liveNavigate.inProgress = false;
+  liveNavigate.previousLocation = { ...window.location };
 }
 liveNavigate.abortController = new AbortController();
 liveNavigate.inProgress = false;
@@ -169,12 +166,12 @@ window.onpopstate = async (event) => {
 //   const serverVersion = document
 //     .querySelector(`meta[name="version"]`)
 //     ?.getAttribute("content");
-//   let inLiveNavigation = false;
+//   let inLiveNavigation = false; // TODO: Use liveNavigate.inProgress
 //   let heartbeatTimeout;
 //   let abortController;
 //   let liveReloadOnNextConnection = false;
 
-//   window.addEventListener(
+//   window.addEventListener( // TODO: This event doesn’t exist anymore.
 //     "livenavigate",
 //     () => {
 //       inLiveNavigation = true;
