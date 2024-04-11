@@ -1,6 +1,6 @@
 import * as utilities from "@radically-straightforward/utilities";
 import fastMyersDiff from "fast-myers-diff";
-import tippy, * as tippyStatic from "tippy.js";
+import * as Tippy from "tippy.js";
 
 // export function liveNavigation() {
 //   let abortController;
@@ -88,20 +88,18 @@ import tippy, * as tippyStatic from "tippy.js";
 //         if (isGet && !(event instanceof PopStateEvent))
 //           window.history.pushState(undefined, "", requestURL.href);
 
-//         setTippy({
+//         tippy({
 //           event,
 //           element: body,
 //           elementProperty: "liveNavigationErrorTooltip",
-//           tippyProps: {
-//             appendTo: body,
-//             trigger: "manual",
-//             hideOnClick: false,
-//             theme: "error",
-//             arrow: false,
-//             interactive: true,
-//             content:
-//               "Something went wrong when trying to perform this action. Please try reloading the page.",
-//           },
+//           appendTo: body,
+//           trigger: "manual",
+//           hideOnClick: false,
+//           theme: "error",
+//           arrow: false,
+//           interactive: true,
+//           content:
+//             "Something went wrong when trying to perform this action. Please try reloading the page.",
 //         });
 //         body.liveNavigationErrorTooltip.show();
 
@@ -253,19 +251,17 @@ execute.functions = new Map();
 
 //       if (response.status === 422) {
 //         console.error(response);
-//         setTippy({
+//         tippy({
 //           element: body,
 //           elementProperty: "liveConnectionValidationErrorTooltip",
-//           tippyProps: {
-//             appendTo: body,
-//             trigger: "manual",
-//             hideOnClick: false,
-//             theme: "error",
-//             arrow: false,
-//             interactive: true,
-//             content:
-//               "Failed to connect to server. Please try reloading the page.",
-//           },
+//           appendTo: body,
+//           trigger: "manual",
+//           hideOnClick: false,
+//           theme: "error",
+//           arrow: false,
+//           interactive: true,
+//           content:
+//             "Failed to connect to server. Please try reloading the page.",
 //         });
 //         body.liveConnectionValidationErrorTooltip.show();
 //         return;
@@ -284,18 +280,16 @@ execute.functions = new Map();
 //         console.error(
 //           `NEW SERVER VERSION: ${serverVersion} → ${newServerVersion}`,
 //         );
-//         setTippy({
+//         tippy({
 //           element: body,
 //           elementProperty: "liveConnectionNewServerVersionTooltip",
-//           tippyProps: {
-//             appendTo: body,
-//             trigger: "manual",
-//             hideOnClick: false,
-//             theme: "error",
-//             arrow: false,
-//             interactive: true,
-//             content: newServerVersionMessage,
-//           },
+//           appendTo: body,
+//           trigger: "manual",
+//           hideOnClick: false,
+//           theme: "error",
+//           arrow: false,
+//           interactive: true,
+//           content: newServerVersionMessage,
 //         });
 //         body.liveConnectionNewServerVersionTooltip.show();
 //         return;
@@ -342,18 +336,16 @@ execute.functions = new Map();
 //       console.error(error);
 
 //       if (!connected) {
-//         setTippy({
+//         tippy({
 //           element: body,
 //           elementProperty: "liveConnectionOfflineTooltip",
-//           tippyProps: {
-//             appendTo: body,
-//             trigger: "manual",
-//             hideOnClick: false,
-//             theme: "error",
-//             arrow: false,
-//             interactive: true,
-//             content: liveReload ? "Live-Reloading…" : offlineMessage,
-//           },
+//           appendTo: body,
+//           trigger: "manual",
+//           hideOnClick: false,
+//           theme: "error",
+//           arrow: false,
+//           interactive: true,
+//           content: liveReload ? "Live-Reloading…" : offlineMessage,
 //         });
 //         body.liveConnectionOfflineTooltip.show();
 //       }
@@ -375,7 +367,7 @@ execute.functions = new Map();
 // }
 
 // export function loadDocument(documentString, event) {
-//   if (!event?.detail?.liveConnectionUpdate) tippyStatic.hideAll();
+//   if (!event?.detail?.liveConnectionUpdate) Tippy.hideAll();
 
 //   morph(
 //     document.querySelector("html"),
@@ -395,7 +387,7 @@ execute.functions = new Map();
 // }
 
 /**
- * `morph()` the `content` into the container `element`. `execute()` the browser JavaScript in the `content`. If the `element` is within a Tippy.js tippy, force a reflow.
+ * `morph()` the `content` into the container `element`. Protect the `content` from changing in Live Connection updates. `execute()` the browser JavaScript in the `content`. If the `element` is within a Tippy.js tippy, force a reflow.
  */
 export function mount(element, content) {
   morph(element, content);
@@ -543,26 +535,27 @@ export function morph(from, to, event = undefined) {
 /**
  * Create a Tippy.js tippy. This is different from calling Tippy’s constructor in the following ways:
  *
- * 1. If called multiple times on the same `element` with the same `elementProperty`, then `setTippy()` doesn’t create new tippys, but `morph()`s the tippy contents.
+ * 1. If called multiple times on the same `element` with the same `elementProperty`, then `tippy()` doesn’t create new tippys, but `morph()`s the tippy contents.
  *
- * 2. `setTippy()` `execute()`s the contents of the tippy.
+ * 2. `tippy()` `execute()`s the contents of the tippy.
  */
-export function setTippy({
+export function tippy({
   event = undefined,
   element,
   elementProperty = "tooltip",
-  tippyProps: { content: tippyContent, ...tippyProps },
+  content,
+  ...tippyProps
 }) {
-  element[elementProperty] ??= tippy(element, {
+  element[elementProperty] ??= Tippy.default(element, {
     content: document.createElement("div"),
   });
   element[elementProperty].setProps(tippyProps);
-  morph(element[elementProperty].props.content, tippyContent, event);
+  morph(element[elementProperty].props.content, content, event);
   execute({ event, element: element[elementProperty].props.content });
   return element[elementProperty];
 }
-tippy.setDefaultProps({
-  arrow: tippyStatic.roundArrow + tippyStatic.roundArrow,
+Tippy.default.setDefaultProps({
+  arrow: Tippy.roundArrow + Tippy.roundArrow,
   duration: window.matchMedia("(prefers-reduced-motion: reduce)").matches
     ? 1
     : 150,
@@ -641,14 +634,12 @@ export function validate(element) {
         element.closest(
           "[hidden], .visually-hidden, .visually-hidden--interactive:not(:focus):not(:focus-within):not(:active)",
         )?.parentElement ?? element;
-      setTippy({
+      tippy({
         element: target,
         elementProperty: "validationErrorTooltip",
-        tippyProps: {
-          theme: "error",
-          trigger: "manual",
-          content: error.message,
-        },
+        theme: "error",
+        trigger: "manual",
+        content: error.message,
       }).show();
       target.focus();
       return false;
@@ -803,15 +794,13 @@ export function relativizeDateTimeElement(
   { target = element, capitalize = false, ...relativizeDateTimeOptions } = {},
 ) {
   const dateString = element.getAttribute("datetime");
-  setTippy({
+  tippy({
     element: target,
     elementProperty: "relativizeDateTimeElementTooltip",
-    tippyProps: {
-      touch: false,
-      content: `${localizeDateTime(dateString)} (${formatUTCDateTime(
-        dateString,
-      )})`,
-    },
+    touch: false,
+    content: `${localizeDateTime(dateString)} (${formatUTCDateTime(
+      dateString,
+    )})`,
   });
   backgroundJob(
     element,
