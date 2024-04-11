@@ -10,13 +10,12 @@ async function liveNavigate(request, event) {
   const detail = { request, previousLocation: liveNavigate.previousLocation };
   if (
     request.method === "GET" &&
-    liveNavigate.previousLocation.origin === requestURL.origin &&
     liveNavigate.previousLocation.pathname === requestURL.pathname &&
     liveNavigate.previousLocation.search === requestURL.search
   ) {
     if (
-      liveNavigate.previousLocation.hash !== requestURL.hash &&
-      !(event instanceof PopStateEvent)
+      !(event instanceof PopStateEvent) &&
+      liveNavigate.previousLocation.hash !== requestURL.hash
     )
       window.history.pushState(undefined, "", requestURL.href);
     window.dispatchEvent(new CustomEvent("livenavigateself", { detail }));
@@ -59,11 +58,9 @@ async function liveNavigate(request, event) {
 
     if (
       (request.method === "GET" ||
-        window.location.origin !== responseURL.origin ||
         window.location.pathname !== responseURL.pathname ||
         window.location.search !== responseURL.search) &&
       (!(event instanceof PopStateEvent) ||
-        requestURL.origin !== responseURL.origin ||
         requestURL.pathname !== responseURL.pathname ||
         requestURL.search !== responseURL.search)
     )
@@ -125,7 +122,7 @@ document.onclick = async (event) => {
     event.altKey ||
     event.metaKey ||
     link === null ||
-    link.hostname !== window.location.hostname ||
+    link.origin !== window.location.origin ||
     link.liveNavigate === false
   )
     return;
@@ -138,7 +135,7 @@ document.onsubmit = async (event) => {
   ).toUpperCase();
   const action =
     event.submitter?.getAttribute("formaction") ?? event.target.action;
-  if (new URL(action).hostname !== window.location.hostname) return;
+  if (new URL(action).origin !== window.location.origin) return;
   const enctype =
     event.submitter?.getAttribute("formenctype") ?? event.target.enctype;
   const body =
