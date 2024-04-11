@@ -75,7 +75,16 @@ import * as Tippy from "tippy.js";
 //       )
 //         window.history.pushState(undefined, "", responseURL.href);
 
-//       mountDocument(responseText, { detail });
+//       Tippy.hideAll();
+//       morph(
+//         document.querySelector("html"),
+//         documentStringToElement(content),
+//         { detail },
+//       );
+//       window.dispatchEvent(
+//         new CustomEvent("DOMContentLoaded", { detail }),
+//       );
+//       document.querySelector("[autofocus]")?.focus();
 
 //       if (window.location.hash.trim() !== "")
 //         document
@@ -293,12 +302,18 @@ import * as Tippy from "tippy.js";
 //         if (bufferPart === undefined) continue;
 //         const bufferPartJSON = JSON.parse(bufferPart);
 //         if (inLiveNavigation) return;
-//         mountDocument(bufferPartJSON, {
-//           detail: {
-//             previousLocation: { ...window.location },
-//             liveConnectionUpdate: true,
-//           },
-//         });
+//         const detail = {
+//           previousLocation: { ...window.location },
+//           liveConnectionUpdate: true,
+//         };
+//         morph(
+//           document.querySelector("html"),
+//           documentStringToElement(bufferPartJSON),
+//           { detail },
+//         );
+//         window.dispatchEvent(
+//           new CustomEvent("DOMContentLoaded", { detail }),
+//         );
 //       }
 //     } catch (error) {
 //       if (inLiveNavigation) return;
@@ -334,20 +349,6 @@ import * as Tippy from "tippy.js";
 //       );
 //     });
 //   }
-// }
-
-// export function mountDocument(content, event) {
-//   if (!event?.detail?.liveConnectionUpdate) Tippy.hideAll();
-//   morph(
-//     document.querySelector("html"),
-//     documentStringToElement(content),
-//     event,
-//   );
-//   window.dispatchEvent(
-//     new CustomEvent("DOMContentLoaded", { detail: event?.detail }),
-//   );
-//   if (!event?.detail?.liveConnectionUpdate)
-//     document.querySelector("[autofocus]")?.focus();
 // }
 
 /**
