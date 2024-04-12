@@ -28,6 +28,7 @@ async function liveNavigate(request, event = undefined) {
           })()) + "%";
   });
   try {
+    liveConnection.backgroundJob?.stop();
     liveNavigate.inProgress++;
     liveNavigate.abortController = new AbortController();
     const response = await fetch(request, {
@@ -136,15 +137,12 @@ export async function liveConnection({
   serverVersion = undefined,
   environment = "production",
 }) {
-  liveConnection.requestId = requestId;
   if (
     typeof liveConnection.serverVersion === "string" &&
     typeof serverVersion === "string" &&
     liveConnection.serverVersion !== serverVersion
   ) {
-    liveConnection.backgroundJob.stop();
-    liveConnection.abortController.abort();
-    window.clearTimeout(liveConnection.abortControllerTimeout);
+    document.querySelector("body").isModified = false;
     tippy({
       element:
         document.querySelector(`[key="global-error"]`) ??
@@ -157,32 +155,39 @@ export async function liveConnection({
       interactive: true,
       content: "There has been an update. Please reload the page.",
     }).show();
+    return;
   }
   liveConnection.serverVersion = serverVersion;
-  liveConnection.reload ??= false;
+  let abortController;
+  let abortControllerTimeout;
+  let reload = false;
   liveConnection.backgroundJob ??= utilities.backgroundJob(
-    { interval: environment === "development" ? 200 : 5 * 1000 },
+    {
+      interval: environment === "development" ? 200 : 5 * 1000,
+      onStop: () => {
+        abortController.abort();
+        window.clearTimeout(abortControllerTimeout);
+      },
+    },
     async () => {
-      liveConnection.abortController = new AbortController();
-      liveConnection.abortControllerTimeout = window.setTimeout(() => {
-        liveConnection.abortController.abort();
-      }, 50 * 1000);
-
       let connected = false;
-
       try {
+        abortController = new AbortController();
+        abortControllerTimeout = window.setTimeout(() => {
+          abortController.abort();
+        }, 60 * 1000);
         const response = await fetch(window.location.href, {
-          headers: { "Live-Connection": liveConnection.requestId },
-          cache: "no-store",
-          signal: liveConnection.abortController.signal,
+          headers: { "Live-Connection": requestId },
+          signal: abortController.signal,
         });
-
-        if (response.status === 422) {
+        if (!response.ok) {
+          // TODO: Throw an error here and use the `catch` flow to show error message.
           console.error(response);
           tippy({
-            element: document.querySelector("body"),
-            elementProperty: "liveConnectionValidationErrorTooltip",
-            appendTo: document.querySelector("body"),
+            element:
+              document.querySelector(`[key="global-error"]`) ??
+              document.querySelector("body > :first-child"),
+            elementProperty: "liveConnectionBadRequestTooltip",
             trigger: "manual",
             hideOnClick: false,
             theme: "error",
@@ -190,48 +195,16 @@ export async function liveConnection({
             interactive: true,
             content:
               "Failed to connect to server. Please try reloading the page.",
-          });
-          document
-            .querySelector("body")
-            .liveConnectionValidationErrorTooltip.show();
+          }).show();
           return;
         }
-        if (!response.ok) throw new Error("Response isn’t OK");
-
         connected = true;
-        document.querySelector("body").liveConnectionOfflineTooltip?.hide();
-
-        const newServerVersion = response.headers.get("Version");
-        if (
-          typeof serverVersion === "string" &&
-          typeof newServerVersion === "string" &&
-          serverVersion !== newServerVersion
-        ) {
-          console.error(
-            `NEW SERVER VERSION: ${serverVersion} → ${newServerVersion}`,
-          );
-          tippy({
-            element: document.querySelector("body"),
-            elementProperty: "liveConnectionNewServerVersionTooltip",
-            appendTo: document.querySelector("body"),
-            trigger: "manual",
-            hideOnClick: false,
-            theme: "error",
-            arrow: false,
-            interactive: true,
-            content: "There has been an update. Please reload the page.",
-          });
-          document
-            .querySelector("body")
-            .liveConnectionNewServerVersionTooltip.show();
-          return;
-        }
-
-        if (liveConnection.reload) {
+        (
+          document.querySelector(`[key="global-error"]`) ??
+          document.querySelector("body > :first-child")
+        ).liveConnectionOfflineTooltip?.hide();
+        if (reload) {
           document.querySelector("body").isModified = false;
-          await new Promise((resolve) => {
-            window.setTimeout(resolve, 300);
-          });
           window.location.reload();
           return;
         }
@@ -242,9 +215,9 @@ export async function liveConnection({
         while (true) {
           const chunk = (await responseBodyReader.read()).value;
           if (chunk === undefined) break;
-          window.clearTimeout(liveConnection.abortControllerTimeout);
-          liveConnection.abortControllerTimeout = window.setTimeout(() => {
-            liveConnection.abortController.abort();
+          window.clearTimeout(abortControllerTimeout);
+          abortControllerTimeout = window.setTimeout(() => {
+            abortController.abort();
           }, 50 * 1000);
           buffer += textDecoder.decode(chunk, { stream: true });
           const bufferParts = buffer.split("\n");
@@ -254,28 +227,24 @@ export async function liveConnection({
             .find((bufferPart) => bufferPart.trim() !== "");
           if (bufferPart === undefined) continue;
           const bufferPartJSON = JSON.parse(bufferPart);
-          if (liveNavigate.inProgress > 0) return;
-          const detail = {
-            previousLocation: { ...window.location },
-            liveConnectionUpdate: true,
-          };
+          const event = new CustomEvent("DOMContentLoaded", {
+            detail: { liveConnectionUpdate: true },
+          });
           morph(
             document.querySelector("html"),
             documentStringToElement(bufferPartJSON),
-            { detail },
+            event,
           );
-          window.dispatchEvent(new CustomEvent("DOMContentLoaded", { detail }));
+          window.dispatchEvent(event);
         }
       } catch (error) {
-        if (liveNavigate.inProgress > 0) return;
-
         console.error(error);
-
-        if (!connected) {
+        if (!connected)
           tippy({
-            element: document.querySelector("body"),
+            element:
+              document.querySelector(`[key="global-error"]`) ??
+              document.querySelector("body > :first-child"),
             elementProperty: "liveConnectionOfflineTooltip",
-            appendTo: document.querySelector("body"),
             trigger: "manual",
             hideOnClick: false,
             theme: "error",
@@ -283,19 +252,19 @@ export async function liveConnection({
             interactive: true,
             content:
               environment === "development"
-                ? "Live-Reloading…"
+                ? "Reloading…"
                 : "Failed to connect. Please check your internet connection and try reloading the page.",
-          });
-          document.querySelector("body").liveConnectionOfflineTooltip.show();
-        }
+          }).show();
       } finally {
-        window.clearTimeout(liveConnection.abortControllerTimeout);
-        liveConnection.abortController.abort();
-        liveConnection.reload = environment === "development";
+        abortController.abort();
+        window.clearTimeout(abortControllerTimeout);
+        reload = environment === "development";
       }
     },
   );
 }
+liveConnection.backgroundJob = undefined;
+liveConnection.serverVersion = undefined;
 
 /**
  * `morph()` the `element` container to include `content`. `execute()` the browser JavaScript in the `element`. Protect the `element` from changing in Live Connection updates.
