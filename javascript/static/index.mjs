@@ -143,6 +143,8 @@ export async function liveConnection({
     liveConnection.serverVersion !== serverVersion
   ) {
     liveConnection.backgroundJob.stop();
+    liveConnection.abortController.abort();
+    window.clearTimeout(liveConnection.abortControllerTimeout);
     tippy({
       element:
         document.querySelector(`[key="global-error"]`) ??
@@ -161,10 +163,10 @@ export async function liveConnection({
   liveConnection.backgroundJob ??= utilities.backgroundJob(
     { interval: environment === "development" ? 200 : 5 * 1000 },
     async () => {
-      heartbeatTimeout = window.setTimeout(() => {
-        abortController.abort();
+      liveConnection.abortController = new AbortController();
+      liveConnection.abortControllerTimeout = window.setTimeout(() => {
+        liveConnection.abortController.abort();
       }, 50 * 1000);
-      abortController = new AbortController();
 
       let connected = false;
 
@@ -172,7 +174,7 @@ export async function liveConnection({
         const response = await fetch(window.location.href, {
           headers: { "Live-Connection": liveConnection.requestId },
           cache: "no-store",
-          signal: abortController.signal,
+          signal: liveConnection.abortController.signal,
         });
 
         if (response.status === 422) {
@@ -240,9 +242,9 @@ export async function liveConnection({
         while (true) {
           const chunk = (await responseBodyReader.read()).value;
           if (chunk === undefined) break;
-          clearTimeout(heartbeatTimeout);
-          heartbeatTimeout = window.setTimeout(() => {
-            abortController.abort();
+          window.clearTimeout(liveConnection.abortControllerTimeout);
+          liveConnection.abortControllerTimeout = window.setTimeout(() => {
+            liveConnection.abortController.abort();
           }, 50 * 1000);
           buffer += textDecoder.decode(chunk, { stream: true });
           const bufferParts = buffer.split("\n");
@@ -287,10 +289,10 @@ export async function liveConnection({
           document.querySelector("body").liveConnectionOfflineTooltip.show();
         }
       } finally {
-        clearTimeout(heartbeatTimeout);
-        abortController.abort();
+        window.clearTimeout(liveConnection.abortControllerTimeout);
+        liveConnection.abortController.abort();
+        liveConnection.reload = environment === "development";
       }
-      liveConnection.reload = environment === "development";
     },
   );
 }
