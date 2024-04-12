@@ -115,7 +115,7 @@ window.onsubmit = async (event) => {
   if (typeof event.submitter?.getAttribute("name") === "string")
     body.set(event.submitter.getAttribute("name"), event.submitter.value);
   event.preventDefault();
-  const request =
+  liveNavigate(
     method === "GET"
       ? (() => {
           const actionURL = new URL(action);
@@ -127,8 +127,8 @@ window.onsubmit = async (event) => {
           method,
           headers: { "CSRF-Protection": "true" },
           body,
-        });
-  liveNavigate(request);
+        }),
+  );
 };
 window.onpopstate = async (event) => {
   liveNavigate(new Request(window.location), event);
