@@ -14,7 +14,22 @@ async function liveNavigate(request, event) {
     )
   )
     return;
-  window.onlivenavigate?.();
+  const progressBar = document
+    .querySelector("body")
+    .insertAdjacentElement(
+      "afterbegin",
+      stringToElement(`<div key="live-navigation--progress-bar"></div>`)
+        .firstElementChild,
+    );
+  backgroundJob(progressBar, "progressBar", { interval: 1000 }, () => {
+    progressBar.style.width =
+      (progressBar.style.width.trim() === ""
+        ? "15"
+        : (() => {
+            const width = Number(progressBar.style.width.slice(0, -1));
+            return width + (90 - width) / (20 + Math.random() * 50);
+          })()) + "%";
+  });
   try {
     liveNavigate.inProgress++;
     liveNavigate.abortController = new AbortController();
