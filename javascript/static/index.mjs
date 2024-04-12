@@ -72,7 +72,7 @@ async function liveNavigate(request, event) {
 liveNavigate.abortController = new AbortController();
 liveNavigate.inProgress = 0;
 liveNavigate.previousLocation = { ...window.location };
-document.onclick = async (event) => {
+window.onclick = async (event) => {
   const link = event.target.closest(`a:not([target="_blank"])`);
   if (
     event.button !== 0 ||
@@ -96,7 +96,7 @@ document.onclick = async (event) => {
   event.preventDefault();
   liveNavigate(new Request(link.href), event);
 };
-document.onsubmit = async (event) => {
+window.onsubmit = async (event) => {
   const method = (
     event.submitter?.getAttribute("formmethod") ?? event.target.method
   ).toUpperCase();
@@ -148,7 +148,8 @@ window.onpopstate = async (event) => {
 //   let abortController;
 //   let liveReloadOnNextConnection = false;
 
-//   window.addEventListener( // TODO: This event doesn’t exist anymore.
+//   window.addEventListener(
+//     // TODO: This event doesn’t exist anymore.
 //     "livenavigate",
 //     () => {
 //       inLiveNavigation = true;
@@ -256,9 +257,7 @@ window.onpopstate = async (event) => {
 //           documentStringToElement(bufferPartJSON),
 //           { detail },
 //         );
-//         window.dispatchEvent(
-//           new CustomEvent("DOMContentLoaded", { detail }),
-//         );
+//         window.dispatchEvent(new CustomEvent("DOMContentLoaded", { detail }));
 //       }
 //     } catch (error) {
 //       if (inLiveNavigation) return;
@@ -579,7 +578,7 @@ export function validate(element) {
   }
   return true;
 }
-document.addEventListener(
+window.addEventListener(
   "submit",
   (event) => {
     if (validate(event.target)) return;
@@ -694,7 +693,7 @@ window.addEventListener("DOMContentLoaded", () => {
     if (isModified(document.querySelector("body"))) event.preventDefault();
   };
 });
-document.addEventListener("submit", () => {
+window.addEventListener("submit", () => {
   window.onbeforeunload = () => {};
 });
 
