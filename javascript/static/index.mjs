@@ -150,147 +150,143 @@ export async function liveConnection({
     { once: true },
   );
 
-  while (true) {
-    heartbeatTimeout = window.setTimeout(() => {
-      abortController.abort();
-    }, 50 * 1000);
-    abortController = new AbortController();
+  utilities.backgroundJob(
+    { interval: environment === "development" ? 200 : 5 * 1000 },
+    async () => {
+      heartbeatTimeout = window.setTimeout(() => {
+        abortController.abort();
+      }, 50 * 1000);
+      abortController = new AbortController();
 
-    let connected = false;
+      let connected = false;
 
-    try {
-      const response = await fetch(window.location.href, {
-        headers: { "Live-Connection": requestId },
-        cache: "no-store",
-        signal: abortController.signal,
-      });
-
-      if (response.status === 422) {
-        console.error(response);
-        tippy({
-          element: document.querySelector("body"),
-          elementProperty: "liveConnectionValidationErrorTooltip",
-          appendTo: document.querySelector("body"),
-          trigger: "manual",
-          hideOnClick: false,
-          theme: "error",
-          arrow: false,
-          interactive: true,
-          content:
-            "Failed to connect to server. Please try reloading the page.",
+      try {
+        const response = await fetch(window.location.href, {
+          headers: { "Live-Connection": requestId },
+          cache: "no-store",
+          signal: abortController.signal,
         });
-        document
-          .querySelector("body")
-          .liveConnectionValidationErrorTooltip.show();
-        return;
-      }
-      if (!response.ok) throw new Error("Response isn’t OK");
 
-      connected = true;
-      document.querySelector("body").liveConnectionOfflineTooltip?.hide();
+        if (response.status === 422) {
+          console.error(response);
+          tippy({
+            element: document.querySelector("body"),
+            elementProperty: "liveConnectionValidationErrorTooltip",
+            appendTo: document.querySelector("body"),
+            trigger: "manual",
+            hideOnClick: false,
+            theme: "error",
+            arrow: false,
+            interactive: true,
+            content:
+              "Failed to connect to server. Please try reloading the page.",
+          });
+          document
+            .querySelector("body")
+            .liveConnectionValidationErrorTooltip.show();
+          return;
+        }
+        if (!response.ok) throw new Error("Response isn’t OK");
 
-      const newServerVersion = response.headers.get("Version");
-      if (
-        typeof serverVersion === "string" &&
-        typeof newServerVersion === "string" &&
-        serverVersion !== newServerVersion
-      ) {
-        console.error(
-          `NEW SERVER VERSION: ${serverVersion} → ${newServerVersion}`,
-        );
-        tippy({
-          element: document.querySelector("body"),
-          elementProperty: "liveConnectionNewServerVersionTooltip",
-          appendTo: document.querySelector("body"),
-          trigger: "manual",
-          hideOnClick: false,
-          theme: "error",
-          arrow: false,
-          interactive: true,
-          content: "There has been an update. Please reload the page.",
-        });
-        document
-          .querySelector("body")
-          .liveConnectionNewServerVersionTooltip.show();
-        return;
-      }
+        connected = true;
+        document.querySelector("body").liveConnectionOfflineTooltip?.hide();
 
-      if (liveReloadOnNextConnection) {
-        document.querySelector("body").isModified = false;
-        await new Promise((resolve) => {
-          window.setTimeout(resolve, 300);
-        });
-        window.location.reload();
-        return;
-      }
+        const newServerVersion = response.headers.get("Version");
+        if (
+          typeof serverVersion === "string" &&
+          typeof newServerVersion === "string" &&
+          serverVersion !== newServerVersion
+        ) {
+          console.error(
+            `NEW SERVER VERSION: ${serverVersion} → ${newServerVersion}`,
+          );
+          tippy({
+            element: document.querySelector("body"),
+            elementProperty: "liveConnectionNewServerVersionTooltip",
+            appendTo: document.querySelector("body"),
+            trigger: "manual",
+            hideOnClick: false,
+            theme: "error",
+            arrow: false,
+            interactive: true,
+            content: "There has been an update. Please reload the page.",
+          });
+          document
+            .querySelector("body")
+            .liveConnectionNewServerVersionTooltip.show();
+          return;
+        }
 
-      const responseBodyReader = response.body.getReader();
-      const textDecoder = new TextDecoder();
-      let buffer = "";
-      while (true) {
-        const chunk = (await responseBodyReader.read()).value;
-        if (chunk === undefined) break;
-        clearTimeout(heartbeatTimeout);
-        heartbeatTimeout = window.setTimeout(() => {
-          abortController.abort();
-        }, 50 * 1000);
-        buffer += textDecoder.decode(chunk, { stream: true });
-        const bufferParts = buffer.split("\n");
-        buffer = bufferParts.pop();
-        const bufferPart = bufferParts
-          .reverse()
-          .find((bufferPart) => bufferPart.trim() !== "");
-        if (bufferPart === undefined) continue;
-        const bufferPartJSON = JSON.parse(bufferPart);
+        if (liveReloadOnNextConnection) {
+          document.querySelector("body").isModified = false;
+          await new Promise((resolve) => {
+            window.setTimeout(resolve, 300);
+          });
+          window.location.reload();
+          return;
+        }
+
+        const responseBodyReader = response.body.getReader();
+        const textDecoder = new TextDecoder();
+        let buffer = "";
+        while (true) {
+          const chunk = (await responseBodyReader.read()).value;
+          if (chunk === undefined) break;
+          clearTimeout(heartbeatTimeout);
+          heartbeatTimeout = window.setTimeout(() => {
+            abortController.abort();
+          }, 50 * 1000);
+          buffer += textDecoder.decode(chunk, { stream: true });
+          const bufferParts = buffer.split("\n");
+          buffer = bufferParts.pop();
+          const bufferPart = bufferParts
+            .reverse()
+            .find((bufferPart) => bufferPart.trim() !== "");
+          if (bufferPart === undefined) continue;
+          const bufferPartJSON = JSON.parse(bufferPart);
+          if (liveNavigate.inProgress > 0) return;
+          const detail = {
+            previousLocation: { ...window.location },
+            liveConnectionUpdate: true,
+          };
+          morph(
+            document.querySelector("html"),
+            documentStringToElement(bufferPartJSON),
+            { detail },
+          );
+          window.dispatchEvent(new CustomEvent("DOMContentLoaded", { detail }));
+        }
+      } catch (error) {
         if (liveNavigate.inProgress > 0) return;
-        const detail = {
-          previousLocation: { ...window.location },
-          liveConnectionUpdate: true,
-        };
-        morph(
-          document.querySelector("html"),
-          documentStringToElement(bufferPartJSON),
-          { detail },
-        );
-        window.dispatchEvent(new CustomEvent("DOMContentLoaded", { detail }));
+
+        console.error(error);
+
+        if (!connected) {
+          tippy({
+            element: document.querySelector("body"),
+            elementProperty: "liveConnectionOfflineTooltip",
+            appendTo: document.querySelector("body"),
+            trigger: "manual",
+            hideOnClick: false,
+            theme: "error",
+            arrow: false,
+            interactive: true,
+            content:
+              environment === "development"
+                ? "Live-Reloading…"
+                : "Failed to connect. Please check your internet connection and try reloading the page.",
+          });
+          document.querySelector("body").liveConnectionOfflineTooltip.show();
+        }
+      } finally {
+        clearTimeout(heartbeatTimeout);
+        abortController.abort();
       }
-    } catch (error) {
-      if (liveNavigate.inProgress > 0) return;
 
-      console.error(error);
-
-      if (!connected) {
-        tippy({
-          element: document.querySelector("body"),
-          elementProperty: "liveConnectionOfflineTooltip",
-          appendTo: document.querySelector("body"),
-          trigger: "manual",
-          hideOnClick: false,
-          theme: "error",
-          arrow: false,
-          interactive: true,
-          content:
-            environment === "development"
-              ? "Live-Reloading…"
-              : "Failed to connect. Please check your internet connection and try reloading the page.",
-        });
-        document.querySelector("body").liveConnectionOfflineTooltip.show();
-      }
-    } finally {
-      clearTimeout(heartbeatTimeout);
-      abortController.abort();
-    }
-
-    requestId = Math.random().toString(36).slice(2);
-    liveReloadOnNextConnection = environment === "development";
-
-    await new Promise((resolve) => {
-      window.setTimeout(
-        resolve,
-        environment === "development" ? 200 : 5 * 1000,
-      );
-    });
-  }
+      requestId = Math.random().toString(36).slice(2);
+      liveReloadOnNextConnection = environment === "development";
+    },
+  );
 }
 
 /**
