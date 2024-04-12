@@ -34,7 +34,7 @@ async function liveNavigate(request, event) {
         requestURL.pathname !== responseURL.pathname ||
         requestURL.search !== responseURL.search)
     )
-      window.history.pushState(undefined, "", responseURL.href);
+      window.history.pushState(null, "", responseURL.href);
     Tippy.hideAll();
     const detail = { request, previousLocation: liveNavigate.previousLocation };
     morph(
@@ -49,7 +49,7 @@ async function liveNavigate(request, event) {
   } catch (error) {
     if (error.name === "AbortError") return;
     if (request.method === "GET" && !(event instanceof PopStateEvent))
-      window.history.pushState(undefined, "", request.url);
+      window.history.pushState(null, "", request.url);
     tippy({
       event,
       element:
