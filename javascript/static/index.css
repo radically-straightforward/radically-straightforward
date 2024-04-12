@@ -1,3 +1,7 @@
+@import "tippy.js/dist/tippy.css";
+@import "tippy.js/dist/border.css";
+@import "tippy.js/dist/svg-arrow.css";
+
 [key="live-navigation--progress-bar"] {
   background-color: #3b82f6;
   height: 4px;
@@ -7,10 +11,6 @@
   left: 0;
   transition: width 300ms cubic-bezier(0.4, 0, 0.2, 1);
 }
-
-@import "tippy.js/dist/tippy.css";
-@import "tippy.js/dist/border.css";
-@import "tippy.js/dist/svg-arrow.css";
 
 .tippy-box {
   --background-color: black;
