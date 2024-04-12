@@ -2,7 +2,7 @@ import * as utilities from "@radically-straightforward/utilities";
 import fastMyersDiff from "fast-myers-diff";
 import * as Tippy from "tippy.js";
 
-async function liveNavigate(request, event) {
+async function liveNavigate(request, event = undefined) {
   if (liveNavigate.inProgress > 0)
     if (event instanceof PopStateEvent) liveNavigate.abortController.abort();
     else return;
@@ -94,7 +94,7 @@ window.onclick = async (event) => {
   )
     return;
   event.preventDefault();
-  liveNavigate(new Request(link.href), event);
+  liveNavigate(new Request(link.href));
 };
 window.onsubmit = async (event) => {
   const method = (
@@ -124,9 +124,12 @@ window.onsubmit = async (event) => {
             actionURL.searchParams.append(name, value);
           return new Request(actionURL.href);
         })()
-      : new Request(action, { method, body });
-  request.headers.set("CSRF-Protection", "true");
-  liveNavigate(request, event);
+      : new Request(action, {
+          method,
+          headers: { "CSRF-Protection": "true" },
+          body,
+        });
+  liveNavigate(request);
 };
 window.onpopstate = async (event) => {
   liveNavigate(new Request(window.location), event);
