@@ -132,12 +132,9 @@ window.onpopstate = async (event) => {
 };
 
 export async function liveConnection({
-  nonce,
-  newServerVersionMessage = "There has been an update. Please reload the page.",
-  offlineMessage = "Failed to connect. Please check your internet connection and try reloading the page.",
+  requestId,
+  serverVersion = undefined,
   environment = "production",
-  reconnectTimeout = environment === "development" ? 200 : 5 * 1000,
-  liveReload = environment === "development",
 }) {
   const body = document.querySelector("body");
   const serverVersion = document
@@ -169,7 +166,7 @@ export async function liveConnection({
 
     try {
       const response = await fetch(window.location.href, {
-        headers: { "Live-Connection": nonce },
+        headers: { "Live-Connection": requestId },
         cache: "no-store",
         signal: abortController.signal,
       });
@@ -214,7 +211,7 @@ export async function liveConnection({
           theme: "error",
           arrow: false,
           interactive: true,
-          content: newServerVersionMessage,
+          content: "There has been an update. Please reload the page.",
         });
         body.liveConnectionNewServerVersionTooltip.show();
         return;
@@ -274,7 +271,10 @@ export async function liveConnection({
           theme: "error",
           arrow: false,
           interactive: true,
-          content: liveReload ? "Live-Reloading…" : offlineMessage,
+          content:
+            environment === "development"
+              ? "Live-Reloading…"
+              : "Failed to connect. Please check your internet connection and try reloading the page.",
         });
         body.liveConnectionOfflineTooltip.show();
       }
@@ -283,13 +283,13 @@ export async function liveConnection({
       abortController.abort();
     }
 
-    nonce = Math.random().toString(36).slice(2);
-    liveReloadOnNextConnection = liveReload;
+    requestId = Math.random().toString(36).slice(2);
+    liveReloadOnNextConnection = environment === "development";
 
     await new Promise((resolve) => {
       window.setTimeout(
         resolve,
-        reconnectTimeout + Math.random() * reconnectTimeout * 0.2,
+        environment === "development" ? 200 : 5 * 1000,
       );
     });
   }
