@@ -4,7 +4,7 @@ import * as Tippy from "tippy.js";
 
 async function liveNavigate(request, event) {
   if (event instanceof PopStateEvent) liveNavigate.abortController.abort();
-  else if (liveNavigate.inProgress) return;
+  else if (liveNavigate.inProgress > 0) return;
   if (request.method !== "GET") request.headers.set("CSRF-Protection", "true");
   const requestURL = new URL(request.url);
   const detail = { request, previousLocation: liveNavigate.previousLocation };
@@ -16,7 +16,7 @@ async function liveNavigate(request, event) {
     )
   )
     return;
-  liveNavigate.inProgress = true;
+  liveNavigate.inProgress++;
   window.onlivenavigate?.();
   try {
     liveNavigate.abortController = new AbortController();
@@ -61,29 +61,29 @@ async function liveNavigate(request, event) {
     if (window.location.hash.trim() !== "")
       document.getElementById(window.location.hash.slice(1))?.scrollIntoView();
   } catch (error) {
-    if (error.name !== "AbortError") {
-      console.error(error);
-      if (request.method === "GET" && !(event instanceof PopStateEvent))
-        window.history.pushState(undefined, "", requestURL.href);
-      tippy({
-        event,
-        element: document.querySelector("body"),
-        elementProperty: "liveNavigationErrorTooltip",
-        appendTo: document.querySelector("body"),
-        trigger: "manual",
-        hideOnClick: false,
-        theme: "error",
-        arrow: false,
-        interactive: true,
-        content: "Something went wrong. Please try reloading the page.",
-      }).show();
-    }
+    if (error.name === "AbortError") return;
+    console.error(error);
+    if (request.method === "GET" && !(event instanceof PopStateEvent))
+      window.history.pushState(undefined, "", requestURL.href);
+    tippy({
+      event,
+      element: document.querySelector("body"),
+      elementProperty: "liveNavigationErrorTooltip",
+      appendTo: document.querySelector("body"),
+      trigger: "manual",
+      hideOnClick: false,
+      theme: "error",
+      arrow: false,
+      interactive: true,
+      content: "Something went wrong. Please try reloading the page.",
+    }).show();
+  } finally {
+    liveNavigate.inProgress--;
+    liveNavigate.previousLocation = { ...window.location };
   }
-  liveNavigate.inProgress = false;
-  liveNavigate.previousLocation = { ...window.location };
 }
 liveNavigate.abortController = new AbortController();
-liveNavigate.inProgress = false;
+liveNavigate.inProgress = 0;
 liveNavigate.previousLocation = { ...window.location };
 document.onclick = async (event) => {
   const link = event.target.closest(`a:not([target="_blank"])`);
@@ -103,7 +103,7 @@ document.onclick = async (event) => {
     link.search === window.location.search &&
     link.hash !== window.location.hash
   ) {
-    liveNavigate.previousLocation = { ...window.location };
+    liveNavigate.previousLocation = { ...window.location, hash: link.hash };
     return;
   }
   event.preventDefault();
