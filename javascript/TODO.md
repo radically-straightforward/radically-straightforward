@@ -1,6 +1,5 @@
 # TODO
 
-- Can we get rid of `previousLocation`?
 - `TODO` in `index.mjs`
 
 ---
