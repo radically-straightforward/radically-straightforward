@@ -58,7 +58,6 @@ async function liveNavigate(request, event = undefined) {
     if (!(event instanceof PopStateEvent) && request.method === "GET")
       window.history.pushState(null, "", request.url);
     tippy({
-      event,
       element:
         document.querySelector("#global-error") ??
         document.querySelector("body > :first-child"),
