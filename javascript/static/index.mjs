@@ -24,14 +24,6 @@ async function liveNavigate(request, event) {
       signal: liveNavigate.abortController.signal,
     });
 
-    const externalRedirect = response.headers.get(
-      "Live-Navigation-External-Redirect",
-    );
-    if (typeof externalRedirect === "string") {
-      window.location.assign(externalRedirect);
-      return;
-    }
-
     const requestURL = new URL(request.url);
     const responseText = await response.text();
     const responseURL = new URL(response.url);
@@ -116,7 +108,11 @@ document.onsubmit = async (event) => {
   ).toUpperCase();
   const action =
     event.submitter?.getAttribute("formaction") ?? event.target.action;
-  if (new URL(action).origin !== window.location.origin) return;
+  if (
+    new URL(action).origin !== window.location.origin ||
+    event.target.liveNavigate === false
+  )
+    return;
   const enctype =
     event.submitter?.getAttribute("formenctype") ?? event.target.enctype;
   const body =
