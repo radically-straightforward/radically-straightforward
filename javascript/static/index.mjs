@@ -43,12 +43,8 @@ async function liveNavigate(request, event) {
     responseURL.hash = requestURL.hash;
     const responseText = await response.text();
     if (
-      (request.method === "GET" ||
-        liveNavigate.previousLocation.pathname !== responseURL.pathname ||
-        liveNavigate.previousLocation.search !== responseURL.search) &&
-      (!(event instanceof PopStateEvent) ||
-        requestURL.pathname !== responseURL.pathname ||
-        requestURL.search !== responseURL.search)
+      window.location.pathname !== response.pathname ||
+      window.location.search !== response.search
     )
       window.history.pushState(null, "", responseURL.href);
     Tippy.hideAll();
@@ -64,7 +60,7 @@ async function liveNavigate(request, event) {
     window.dispatchEvent(new CustomEvent("DOMContentLoaded", { detail }));
   } catch (error) {
     if (error.name === "AbortError") return;
-    if (request.method === "GET" && !(event instanceof PopStateEvent))
+    if (!(event instanceof PopStateEvent) && request.method === "GET")
       window.history.pushState(null, "", request.url);
     tippy({
       event,
