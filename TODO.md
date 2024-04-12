@@ -1,5 +1,7 @@
 # TODO
 
+- Can we get by without `cache: "no-store"` on every `fetch()`?
+
 ---
 
 `@radically-straightforward/utilities`’s `intern` performance benchmark:

@@ -5,9 +5,6 @@ import * as Tippy from "tippy.js";
 async function liveNavigate(request, event) {
   if (event instanceof PopStateEvent) liveNavigate.abortController.abort();
   else if (liveNavigate.inProgress > 0) return;
-  if (request.method !== "GET") request.headers.set("CSRF-Protection", "true");
-  const requestURL = new URL(request.url);
-  const detail = { request, previousLocation: liveNavigate.previousLocation };
   if (
     request.method === "GET" &&
     isModified(document.querySelector("body")) &&
@@ -16,9 +13,11 @@ async function liveNavigate(request, event) {
     )
   )
     return;
-  liveNavigate.inProgress++;
   window.onlivenavigate?.();
   try {
+    liveNavigate.inProgress++;
+    if (request.method !== "GET")
+      request.headers.set("CSRF-Protection", "true");
     liveNavigate.abortController = new AbortController();
     const response = await fetch(request, {
       cache: "no-store",
@@ -33,6 +32,7 @@ async function liveNavigate(request, event) {
       return;
     }
 
+    const requestURL = new URL(request.url);
     const responseText = await response.text();
     const responseURL = new URL(response.url);
     responseURL.hash = requestURL.hash;
@@ -48,6 +48,7 @@ async function liveNavigate(request, event) {
       window.history.pushState(undefined, "", responseURL.href);
 
     Tippy.hideAll();
+    const detail = { request, previousLocation: liveNavigate.previousLocation };
     morph(
       document.querySelector("html"),
       documentStringToElement(responseText),
