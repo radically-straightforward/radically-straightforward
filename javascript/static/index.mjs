@@ -16,8 +16,7 @@ async function liveNavigate(request, event = undefined) {
     .querySelector("body")
     .insertAdjacentElement(
       "afterbegin",
-      stringToElement(`<div key="live-navigation--progress-bar"></div>`)
-        .firstElementChild,
+      stringToElement(`<div key="progress-bar"></div>`).firstElementChild,
     );
   backgroundJob(progressBar, "progressBar", { interval: 1000 }, () => {
     progressBar.style.width =
@@ -57,7 +56,7 @@ async function liveNavigate(request, event = undefined) {
       window.history.pushState(null, "", request.url);
     tippy({
       element:
-        document.querySelector("#global-error") ??
+        document.querySelector(`[key="global-error"]`) ??
         document.querySelector("body > :first-child"),
       elementProperty: "liveNavigationErrorTooltip",
       trigger: "manual",

@@ -2,7 +2,7 @@
 @import "tippy.js/dist/border.css";
 @import "tippy.js/dist/svg-arrow.css";
 
-[key="live-navigation--progress-bar"] {
+[key="progress-bar"] {
   background-color: #3b82f6;
   height: 4px;
   position: fixed;
