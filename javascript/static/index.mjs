@@ -136,21 +136,29 @@ export async function liveConnection({
   serverVersion = undefined,
   environment = "production",
 }) {
-  let heartbeatTimeout;
-  let abortController;
-  let liveReloadOnNextConnection = false;
-
-  window.addEventListener(
-    "DOMContentLoaded",
-    () => {
-      clearTimeout(heartbeatTimeout);
-      abortController.abort();
-    },
-    { once: true },
-  );
-
-  liveConnection.backgroundJob?.stop();
-  liveConnection.backgroundJob = utilities.backgroundJob(
+  liveConnection.requestId = requestId;
+  if (
+    typeof liveConnection.serverVersion === "string" &&
+    typeof serverVersion === "string" &&
+    liveConnection.serverVersion !== serverVersion
+  ) {
+    liveConnection.backgroundJob.stop();
+    tippy({
+      element:
+        document.querySelector(`[key="global-error"]`) ??
+        document.querySelector("body > :first-child"),
+      elementProperty: "liveConnectionNewServerVersionTooltip",
+      trigger: "manual",
+      hideOnClick: false,
+      theme: "error",
+      arrow: false,
+      interactive: true,
+      content: "There has been an update. Please reload the page.",
+    }).show();
+  }
+  liveConnection.serverVersion = serverVersion;
+  liveConnection.reload ??= false;
+  liveConnection.backgroundJob ??= utilities.backgroundJob(
     { interval: environment === "development" ? 200 : 5 * 1000 },
     async () => {
       heartbeatTimeout = window.setTimeout(() => {
@@ -162,7 +170,7 @@ export async function liveConnection({
 
       try {
         const response = await fetch(window.location.href, {
-          headers: { "Live-Connection": requestId },
+          headers: { "Live-Connection": liveConnection.requestId },
           cache: "no-store",
           signal: abortController.signal,
         });
@@ -217,7 +225,7 @@ export async function liveConnection({
           return;
         }
 
-        if (liveReloadOnNextConnection) {
+        if (liveConnection.reload) {
           document.querySelector("body").isModified = false;
           await new Promise((resolve) => {
             window.setTimeout(resolve, 300);
@@ -282,13 +290,10 @@ export async function liveConnection({
         clearTimeout(heartbeatTimeout);
         abortController.abort();
       }
-
-      requestId = Math.random().toString(36).slice(2);
-      liveReloadOnNextConnection = environment === "development";
+      liveConnection.reload = environment === "development";
     },
   );
 }
-liveConnection.backgroundJob = undefined;
 
 /**
  * `morph()` the `element` container to include `content`. `execute()` the browser JavaScript in the `element`. Protect the `element` from changing in Live Connection updates.
