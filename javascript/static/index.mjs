@@ -943,10 +943,10 @@ export let shiftKey = false;
   const eventListener = (event) => {
     isPhysicalKeyboard =
       isPhysicalKeyboard ||
-      event.altKey ||
+      event.shiftKey ||
       event.ctrlKey ||
-      event.metaKey ||
-      event.shiftKey;
+      event.altKey ||
+      event.metaKey;
     shiftKey = event.shiftKey;
   };
   window.addEventListener("keydown", eventListener);
