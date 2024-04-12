@@ -136,11 +136,6 @@ export async function liveConnection({
   serverVersion = undefined,
   environment = "production",
 }) {
-  const body = document.querySelector("body");
-  const serverVersion = document
-    .querySelector(`meta[name="version"]`)
-    ?.getAttribute("content");
-  let inLiveNavigation = false; // TODO: Use liveNavigate.inProgress
   let heartbeatTimeout;
   let abortController;
   let liveReloadOnNextConnection = false;
@@ -149,7 +144,6 @@ export async function liveConnection({
     // TODO: This event doesn’t exist anymore.
     "livenavigate",
     () => {
-      inLiveNavigation = true;
       clearTimeout(heartbeatTimeout);
       abortController.abort();
     },
@@ -174,9 +168,9 @@ export async function liveConnection({
       if (response.status === 422) {
         console.error(response);
         tippy({
-          element: body,
+          element: document.querySelector("body"),
           elementProperty: "liveConnectionValidationErrorTooltip",
-          appendTo: body,
+          appendTo: document.querySelector("body"),
           trigger: "manual",
           hideOnClick: false,
           theme: "error",
@@ -185,13 +179,15 @@ export async function liveConnection({
           content:
             "Failed to connect to server. Please try reloading the page.",
         });
-        body.liveConnectionValidationErrorTooltip.show();
+        document
+          .querySelector("body")
+          .liveConnectionValidationErrorTooltip.show();
         return;
       }
       if (!response.ok) throw new Error("Response isn’t OK");
 
       connected = true;
-      body.liveConnectionOfflineTooltip?.hide();
+      document.querySelector("body").liveConnectionOfflineTooltip?.hide();
 
       const newServerVersion = response.headers.get("Version");
       if (
@@ -203,9 +199,9 @@ export async function liveConnection({
           `NEW SERVER VERSION: ${serverVersion} → ${newServerVersion}`,
         );
         tippy({
-          element: body,
+          element: document.querySelector("body"),
           elementProperty: "liveConnectionNewServerVersionTooltip",
-          appendTo: body,
+          appendTo: document.querySelector("body"),
           trigger: "manual",
           hideOnClick: false,
           theme: "error",
@@ -213,12 +209,14 @@ export async function liveConnection({
           interactive: true,
           content: "There has been an update. Please reload the page.",
         });
-        body.liveConnectionNewServerVersionTooltip.show();
+        document
+          .querySelector("body")
+          .liveConnectionNewServerVersionTooltip.show();
         return;
       }
 
       if (liveReloadOnNextConnection) {
-        body.isModified = false;
+        document.querySelector("body").isModified = false;
         await new Promise((resolve) => {
           window.setTimeout(resolve, 300);
         });
@@ -244,7 +242,7 @@ export async function liveConnection({
           .find((bufferPart) => bufferPart.trim() !== "");
         if (bufferPart === undefined) continue;
         const bufferPartJSON = JSON.parse(bufferPart);
-        if (inLiveNavigation) return;
+        if (liveNavigate.inProgress > 0) return;
         const detail = {
           previousLocation: { ...window.location },
           liveConnectionUpdate: true,
@@ -257,15 +255,15 @@ export async function liveConnection({
         window.dispatchEvent(new CustomEvent("DOMContentLoaded", { detail }));
       }
     } catch (error) {
-      if (inLiveNavigation) return;
+      if (liveNavigate.inProgress > 0) return;
 
       console.error(error);
 
       if (!connected) {
         tippy({
-          element: body,
+          element: document.querySelector("body"),
           elementProperty: "liveConnectionOfflineTooltip",
-          appendTo: body,
+          appendTo: document.querySelector("body"),
           trigger: "manual",
           hideOnClick: false,
           theme: "error",
@@ -276,7 +274,7 @@ export async function liveConnection({
               ? "Live-Reloading…"
               : "Failed to connect. Please check your internet connection and try reloading the page.",
         });
-        body.liveConnectionOfflineTooltip.show();
+        document.querySelector("body").liveConnectionOfflineTooltip.show();
       }
     } finally {
       clearTimeout(heartbeatTimeout);
