@@ -1,23 +1,7 @@
 # TODO
 
+- Can we get rid of `previousLocation`?
 - `TODO` in `index.mjs`
-
----
-
-```typescript
-css`
-  @import "@radically-straightforward/javascript/static/index.css";
-
-  .tippy-box {
-    --background-color: blue;
-    --border-color: red;
-  }
-`;
-
-javascript`
-  import * as javascript from "@radically-straightforward/javascript/static/index.mjs";
-`;
-```
 
 ---
 

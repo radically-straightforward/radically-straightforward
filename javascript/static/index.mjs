@@ -27,7 +27,7 @@ async function liveNavigate(request, event) {
         ? "15"
         : (() => {
             const width = Number(progressBar.style.width.slice(0, -1));
-            return width + (90 - width) / (20 + Math.random() * 50);
+            return width + (90 - width) / (10 + Math.random() * 50);
           })()) + "%";
   });
   try {
