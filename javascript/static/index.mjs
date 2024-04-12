@@ -141,8 +141,7 @@ export async function liveConnection({
   let liveReloadOnNextConnection = false;
 
   window.addEventListener(
-    // TODO: This event doesn’t exist anymore.
-    "livenavigate",
+    "DOMContentLoaded",
     () => {
       clearTimeout(heartbeatTimeout);
       abortController.abort();
@@ -150,7 +149,8 @@ export async function liveConnection({
     { once: true },
   );
 
-  utilities.backgroundJob(
+  liveConnection.backgroundJob?.stop();
+  liveConnection.backgroundJob = utilities.backgroundJob(
     { interval: environment === "development" ? 200 : 5 * 1000 },
     async () => {
       heartbeatTimeout = window.setTimeout(() => {
@@ -288,6 +288,7 @@ export async function liveConnection({
     },
   );
 }
+liveConnection.backgroundJob = undefined;
 
 /**
  * `morph()` the `element` container to include `content`. `execute()` the browser JavaScript in the `element`. Protect the `element` from changing in Live Connection updates.
