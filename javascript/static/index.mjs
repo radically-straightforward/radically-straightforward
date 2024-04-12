@@ -9,9 +9,7 @@ async function liveNavigate(request, event = undefined) {
   if (
     request.method === "GET" &&
     isModified(document.querySelector("body")) &&
-    !confirm(
-      "Your changes will be lost if you leave this page. Do you wish to continue?",
-    )
+    !confirm("Your changes will be lost if you continue.")
   )
     return;
   const progressBar = document
