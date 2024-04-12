@@ -10,20 +10,6 @@ async function liveNavigate(request, event) {
   const detail = { request, previousLocation: liveNavigate.previousLocation };
   if (
     request.method === "GET" &&
-    liveNavigate.previousLocation.pathname === requestURL.pathname &&
-    liveNavigate.previousLocation.search === requestURL.search &&
-    liveNavigate.previousLocation.hash !== requestURL.hash
-  ) {
-    if (!(event instanceof PopStateEvent))
-      window.history.pushState(undefined, "", requestURL.href);
-    if (window.location.hash.trim() !== "")
-      document.getElementById(window.location.hash.slice(1))?.scrollIntoView();
-    window.onhashchange?.();
-    liveNavigate.previousLocation = { ...window.location };
-    return;
-  }
-  if (
-    request.method === "GET" &&
     isModified(document.querySelector("body")) &&
     !confirm(
       "Your changes will be lost if you leave this page. Do you wish to continue?",
@@ -112,6 +98,14 @@ document.onclick = async (event) => {
     link.liveNavigate === false
   )
     return;
+  if (
+    link.pathname === window.location.pathname &&
+    link.search === window.location.search &&
+    link.hash !== window.location.hash
+  ) {
+    liveNavigate.previousLocation = { ...window.location };
+    return;
+  }
   event.preventDefault();
   liveNavigate(new Request(link.href), event);
 };
