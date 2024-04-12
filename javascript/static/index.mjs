@@ -28,8 +28,8 @@ async function liveNavigate(request, event) {
     const responseText = await response.text();
     if (
       (request.method === "GET" ||
-        window.location.pathname !== responseURL.pathname ||
-        window.location.search !== responseURL.search) &&
+        liveNavigate.previousLocation.pathname !== responseURL.pathname ||
+        liveNavigate.previousLocation.search !== responseURL.search) &&
       (!(event instanceof PopStateEvent) ||
         requestURL.pathname !== responseURL.pathname ||
         requestURL.search !== responseURL.search)
@@ -48,14 +48,14 @@ async function liveNavigate(request, event) {
     window.dispatchEvent(new CustomEvent("DOMContentLoaded", { detail }));
   } catch (error) {
     if (error.name === "AbortError") return;
-    console.error(error);
     if (request.method === "GET" && !(event instanceof PopStateEvent))
-      window.history.pushState(undefined, "", requestURL.href);
+      window.history.pushState(undefined, "", request.url);
     tippy({
       event,
-      element: document.querySelector("body"),
+      element:
+        document.querySelector("#global-error") ??
+        document.querySelector("body > :first-child"),
       elementProperty: "liveNavigationErrorTooltip",
-      appendTo: document.querySelector("body"),
       trigger: "manual",
       hideOnClick: false,
       theme: "error",
@@ -63,6 +63,7 @@ async function liveNavigate(request, event) {
       interactive: true,
       content: "Something went wrong. Please try reloading the page.",
     }).show();
+    throw error;
   } finally {
     liveNavigate.inProgress--;
     liveNavigate.previousLocation = { ...window.location };
