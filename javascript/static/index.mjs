@@ -16,19 +16,16 @@ async function liveNavigate(request, event) {
   window.onlivenavigate?.();
   try {
     liveNavigate.inProgress++;
+    liveNavigate.abortController = new AbortController();
     if (request.method !== "GET")
       request.headers.set("CSRF-Protection", "true");
-    liveNavigate.abortController = new AbortController();
     const response = await fetch(request, {
-      cache: "no-store",
       signal: liveNavigate.abortController.signal,
     });
-
     const requestURL = new URL(request.url);
-    const responseText = await response.text();
     const responseURL = new URL(response.url);
     responseURL.hash = requestURL.hash;
-
+    const responseText = await response.text();
     if (
       (request.method === "GET" ||
         window.location.pathname !== responseURL.pathname ||
@@ -38,21 +35,17 @@ async function liveNavigate(request, event) {
         requestURL.search !== responseURL.search)
     )
       window.history.pushState(undefined, "", responseURL.href);
-
     Tippy.hideAll();
     const detail = { request, previousLocation: liveNavigate.previousLocation };
     morph(
       document.querySelector("html"),
       documentStringToElement(responseText),
-      {
-        detail,
-      },
+      { detail },
     );
-    window.dispatchEvent(new CustomEvent("DOMContentLoaded", { detail }));
     document.querySelector("[autofocus]")?.focus();
-
-    if (window.location.hash.trim() !== "")
-      document.getElementById(window.location.hash.slice(1))?.scrollIntoView();
+    if (responseURL.hash.trim() !== "")
+      document.getElementById(responseURL.hash.slice(1))?.scrollIntoView();
+    window.dispatchEvent(new CustomEvent("DOMContentLoaded", { detail }));
   } catch (error) {
     if (error.name === "AbortError") return;
     console.error(error);
@@ -331,7 +324,7 @@ export function mount(element, content, event = undefined) {
  *
  * - When `fromChildNode.liveConnectionUpdate` or any of `fromChildNode`’s parents is `new Set(["style", "hidden", "disabled", "value", "checked"])` or any subset thereof, the mentioned attributes are updated even in a Live Connection update (normally these attributes represent browser state and are skipped in Live Connection updates). This is useful, for example, for forms with hidden fields which must be updated by the server.
  *
- * > **Note:** `to` is expected to already belong to the `document`. You may need to call [`importNode()`](https://developer.mozilla.org/en-US/docs/Web/API/Document/importNode) or [`adoptNode()`](https://developer.mozilla.org/en-US/docs/Web/API/Document/adoptNode) on a node before passing it to `morph()`.
+ * > **Note:** `to` is expected to already belong to the `document`. You may need to call [`importNode()`](https://developer.mozilla.org/en-US/docs/Web/API/Document/importNode) or [`adoptNode()`](https://developer.mozilla.org/en-US/docs/Web/API/Document/adoptNode) on a node before passing it to `morph()`. `documentStringToElement()` does that for you.
  *
  * > **Note:** `to` is mutated destructively in the process of morphing. Create a clone of `to` before passing it into `morph()` if you wish to continue using it.
  *
