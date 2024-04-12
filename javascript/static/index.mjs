@@ -49,7 +49,7 @@ async function liveNavigate(request, event = undefined) {
     if (responseURL.hash.trim() !== "")
       document.getElementById(responseURL.hash.slice(1))?.scrollIntoView();
     document.querySelector("[autofocus]")?.focus();
-    window.dispatchEvent(new CustomEvent("DOMContentLoaded"));
+    window.dispatchEvent(new Event("DOMContentLoaded"));
   } catch (error) {
     if (error.name === "AbortError") return;
     if (!(event instanceof PopStateEvent) && request.method === "GET")
