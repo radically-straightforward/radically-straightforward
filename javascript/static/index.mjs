@@ -38,9 +38,8 @@ async function liveNavigate(request, event) {
     const response = await fetch(request, {
       signal: liveNavigate.abortController.signal,
     });
-    const requestURL = new URL(request.url);
     const responseURL = new URL(response.url);
-    responseURL.hash = requestURL.hash;
+    responseURL.hash = new URL(request.url).hash;
     const responseText = await response.text();
     if (
       window.location.pathname !== response.pathname ||
@@ -48,15 +47,15 @@ async function liveNavigate(request, event) {
     )
       window.history.pushState(null, "", responseURL.href);
     Tippy.hideAll();
-    const detail = { request, previousLocation: liveNavigate.previousLocation };
+    const detail = { request };
     morph(
       document.querySelector("html"),
       documentStringToElement(responseText),
       { detail },
     );
-    document.querySelector("[autofocus]")?.focus();
     if (responseURL.hash.trim() !== "")
       document.getElementById(responseURL.hash.slice(1))?.scrollIntoView();
+    document.querySelector("[autofocus]")?.focus();
     window.dispatchEvent(new CustomEvent("DOMContentLoaded", { detail }));
   } catch (error) {
     if (error.name === "AbortError") return;
@@ -78,12 +77,10 @@ async function liveNavigate(request, event) {
     throw error;
   } finally {
     liveNavigate.inProgress--;
-    liveNavigate.previousLocation = { ...window.location };
   }
 }
-liveNavigate.abortController = new AbortController();
 liveNavigate.inProgress = 0;
-liveNavigate.previousLocation = { ...window.location };
+liveNavigate.abortController = new AbortController();
 window.onclick = async (event) => {
   const link = event.target.closest(`a:not([target="_blank"])`);
   if (
@@ -94,17 +91,12 @@ window.onclick = async (event) => {
     event.metaKey ||
     link === null ||
     link.origin !== window.location.origin ||
+    (link.pathname === window.location.pathname &&
+      link.search === window.location.search &&
+      link.hash !== window.location.hash) ||
     link.liveNavigate === false
   )
     return;
-  if (
-    link.pathname === window.location.pathname &&
-    link.search === window.location.search &&
-    link.hash !== window.location.hash
-  ) {
-    liveNavigate.previousLocation = { ...window.location, hash: link.hash };
-    return;
-  }
   event.preventDefault();
   liveNavigate(new Request(link.href), event);
 };
