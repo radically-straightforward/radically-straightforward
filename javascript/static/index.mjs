@@ -33,8 +33,6 @@ async function liveNavigate(request, event) {
   try {
     liveNavigate.inProgress++;
     liveNavigate.abortController = new AbortController();
-    if (request.method !== "GET")
-      request.headers.set("CSRF-Protection", "true");
     const response = await fetch(request, {
       signal: liveNavigate.abortController.signal,
     });
@@ -47,16 +45,14 @@ async function liveNavigate(request, event) {
     )
       window.history.pushState(null, "", responseURL.href);
     Tippy.hideAll();
-    const detail = { request };
     morph(
       document.querySelector("html"),
       documentStringToElement(responseText),
-      { detail },
     );
     if (responseURL.hash.trim() !== "")
       document.getElementById(responseURL.hash.slice(1))?.scrollIntoView();
     document.querySelector("[autofocus]")?.focus();
-    window.dispatchEvent(new CustomEvent("DOMContentLoaded", { detail }));
+    window.dispatchEvent(new CustomEvent("DOMContentLoaded"));
   } catch (error) {
     if (error.name === "AbortError") return;
     if (!(event instanceof PopStateEvent) && request.method === "GET")
@@ -129,6 +125,7 @@ window.onsubmit = async (event) => {
           return new Request(actionURL.href);
         })()
       : new Request(action, { method, body });
+  request.headers.set("CSRF-Protection", "true");
   liveNavigate(request, event);
 };
 window.onpopstate = async (event) => {
@@ -344,7 +341,7 @@ export function mount(element, content, event = undefined) {
  *
  * - `morph()` is aware of Live Connection updates, `tippy()`s, and so forth.
  */
-export function morph(from, to, event) {
+export function morph(from, to, event = undefined) {
   if (
     event?.detail?.liveConnectionUpdate &&
     from.liveConnectionUpdate === false
@@ -450,7 +447,7 @@ export function morph(from, to, event) {
  *
  * Execute the functions defined by the `javascript="___"` attribute, which is set by [`@radically-straightforward/build`](https://github.com/radically-straightforward/radically-straightforward/tree/main/build) when extracting browser JavaScript. You must call this when you insert new elements in the DOM, for example, when mounting content.
  */
-export function execute(element, event) {
+export function execute(element, event = undefined) {
   const elements = element.querySelectorAll("[javascript]");
   for (const element of elements) {
     if (
