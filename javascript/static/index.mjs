@@ -202,7 +202,7 @@ export async function liveConnection({
         (
           document.querySelector(`[key="global-error"]`) ??
           document.querySelector("body > :first-child")
-        ).liveConnectionOfflineTooltip?.hide();
+        ).liveConnectionFailedToConnectTooltip?.hide();
         if (reload) {
           document.querySelector("body").isModified = false;
           window.location.reload();
@@ -244,7 +244,7 @@ export async function liveConnection({
             element:
               document.querySelector(`[key="global-error"]`) ??
               document.querySelector("body > :first-child"),
-            elementProperty: "liveConnectionOfflineTooltip",
+            elementProperty: "liveConnectionFailedToConnectTooltip",
             trigger: "manual",
             hideOnClick: false,
             theme: "error",
