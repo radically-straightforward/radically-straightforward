@@ -191,7 +191,6 @@ export async function liveConnection({
           );
         }
       } catch (error) {
-        console.error(error);
         if (!connected)
           tippy({
             element:
@@ -208,6 +207,7 @@ export async function liveConnection({
                 ? "Reloading…"
                 : "Failed to connect. Please check your internet connection and try reloading the page.",
           }).show();
+        throw error;
       } finally {
         abortController.abort();
         window.clearTimeout(abortControllerTimeout);
@@ -233,7 +233,7 @@ export function mount(element, content, event = undefined) {
 
 /**
  * > **Note:** This is a low-level function used by Live Navigation and Live Connection.
- * 
+ *
  * Similar to `mount()`, but suited for morphing the entire `document`. If the `document` and the `content` have `<meta name="version" content="___" />` with different `content`s, then `documentMount()` displays an error message in a `tippy()` and doesn’t mount the new document.
  */
 export function documentMount(content, event = new Event("DOMContentLoaded")) {
