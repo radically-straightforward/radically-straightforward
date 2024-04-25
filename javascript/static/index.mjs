@@ -43,14 +43,10 @@ async function liveNavigate(request, event = undefined) {
     )
       window.history.pushState(null, "", responseURL.href);
     Tippy.hideAll();
-    morph(
-      document.querySelector("html"),
-      documentStringToElement(responseText),
-    );
+    documentMount(responseText);
     if (responseURL.hash.trim() !== "")
       document.getElementById(responseURL.hash.slice(1))?.scrollIntoView();
     document.querySelector("[autofocus]")?.focus();
-    window.dispatchEvent(new Event("DOMContentLoaded"));
   } catch (error) {
     if (error.name === "AbortError") return;
     if (!(event instanceof PopStateEvent) && request.method === "GET")
@@ -185,17 +181,14 @@ export async function liveConnection({
           .pipeThrough(new utilities.JSONLinesTransformStream())
           .getReader();
         while (true) {
-          const responseBody = (await responseBodyReader.read()).value;
-          if (responseBody === undefined) break;
-          const event = new CustomEvent("DOMContentLoaded", {
-            detail: { liveConnectionUpdate: true },
-          });
-          morph(
-            document.querySelector("html"),
-            documentStringToElement(responseBody),
-            event,
+          const responseText = (await responseBodyReader.read()).value;
+          if (responseText === undefined) break;
+          documentMount(
+            responseText,
+            new CustomEvent("DOMContentLoaded", {
+              detail: { liveConnectionUpdate: true },
+            }),
           );
-          window.dispatchEvent(event);
         }
       } catch (error) {
         console.error(error);
@@ -229,6 +222,7 @@ liveConnection.backgroundJob = undefined;
  * `morph()` the `element` container to include `content`. `execute()` the browser JavaScript in the `element`. Protect the `element` from changing in Live Connection updates.
  */
 export function mount(element, content, event = undefined) {
+  if (typeof content === "string") content = stringToElement(content);
   element.isAttached = true;
   delete element.liveConnectionUpdate;
   morph(element, content, event);
@@ -238,7 +232,44 @@ export function mount(element, content, event = undefined) {
 }
 
 /**
- * **Note:** This is a low-level function—in most cases you want to call `mount()` instead.
+ * > **Note:** This is a low-level function used by Live Navigation and Live Connection.
+ * 
+ * Similar to `mount()`, but suited for morphing the entire `document`. If the `document` and the `content` have `<meta name="version" content="___" />` with different `content`s, then `documentMount()` displays an error message in a `tippy()` and doesn’t mount the new document.
+ */
+export function documentMount(content, event = new Event("DOMContentLoaded")) {
+  if (typeof content === "string") content = documentStringToElement(content);
+  const documentVersion = document
+    .querySelector(`meta[name="version"]`)
+    ?.getAttribute("content");
+  const contentVersion = content
+    .querySelector(`meta[name="version"]`)
+    ?.getAttribute("content");
+  if (
+    typeof documentVersion === "string" &&
+    typeof contentVersion === "string" &&
+    documentVersion !== contentVersion
+  ) {
+    document.querySelector("body").isModified = false;
+    tippy({
+      element:
+        document.querySelector(`[key="global-error"]`) ??
+        document.querySelector("body > :first-child"),
+      elementProperty: "documentMountNewServerVersionTooltip",
+      trigger: "manual",
+      hideOnClick: false,
+      theme: "error",
+      arrow: false,
+      interactive: true,
+      content: "There has been an update. Please reload the page.",
+    }).show();
+    return;
+  }
+  morph(document.querySelector("html"), content, event);
+  window.dispatchEvent(event);
+}
+
+/**
+ * > **Note:** This is a low-level function—in most cases you want to call `mount()` instead.
  *
  * Morph the contents of the `from` container element into the contents of the `to` container element with minimal DOM manipulation by using a diffing algorithm.
  *
@@ -276,33 +307,6 @@ export function morph(from, to, event = undefined) {
     from.liveConnectionUpdate === false
   )
     return;
-  if (typeof to === "string") to = stringToElement(to);
-  const fromVersion = from
-    .querySelector(`meta[name="version"]`)
-    ?.getAttribute("content");
-  const toVersion = to
-    .querySelector(`meta[name="version"]`)
-    ?.getAttribute("content");
-  if (
-    typeof fromVersion === "string" &&
-    typeof toVersion === "string" &&
-    fromVersion !== toVersion
-  ) {
-    document.querySelector("body").isModified = false;
-    tippy({
-      element:
-        document.querySelector(`[key="global-error"]`) ??
-        document.querySelector("body > :first-child"),
-      elementProperty: "morphNewServerVersionTooltip",
-      trigger: "manual",
-      hideOnClick: false,
-      theme: "error",
-      arrow: false,
-      interactive: true,
-      content: "There has been an update. Please reload the page.",
-    }).show();
-    return;
-  }
   const key = (node) =>
     `${node.nodeType}--${
       node.nodeType === node.ELEMENT_NODE
@@ -398,7 +402,7 @@ export function morph(from, to, event = undefined) {
 }
 
 /**
- * **Note:** This is a low-level function—in most cases you want to call `mount()` instead.
+ * > **Note:** This is a low-level function—in most cases you want to call `mount()` instead.
  *
  * Execute the functions defined by the `javascript="___"` attribute, which is set by [`@radically-straightforward/build`](https://github.com/radically-straightforward/radically-straightforward/tree/main/build) when extracting browser JavaScript. You must call this when you insert new elements in the DOM, for example, when mounting content.
  */
