@@ -1,5 +1,7 @@
 # TODO
 
+- Is a heartbeat necessary?
+
 ```typescript
 css`
   @import "@radically-straightforward/javascript/static/index.css";
