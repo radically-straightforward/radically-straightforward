@@ -1,18 +1,7 @@
 # TODO
 
 - Server update
-  - Live Navigation without Live Connection
   - Live Connection
-
-    ```typescript
-    javascript="${javascript`
-      javascript.liveConnection({
-        requestId: ${request.id},
-        serverVersion: "3.0.0",
-        environment: "production",
-      });
-    `}"
-    ```
 
 ```typescript
 css`
