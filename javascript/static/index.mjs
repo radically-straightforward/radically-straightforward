@@ -134,30 +134,8 @@ window.onpopstate = async (event) => {
 
 export async function liveConnection({
   requestId,
-  serverVersion = undefined,
   environment = "production",
 }) {
-  if (
-    typeof liveConnection.serverVersion === "string" &&
-    typeof serverVersion === "string" &&
-    liveConnection.serverVersion !== serverVersion
-  ) {
-    document.querySelector("body").isModified = false;
-    tippy({
-      element:
-        document.querySelector(`[key="global-error"]`) ??
-        document.querySelector("body > :first-child"),
-      elementProperty: "liveConnectionNewServerVersionTooltip",
-      trigger: "manual",
-      hideOnClick: false,
-      theme: "error",
-      arrow: false,
-      interactive: true,
-      content: "There has been an update. Please reload the page.",
-    }).show();
-    return;
-  }
-  liveConnection.serverVersion = serverVersion;
   let abortController;
   let abortControllerTimeout;
   let reload = false;
@@ -246,7 +224,6 @@ export async function liveConnection({
   );
 }
 liveConnection.backgroundJob = undefined;
-liveConnection.serverVersion = undefined;
 
 /**
  * `morph()` the `element` container to include `content`. `execute()` the browser JavaScript in the `element`. Protect the `element` from changing in Live Connection updates.
