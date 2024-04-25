@@ -1,8 +1,5 @@
 # TODO
 
-- Server update
-  - Live Connection
-
 ```typescript
 css`
   @import "@radically-straightforward/javascript/static/index.css";
