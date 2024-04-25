@@ -180,24 +180,7 @@ export async function liveConnection({
           headers: { "Live-Connection": requestId },
           signal: abortController.signal,
         });
-        if (!response.ok) {
-          // TODO: Throw an error here and use the `catch` flow to show error message.
-          console.error(response);
-          tippy({
-            element:
-              document.querySelector(`[key="global-error"]`) ??
-              document.querySelector("body > :first-child"),
-            elementProperty: "liveConnectionBadRequestTooltip",
-            trigger: "manual",
-            hideOnClick: false,
-            theme: "error",
-            arrow: false,
-            interactive: true,
-            content:
-              "Failed to connect to server. Please try reloading the page.",
-          }).show();
-          return;
-        }
+        if (response.status !== 200) throw response;
         connected = true;
         (
           document.querySelector(`[key="global-error"]`) ??
