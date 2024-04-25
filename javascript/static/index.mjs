@@ -191,7 +191,6 @@ export async function liveConnection({
           window.location.reload();
           return;
         }
-
         const responseBodyReader = response.body
           .pipeThrough(
             new TransformStream({
