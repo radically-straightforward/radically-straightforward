@@ -1,6 +1,37 @@
 # TODO
 
-- `TODO` in `index.mjs`
+- Server update
+  - Live Navigation without Live Connection
+  - Live Connection
+
+    ```typescript
+    javascript="${javascript`
+      javascript.liveConnection({
+        requestId: ${request.id},
+        serverVersion: "3.0.0",
+        environment: "production",
+      });
+    `}"
+    ```
+
+```typescript
+css`
+  @import "@radically-straightforward/javascript/static/index.css";
+
+  .tippy-box {
+    --background-color: blue;
+    --border-color: red;
+  }
+
+  [key="progress-bar"] {
+    background-color: pink;
+  }
+`;
+
+javascript`
+  import * as javascript from "@radically-straightforward/javascript/static/index.mjs";
+`;
+```
 
 ---
 
