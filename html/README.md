@@ -15,6 +15,8 @@ $ npm install @radically-straightforward/html
 > **[Prettier - Code formatter](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode):** A [Visual Studio Code](https://code.visualstudio.com/) extension to use Prettier more ergonomically.
 >
 > **[es6-string-html](https://marketplace.visualstudio.com/items?itemName=Tobermory.es6-string-html):** A Visual Studio Code extension to syntax highlight HTML in tagged templates.
+>
+> **[Indentation Level Movement](https://marketplace.visualstudio.com/items?itemName=kaiwood.indentation-level-movement):** A Visual Studio Code extension to navigate in code based on indentation, which helps with long snippets of HTML in tagged templates.
 
 > **Note:** This tool is primarily designed for rendering HTML on the server with Node.js, but it also works in the browser.
 
