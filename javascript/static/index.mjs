@@ -192,30 +192,30 @@ export async function liveConnection({
           return;
         }
 
-        const responseBodyReader = response.body.getReader();
-        const textDecoder = new TextDecoder();
-        let buffer = "";
+        const responseBodyReader = response.body
+          .pipeThrough(
+            new TransformStream({
+              async transform(chunk, controller) {
+                window.clearTimeout(abortControllerTimeout);
+                abortControllerTimeout = window.setTimeout(() => {
+                  abortController.abort();
+                }, 60 * 1000);
+                controller.enqueue(await chunk);
+              },
+            }),
+          )
+          .pipeThrough(new TextDecoderStream())
+          .pipeThrough(new utilities.JSONLinesTransformStream())
+          .getReader();
         while (true) {
-          const chunk = (await responseBodyReader.read()).value;
-          if (chunk === undefined) break;
-          window.clearTimeout(abortControllerTimeout);
-          abortControllerTimeout = window.setTimeout(() => {
-            abortController.abort();
-          }, 50 * 1000);
-          buffer += textDecoder.decode(chunk, { stream: true });
-          const bufferParts = buffer.split("\n");
-          buffer = bufferParts.pop();
-          const bufferPart = bufferParts
-            .reverse()
-            .find((bufferPart) => bufferPart.trim() !== "");
-          if (bufferPart === undefined) continue;
-          const bufferPartJSON = JSON.parse(bufferPart);
+          const responseBody = (await responseBodyReader.read()).value;
+          if (responseBody === undefined) break;
           const event = new CustomEvent("DOMContentLoaded", {
             detail: { liveConnectionUpdate: true },
           });
           morph(
             document.querySelector("html"),
-            documentStringToElement(bufferPartJSON),
+            documentStringToElement(responseBody),
             event,
           );
           window.dispatchEvent(event);
