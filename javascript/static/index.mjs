@@ -300,6 +300,32 @@ export function morph(from, to, event = undefined) {
   )
     return;
   if (typeof to === "string") to = stringToElement(to);
+  const fromVersion = from
+    .querySelector(`meta[name="version"]`)
+    ?.getAttribute("content");
+  const toVersion = to
+    .querySelector(`meta[name="version"]`)
+    ?.getAttribute("content");
+  if (
+    typeof fromVersion === "string" &&
+    typeof toVersion === "string" &&
+    fromVersion !== toVersion
+  ) {
+    document.querySelector("body").isModified = false;
+    tippy({
+      element:
+        document.querySelector(`[key="global-error"]`) ??
+        document.querySelector("body > :first-child"),
+      elementProperty: "morphNewServerVersionTooltip",
+      trigger: "manual",
+      hideOnClick: false,
+      theme: "error",
+      arrow: false,
+      interactive: true,
+      content: "There has been an update. Please reload the page.",
+    }).show();
+    return;
+  }
   const key = (node) =>
     `${node.nodeType}--${
       node.nodeType === node.ELEMENT_NODE
