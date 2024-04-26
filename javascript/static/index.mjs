@@ -140,7 +140,7 @@ export async function liveConnection(requestId) {
   let abortController;
   let abortControllerTimeout;
   let reload = false;
-  liveConnection.backgroundJob ??= utilities.backgroundJob(
+  liveConnection.backgroundJob = utilities.backgroundJob(
     {
       interval: configuration.environment === "development" ? 200 : 5 * 1000,
       onStop: () => {
