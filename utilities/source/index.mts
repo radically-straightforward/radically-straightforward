@@ -315,7 +315,15 @@ export function backgroundJob(
         case "sleeping":
           clearTimeout(timeout);
           state = "running";
-          await job();
+          try {
+            await job();
+          } catch (error) {
+            log(
+              "BACKGROUND JOB ERROR",
+              String(error),
+              (error as Error)?.stack ?? "",
+            );
+          }
           if (state === "running" || state === "runningAndMarkedForRerun") {
             timeout = setTimeout(
               () => {

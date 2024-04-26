@@ -137,6 +137,10 @@ test(
         console.log("backgroundJob(): Running background job...");
         await utilities.sleep(3 * 1000);
         console.log("backgroundJob(): ...finished running background job.");
+        if (Math.random() < 0.3)
+          throw new Error(
+            "There’s a 30% chance that the background job results in error.",
+          );
       },
     );
     process.on("SIGTSTP", () => {
