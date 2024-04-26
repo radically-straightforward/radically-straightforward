@@ -2,6 +2,9 @@ import * as utilities from "@radically-straightforward/utilities";
 import fastMyersDiff from "fast-myers-diff";
 import * as Tippy from "tippy.js";
 
+/**
+ * TODO
+ */
 export const configuration = { environment: "production" };
 
 async function liveNavigate(request, event = undefined) {
@@ -130,6 +133,9 @@ window.onpopstate = async (event) => {
   liveNavigate(new Request(window.location), event);
 };
 
+/**
+ * TODO
+ */
 export async function liveConnection(requestId) {
   let abortController;
   let abortControllerTimeout;
