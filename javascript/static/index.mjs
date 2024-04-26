@@ -2,6 +2,8 @@ import * as utilities from "@radically-straightforward/utilities";
 import fastMyersDiff from "fast-myers-diff";
 import * as Tippy from "tippy.js";
 
+export const options = { environment: "production" };
+
 async function liveNavigate(request, event = undefined) {
   if (liveNavigate.inProgress > 0)
     if (event instanceof PopStateEvent) liveNavigate.abortController.abort();
@@ -128,16 +130,13 @@ window.onpopstate = async (event) => {
   liveNavigate(new Request(window.location), event);
 };
 
-export async function liveConnection({
-  requestId,
-  environment = "production",
-}) {
+export async function liveConnection(requestId) {
   let abortController;
   let abortControllerTimeout;
   let reload = false;
   liveConnection.backgroundJob ??= utilities.backgroundJob(
     {
-      interval: environment === "development" ? 200 : 5 * 1000,
+      interval: options.environment === "development" ? 200 : 5 * 1000,
       onStop: () => {
         abortController.abort();
         window.clearTimeout(abortControllerTimeout);
@@ -203,7 +202,7 @@ export async function liveConnection({
             arrow: false,
             interactive: true,
             content:
-              environment === "development"
+              options.environment === "development"
                 ? "Reloading…"
                 : "Failed to connect. Please check your internet connection and try reloading the page.",
           }).show();
@@ -211,7 +210,7 @@ export async function liveConnection({
       } finally {
         abortController.abort();
         window.clearTimeout(abortControllerTimeout);
-        reload = environment === "development";
+        reload = options.environment === "development";
       }
     },
   );

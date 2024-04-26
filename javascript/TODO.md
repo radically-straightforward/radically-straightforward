@@ -19,6 +19,37 @@ css`
 javascript`
   import * as javascript from "@radically-straightforward/javascript/static/index.mjs";
 `;
+
+function layout({
+  request,
+  response,
+  body,
+}: {
+  request: serverTypes.Request<{}, {}, {}, {}, {}>;
+  response: serverTypes.Response;
+  body: HTML;
+}): HTML {
+  return html`
+    <!doctype html>
+    <html>
+      <head>
+        <meta name="version" content="3.0.0" />
+        <link rel="stylesheet" href="/${caddy.staticFiles["index.css"]}" />
+        <script src="/${caddy.staticFiles["index.mjs"]}"></script>
+      </head>
+      <body
+        javascript="${javascript`
+          javascript.liveConnection({
+            requestId: ${request.id},
+            environment: "production",
+          });
+        `}"
+      >
+        $${body}
+      </body>
+    </html>
+  `;
+}
 ```
 
 ---
