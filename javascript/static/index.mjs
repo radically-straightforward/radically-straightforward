@@ -3,7 +3,13 @@ import fastMyersDiff from "fast-myers-diff";
 import * as Tippy from "tippy.js";
 
 /**
- * TODO
+ * Global configuration for browser JavaScript.
+ *
+ * **Example**
+ *
+ * ```javascript
+ * javascript.configuration.environment = "development";
+ * ```
  */
 export const configuration = { environment: "production" };
 

@@ -1,8 +1,16 @@
 # TODO
 
-- Is a heartbeat necessary?
-
 ```typescript
+import childProcess from "node:child_process";
+import server from "@radically-straightforward/server";
+import * as serverTypes from "@radically-straightforward/server";
+import html, { HTML } from "@radically-straightforward/html";
+import css from "@radically-straightforward/css";
+import javascript from "@radically-straightforward/javascript";
+import * as caddy from "@radically-straightforward/caddy";
+
+const application = server();
+
 css`
   @import "@radically-straightforward/javascript/static/index.css";
 
@@ -18,7 +26,64 @@ css`
 
 javascript`
   import * as javascript from "@radically-straightforward/javascript/static/index.mjs";
+
+  javascript.configuration.environment = "development";
 `;
+
+application.push({
+  method: "GET",
+  handler: (request, response) => {
+    if (
+      request.liveConnection?.establish &&
+      request.liveConnection?.skipUpdateOnEstablish
+    )
+      response.end();
+  },
+});
+
+application.push({
+  method: "GET",
+  pathname: "/",
+  handler: (request, response) => {
+    response.redirect("/1");
+  },
+});
+
+application.push({
+  method: "GET",
+  pathname: "/1",
+  handler: (request, response) => {
+    response.end(
+      layout({
+        request,
+        response,
+        body: html`
+          <p>
+            ${new Date().toISOString()}: This is /1, <a href="/2">go to /2</a>.
+          </p>
+        `,
+      }),
+    );
+  },
+});
+
+application.push({
+  method: "GET",
+  pathname: "/2",
+  handler: (request, response) => {
+    response.end(
+      layout({
+        request,
+        response,
+        body: html`
+          <p>
+            ${new Date().toISOString()}: This is /2, <a href="/1">go to /1</a>.
+          </p>
+        `,
+      }),
+    );
+  },
+});
 
 function layout({
   request,
@@ -33,16 +98,13 @@ function layout({
     <!doctype html>
     <html>
       <head>
-        <meta name="version" content="3.0.0" />
+        <meta name="version" content="1.0.0" />
         <link rel="stylesheet" href="/${caddy.staticFiles["index.css"]}" />
         <script src="/${caddy.staticFiles["index.mjs"]}"></script>
       </head>
       <body
         javascript="${javascript`
-          javascript.liveConnection({
-            requestId: ${request.id},
-            environment: "production",
-          });
+          javascript.liveConnection(${request.id});
         `}"
       >
         $${body}
@@ -50,6 +112,16 @@ function layout({
     </html>
   `;
 }
+
+const caddyServer = childProcess.spawn(
+  "./node_modules/.bin/caddy",
+  ["run", "--adapter", "caddyfile", "--config", "-"],
+  { stdio: [undefined, "ignore", "ignore"] },
+);
+caddyServer.stdin.end(caddy.application());
+process.once("gracefulTermination", () => {
+  caddyServer.kill();
+});
 ```
 
 ---
