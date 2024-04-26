@@ -278,4 +278,6 @@ Start a background job that runs every `interval`.
 
 4. We introduce a random interval variance of 10% on top of the given `interval` to avoid many background jobs from starting at the same time and overloading the machine.
 
+> **Note:** If the job throws an exception, the exception is logged and the background job continues.
+
 <!-- DOCUMENTATION END: ./source/index.mts -->

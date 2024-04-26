@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.0.1 · 2024-04-26
+
+- `backgroundJob()` doesn’t stop when the job throws an exception.
+
 ## 2.0.0 · 2024-04-09
 
 - **Breaking Change:** Made `@radically-straightforward/utilities` truly independent of platform by extracting the Node.js especial treatment into `@radically-straightforward/node`.

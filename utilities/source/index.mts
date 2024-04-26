@@ -292,6 +292,8 @@ intern.finalizationRegistry = new FinalizationRegistry<{
  * 3. You may use `backgroundJob.stop()` to stop the background job. If the background job is in the middle of running, it will finish but it will not be scheduled to run again. This is similar to how an HTTP server may terminate gracefully by stopping accepting new requests but finishing responding to existing requests. After a job has been stopped, you may not `backgroundJob.run()` it again (calling `backgroundJob.run()` has no effect).
  *
  * 4. We introduce a random interval variance of 10% on top of the given `interval` to avoid many background jobs from starting at the same time and overloading the machine.
+ *
+ * > **Note:** If the job throws an exception, the exception is logged and the background job continues.
  */
 export function backgroundJob(
   {
