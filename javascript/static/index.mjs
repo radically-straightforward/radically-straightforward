@@ -196,22 +196,22 @@ export async function liveConnection(requestId) {
           );
         }
       } catch (error) {
-        if (!connected)
-          tippy({
-            element:
-              document.querySelector(`[key="global-error"]`) ??
-              document.querySelector("body > :first-child"),
-            elementProperty: "liveConnectionFailedToConnectTooltip",
-            trigger: "manual",
-            hideOnClick: false,
-            theme: "error",
-            arrow: false,
-            interactive: true,
-            content:
-              configuration.environment === "development"
-                ? "Reloading…"
-                : "Failed to connect. Please check your internet connection and try reloading the page.",
-          }).show();
+        if (connected) return;
+        tippy({
+          element:
+            document.querySelector(`[key="global-error"]`) ??
+            document.querySelector("body > :first-child"),
+          elementProperty: "liveConnectionFailedToConnectTooltip",
+          trigger: "manual",
+          hideOnClick: false,
+          theme: "error",
+          arrow: false,
+          interactive: true,
+          content:
+            configuration.environment === "development"
+              ? "Reloading…"
+              : "Failed to connect. Please check your internet connection and try reloading the page.",
+        }).show();
         throw error;
       } finally {
         abortController.abort();
