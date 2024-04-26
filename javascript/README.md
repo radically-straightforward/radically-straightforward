@@ -63,6 +63,86 @@ import * as javascript from "@radically-straightforward/javascript/static/index.
 
 <!-- DOCUMENTATION START: ./static/index.mjs -->
 
+### `mount()`
+
+```typescript
+export function mount(element, content, event = undefined);
+```
+
+`morph()` the `element` container to include `content`. `execute()` the browser JavaScript in the `element`. Protect the `element` from changing in Live Connection updates.
+
+### `documentMount()`
+
+```typescript
+export function documentMount(content, event = new Event("DOMContentLoaded"));
+```
+
+> **Note:** This is a low-level function used by Live Navigation and Live Connection.
+
+Similar to `mount()`, but suited for morphing the entire `document`. If the `document` and the `content` have `<meta name="version" content="___" />` with different `content`s, then `documentMount()` displays an error message in a `tippy()` and doesn’t mount the new document.
+
+### `morph()`
+
+```typescript
+export function morph(from, to, event = undefined);
+```
+
+> **Note:** This is a low-level function—in most cases you want to call `mount()` instead.
+
+Morph the contents of the `from` container element into the contents of the `to` container element with minimal DOM manipulation by using a diffing algorithm.
+
+If the `to` element is a string, then it’s first converted into an element with `stringToElement()`.
+
+Elements may provide a `key="___"` attribute to help identify them with respect to the diffing algorithm. This is similar to [React’s `key`s](https://react.dev/learn/rendering-lists#keeping-list-items-in-order-with-key), but sibling elements may have the same `key` (at the risk of potentially getting them mixed up if they’re reordered).
+
+When `morph()` is called to perform a Live Connection update (that is,`event?.detail.liveConnectionUpdate`is `true`), elements may set a `liveConnectionUpdate` attribute, which controls the behavior of `morph()` in the following ways:
+
+- When `from.liveConnectionUpdate` is `false`, `morph()` doesn’t do anything. This is useful for elements which contain browser state that must be preserved on Live Connection updates, for example, the container of dynamically-loaded content (see `mount()`).
+
+- When `fromChildNode.liveConnectionUpdate` is `false`, `morph()` doesn’t remove that `fromChildNode` even if it’s missing among `to`’s child nodes. This is useful for elements that should remain on the page but wouldn’t be sent by server again in a Live Connection update, for example, an indicator of unread messages.
+
+- When `fromChildNode.liveConnectionUpdate` or any of `fromChildNode`’s parents is `new Set(["style", "hidden", "disabled", "value", "checked"])` or any subset thereof, the mentioned attributes are updated even in a Live Connection update (normally these attributes represent browser state and are skipped in Live Connection updates). This is useful, for example, for forms with hidden fields which must be updated by the server.
+
+> **Note:** `to` is expected to already belong to the `document`. You may need to call [`importNode()`](https://developer.mozilla.org/en-US/docs/Web/API/Document/importNode) or [`adoptNode()`](https://developer.mozilla.org/en-US/docs/Web/API/Document/adoptNode) on a node before passing it to `morph()`. `documentStringToElement()` does that for you.
+
+> **Note:** `to` is mutated destructively in the process of morphing. Create a clone of `to` before passing it into `morph()` if you wish to continue using it.
+
+**Related Work**
+
+`morph()` is different from `from.innerHTML = to.innerHTML` because setting `innerHTML` loses browser state, for example, form inputs, scrolling position, and so forth.
+
+`morph()` is different form [`morphdom`](https://github.com/patrick-steele-idem/morphdom) and its derivatives in the following ways:
+
+- `morph()` deals better with insertions/deletions/moves in the middle of a list. In some situations `morphdom` touches all subsequent elements, while `morph()` tends to only touch the affected elements.
+
+- `morph()` supports `key="___"` instead of `morphdom`’s `id="___"`s. `key`s don’t have to be unique across the document and don’t even have to be unique across the element siblings—they’re just a hint at the identity of the element that’s used in the diffing process.
+
+- `morph()` is aware of Live Connection updates, `tippy()`s, and so forth.
+
+### `execute()`
+
+```typescript
+export function execute(element, event = undefined);
+```
+
+> **Note:** This is a low-level function—in most cases you want to call `mount()` instead.
+
+Execute the functions defined by the `javascript="___"` attribute, which is set by [`@radically-straightforward/build`](https://github.com/radically-straightforward/radically-straightforward/tree/main/build) when extracting browser JavaScript. You must call this when you insert new elements in the DOM, for example, when mounting content.
+
+### `tippy()`
+
+```typescript
+export function tippy({
+  event = undefined,
+  element,
+  elementProperty = "tooltip",
+  content,
+  ...tippyProps
+});
+```
+
+Create a [Tippy.js](https://atomiks.github.io/tippyjs/) tippy. This is different from calling Tippy’s constructor because if `tippy()` is called multiple times on the same `element` with the same `elementProperty`, then it doesn’t create new tippys but `mount()`s the `content`.
+
 ### `validate()`
 
 ```typescript
@@ -71,7 +151,7 @@ export function validate(element);
 
 Validate `element` (usually a `<form>`) and its `children()`.
 
-Validation errors are reported with Tippy.js tippys with the `error` theme.
+Validation errors are reported with `tippy()`s with the `error` theme.
 
 Use `<form novalidate>` to disable the native browser validation, which is too permissive on email addresses, is more limited in custom validation, and so forth.
 
@@ -167,6 +247,30 @@ You may set the `disabled` attribute on a parent element to disable an entire su
 
 `isModified()` powers the “your changes may be lost, do you wish to leave this page?” dialog that `@radically-straightforward/javascript` enables by default.
 
+### `relativizeDateTimeElement()`
+
+```typescript
+export function relativizeDateTimeElement(
+  element,
+  { target = element, capitalize = false, ...relativizeDateTimeOptions } = {},
+);
+```
+
+Given an `element` with the `datetime` attribute, `relativizeDateTimeElement()` keeps it updated with a relative datetime. See `relativizeDateTime()`, which provides the relative datetime, and `backgroundJob()`, which provides the background job management.
+
+**Example**
+
+```javascript
+html`
+  <time
+    datetime="2024-04-03T14:51:45.604Z"
+    javascript="${javascript`
+      javascript.relativizeDateTimeElement(this);
+    `}"
+  ></time>
+`;
+```
+
 ### `relativizeDateTime()`
 
 ```typescript
@@ -217,6 +321,14 @@ export function stringToElement(string);
 
 Convert a string into a DOM element. The string may have multiple siblings without a common parent, so `stringToElement()` returns a `<div>` containing the elements.
 
+### `documentStringToElement()`
+
+```typescript
+export function documentStringToElement(string);
+```
+
+Similar to `stringToElement()` but for a `string` which is a whole document, for example, starting `<!DOCTYPE html>`. [`document.adoptNode()`](https://developer.mozilla.org/en-US/docs/Web/API/Document/adoptNode) is used so that the resulting element belongs to the current `document`.
+
 ### `backgroundJob()`
 
 ```typescript
@@ -246,7 +358,7 @@ export function isAttached(element);
 
 Check whether the `element` is attached to the document. This is different from the [`isConnected` property](https://developer.mozilla.org/en-US/docs/Web/API/Node/isConnected) in the following ways:
 
-1. It uses `parents()`, so it supports Tippy.js’s tippys that aren’t mounted but whose `target`s are attached.
+1. It uses `parents()`, so it supports `tippy()`s that aren’t showing but whose `target`s are attached.
 
 2. You may force an element to be attached by setting `element.isAttached = true` on the `element` itself or on one of its parents.
 
@@ -258,7 +370,7 @@ See, for example, `backgroundJob()`, which uses `isAttached()`.
 export function parents(element);
 ```
 
-Returns an array of parents, including `element` itself. It knows how to navigate up Tippy.js’s tippys that aren’t mounted.
+Returns an array of parents, including `element` itself. It knows how to navigate up `tippy()`s that aren’t showing.
 
 ### `children()`
 
