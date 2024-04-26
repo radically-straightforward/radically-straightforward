@@ -63,6 +63,22 @@ import * as javascript from "@radically-straightforward/javascript/static/index.
 
 <!-- DOCUMENTATION START: ./static/index.mjs -->
 
+### `configuration`
+
+```typescript
+export const configuration;
+```
+
+TODO
+
+### `liveConnection()`
+
+```typescript
+export async function liveConnection(requestId);
+```
+
+TODO
+
 ### `mount()`
 
 ```typescript

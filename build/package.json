@@ -42,8 +42,8 @@
     "@radically-straightforward/typescript": "^1.0.0",
     "@types/babel__core": "^7.20.5",
     "@types/babel__generator": "^7.6.8",
-    "@types/node": "^20.12.6",
-    "typescript": "^5.4.4"
+    "@types/node": "^20.12.7",
+    "typescript": "^5.4.5"
   },
   "prettier": {}
 }
