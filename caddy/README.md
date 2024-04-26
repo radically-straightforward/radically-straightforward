@@ -122,8 +122,6 @@ A Caddyfile template for an application.
 
 - Set the system administrator email, which is used by certificate authorities to contact about certificates.
 
-- Enable compression for better performance.
-
 - Set the following security headers:
 
   - **`Strict-Transport-Security`:** Tells the browser that moving forward it should only attempt to load this origin with HTTPS (not HTTP). The `hstsPreload` parameter controls whether to set the [`preload` directive](https://hstspreload.org/)—by default it’s `false`, but it’s recommended that you opt into preloading by setting `hstsPreload: true`.

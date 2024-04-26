@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.3.3 · 2024-04-26
+
+- Removed compression from `application()`, because for some reason it breaks streaming HTTP responses.
+
 ## 1.3.2 · 2024-04-09
 
 - Added `staticFiles`.
