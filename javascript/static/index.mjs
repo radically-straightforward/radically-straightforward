@@ -2,7 +2,7 @@ import * as utilities from "@radically-straightforward/utilities";
 import fastMyersDiff from "fast-myers-diff";
 import * as Tippy from "tippy.js";
 
-export const options = { environment: "production" };
+export const configuration = { environment: "production" };
 
 async function liveNavigate(request, event = undefined) {
   if (liveNavigate.inProgress > 0)
@@ -136,7 +136,7 @@ export async function liveConnection(requestId) {
   let reload = false;
   liveConnection.backgroundJob ??= utilities.backgroundJob(
     {
-      interval: options.environment === "development" ? 200 : 5 * 1000,
+      interval: configuration.environment === "development" ? 200 : 5 * 1000,
       onStop: () => {
         abortController.abort();
         window.clearTimeout(abortControllerTimeout);
@@ -202,7 +202,7 @@ export async function liveConnection(requestId) {
             arrow: false,
             interactive: true,
             content:
-              options.environment === "development"
+              configuration.environment === "development"
                 ? "Reloading…"
                 : "Failed to connect. Please check your internet connection and try reloading the page.",
           }).show();
@@ -210,7 +210,7 @@ export async function liveConnection(requestId) {
       } finally {
         abortController.abort();
         window.clearTimeout(abortControllerTimeout);
-        reload = options.environment === "development";
+        reload = configuration.environment === "development";
       }
     },
   );
