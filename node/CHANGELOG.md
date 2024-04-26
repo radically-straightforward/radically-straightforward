@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.1.1 · 2024-04-26
+
+- Update `@radically-straightforward/utilities`, which adds support for background jobs that throw an exception.
+
 ## 3.1.0 · 2024-04-09
 
 - Added `backgroundJob()`.
