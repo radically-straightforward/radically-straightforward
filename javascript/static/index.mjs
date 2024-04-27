@@ -47,8 +47,8 @@ async function liveNavigate(request, event = undefined) {
     responseURL.hash = new URL(request.url).hash;
     const responseText = await response.text();
     if (
-      window.location.pathname !== response.pathname ||
-      window.location.search !== response.search
+      window.location.pathname !== responseURL.pathname ||
+      window.location.search !== responseURL.search
     )
       window.history.pushState(null, "", responseURL.href);
     Tippy.hideAll();
