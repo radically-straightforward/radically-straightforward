@@ -100,4 +100,26 @@ node.backgroundJob({ interval: 3 * 1000 }, async () => {
 });
 ```
 
+### `childProcessKeepAlive()`
+
+```typescript
+export function childProcessKeepAlive(
+  newChildProcess: () =>
+    | ReturnType<(typeof childProcess)["spawn"]>
+    | Promise<ReturnType<(typeof childProcess)["spawn"]>>,
+): void;
+```
+
+Keep a child process alive. If the child process crashes, respawn it. When the process gracefully terminates, gracefully terminate the child process as well.
+
+**Example**
+
+```typescript
+node.childProcessKeepAlive(() =>
+  childProcess.spawn("node", ["--eval", `http.createServer().listen(18000)`], {
+    stdio: "inherit",
+  })
+);
+```
+
 <!-- DOCUMENTATION END: ./source/index.mts -->

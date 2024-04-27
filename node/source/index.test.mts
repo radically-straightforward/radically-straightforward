@@ -1,6 +1,7 @@
 import test from "node:test";
 import http from "node:http";
 import timers from "node:timers/promises";
+import childProcess from "node:child_process";
 import * as node from "@radically-straightforward/node";
 
 test(
@@ -61,5 +62,28 @@ test(
       backgroundJob.run();
     });
     console.log("backgroundJob(): Press ⌃Z to ‘run()’ and ⌃C to ‘stop()’...");
+  },
+);
+
+test(
+  "childProcessKeepAlive()",
+  {
+    skip:
+      process.stdin.isTTY && process.argv[2] === "childProcessKeepAlive()"
+        ? false
+        : `Run interactive test with ‘node ./build/index.test.mjs "childProcessKeepAlive()"’.`,
+  },
+  async () => {
+    node.childProcessKeepAlive(() => {
+      const childProcessInstance = childProcess.spawn(
+        "node",
+        ["--eval", `http.createServer().listen(18000)`],
+        { stdio: "inherit" },
+      );
+      console.log(
+        `childProcessKeepAlive(): Child process id: ${childProcessInstance.pid}`,
+      );
+      return childProcessInstance;
+    });
   },
 );

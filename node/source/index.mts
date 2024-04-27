@@ -1,3 +1,4 @@
+import childProcess from "node:child_process";
 import * as utilities from "@radically-straightforward/utilities";
 
 let gracefulTerminationEmitted = false;
@@ -56,4 +57,39 @@ export function backgroundJob(
   };
   process.once("gracefulTermination", gracefulTerminationEventListener);
   return backgroundJob;
+}
+
+/**
+ * Keep a child process alive. If the child process crashes, respawn it. When the process gracefully terminates, gracefully terminate the child process as well.
+ *
+ * **Example**
+ *
+ * ```typescript
+ * node.childProcessKeepAlive(() =>
+ *   childProcess.spawn("node", ["--eval", `http.createServer().listen(18000)`], {
+ *     stdio: "inherit",
+ *   })
+ * );
+ * ```
+ */
+export function childProcessKeepAlive(
+  newChildProcess: () =>
+    | ReturnType<(typeof childProcess)["spawn"]>
+    | Promise<ReturnType<(typeof childProcess)["spawn"]>>,
+): void {
+  let childProcessInstance: ReturnType<(typeof childProcess)["spawn"]>;
+  backgroundJob(
+    {
+      interval: 200,
+      onStop: () => {
+        childProcessInstance.kill();
+      },
+    },
+    async () => {
+      childProcessInstance = await newChildProcess();
+      await new Promise((resolve) => {
+        childProcessInstance.once("close", resolve);
+      });
+    },
+  );
 }
