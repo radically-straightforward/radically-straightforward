@@ -497,7 +497,3 @@ export let shiftKey;
 Whether the shift key is being held. Useful for events such as `paste`, which don’t include the state of modifier keys.
 
 <!-- DOCUMENTATION END: ./static/index.mjs -->
-
-## Related Work
-
-TODO
