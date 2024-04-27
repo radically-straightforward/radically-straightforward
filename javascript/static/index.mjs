@@ -14,7 +14,7 @@ import * as Tippy from "tippy.js";
 export const configuration = { environment: "production" };
 
 async function liveNavigate(request, event = undefined) {
-  if (liveNavigate.inProgress > 0)
+  if (liveNavigate.abortController !== undefined)
     if (event instanceof PopStateEvent) liveNavigate.abortController.abort();
     else return;
   if (
@@ -40,7 +40,6 @@ async function liveNavigate(request, event = undefined) {
   });
   try {
     liveConnection.backgroundJob?.stop();
-    liveNavigate.inProgress++;
     liveNavigate.abortController = new AbortController();
     const response = await fetch(request, {
       signal: liveNavigate.abortController.signal,
@@ -76,11 +75,10 @@ async function liveNavigate(request, event = undefined) {
     }).show();
     throw error;
   } finally {
-    liveNavigate.inProgress--;
+    delete liveNavigate.abortController;
   }
 }
-liveNavigate.inProgress = 0;
-liveNavigate.abortController = new AbortController();
+liveNavigate.abortController = undefined;
 window.onclick = async (event) => {
   const link = event.target.closest(`a:not([target="_blank"])`);
   if (
