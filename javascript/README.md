@@ -121,11 +121,13 @@ javascript.configuration.environment = "development";
 export async function liveConnection(requestId);
 ```
 
-TODO
+Open a [Live Connection](https://github.com/radically-straightforward/radically-straightforward/tree/main/server#live-connection) to the server.
 
-- If `configuration.environment === "development"`, reload instead of Live Connection update.
-- `<meta name="version" content="1.0.0" />`
-- `key="global-error"` (or `body` first child)
+If a connection can’t be established, then an error message is shown in a `tippy()`. The `tippy()` is attached to an element of `key="global-error"` or the `<body>`’s first child.
+
+If the `content` of the meta tag `<meta name="version" content="___" />` has changed, a Live Connection update doesn’t happen. Instead, a message is shown in a `tippy()` instructing to reload the page.
+
+If `configuration.environment === "development"` then the page reloads when the connection is closed and reopened, because presumably the server has been restarted after a code modification.
 
 ### `mount()`
 
