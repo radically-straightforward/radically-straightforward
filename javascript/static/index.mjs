@@ -74,6 +74,7 @@ async function liveNavigate(request, event = undefined) {
     }).show();
     throw error;
   } finally {
+    progressBar.remove();
     delete liveNavigate.abortController;
   }
 }
