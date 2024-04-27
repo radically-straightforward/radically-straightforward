@@ -1,5 +1,13 @@
 # TODO
 
+- Live Navigation.
+- `execute()`.
+- Form validation.
+- Warn before leaving page with unsubmitted form.
+- Tippy.js configuration.
+
+---
+
 ```typescript
 import childProcess from "node:child_process";
 import server from "@radically-straightforward/server";

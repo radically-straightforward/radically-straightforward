@@ -8,7 +8,7 @@
 $ npm install --save-dev @radically-straightforward/javascript
 ```
 
-> **Note:** We recommend installing `@radically-straightforward/javascript` as a development dependency because `@radically-straightforward/build` can build the `` javascript`___` `` tagged templates away on the server and bundle the JavaScript framework on the browser.
+> **Note:** We recommend installing `@radically-straightforward/javascript` as a development dependency because `@radically-straightforward/build` removes the `` javascript`___` `` tagged templates from the server code and bundles the browser JavaScript.
 
 > **Note:** We recommend the **[es6-string-html](https://marketplace.visualstudio.com/items?itemName=Tobermory.es6-string-html)** Visual Studio Code extension to syntax highlight browser JavaScript in tagged templates.
 
@@ -54,12 +54,6 @@ javascript`
 ```javascript
 import * as javascript from "@radically-straightforward/javascript/static/index.mjs";
 ```
-
-- Live Navigation.
-- `execute()`.
-- Form validation.
-- Warn before leaving page with unsubmitted form.
-- Tippy.js configuration.
 
 <!-- DOCUMENTATION START: ./static/index.mjs -->
 
