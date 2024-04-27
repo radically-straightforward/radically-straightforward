@@ -49,11 +49,55 @@ javascript`
 
 <!-- DOCUMENTATION END: ./source/index.mts -->
 
-### Browser JavaScript
+## Browser JavaScript
 
-```javascript
-import * as javascript from "@radically-straightforward/javascript/static/index.mjs";
+```typescript
+css`
+  @import "@radically-straightforward/javascript/static/index.css";
+`;
+
+javascript`
+  import * as javascript from "@radically-straightforward/javascript/static/index.mjs";
+`;
 ```
+
+Importing this module enables the following features:
+
+### Live Navigation
+
+Detect that the user is following a link, submitting a form, or navigating **Back**/**Forward** in history and overwrite the browser’s default behavior: instead of loading an entire new page, `morph()` the current page into the new one. This speeds up navigation because CSS and browser JavaScript are preserved. Also, it allows for preserving some browser state (for example, scroll position on a sidebar) through careful use of the same `key="___"` attribute across pages.
+
+Live Navigation enhances `<form>`s in the following ways:
+
+- More `method`s are supported, including `PATCH`, `PUT`, `DELETE`, and so forth. This goes beyond the methods `GET` and `POST` that are supported by browsers by default.
+
+- The `CSRF-Protection` HTTP header is set, to satisfy [`@radically-straightforward/server`’s CSRF Protection mechanism](https://github.com/radically-straightforward/radically-straightforward/tree/main/server#csrf-protection).
+
+If the pages include the `<meta name="version" content="___" />` meta tag, then Live Navigation is disabled and the user is alerted through a `tippy()` to reload the page. The `tippy()` is attached to an element of `key="global-error"` or the `<body>`’s first child.
+
+When loading a new page, a progress bar is displayed on an element identified by `key="progress-bar"` that is the last child of `<body>`. This element may be styled via CSS.
+
+An `<a>` or `<form>` may opt out of Live Navigation by setting the property `element.liveNavigate = false`.
+
+### Code Execution through the ``javascript="${javascript`___`}"`` Attribute
+
+When the page is loaded, the browser JavaScript in the ``javascript="${javascript`___`}"`` attribute is executed. This is made to work along with the [`@radically-straightforward/build`](https://github.com/radically-straightforward/radically-straightforward/tree/main/build) package, which extracted browser JavaScript from the server code.
+
+### Custom Form Validation
+
+The default browser form validation is limited in many ways:
+
+- Email verification in `<input type="email" />` is too permissive to be practical, allowing, for example, for the email address `example@localhost`, which is technically valid, but undesirable.
+
+- Custom validation is awkward to use.
+
+- It isn’t possible to control the style of the error messages.
+
+`@radically-straightforward/javascript` overwrites the default browser behavior and introduces a custom validation mechanism. See `validate()` for more information.
+
+### Warn about Unsaved Changes before Leaving the Page
+
+If the user has filled a form but hasn’t submitted it and they try to leave the page, then `@radically-straightforward/javascript` warns that they will lose data. See `isModified()` for more information.
 
 <!-- DOCUMENTATION START: ./static/index.mjs -->
 
@@ -451,10 +495,6 @@ export let shiftKey;
 Whether the shift key is being held. Useful for events such as `paste`, which don’t include the state of modifier keys.
 
 <!-- DOCUMENTATION END: ./static/index.mjs -->
-
-## Live Navigation
-
-TODO: `@radically-straightforward/server` refers to this.
 
 ## Related Work
 

@@ -1,18 +1,5 @@
 # TODO
 
-- Live Navigation.
-  - `<meta name="version" content="1.0.0" />`
-  - `key="progress-bar"` (`body` last child)
-  - `key="global-error"` (or `body` first child)
-  - `CSRF-Protection`
-  - `<a>` or `<form>` `liveNavigate = false`
-- `execute()`.
-- Tippy.js configuration.
-- Form validation.
-- Warn before leaving page with unsubmitted form.
-
----
-
 ```typescript
 import childProcess from "node:child_process";
 import server from "@radically-straightforward/server";
