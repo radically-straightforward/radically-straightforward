@@ -1,6 +1,11 @@
 # TODO
 
 - Live Navigation.
+  - `<meta name="version" content="1.0.0" />`
+  - `key="progress-bar"` (`body` last child)
+  - `key="global-error"` (or `body` first child)
+  - `CSRF-Protection`
+  - `<a>` or `<form>` `liveNavigate = false`
 - `execute()`.
 - Form validation.
 - Warn before leaving page with unsubmitted form.

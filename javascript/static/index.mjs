@@ -25,7 +25,7 @@ async function liveNavigate(request, event = undefined) {
   const progressBar = document
     .querySelector("body")
     .insertAdjacentElement(
-      "afterbegin",
+      "beforeend",
       stringToElement(`<div key="progress-bar"></div>`).firstElementChild,
     );
   backgroundJob(progressBar, "progressBar", { interval: 1000 }, () => {
