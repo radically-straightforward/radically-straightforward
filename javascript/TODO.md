@@ -7,9 +7,9 @@
   - `CSRF-Protection`
   - `<a>` or `<form>` `liveNavigate = false`
 - `execute()`.
+- Tippy.js configuration.
 - Form validation.
 - Warn before leaving page with unsubmitted form.
-- Tippy.js configuration.
 
 ---
 
