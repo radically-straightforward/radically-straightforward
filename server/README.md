@@ -150,11 +150,11 @@ Live Connections are a simple but powerful solution to many typical problems in 
 
 - And more…
 
-> **Note:** Use Live Connections with [`@radically-straightforward/javascript`](https://github.com/radically-straightforward/radically-straightforward/tree/main/javascript#live-connection), which implements the browser side of these features and subsumes many of the details below.
+> **Note:** Use Live Connections with [`@radically-straightforward/javascript`](https://github.com/radically-straightforward/radically-straightforward/tree/main/javascript#liveconnection), which implements the browser side of these features and subsumes many of the details below.
 
 A Live Connection is a variation on a `GET` request in which the server doesn’t `response.end()`, but leaves the connection open and the browser waiting for more content. When there’s a change that requires an update on the page, the server runs the `request` and `response` through the routes again and sends the updated page to the browser through that connection.
 
-From the perspective of the application developer this is advantageous because there’s a single source of truth for how to present a page to the user: the server-side rendered page. It’s as if the browser knew that a new version of a page is available and requested it. Also, in combination with [`@radically-straightforward/javascript`](https://github.com/radically-straightforward/radically-straightforward/tree/main/javascript#live-connection) only the part of the page that changed is touched (without the need for virtual DOMs, complex browser state management, and so forth).
+From the perspective of the application developer this is advantageous because there’s a single source of truth for how to present a page to the user: the server-side rendered page. It’s as if the browser knew that a new version of a page is available and requested it. Also, in combination with [`@radically-straightforward/javascript`](https://github.com/radically-straightforward/radically-straightforward/tree/main/javascript#liveconnection) only the part of the page that changed is touched (without the need for virtual DOMs, complex browser state management, and so forth).
 
 To establish a Live Connection perform a `GET` request with the `Live-Connection` header set to the `request.id` of the request for the original page (or, failing that, to a random string which will become the `request.id` moving forward), for example:
 

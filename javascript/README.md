@@ -63,7 +63,13 @@ import * as javascript from "@radically-straightforward/javascript/static/index.
 export const configuration;
 ```
 
-TODO
+Global configuration for browser JavaScript.
+
+**Example**
+
+```javascript
+javascript.configuration.environment = "development";
+```
 
 ### `liveConnection()`
 
@@ -72,6 +78,10 @@ export async function liveConnection(requestId);
 ```
 
 TODO
+
+- If `configuration.environment === "development"`, reload instead of Live Connection update.
+- `<meta name="version" content="1.0.0" />`
+- `key="global-error"` (or `body` first child)
 
 ### `mount()`
 
@@ -89,7 +99,9 @@ export function documentMount(content, event = new Event("DOMContentLoaded"));
 
 > **Note:** This is a low-level function used by Live Navigation and Live Connection.
 
-Similar to `mount()`, but suited for morphing the entire `document`. If the `document` and the `content` have `<meta name="version" content="___" />` with different `content`s, then `documentMount()` displays an error message in a `tippy()` and doesn’t mount the new document.
+Similar to `mount()`, but suited for morphing the entire `document`. For example, it dispatches the `event` to the `window`.
+
+If the `document` and the `content` have `<meta name="version" content="___" />` with different `content`s, then `documentMount()` displays an error message in a `tippy()` and doesn’t mount the new document. The `tippy()` is attached to an element of `key="global-error"` or the `<body>`’s first child.
 
 ### `morph()`
 
@@ -444,10 +456,8 @@ Whether the shift key is being held. Useful for events such as `paste`, which do
 
 TODO: `@radically-straightforward/server` refers to this.
 
-## Live Connection
-
-TODO: `@radically-straightforward/server` refers to this.
-
 ## Related Work
 
 TODO
+
+[](#liveconnection)
