@@ -115,8 +115,11 @@ window.onsubmit = async (event) => {
     enctype === "multipart/form-data"
       ? new FormData(event.target)
       : new URLSearchParams(new FormData(event.target));
-  if (typeof event.submitter?.getAttribute("name") === "string")
-    body.set(event.submitter.getAttribute("name"), event.submitter.value);
+  if (
+    typeof event.submitter?.getAttribute("name") === "string" &&
+    event.submitter.getAttribute("name").trim() !== ""
+  )
+    body.append(event.submitter.getAttribute("name"), event.submitter.value);
   event.preventDefault();
   liveNavigate(
     method === "GET"
