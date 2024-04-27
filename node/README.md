@@ -118,7 +118,7 @@ Keep a child process alive. If the child process crashes, respawn it. When the p
 node.childProcessKeepAlive(() =>
   childProcess.spawn("node", ["--eval", `http.createServer().listen(18000)`], {
     stdio: "inherit",
-  })
+  }),
 );
 ```
 

@@ -68,7 +68,7 @@ export function backgroundJob(
  * node.childProcessKeepAlive(() =>
  *   childProcess.spawn("node", ["--eval", `http.createServer().listen(18000)`], {
  *     stdio: "inherit",
- *   })
+ *   }),
  * );
  * ```
  */
