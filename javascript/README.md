@@ -459,5 +459,3 @@ TODO: `@radically-straightforward/server` refers to this.
 ## Related Work
 
 TODO
-
-[](#liveconnection)
