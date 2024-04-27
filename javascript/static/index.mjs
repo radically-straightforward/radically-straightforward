@@ -14,13 +14,12 @@ import * as Tippy from "tippy.js";
 export const configuration = { environment: "production" };
 
 async function liveNavigate(request, event = undefined) {
-  if (liveNavigate.abortController !== undefined)
-    if (event instanceof PopStateEvent) liveNavigate.abortController.abort();
-    else return;
-  if (
-    request.method === "GET" &&
-    isModified(document.querySelector("body")) &&
-    !confirm("Your changes will be lost if you continue.")
+  if (event instanceof PopStateEvent) liveNavigate.abortController?.abort();
+  else if (
+    liveNavigate.abortController !== undefined ||
+    (request.method === "GET" &&
+      isModified(document.querySelector("body")) &&
+      !confirm("Your changes will be lost if you continue."))
   )
     return;
   const progressBar = document
