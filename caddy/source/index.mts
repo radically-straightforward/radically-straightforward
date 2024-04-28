@@ -4,6 +4,9 @@ import fs from "node:fs/promises";
 import childProcess from "node:child_process";
 import * as node from "@radically-straightforward/node";
 
+/**
+ * Start a Caddy process with `application()` configuration. If the process crashes, a new one is spawned.
+ */
 export function start({
   extraCaddyfile = caddyfile``,
   ...applicationOptions
@@ -109,11 +112,11 @@ export const staticFiles: { [key: string]: string } = JSON.parse(
 export function application({
   address = "localhost",
   trustedStaticFilesRoots = [
-    `* "${url.fileURLToPath(
-      new URL(
-        "./build/static/",
-        import.meta.url.split("/node_modules/")[0] + "/",
-      ),
+    `* "${path.join(
+      url
+        .fileURLToPath(new URL("..", import.meta.url))
+        .split("/node_modules/")[0],
+      "build/static/",
     )}"`,
   ],
   untrustedStaticFilesRoots = [

@@ -3,9 +3,7 @@ import assert from "node:assert/strict";
 import os from "node:os";
 import path from "node:path";
 import fs from "node:fs/promises";
-import url from "node:url";
 import http from "node:http";
-import childProcess from "node:child_process";
 import timers from "node:timers/promises";
 import * as caddy from "@radically-straightforward/caddy";
 
@@ -74,16 +72,9 @@ test(
       })
       .listen(18000, "localhost");
 
-    const caddyServer = childProcess.spawn(
-      url.fileURLToPath(new URL("../node_modules/.bin/caddy", import.meta.url)),
-      ["run", "--adapter", "caddyfile", "--config", "-"],
-      { stdio: [undefined, "ignore", "ignore"] },
-    );
-    caddyServer.stdin.end(
-      caddy.application({
-        trustedStaticFilesRoots: [`* "./example-application/_/build/static/"`],
-      }),
-    );
+    caddy.start({
+      trustedStaticFilesRoots: [`* "./example-application/_/build/static/"`],
+    });
 
     await timers.setTimeout(2 * 1000);
 
@@ -201,6 +192,7 @@ test(
       assert.equal(response.headers.get("Cache-Control"), "no-store");
     }
 
-    caddyServer.kill();
+    if (process.platform === "win32") process.exit();
+    else process.kill(process.pid);
   },
 );

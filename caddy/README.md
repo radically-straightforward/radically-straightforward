@@ -55,24 +55,28 @@ caddyServer.stdin.end(caddy.application());
 
 <!-- DOCUMENTATION START: ./source/index.mts -->
 
-### `Caddyfile`
+### `start()`
 
 ```typescript
-export type Caddyfile = string;
+export function start({
+  extraCaddyfile = caddyfile``,
+  ...applicationOptions
+}: {
+  extraCaddyfile?: Caddyfile;
+} & Parameters<typeof application>[0] = {}): void;
 ```
 
-A type alias to make your type annotations more specific.
+Start a Caddy process with `application()` configuration. If the process crashes, a new one is spawned.
 
-### `caddyfile()`
+### `staticFiles`
 
 ```typescript
-export default function caddyfile(
-  templateStrings: TemplateStringsArray,
-  ...substitutions: Caddyfile[]
-): Caddyfile;
+export const staticFiles: {
+  [key: string]: string;
+};
 ```
 
-A [tagged template](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_literals#tagged_templates) for [Caddyfile](https://caddyserver.com/docs/quick-starts/caddyfile).
+A mapping from static file names to their hashed names, as produced by [`@radically-straightforward/build`](https://github.com/radically-straightforward/radically-straightforward/tree/main/build) and found in `./build/static.json`.
 
 ### `application()`
 
@@ -80,7 +84,7 @@ A [tagged template](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Refe
 export function application({
   address = "localhost",
   trustedStaticFilesRoots = [
-    `* "${url.fileURLToPath(new URL("./build/static/", import.meta.url.split("/node_modules/")[0] + "/"))}"`,
+    `* "${path.join(url.fileURLToPath(new URL("..", import.meta.url)).split("/node_modules/")[0], "build/static/")}"`,
   ],
   untrustedStaticFilesRoots = [
     `/files/* "${path.join(process.cwd(), "data")}"`,
@@ -158,15 +162,24 @@ A Caddyfile template for an application.
 - <https://owasp.org/www-project-secure-headers/>
 - <https://helmetjs.github.io/>
 
-### `staticFiles`
+### `Caddyfile`
 
 ```typescript
-export const staticFiles: {
-  [key: string]: string;
-};
+export type Caddyfile = string;
 ```
 
-A mapping from static file names to their hashed names, as produced by [`@radically-straightforward/build`](https://github.com/radically-straightforward/radically-straightforward/tree/main/build) and found in `./build/static.json`.
+A type alias to make your type annotations more specific.
+
+### `caddyfile()`
+
+```typescript
+export default function caddyfile(
+  templateStrings: TemplateStringsArray,
+  ...substitutions: Caddyfile[]
+): Caddyfile;
+```
+
+A [tagged template](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_literals#tagged_templates) for [Caddyfile](https://caddyserver.com/docs/quick-starts/caddyfile).
 
 <!-- DOCUMENTATION END: ./source/index.mts -->
 

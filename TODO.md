@@ -1,11 +1,5 @@
 # TODO
 
-- Use `start` in test
-- Document `start`
-- import.meta.url.split
-
----
-
 - `@radically-straightforward/all`
 - JAVASCRIPT-PACKAGE-EXAMPLE
 - Can we get by without `cache: "no-store"` on every `fetch()`?
