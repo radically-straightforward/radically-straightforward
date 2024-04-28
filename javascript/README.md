@@ -45,7 +45,7 @@ javascript`
 `;
 ```
 
-> **Note:** Browser JavaScript is represented as a string and this tagged template works by performing string interpolation. The substitutions are `JSON.stringify()`ed. This is conceptually simple and fast. To process the generated JavaScript, find issues automatically, and so forth, refer to [`@radically-straightforward/build`](https://www.npmjs.com/package/@radically-straightforward/build).
+> **Note:** Browser JavaScript is represented as a string and this tagged template works by performing string interpolation. The substitutions are `JSON.stringify()`ed. This is conceptually simple and fast. To extract and process the browser JavaScript refer to [`@radically-straightforward/build`](https://www.npmjs.com/package/@radically-straightforward/build).
 
 <!-- DOCUMENTATION END: ./source/index.mts -->
 
@@ -65,7 +65,7 @@ Importing this module enables the following features:
 
 ### Live Navigation
 
-Detect that the user is following a link, submitting a form, or navigating **Back**/**Forward** in history and overwrite the browser’s default behavior: instead of loading an entire new page, `morph()` the current page into the new one. This speeds up navigation because CSS and browser JavaScript are preserved. Also, it allows for preserving some browser state (for example, scroll position on a sidebar) through careful use of the same `key="___"` attribute across pages.
+Detect that the user is following a link, submitting a form, or navigating in browser history and overwrite the browser’s default behavior: instead of loading an entire new page, `morph()` the current page into the new one. This speeds up navigation because CSS and browser JavaScript are preserved. Also, it allows for preserving some browser state (for example, scroll position on a sidebar) through careful use of the same `key="___"` attribute across pages.
 
 Live Navigation enhances `<form>`s in the following ways:
 
@@ -73,21 +73,21 @@ Live Navigation enhances `<form>`s in the following ways:
 
 - The `CSRF-Protection` HTTP header is set, to satisfy [`@radically-straightforward/server`’s CSRF Protection mechanism](https://github.com/radically-straightforward/radically-straightforward/tree/main/server#csrf-protection).
 
-If the pages include the `<meta name="version" content="___" />` meta tag, then Live Navigation is disabled and the user is alerted through a `tippy()` to reload the page. The `tippy()` is attached to an element of `key="global-error"` or the `<body>`’s first child.
+If the pages include the `<meta name="version" content="___" />` meta tag and the versions differ, then Live Navigation is disabled and the user is alerted through a `tippy()` to reload the page. The `tippy()` is attached to an element with `key="global-error"` or the `<body>`’s first child.
 
-When loading a new page, a progress bar is displayed on an element identified by `key="progress-bar"` that is the last child of `<body>`. This element may be styled via CSS.
+When loading a new page, a progress bar is displayed on an element with `key="progress-bar"` that is the last child of `<body>`. This element may be styled via CSS.
 
 An `<a>` or `<form>` may opt out of Live Navigation by setting the property `element.liveNavigate = false`.
 
 ### Code Execution through the ``javascript="${javascript`___`}"`` Attribute
 
-When the page is loaded, the browser JavaScript in the ``javascript="${javascript`___`}"`` attribute is executed. This is made to work along with the [`@radically-straightforward/build`](https://github.com/radically-straightforward/radically-straightforward/tree/main/build) package, which extracted browser JavaScript from the server code.
+When the page is loaded, the browser JavaScript in the ``javascript="${javascript`___`}"`` attribute is executed. This is made to work along with the [`@radically-straightforward/build`](https://github.com/radically-straightforward/radically-straightforward/tree/main/build) package, which extracts browser JavaScript from the server code.
 
 ### Custom Form Validation
 
 The default browser form validation is limited in many ways:
 
-- Email verification in `<input type="email" />` is too permissive to be practical, allowing, for example, for the email address `example@localhost`, which is technically valid, but undesirable.
+- Email verification in `<input type="email" />` is too permissive to be practical, allowing, for example, the email address `example@localhost`, which is technically valid but undesirable.
 
 - Custom validation is awkward to use.
 
@@ -123,7 +123,7 @@ export async function liveConnection(requestId);
 
 Open a [Live Connection](https://github.com/radically-straightforward/radically-straightforward/tree/main/server#live-connection) to the server.
 
-If a connection can’t be established, then an error message is shown in a `tippy()`. The `tippy()` is attached to an element of `key="global-error"` or the `<body>`’s first child.
+If a connection can’t be established, then an error message is shown in a `tippy()`. The `tippy()` is attached to an element with `key="global-error"` or the `<body>`’s first child.
 
 If the `content` of the meta tag `<meta name="version" content="___" />` has changed, a Live Connection update doesn’t happen. Instead, a message is shown in a `tippy()` instructing to reload the page.
 
@@ -147,7 +147,7 @@ export function documentMount(content, event = new Event("DOMContentLoaded"));
 
 Similar to `mount()`, but suited for morphing the entire `document`. For example, it dispatches the `event` to the `window`.
 
-If the `document` and the `content` have `<meta name="version" content="___" />` with different `content`s, then `documentMount()` displays an error message in a `tippy()` and doesn’t mount the new document. The `tippy()` is attached to an element of `key="global-error"` or the `<body>`’s first child.
+If the `document` and the `content` have `<meta name="version" content="___" />` with different `content`s, then `documentMount()` displays an error message in a `tippy()` and doesn’t mount the new document. The `tippy()` is attached to an element with `key="global-error"` or the `<body>`’s first child.
 
 ### `morph()`
 
