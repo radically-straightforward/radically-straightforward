@@ -118,7 +118,6 @@ console.timeEnd("intern()");
   - Compiled
     - No interpolation at all
 
-
 # TODO
 
 ```typescript
@@ -183,7 +182,7 @@ application.push({
             ${new Date().toISOString()}: This is /1, <a href="/2">go to /2</a>.
           </p>
         `,
-      }),
+      })
     );
   },
 });
@@ -201,7 +200,7 @@ application.push({
             ${new Date().toISOString()}: This is /2, <a href="/1">go to /1</a>.
           </p>
         `,
-      }),
+      })
     );
   },
 });
@@ -216,7 +215,7 @@ function layout({
   body: HTML;
 }): HTML {
   return html`
-    <!doctype html>
+    <!DOCTYPE html>
     <html>
       <head>
         <meta name="version" content="1.0.0" />
@@ -237,7 +236,7 @@ function layout({
 const caddyServer = childProcess.spawn(
   "./node_modules/.bin/caddy",
   ["run", "--adapter", "caddyfile", "--config", "-"],
-  { stdio: [undefined, "ignore", "ignore"] },
+  { stdio: [undefined, "ignore", "ignore"] }
 );
 caddyServer.stdin.end(caddy.application());
 process.once("gracefulTermination", () => {
@@ -568,7 +567,6 @@ One (perhaps valuable) difference between `morph()` and other solutions like `mo
 ## Pre-Fetching
 
 - https://getquick.link/
-
 
 # Server
 
