@@ -12,7 +12,12 @@ export function start({
 >[0] = {}): void {
   node.childProcessKeepAlive(() => {
     const caddyChildProcess = childProcess.spawn(
-      "./node_modules/.bin/caddy",
+      path.join(
+        url
+          .fileURLToPath(new URL("..", import.meta.url))
+          .split("/node_modules/")[0],
+        "node_modules/.bin/caddy",
+      ),
       ["run", "--adapter", "caddyfile", "--config", "-"],
       { stdio: [undefined, "ignore", "ignore"] },
     );
