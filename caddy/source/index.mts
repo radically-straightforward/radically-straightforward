@@ -1,29 +1,44 @@
 import path from "node:path";
 import url from "node:url";
 import fs from "node:fs/promises";
+import childProcess from "node:child_process";
+import * as node from "@radically-straightforward/node";
 
-/**
- * A type alias to make your type annotations more specific.
- */
-export type Caddyfile = string;
-
-/**
- * A [tagged template](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_literals#tagged_templates) for [Caddyfile](https://caddyserver.com/docs/quick-starts/caddyfile).
- */
-export default function caddyfile(
-  templateStrings: TemplateStringsArray,
-  ...substitutions: Caddyfile[]
-): Caddyfile {
-  let output = "";
-  for (const index of substitutions.keys()) {
-    const templateString = templateStrings[index];
-    output += templateString;
-    const substitution = substitutions[index];
-    output += substitution;
-  }
-  output += templateStrings.at(-1);
-  return output;
+export function start({
+  extraCaddyfile = caddyfile``,
+  ...applicationOptions
+}: { extraCaddyfile?: Caddyfile } & Parameters<
+  typeof application
+>[0] = {}): void {
+  node.childProcessKeepAlive(() => {
+    const caddyChildProcess = childProcess.spawn(
+      "./node_modules/.bin/caddy",
+      ["run", "--adapter", "caddyfile", "--config", "-"],
+      { stdio: [undefined, "ignore", "ignore"] },
+    );
+    caddyChildProcess.stdin.end(
+      application(applicationOptions) + extraCaddyfile,
+    );
+    return caddyChildProcess;
+  });
 }
+
+/**
+ * A mapping from static file names to their hashed names, as produced by [`@radically-straightforward/build`](https://github.com/radically-straightforward/radically-straightforward/tree/main/build) and found in `./build/static.json`.
+ */
+export const staticFiles: { [key: string]: string } = JSON.parse(
+  await fs
+    .readFile(
+      path.join(
+        url
+          .fileURLToPath(new URL(".", import.meta.url))
+          .split("/node_modules/")[0],
+        "./build/static.json",
+      ),
+      "utf-8",
+    )
+    .catch(() => JSON.stringify({})),
+);
 
 /**
  * A Caddyfile template for an application.
@@ -180,18 +195,24 @@ export function application({
 }
 
 /**
- * A mapping from static file names to their hashed names, as produced by [`@radically-straightforward/build`](https://github.com/radically-straightforward/radically-straightforward/tree/main/build) and found in `./build/static.json`.
+ * A type alias to make your type annotations more specific.
  */
-export const staticFiles: { [key: string]: string } = JSON.parse(
-  await fs
-    .readFile(
-      path.join(
-        url
-          .fileURLToPath(new URL(".", import.meta.url))
-          .split("/node_modules/")[0],
-        "./build/static.json",
-      ),
-      "utf-8",
-    )
-    .catch(() => JSON.stringify({})),
-);
+export type Caddyfile = string;
+
+/**
+ * A [tagged template](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_literals#tagged_templates) for [Caddyfile](https://caddyserver.com/docs/quick-starts/caddyfile).
+ */
+export default function caddyfile(
+  templateStrings: TemplateStringsArray,
+  ...substitutions: Caddyfile[]
+): Caddyfile {
+  let output = "";
+  for (const index of substitutions.keys()) {
+    const templateString = templateStrings[index];
+    output += templateString;
+    const substitution = substitutions[index];
+    output += substitution;
+  }
+  output += templateStrings.at(-1);
+  return output;
+}
