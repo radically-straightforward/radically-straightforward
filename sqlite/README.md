@@ -38,7 +38,7 @@ To appreciate the difference in ergonomics between `better-sqlite3` and `@radica
 
 **`better-sqlite3`**
 
-```javascript
+```typescript
 import Database from "better-sqlite3";
 
 const database = new Database("example.db");
@@ -73,7 +73,7 @@ database.close();
 
 **`@radically-straightforward/sqlite`**
 
-```javascript
+```typescript
 import sql, { Database } from "@radically-straightforward/sqlite";
 
 const database = await new Database("example.db").migrate(
