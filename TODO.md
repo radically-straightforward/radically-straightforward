@@ -8,12 +8,21 @@
   - https://www.npmjs.com/package/better-queue-sqlite
   - https://github.com/bensheldon/good_job
   - https://github.com/betterment/delayed
-- `createdAt`
-- `startAt`
-- `startedAt`
-- `expiresAt`
-- `type`
-- `parameters`
+
+```sql
+CREATE TABLE IF NOT EXISTS "_backgroundJobs" (
+  "id" INTEGER PRIMARY KEY AUTOINCREMENT,
+  "createdAt" TEXT NOT NULL,
+  "startAt" TEXT NULL,
+  "startedAt" TEXT NULL,
+  "expiresAt" TEXT NOT NULL,
+  "type" TEXT NOT NULL,
+  "parameters" TEXT NOT NULL
+) STRICT;
+CREATE INDEX IF NOT EXISTS "_backgroundJobsStartAt" ON "_backgroundJobs" ("startAt");
+CREATE INDEX IF NOT EXISTS "_backgroundJobsExpiresAt" ON "_backgroundJobs" ("expiresAt");
+CREATE INDEX IF NOT EXISTS "_backgroundJobsType" ON "_backgroundJobs" ("type");
+```
 
 ## Features
 
