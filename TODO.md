@@ -1,9 +1,5 @@
 # TODO
 
-- Use `executeTransaction()` in `migrate()`.
-
----
-
 - `@radically-straightforward/all`
 - JAVASCRIPT-PACKAGE-EXAMPLE
 - Can we get by without `cache: "no-store"` on every `fetch()`?
