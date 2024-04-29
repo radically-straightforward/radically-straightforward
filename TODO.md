@@ -8,6 +8,12 @@
   - https://www.npmjs.com/package/better-queue-sqlite
   - https://github.com/bensheldon/good_job
   - https://github.com/betterment/delayed
+- `createdAt`
+- `startAt`
+- `startedAt`
+- `expiresAt`
+- `type`
+- `parameters`
 
 ## Features
 
