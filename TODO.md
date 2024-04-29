@@ -1,13 +1,5 @@
 # TODO
 
-## Features
-
-- Application startup (process management)
-  - Different children processes
-  - Tunnel
-    - Start Caddy with `address` `http://localhost`, then create a port forwarding in Visual Studio Code to port 80, public.
-  - Profiling
-  - Source maps
 - Use SQLite as queue:
   - https://github.com/collectiveidea/delayed_job/tree/11e0212fb112c5e11e4555ef1e24510819a66347#gory-details
   - https://sqlite.org/forum/info/b047f5ef5b76edff
@@ -16,6 +8,15 @@
   - https://www.npmjs.com/package/better-queue-sqlite
   - https://github.com/bensheldon/good_job
   - https://github.com/betterment/delayed
+
+## Features
+
+- Application startup (process management)
+  - Different children processes
+  - Tunnel
+    - Start Caddy with `address` `http://localhost`, then create a port forwarding in Visual Studio Code to port 80, public.
+  - Profiling
+  - Source maps
 - Developer experience
   - Better text editor support:
     - Syntax highlighting
