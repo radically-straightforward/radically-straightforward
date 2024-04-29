@@ -1,13 +1,6 @@
 # TODO
 
-- Use SQLite as queue:
-  - https://github.com/collectiveidea/delayed_job/tree/11e0212fb112c5e11e4555ef1e24510819a66347#gory-details
-  - https://sqlite.org/forum/info/b047f5ef5b76edff
-  - https://github.com/StratoKit/strato-db/blob/master/src/EventQueue.js
-  - https://github.com/litements/litequeue
-  - https://www.npmjs.com/package/better-queue-sqlite
-  - https://github.com/bensheldon/good_job
-  - https://github.com/betterment/delayed
+**SQLite as background job queue**
 
 ```sql
 CREATE TABLE IF NOT EXISTS "_backgroundJobs" (
@@ -15,14 +8,35 @@ CREATE TABLE IF NOT EXISTS "_backgroundJobs" (
   "createdAt" TEXT NOT NULL,
   "startAt" TEXT NULL,
   "startedAt" TEXT NULL,
-  "expiresAt" TEXT NOT NULL,
+  "attempts" INTEGER NOT NULL,
   "type" TEXT NOT NULL,
   "parameters" TEXT NOT NULL
 ) STRICT;
 CREATE INDEX IF NOT EXISTS "_backgroundJobsStartAt" ON "_backgroundJobs" ("startAt");
-CREATE INDEX IF NOT EXISTS "_backgroundJobsExpiresAt" ON "_backgroundJobs" ("expiresAt");
+CREATE INDEX IF NOT EXISTS "_backgroundJobsAttempts" ON "_backgroundJobs" ("attempts");
 CREATE INDEX IF NOT EXISTS "_backgroundJobsType" ON "_backgroundJobs" ("type");
 ```
+
+- Features
+
+  - Schedule jobs
+  - Schedule jobs in the future
+  - Detect that a job was picked up and not finished (implicit failure)
+  - Retry jobs that failed (explicitly (with an exception), or implicitly (see above))
+  - At some point expire the job
+  - Have a way to force the worker to run
+  - On graceful termination finish existing jobs (or just give up on the job and return it to the queue?)
+  - Separate database, for better performance, or same database, for ease of management?
+
+- References
+
+  - https://github.com/collectiveidea/delayed_job
+  - https://sqlite.org/forum/info/b047f5ef5b76edff
+  - https://github.com/StratoKit/strato-db/blob/master/src/EventQueue.js
+  - https://github.com/litements/litequeue
+  - https://www.npmjs.com/package/better-queue-sqlite
+  - https://github.com/bensheldon/good_job
+  - https://github.com/betterment/delayed
 
 ## Features
 
