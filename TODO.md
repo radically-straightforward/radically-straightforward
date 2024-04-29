@@ -1,32 +1,7 @@
 # TODO
 
-- globby → Node.js’s fs glob
-
----
-
-`@radically-straightforward/utilities`’s `intern` performance benchmark:
-
-```typescript
-const iterations = 1000;
-console.time("intern()");
-const objects = [];
-for (let iteration = 0; iteration < iterations; iteration++) {
-  const entries = [];
-  for (let key = 0; key < Math.floor(Math.random() * 15); key++) {
-    entries.push([String(key + Math.floor(Math.random() * 15)), true]);
-  }
-  objects.push($(Object.fromEntries(entries)));
-  objects.push($(entries.flat()));
-}
-// console.log($.pool.record.size);
-console.timeEnd("intern()");
-```
-
 ## Features
 
-- `javascript`
-  - Browser JavaScript
-  - Documentation
 - Application startup (process management)
   - Different children processes
   - Tunnel
@@ -627,3 +602,430 @@ One (perhaps valuable) difference between `morph()` and other solutions like `mo
 
 - Rate limiting
   - Could be done on Caddy with extension
+
+---
+
+---
+
+# Self-Hosting
+
+**Welcome!** 👋
+
+You may use Courselore at [`courselore.org`](https://courselore.org), but you may prefer to run Courselore on your own server for maximum privacy and control. Courselore is easy to self-host and is an excellent first project if you’re new to system administration.
+
+> **Note:** If you get stuck, please [open an issue](https://github.com/courselore/courselore/issues/new?body=%2A%2AWhat%20did%20you%20try%20to%20do%3F%2A%2A%0A%0A%0A%0A%2A%2AWhat%20did%20you%20expect%20to%20happen%3F%2A%2A%0A%0A%0A%0A%2A%2AWhat%20really%20happened%3F%2A%2A%0A%0A%0A%0A%2A%2AWhat%20error%20messages%20%28if%20any%29%20did%20you%20run%20into%3F%2A%2A%0A%0A%0A%0A%2A%2APlease%20provide%20as%20much%20relevant%20context%20as%20possible%20%28operating%20system%2C%20browser%2C%20and%20so%20forth%29%3A%2A%2A%0A).
+
+> **Note:** Join our community at [Meta Courselore](https://courselore.org/courses/8537410611/invitations/3667859788) to talk to the developers, request features, report bugs, and so forth.
+
+## Requirements
+
+- **Server.** This is the machine that will run Courselore. You may rent a server from a provider such as [DigitalOcean](https://www.digitalocean.com/) (this is what we use for [`courselore.org`](https://courselore.org)), [Linode](https://www.linode.com/), and so forth. You may also use a server provided by your educational institution, or a [Raspberry Pi](https://www.raspberrypi.com) that you have running in your closet.
+
+  > **Note:** You need command-line access to the server.
+
+  > **Note:** We recommend that Courselore is the only application running in the machine. Or, if you must, use containers to separate applications and give Courselore its own container.
+
+  > **Note:** The server may run Linux, Windows, or macOS. We recommend Linux ([Ubuntu](https://ubuntu.com)).
+
+  > **Note:** Courselore is lightweight. A $12/month DigitalOcean server is enough for a couple hundred users.
+
+- **Email Delivery Service.** This is the service that will deliver emails on behalf of your server. You may use a service such as [Amazon SES](https://aws.amazon.com/ses/) (this is what we use for [`courselore.org`](https://courselore.org)), [SendGrid](https://sendgrid.com), and so forth. You may also use an email delivery service provided by your educational institution.
+
+  > **Note:** In theory your server could try delivering emails directly instead of relying on an email delivery service. Courselore may be configured to do that, and it would be better for privacy because no data would be going through third-party services. Unfortunately, in practice your emails would likely be marked as spam or even be rejected by most destinations such as [Gmail](https://www.google.com/gmail/) and [Microsoft Outlook](https://outlook.live.com/). Courselore must be able to send emails to complete the sign-up process, to send notifications, and so forth, so it’s best to rely on an email delivery service which guarantees that emails will arrive at your users’ inboxes.
+
+- **Domain/Subdomain.** This is a name such as `courselore.org`. You may buy a domain from providers such as [Namecheap](https://www.namecheap.com/) (this is what we use for `courselore.org`), [Amazon Route 53](https://aws.amazon.com/route53/), and so forth. You may also use a domain/subdomain provided by your educational institution, for example, `my-course.educational-institution.edu`.
+
+  > **Note:** You need access to the DNS configuration for the domain/subdomain to set records such as “`my-course.educational-institution.edu` maps to the IP address of my server at `159.203.147.228`.”
+
+  > **Note:** You must have a domain/subdomain dedicated to Courselore—you may not run Courselore under a pathname, for example, `educational-institution.edu/courselore/`. This is necessary to enable Courselore to manage cookies in the most secure way and to avoid conflicts with other applications that could be running on the same domain/subdomain under other pathnames.
+
+## DNS Setup
+
+Create an `A` Record pointing at your server’s IP address and `ALIAS` or `CNAME` Records for common subdomains, for example, `www`.
+
+## Server Setup
+
+1. [Download the latest Courselore release for your platform](https://github.com/courselore/courselore/releases). For example, from the Linux command line:
+
+   ```console
+   # mkdir courselore
+   # cd courselore
+   # wget https://github.com/courselore/courselore/releases/download/v<VERSION>/courselore--linux--v<VERSION>.tgz
+   # tar xzf courselore--linux--v<VERSION>.tgz
+   ```
+
+2. Create a configuration file based on [`web/configuration/example.mjs`](/web/configuration/example.mjs). For example, from the Linux command line:
+
+   ```console
+   # wget -O configuration.mjs https://github.com/courselore/courselore/raw/main/web/configuration/example.mjs
+   # nano configuration.mjs
+   ```
+
+   > **Note for Advanced Users:** The Courselore configuration is a JavaScript module. You may use JavaScript for more advanced configuration options, for example:
+   >
+   > - Read environment variables with `process.env.ENVIRONMENT_VARIABLE`.
+   >
+   > - Load secrets from a different file instead of hard-coding them. For example, see how [`web/configuration/courselore.org.mjs`](/web/configuration/courselore.org.mjs) loads secrets from a file called `secrets.json`.
+
+3. Test the configuration by running Courselore:
+
+   ```console
+   $ ./courselore configuration.mjs
+   ```
+
+   > **Note:** Stop Courselore with `Ctrl+C`.
+
+4. Configure your operating system’s service manager to start Courselore on boot and restart it in case it crashes. For example, you may use Ubuntu’s service manager [systemd](https://systemd.io) with the configuration we use for [`courselore.org`](https://courselore.org) at [`web/configuration/courselore.service`](/web/configuration/courselore.service):
+
+   ```console
+   # wget -O /etc/systemd/system/courselore.service https://github.com/courselore/courselore/raw/main/web/configuration/courselore.service
+   # systemctl daemon-reload
+   # systemctl start courselore
+   # systemctl enable courselore
+   ```
+
+   > **Note:** When you run Courselore for the first time, create an account for yourself, because the first account that is created is granted system administrator privileges.
+
+## Backup
+
+With the default configuration, all the data generated by Courselore lives on the `data/` directory next to the configuration file. Backup that directory using your usual backup strategies. For example, using macOS you may download all the data to a local hard drive:
+
+```console
+$ rsync -av --progress --delete YOUR-USER@YOUR-SERVER.EDU:PATH-TO-COURSELORE/data/ /Volumes/HARD-DRIVE/courselore-data/
+```
+
+> **Note:** If Courselore is running while you run the backup, [there’s a small chance that the database files will be in an invalid state](https://sqlite.org/howtocorrupt.html#_backup_or_restore_while_a_transaction_is_active). We recommend that you stop Courselore during the backup if you can.
+
+## Update
+
+> **Important:** [Backup before updating!](https://github.com/courselore/courselore/blob/main/documentation/self-hosting.md#backup)
+
+> **Important:** Major updates (for example, 1.x.x → 2.x.x) include **required** extra manual steps. Minor updates (for example, x.1.x → x.2.x) include **optional** manual steps.
+>
+> If you’re updating across multiple major & minor versions, then you may update the configuration file with respect to the latest version, but you must follow all other steps for all the versions in between (for example, to update 1.2.3 → 3.2.5 use a configuration file compatible with 3.2.5, but follow the other steps for 1.2.3 → 2.0.0 → 2.1.0 → 2.2.0 → 3.0.0 → 3.1.0 → 3.2.5 as well).
+>
+> Refer to the [changelog](https://github.com/courselore/courselore/blob/main/CHANGELOG.md) for more information.
+
+> **Note:** You may be notified about new Courselore releases in the following ways:
+>
+> **Courselore Footer:** Courselore checks for updates. When a new version is available Courselore notifies administrators with a button in the footer of the main Courselore interface as well as log messages in the console.
+>
+> **GitHub Notifications:** Watch for releases in the [Courselore repository](https://github.com/courselore/courselore/) using the **Watch > Custom > Releases** option.
+>
+> **Atom Feed:** Subscribe to the [releases Atom feed](https://github.com/courselore/courselore/releases.atom).
+>
+> **Email:** Use [CodeRelease.io](https://coderelease.io/) or sign up to the [releases Atom feed](https://github.com/courselore/courselore/releases.atom) via services such as [Blogtrottr](https://blogtrottr.com/) or [IFTTT](https://ifttt.com).
+
+[Download the latest Courselore release for your platform](https://github.com/courselore/courselore/releases) and restart the server. For example, if you followed the examples from [§ Server Setup](#server-setup), you may do the following:
+
+```console
+# rm courselore
+# wget https://github.com/courselore/courselore/releases/download/v<VERSION>/courselore--linux--v<VERSION>.tgz
+# tar xzf courselore--linux--v<VERSION>.tgz
+# systemctl restart courselore
+```
+
+---
+
+---
+
+---
+
+# Setting Up for Development
+
+**Welcome!** 👋
+
+Courselore has been designed to be welcoming to new developers. It’s an excellent first project for people who are new to contributing to open-source software.
+
+> **Note:** If you get stuck, please [open an issue](https://github.com/courselore/courselore/issues/new?body=%2A%2AWhat%20did%20you%20try%20to%20do%3F%2A%2A%0A%0A%0A%0A%2A%2AWhat%20did%20you%20expect%20to%20happen%3F%2A%2A%0A%0A%0A%0A%2A%2AWhat%20really%20happened%3F%2A%2A%0A%0A%0A%0A%2A%2AWhat%20error%20messages%20%28if%20any%29%20did%20you%20run%20into%3F%2A%2A%0A%0A%0A%0A%2A%2APlease%20provide%20as%20much%20relevant%20context%20as%20possible%20%28operating%20system%2C%20browser%2C%20and%20so%20forth%29%3A%2A%2A%0A).
+
+> **Note:** Join our community at [Meta Courselore](https://courselore.org/courses/8537410611/invitations/3667859788) to talk to the developers, propose pull requests, get help on what you’re developing, and so forth.
+
+## Running a Pre-Compiled Binary Locally
+
+The best way to get started is to run a pre-compiled Courselore binary on your machine. You may download Courselore from two channels: The latest development versions, which are available as [Actions Artifacts](https://github.com/courselore/courselore/actions); and stable versions, which are available as [Releases](https://github.com/courselore/courselore/releases). After you downloaded Courselore, extract it and run the `courselore` binary.
+
+> **Note:** You must be signed in to GitHub to download GitHub Actions Artifacts.
+
+> **Note:** Most Linux distributions prevent regular users from binding to network ports lower than 1024. This is a setting that [you should disable](https://github.com/small-tech/auto-encrypt/tree/a917892b93b61cd3b80a6f3919db752e2c5a9f6c#a-note-on-linux-and-the-security-farce-that-is-privileged-ports).
+
+> **Note:** Courselore may ask for your password before running. This happens because it runs with HTTPS—not HTTP—in development to reduce confusion around some browser features that work differently under HTTPS. To accomplish this, it needs to install local TLS certificates on your operating system’s trust store. Courselore relies on [Caddy](https://caddyserver.com) to manage this process.
+
+> **Note:** Firefox may have issues with the local TLS certificate used by Courselore because by default Firefox uses its own trust store. There are two possible solutions for this:
+>
+> 1. Configure Firefox to use the operating system’s trust store by visiting `about:config` and setting `security.enterprise_roots.enabled` to `true`.
+>
+> 2. Use NSS to install the Caddy root TLS certificate into Firefox’s trust store.
+
+## Running from Source
+
+<details>
+<summary>Windows</summary>
+
+> **Note:** If you’re using the Windows Subsystem for Linux (WSL), follow the instructions for Linux instead.
+
+1. Install [Chocolatey](https://chocolatey.org) and the following packages:
+
+   ```console
+   > choco install nodejs python visualstudio2022-workload-vctools vscode git
+   ```
+
+   > **Note:** You must run PowerShell as administrator for Chocolatey to work.
+
+   > **Note:** You may have to close and reopen PowerShell after installing programs such as Chocolatey.
+
+   > **Note:** Instead of using Chocolatey, you could go to the websites for the development tools and install them by hand, but Chocolatey makes installation and updates more straightforward.
+
+   > **Package Breakdown**
+   >
+   > - [Node.js (`nodejs`)](https://nodejs.org/): The program that runs the JavaScript on which most of Courselore is written.
+   >
+   > - [Python (`python`)](https://www.python.org) and [Visual Studio C++ Build Tools (`visualstudio2022-workload-vctools`)](https://visualstudio.microsoft.com/visual-cpp-build-tools/): These tools are necessary to build native Node.js extensions written in C/C++.
+   >
+   > - [Visual Studio Code (`vscode`)](https://code.visualstudio.com): A text editor with excellent support for the programming languages used in Courselore.
+   >
+   > - [Git (`git`)](https://git-scm.com): The version control system used by Courselore.
+
+2. Setup Git:
+
+   - [Username](https://docs.github.com/en/get-started/getting-started-with-git/setting-your-username-in-git#setting-your-git-username-for-every-repository-on-your-computer)
+   - [Email](https://docs.github.com/en/account-and-profile/setting-up-and-managing-your-github-user-account/managing-email-preferences/setting-your-commit-email-address#setting-your-email-address-for-every-repository-on-your-computer)
+   - [Global `.gitignore` for files such as `.DS_Store` generated by Finder in macOS](https://docs.github.com/en/get-started/getting-started-with-git/ignoring-files#configuring-ignored-files-for-all-repositories-on-your-computer)
+   - [SSH keys to connect to GitHub](https://docs.github.com/en/authentication/connecting-to-github-with-ssh).
+
+3. Install the following Visual Studio Code extensions:
+
+   - [Prettier - Code formatter](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode): Support for [Prettier](https://prettier.io), the code formatter used by Courselore.
+   - [`es6-string-html`](https://marketplace.visualstudio.com/items?itemName=Tobermory.es6-string-html): Syntax highlighting for HTML & SQL as tagged templates in TypeScript—a feature heavily used in the Courselore codebase.
+   - [Indentation Level Movement](https://marketplace.visualstudio.com/items?itemName=kaiwood.indentation-level-movement): Move up & down by indentation, which helps navigating on HTML embedded in JavaScript in the style we use in Courselore.
+
+4. Clone the codebase, install the dependencies, and run Courselore:
+
+   ```console
+   > git clone git@github.com:courselore/courselore.git
+   > cd courselore/web/
+   > npm install
+   > npm start
+   ```
+
+</details>
+
+<details>
+
+<summary>macOS</summary>
+
+1. Install [Homebrew](https://brew.sh) and the following packages:
+
+   ```console
+   $ brew install node visual-studio-code git
+   ```
+
+   > **Note:** Instead of using Homebrew, you could go to the websites for the development tools and install them by hand, but Homebrew makes installation and updates more straightforward.
+
+   > **Package Breakdown**
+   >
+   > - [Node.js (`node`)](https://nodejs.org/): The program that runs the JavaScript on which most of Courselore is written.
+   >
+   > - [Visual Studio Code (`visual-studio-code`)](https://code.visualstudio.com): A text editor with excellent support for the programming languages used in Courselore.
+   >
+   > - [Git (`git`)](https://git-scm.com): The version control system used by Courselore.
+
+2. Setup Git:
+
+   - [Username](https://docs.github.com/en/get-started/getting-started-with-git/setting-your-username-in-git#setting-your-git-username-for-every-repository-on-your-computer)
+   - [Email](https://docs.github.com/en/account-and-profile/setting-up-and-managing-your-github-user-account/managing-email-preferences/setting-your-commit-email-address#setting-your-email-address-for-every-repository-on-your-computer)
+   - [Global `.gitignore` for files such as `.DS_Store` generated by Finder in macOS](https://docs.github.com/en/get-started/getting-started-with-git/ignoring-files#configuring-ignored-files-for-all-repositories-on-your-computer)
+   - [SSH keys to connect to GitHub](https://docs.github.com/en/authentication/connecting-to-github-with-ssh).
+
+3. Install the following Visual Studio Code extensions:
+
+   - [Prettier - Code formatter](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode): Support for [Prettier](https://prettier.io), the code formatter used by Courselore.
+   - [`es6-string-html`](https://marketplace.visualstudio.com/items?itemName=Tobermory.es6-string-html): Syntax highlighting for HTML & SQL as tagged templates in TypeScript—a feature heavily used in the Courselore codebase.
+   - [Indentation Level Movement](https://marketplace.visualstudio.com/items?itemName=kaiwood.indentation-level-movement): Move up & down by indentation, which helps navigating on HTML.
+
+4. Clone the codebase, install the dependencies, and run Courselore:
+
+   ```console
+   $ git clone git@github.com:courselore/courselore.git
+   $ cd courselore/web/
+   $ npm install
+   $ npm start
+   ```
+
+   > **Note:** macOS imposes a limit on the number of files a process can open, but in development Courselore needs to open more files than the default setting allows because it reloads code as soon as you change it. Increase the limit by following [these instructions](https://gist.github.com/abernix/a7619b07b687bb97ab573b0dc30928a0).
+
+</details>
+
+<details>
+
+<summary>Linux (<a href="https://ubuntu.com">Ubuntu</a>)</summary>
+
+1. Install [Homebrew on Linux](https://docs.brew.sh/Homebrew-on-Linux) and the following packages:
+
+   ```console
+   $ brew install node git
+   $ sudo snap install code --classic
+   ```
+
+   > **Note:** Instead of using Homebrew, you could go to the websites for the development tools and install them by hand, but Homebrew makes installation and updates more straightforward.
+
+   > **Package Breakdown**
+   >
+   > - [Node.js (`node`)](https://nodejs.org/): The program that runs the JavaScript on which most of Courselore is written.
+   >
+   > - [Git (`git`)](https://git-scm.com): The version control system used by Courselore.
+   >
+   > - [Visual Studio Code (`code`)](https://code.visualstudio.com): A text editor with excellent support for the programming languages used in Courselore.
+
+   > **Why Homebrew for Linux instead of `apt` (a package manager that comes with Ubuntu)?** The packages available from `apt` prioritize stability, so they run behind on the latest releases. This is desirable for long-running servers, but not for development.
+
+   > **Why Homebrew for Linux instead of [Snap](https://snapcraft.io) (another package manager that comes with Ubuntu)?** Snaps use a constrained permissions system that [doesn’t work well with native Node.js extensions written in C/C++](https://github.com/nodejs/snap/issues/3). Note that Snaps are the best option for graphical applications such as Visual Studio Code, which aren’t available in Homebrew for Linux, so in the snippet above we installed Visual Studio Code from Snap.
+
+2. Setup Git:
+
+   - [Username](https://docs.github.com/en/get-started/getting-started-with-git/setting-your-username-in-git#setting-your-git-username-for-every-repository-on-your-computer)
+   - [Email](https://docs.github.com/en/account-and-profile/setting-up-and-managing-your-github-user-account/managing-email-preferences/setting-your-commit-email-address#setting-your-email-address-for-every-repository-on-your-computer)
+   - [Global `.gitignore` for files such as `.DS_Store` generated by Finder in macOS](https://docs.github.com/en/get-started/getting-started-with-git/ignoring-files#configuring-ignored-files-for-all-repositories-on-your-computer)
+   - [SSH keys to connect to GitHub](https://docs.github.com/en/authentication/connecting-to-github-with-ssh).
+
+3. Install the following Visual Studio Code extensions:
+
+   - [Prettier - Code formatter](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode): Support for [Prettier](https://prettier.io), the code formatter used by Courselore.
+   - [`es6-string-html`](https://marketplace.visualstudio.com/items?itemName=Tobermory.es6-string-html): Syntax highlighting for HTML & SQL as tagged templates in TypeScript—a feature heavily used in the Courselore codebase.
+   - [Indentation Level Movement](https://marketplace.visualstudio.com/items?itemName=kaiwood.indentation-level-movement): Move up & down by indentation, which helps navigating on HTML.
+
+4. Clone the codebase, install the dependencies, and run Courselore:
+
+   ```console
+   $ git clone git@github.com:courselore/courselore.git
+   $ cd courselore/web/
+   $ npm install
+   $ npm start
+   ```
+
+</details>
+
+## Sharing the Development Server
+
+It’s often useful to run Courselore in your development machine and access it from another device. For example, you may access it from your phone to test user interface changes, or let someone in a video-chat access it from the internet to assist in investigating an issue.
+
+To make this work, you must establish a network route between your development machine and the device that will access it. There are two ways of doing this:
+
+**Local Area Network (LAN)**
+
+Recommended for: Accessing Courselore from your phone to test user interface changes.
+
+Advantages: Fastest. Works even when you don’t have an internet connection, as long as all the devices are connected to the same LAN/wifi.
+
+Disadvantages: Doesn’t work on some LANs. Doesn’t work across the internet, so may not be used to share a server with someone over video-chat.
+
+<details>
+<summary>How to</summary>
+
+1. Determine the LAN address of your development machine, which may be a name such as `leafac--mac-mini.local` or an IP address. The exact procedure depends on your operating system and network configuration.
+
+   > **macOS Tip:** Go to **System Preferences… > Sharing** and take note of the name ending in `.local`.
+
+2. Send the root TLS certificate created by [Caddy](https://caddyserver.com) to the other device.
+
+   > **Example:** In macOS the default location of the certificate is `~/Library/Application Support/Caddy/pki/authorities/local/root.crt`. You may AirDrop that file to an iPhone/iPad.
+
+   > **Note:** Certificates have a `.crt` extension. **Importantly, `.key` files are not certificates.** These `.key` files are signing keys which must never leave your development machine, because they would allow for other devices to intercept and tamper with your network traffic.
+
+3. Install & trust the TLS certificate on the other device.
+
+   > **Note:** The exact procedure depends on the operating system, but typically this process occurs in two steps: First **install** the certificate, then **trust** it.
+
+   > **iPhone/iPad Tip:** Install the certificate on **Settings > General > VPN & Device Management Certificates**, and trust it on **Settings > General > About > Certificate Trust Settings**.
+
+   > **Windows Tip:** Install the certificate under the Logical Store Name called **Trusted Root Certification Authorities > Certificates**.
+
+4. Run Courselore with the `HOSTNAME` environment variable set to the address determined in step 1, for example, in macOS and Linux:
+
+   ```console
+   $ env HOSTNAME=leafac--mac-mini.local npm start
+   ```
+
+5. Visit the address on the other device.
+
+</details>
+
+**Tunnel**
+
+Recommended for: Letting someone in a video-chat access Courselore from the internet to assist in investigating an issue.
+
+Advantages: Works across the internet.
+
+Disadvantages: Slower. Requires an internet connection.
+
+<details>
+<summary>How to</summary>
+
+1. Create the tunnel. If you’re part of the Courselore team, you may request a custom Courselore tunnel address such as `leafac.courselore.org`, otherwise you may use services such as [Localtunnel](https://theboroer.github.io/localtunnel-www/) and [localhost.run](https://localhost.run), for example:
+
+   ```console
+   # Custom Courselore Tunnel Address
+   $ ssh -NR 3000:localhost:80 root@leafac.courselore.org
+
+   # Localtunnel
+   $ npx localtunnel --port 80
+
+   # localhost.run
+   $ ssh -R 80:localhost:80 localhost.run
+   ```
+
+2. Run Courselore with the `TUNNEL` environment variable set to the address given in step 1, for example, in macOS and Linux:
+
+   ```console
+   # Custom Courselore Tunnel Address
+   $ env TUNNEL=leafac.courselore.org npm run start
+
+   # Localtunnel
+   $ env TUNNEL=tough-feet-train-94-60-46-156.loca.lt npm run start
+
+   # localhost.run
+   $ env TUNNEL=089678d384a43b.lhr.life npm run start
+   ```
+
+3. Visit the address on the other device.
+
+</details>
+
+# Measuring Performance (Profiling & Load Testing)
+
+We use two tools to measure the performance of slow pages:
+
+1. [0x](https://www.npmjs.com/package//0x): Profile the application and generate [flame graphs](https://www.brendangregg.com/flamegraphs.html).
+2. [autocannon](https://www.npmjs.com/package//autocannon): Load test (send lots of requests) and measure response time (which autocannon calls “latency”) & throughput.
+
+Here’s a step-by-step guide of how to use these tools in Courselore:
+
+1. Run the application normally.
+
+   > **Note:** Don’t use a custom `HOSTNAME`, because autocannon may not recognize the self-signed certificate generated by Caddy.
+
+2. Setup what you need, for example, create demonstration data.
+3. Take note of the information necessary to reproduce the request of interest, including cookies, URL, and so forth, for example:
+
+   ```console
+   $ npx autocannon --duration 5 --headers "Cookie: __Host-Session=Vsd6eB9gtfjCuK2TTxiUINfn8PoPMYLMWASxnabSz9XMBGS5sHijmrrUDJ15vUF2aGWlsfPh4hkjclsgXrwir3aqvgtIE2VD5ZeH" https://localhost/courses/4453154610/conversations/33
+   ```
+
+4. Stop the server and restart it in profile mode:
+
+   ```console
+   $ npm run start:profile
+   ```
+
+5. Create load on the server, for example:
+
+   ```console
+   $ mkdir -p ./data/measurements/
+   $ npx autocannon --duration 120 --latency --renderStatusCodes --json --headers "Cookie: __Host-Session=Vsd6eB9gtfjCuK2TTxiUINfn8PoPMYLMWASxnabSz9XMBGS5sHijmrrUDJ15vUF2aGWlsfPh4hkjclsgXrwir3aqvgtIE2VD5ZeH" https://localhost/courses/4453154610/conversations/33 > ./data/measurements/latency-and-throughput.txt 2>&1
+   ```
+
+   > **Note**: You may want to watch the system resources while the test is running. For example, in macOS, use Activity Monitor.
+
+6. Stop the server and see the measurements at `./data/measurements/`.
+
+   > **Note:** If you wish to keep these measurements, then rename the folder, because it will be overwritten the next time you run the server in profile mode.
