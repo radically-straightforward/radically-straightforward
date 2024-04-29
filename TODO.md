@@ -1,7 +1,6 @@
 # TODO
 
 - globby → Node.js’s fs glob
-- nodemon
 
 ---
 
