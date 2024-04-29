@@ -32,6 +32,8 @@ An extension of [`better-sqlite3`](https://www.npmjs.com/package/better-sqlite3)
 
 2. A migration system.
 
+3. Better defaults for running SQLite on the server.
+
 To appreciate the difference in ergonomics between `better-sqlite3` and `@radically-straightforward/sqlite`, consider the following example:
 
 **`better-sqlite3`**
@@ -46,7 +48,7 @@ database.exec(
     CREATE TABLE "users" (
       "id" INTEGER PRIMARY KEY AUTOINCREMENT,
       "name" TEXT
-    );
+    ) STRICT;
   `,
 );
 
@@ -74,14 +76,12 @@ database.close();
 ```javascript
 import sql, { Database } from "@radically-straightforward/sqlite";
 
-const database = new Database("example.db");
-
-await database.migrate(
+const database = await new Database("example.db").migrate(
   sql`
     CREATE TABLE "users" (
       "id" INTEGER PRIMARY KEY AUTOINCREMENT,
       "name" TEXT
-    );
+    ) STRICT;
   `,
 );
 
@@ -131,7 +131,7 @@ A migration may be:
      CREATE TABLE "users" (
        "id" INTEGER PRIMARY KEY AUTOINCREMENT,
        "name" TEXT
-     );
+     ) STRICT;
    `;
    ```
 
@@ -165,9 +165,9 @@ A migration may be:
 
    > **Why?** This makes managing migrations more straightforward, and in any non-trivial case rollback is impossible anyway (for example, if a migration involves dropping a table, then rolling it back would involve bringing back data that has been deleted).
 
-6. The migration system sets the `journal_mode` to WAL. See <https://github.com/WiseLibs/better-sqlite3/blob/bd55c76c1520c7796aa9d904fe65b3fb4fe7aac0/docs/performance.md> and <https://www.sqlite.org/wal.html>.
+6. You may consult the status of your database schema with the [`PRAGMA user_version`](https://www.sqlite.org/pragma.html#pragma_user_version), which holds the number of migrations that have been run successfully.
 
-7. You may consult the status of your database schema with the [`PRAGMA user_version`](https://www.sqlite.org/pragma.html#pragma_user_version), which holds the number of migrations that have been run successfully.
+7. The migration system sets several `PRAGMA`s that make SQLite better suited for running on the server. See <https://kerkour.com/sqlite-for-servers>.
 
 #### `Database.execute()`
 
@@ -195,7 +195,7 @@ Run a `SELECT` statement that returns a single result.
 
 > **Note:** If the `SELECT` statement returns multiple results, only the first result is returned, so it’s better to write statements that return a single result (for example, using `LIMIT`).
 
-> **Note:** You may also use `get()` to run an [`INSERT ... RETURNING ...` statement](https://www.sqlite.org/lang_returning.html), but you probably shouldn’t be using `RETURNING`, because it runs into issues in edge cases. Instead, you should use `run()`, get the `lastInsertRowid`, and perform a follow-up `SELECT`. See <https://github.com/WiseLibs/better-sqlite3/issues/654> and <https://github.com/WiseLibs/better-sqlite3/issues/657>.
+> **Note:** You may also use `get()` to run an [`INSERT ___ RETURNING ___` statement](https://www.sqlite.org/lang_returning.html), but you probably shouldn’t use `RETURNING`, because it runs into issues in edge cases. Instead, you should use `run()`, get the `lastInsertRowid`, and perform a follow-up `SELECT`. See <https://github.com/WiseLibs/better-sqlite3/issues/654> and <https://github.com/WiseLibs/better-sqlite3/issues/657>.
 
 > **Note:** The `Type` parameter is [an assertion](https://www.typescriptlang.org/docs/handbook/2/everyday-types.html#type-assertions). If you’d like to make sure that the values returned from the database are of a certain type, you must implement a runtime check instead. See <https://github.com/DefinitelyTyped/DefinitelyTyped/issues/50794>, <https://github.com/DefinitelyTyped/DefinitelyTyped/discussions/62205>, and <https://github.com/DefinitelyTyped/DefinitelyTyped/pull/65035>. Note that the `get() as ___` pattern also works because by default `Type` is `unknown`.
 
@@ -238,23 +238,7 @@ Run a `PRAGMA`. Similar to `better-sqlite3`’s `pragma()`, but includes the `Ty
 executeTransaction<Type>(fn: () => Type): Type;
 ```
 
-Execute a function in a transaction. All the [caveats](https://github.com/WiseLibs/better-sqlite3/blob/bd55c76c1520c7796aa9d904fe65b3fb4fe7aac0/docs/api.md#caveats) about `better-sqlite3`’s transactions still apply. The type of transaction isn’t specified, so it defaults to `DEFERRED`.
-
-#### `Database.executeTransactionImmediate()`
-
-```typescript
-executeTransactionImmediate<Type>(fn: () => Type): Type;
-```
-
-Execute a function in an `IMMEDIATE` transaction.
-
-#### `Database.executeTransactionExclusive()`
-
-```typescript
-executeTransactionExclusive<Type>(fn: () => Type): Type;
-```
-
-Execute a function in an `EXCLUSIVE` transaction.
+Execute a function in a transaction. All the [caveats](https://github.com/WiseLibs/better-sqlite3/blob/bd55c76c1520c7796aa9d904fe65b3fb4fe7aac0/docs/api.md#caveats) about `better-sqlite3`’s transactions still apply. Transactions are `IMMEDIATE` to avoid `SQLITE_BUSY` errors. See <https://kerkour.com/sqlite-for-servers>.
 
 #### `Database.getStatement()`
 
@@ -308,11 +292,5 @@ sql`SELECT "id", "name" FROM "users" WHERE "name" = ${"Leandro Facchinetti"}$${s
 ```
 
 > **Note:** This is useful, for example, to build queries for advanced search forms by conditionally including clauses for fields that have been filled in.
-
-**SQL Style Guide**
-
-- Include `"id" INTEGER PRIMARY KEY AUTOINCREMENT` in every table.
-- Quote table and column names (for example, `"users"."name"`), to avoid conflicts with SQL reserved keywords and to help with syntax highlighting.
-- Put `` sql`___` `` on its own line because of a glitch in the syntax highlighting.
 
 <!-- DOCUMENTATION END: ./source/index.mts -->

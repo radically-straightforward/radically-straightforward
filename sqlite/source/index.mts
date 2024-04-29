@@ -7,6 +7,8 @@ import BetterSQLite3Database from "better-sqlite3";
  *
  * 2. A migration system.
  *
+ * 3. Better defaults for running SQLite on the server.
+ *
  * To appreciate the difference in ergonomics between `better-sqlite3` and `@radically-straightforward/sqlite`, consider the following example:
  *
  * **`better-sqlite3`**
@@ -21,7 +23,7 @@ import BetterSQLite3Database from "better-sqlite3";
  *     CREATE TABLE "users" (
  *       "id" INTEGER PRIMARY KEY AUTOINCREMENT,
  *       "name" TEXT
- *     );
+ *     ) STRICT;
  *   `,
  * );
  *
@@ -49,14 +51,12 @@ import BetterSQLite3Database from "better-sqlite3";
  * ```javascript
  * import sql, { Database } from "@radically-straightforward/sqlite";
  *
- * const database = new Database("example.db");
- *
- * await database.migrate(
+ * const database = await new Database("example.db").migrate(
  *   sql`
  *     CREATE TABLE "users" (
  *       "id" INTEGER PRIMARY KEY AUTOINCREMENT,
  *       "name" TEXT
- *     );
+ *     ) STRICT;
  *   `,
  * );
  *
@@ -102,7 +102,7 @@ export class Database extends BetterSQLite3Database {
    *      CREATE TABLE "users" (
    *        "id" INTEGER PRIMARY KEY AUTOINCREMENT,
    *        "name" TEXT
-   *      );
+   *      ) STRICT;
    *    `;
    *    ```
    *
@@ -136,20 +136,22 @@ export class Database extends BetterSQLite3Database {
    *
    *    > **Why?** This makes managing migrations more straightforward, and in any non-trivial case rollback is impossible anyway (for example, if a migration involves dropping a table, then rolling it back would involve bringing back data that has been deleted).
    *
-   * 6. The migration system sets the `journal_mode` to WAL. See <https://github.com/WiseLibs/better-sqlite3/blob/bd55c76c1520c7796aa9d904fe65b3fb4fe7aac0/docs/performance.md> and <https://www.sqlite.org/wal.html>.
+   * 6. You may consult the status of your database schema with the [`PRAGMA user_version`](https://www.sqlite.org/pragma.html#pragma_user_version), which holds the number of migrations that have been run successfully.
    *
-   * 7. You may consult the status of your database schema with the [`PRAGMA user_version`](https://www.sqlite.org/pragma.html#pragma_user_version), which holds the number of migrations that have been run successfully.
+   * 7. The migration system sets several `PRAGMA`s that make SQLite better suited for running on the server. See <https://kerkour.com/sqlite-for-servers>.
    */
   async migrate(
     ...migrations: (Query | ((database: this) => void | Promise<void>))[]
   ): Promise<this> {
     this.pragma<void>(`journal_mode = WAL`);
-    const foreignKeys =
-      this.pragma<number>("foreign_keys", { simple: true }) === 1;
-    if (foreignKeys) this.pragma<void>("foreign_keys = OFF");
+    this.pragma<void>(`busy_timeout = 5000`);
+    this.pragma<void>(`synchronous = NORMAL`);
+    this.pragma<void>(`cache_size = 1000000000`);
+    this.pragma<void>(`temp_store = MEMORY`);
+    this.pragma<void>(`foreign_keys = false`);
     try {
       for (
-        let migrationIndex = this.pragma<number>("user_version", {
+        let migrationIndex = this.pragma<number>(`user_version`, {
           simple: true,
         });
         migrationIndex < migrations.length;
@@ -158,24 +160,22 @@ export class Database extends BetterSQLite3Database {
         try {
           this.execute(
             sql`
-              BEGIN;
+              BEGIN IMMEDIATE;
             `,
           );
           const migration = migrations[migrationIndex];
           if (typeof migration === "function") await migration(this);
           else this.execute(migration);
-          if (foreignKeys) {
-            const foreignKeyViolations =
-              this.pragma<unknown[]>("foreign_key_check");
-            if (foreignKeyViolations.length !== 0)
-              throw new Error(
-                `Foreign key violations in migration:\n${JSON.stringify(
-                  foreignKeyViolations,
-                  undefined,
-                  2,
-                )}`,
-              );
-          }
+          const foreignKeyViolations =
+            this.pragma<unknown[]>("foreign_key_check");
+          if (foreignKeyViolations.length !== 0)
+            throw new Error(
+              `Foreign key violations in migration:\n${JSON.stringify(
+                foreignKeyViolations,
+                undefined,
+                2,
+              )}`,
+            );
           this.pragma<void>(`user_version = ${migrationIndex + 1}`);
           this.execute(
             sql`
@@ -191,7 +191,7 @@ export class Database extends BetterSQLite3Database {
           throw error;
         }
     } finally {
-      if (foreignKeys) this.pragma<void>("foreign_keys = ON");
+      this.pragma<void>(`foreign_keys = true`);
     }
     return this;
   }
@@ -229,7 +229,7 @@ export class Database extends BetterSQLite3Database {
    *
    * > **Note:** If the `SELECT` statement returns multiple results, only the first result is returned, so it’s better to write statements that return a single result (for example, using `LIMIT`).
    *
-   * > **Note:** You may also use `get()` to run an [`INSERT ... RETURNING ...` statement](https://www.sqlite.org/lang_returning.html), but you probably shouldn’t be using `RETURNING`, because it runs into issues in edge cases. Instead, you should use `run()`, get the `lastInsertRowid`, and perform a follow-up `SELECT`. See <https://github.com/WiseLibs/better-sqlite3/issues/654> and <https://github.com/WiseLibs/better-sqlite3/issues/657>.
+   * > **Note:** You may also use `get()` to run an [`INSERT ___ RETURNING ___` statement](https://www.sqlite.org/lang_returning.html), but you probably shouldn’t use `RETURNING`, because it runs into issues in edge cases. Instead, you should use `run()`, get the `lastInsertRowid`, and perform a follow-up `SELECT`. See <https://github.com/WiseLibs/better-sqlite3/issues/654> and <https://github.com/WiseLibs/better-sqlite3/issues/657>.
    *
    * > **Note:** The `Type` parameter is [an assertion](https://www.typescriptlang.org/docs/handbook/2/everyday-types.html#type-assertions). If you’d like to make sure that the values returned from the database are of a certain type, you must implement a runtime check instead. See <https://github.com/DefinitelyTyped/DefinitelyTyped/issues/50794>, <https://github.com/DefinitelyTyped/DefinitelyTyped/discussions/62205>, and <https://github.com/DefinitelyTyped/DefinitelyTyped/pull/65035>. Note that the `get() as ___` pattern also works because by default `Type` is `unknown`.
    */
@@ -272,24 +272,10 @@ export class Database extends BetterSQLite3Database {
   }
 
   /**
-   * Execute a function in a transaction. All the [caveats](https://github.com/WiseLibs/better-sqlite3/blob/bd55c76c1520c7796aa9d904fe65b3fb4fe7aac0/docs/api.md#caveats) about `better-sqlite3`’s transactions still apply. The type of transaction isn’t specified, so it defaults to `DEFERRED`.
+   * Execute a function in a transaction. All the [caveats](https://github.com/WiseLibs/better-sqlite3/blob/bd55c76c1520c7796aa9d904fe65b3fb4fe7aac0/docs/api.md#caveats) about `better-sqlite3`’s transactions still apply. Transactions are `IMMEDIATE` to avoid `SQLITE_BUSY` errors. See <https://kerkour.com/sqlite-for-servers>.
    */
   executeTransaction<Type>(fn: () => Type): Type {
-    return this.transaction(fn)();
-  }
-
-  /**
-   * Execute a function in an `IMMEDIATE` transaction.
-   */
-  executeTransactionImmediate<Type>(fn: () => Type): Type {
     return this.transaction(fn).immediate();
-  }
-
-  /**
-   * Execute a function in an `EXCLUSIVE` transaction.
-   */
-  executeTransactionExclusive<Type>(fn: () => Type): Type {
-    return this.transaction(fn).exclusive();
   }
 
   /**
@@ -339,12 +325,6 @@ export type Query = {
  * ```
  *
  * > **Note:** This is useful, for example, to build queries for advanced search forms by conditionally including clauses for fields that have been filled in.
- *
- * **SQL Style Guide**
- *
- * - Include `"id" INTEGER PRIMARY KEY AUTOINCREMENT` in every table.
- * - Quote table and column names (for example, `"users"."name"`), to avoid conflicts with SQL reserved keywords and to help with syntax highlighting.
- * - Put `` sql`___` `` on its own line because of a glitch in the syntax highlighting.
  */
 export default function sql(
   templateStrings: TemplateStringsArray,

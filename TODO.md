@@ -1,5 +1,9 @@
 # TODO
 
+- Use `executeTransaction()` in `migrate()`.
+
+---
+
 - `@radically-straightforward/all`
 - JAVASCRIPT-PACKAGE-EXAMPLE
 - Can we get by without `cache: "no-store"` on every `fetch()`?
@@ -81,6 +85,18 @@ console.timeEnd("intern()");
 - Dedicated website?
 
 # Authoring
+
+## SQL
+
+- `INTEGER PRIMARY KEY AUTOINCREMENT`
+- `STRICT`
+- `"quote"` table and column names
+
+---
+
+- Include `"id" INTEGER PRIMARY KEY AUTOINCREMENT` in every table.
+- Quote table and column names (for example, `"users"."name"`), to avoid conflicts with SQL reserved keywords and to help with syntax highlighting.
+- Put `` sql`___` `` on its own line because of a glitch in the syntax highlighting.
 
 ## CSS
 
