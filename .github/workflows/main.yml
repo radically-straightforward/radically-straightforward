@@ -17,8 +17,8 @@ jobs:
           - caddy
           - build
           - package
-          - dependencies
-          - dev-dependencies
+          - production
+          - development
         os:
           - windows
           - macos
