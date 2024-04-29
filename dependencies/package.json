@@ -1,7 +1,7 @@
 {
-  "name": "radically-straightforward",
+  "name": "@radically-straightforward/dependencies",
   "version": "1.0.0",
-  "description": "🧰 All the Radically Straightforward packages",
+  "description": "🧰 All the Radically Straightforward packages for production",
   "keywords": [
     "radically straightforward",
     "web development"
@@ -17,6 +17,9 @@
   ],
   "author": "Leandro Facchinetti <radically-straightforward@leafac.com> (https://leafac.com)",
   "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "test": ""
   },
