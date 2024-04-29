@@ -1,7 +1,7 @@
 # TODO
 
 - `@radically-straightforward/all`
-  - README
+  - Publish packages
   - Check that `tsconfig.json` is created
 - JAVASCRIPT-PACKAGE-EXAMPLE
 - Can we get by without `cache: "no-store"` on every `fetch()`?
