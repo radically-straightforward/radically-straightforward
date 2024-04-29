@@ -18,6 +18,7 @@ jobs:
           - build
           - package
           - dependencies
+          - dev-dependencies
         os:
           - windows
           - macos
