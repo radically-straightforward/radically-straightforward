@@ -17,5 +17,8 @@
   ],
   "author": "Leandro Facchinetti <radically-straightforward@leafac.com> (https://leafac.com)",
   "license": "MIT",
+  "scripts": {
+    "test": ""
+  },
   "dependencies": {}
 }
