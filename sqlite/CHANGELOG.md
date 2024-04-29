@@ -1,6 +1,10 @@
 # Changelog
 
-## 1.0.0
+## 1.1.0 · 2024-04-29
+
+- Introduced better defaults that avoid the `SQLITE_BUSY` error.
+
+## 1.0.0 · 2024-01-30
 
 - Initial release, based on [`@leafac/sqlite`](https://www.npmjs.com/package/@leafac/sqlite), including the following breaking changes:
   - `migrate()` now sets `journal_mode` to WAL.
