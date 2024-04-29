@@ -1,5 +1,5 @@
 {
-  "name": "@radically-straightforward/all",
+  "name": "radically-straightforward",
   "version": "1.0.0",
   "description": "🧰 All the Radically Straightforward packages",
   "keywords": [
@@ -17,8 +17,5 @@
   ],
   "author": "Leandro Facchinetti <radically-straightforward@leafac.com> (https://leafac.com)",
   "license": "MIT",
-  "publishConfig": {
-    "access": "public"
-  },
   "dependencies": {}
 }
