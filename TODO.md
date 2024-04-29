@@ -1,7 +1,5 @@
 # TODO
 
-- JAVASCRIPT-PACKAGE-EXAMPLE
-- Can we get by without `cache: "no-store"` on every `fetch()`?
 - globby → Node.js’s fs glob
 - nodemon
 
