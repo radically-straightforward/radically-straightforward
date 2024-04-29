@@ -1,0 +1,27 @@
+{
+  "name": "@radically-straightforward/dependencies",
+  "version": "1.0.0",
+  "description": "🧰 All the Radically Straightforward packages for production",
+  "keywords": [
+    "radically straightforward",
+    "web development"
+  ],
+  "homepage": "https://github.com/leafac/radically-straightforward",
+  "repository": "https://github.com/leafac/radically-straightforward",
+  "bugs": "https://github.com/leafac/radically-straightforward/issues",
+  "funding": [
+    "https://patreon.com/leafac",
+    "https://github.com/sponsors/leafac",
+    "https://paypal.me/LeandroFacchinettiEU",
+    "https://btc.com/34KJBgtaFYMtDqpSgMayw9qiKWg2GQXA9M"
+  ],
+  "author": "Leandro Facchinetti <radically-straightforward@leafac.com> (https://leafac.com)",
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "test": ""
+  },
+  "dependencies": {}
+}
