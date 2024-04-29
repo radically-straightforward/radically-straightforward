@@ -1,6 +1,8 @@
 # TODO
 
 - `@radically-straightforward/all`
+  - README
+  - Check that `tsconfig.json` is created
 - JAVASCRIPT-PACKAGE-EXAMPLE
 - Can we get by without `cache: "no-store"` on every `fetch()`?
 - globby → Node.js’s fs glob

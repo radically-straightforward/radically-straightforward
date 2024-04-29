@@ -23,5 +23,12 @@
   "scripts": {
     "test": ""
   },
-  "dependencies": {}
+  "dependencies": {
+    "@radically-straightforward/caddy": "^1.4.0",
+    "@radically-straightforward/html": "^1.0.0",
+    "@radically-straightforward/node": "^3.1.2",
+    "@radically-straightforward/server": "^1.0.2",
+    "@radically-straightforward/sqlite": "^1.1.0",
+    "@radically-straightforward/utilities": "^2.0.1"
+  }
 }
