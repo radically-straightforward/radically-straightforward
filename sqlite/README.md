@@ -169,6 +169,12 @@ A migration may be:
 
 7. The migration system sets several `PRAGMA`s that make SQLite better suited for running on the server. See <https://kerkour.com/sqlite-for-servers>.
 
+**Implementation Notes**
+
+- `migrate()` must be its own separate method instead of being part of the constructor because migrations may be asynchronous.
+
+- We manage transactions by hand with `BEGIN IMMEDIATE` instead of using `executeTransaction()` because migrations are [the one exception](https://github.com/WiseLibs/better-sqlite3/blob/bd55c76c1520c7796aa9d904fe65b3fb4fe7aac0/docs/api.md#caveats) in which it makes sense to have an asynchronous function in the middle of a transaction, given that migrations don’t run in parallel.
+
 #### `Database.execute()`
 
 ```typescript
