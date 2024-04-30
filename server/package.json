@@ -1,6 +1,6 @@
 {
   "name": "@radically-straightforward/server",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "🦾 HTTP server in Node.js",
   "keywords": [
     "server",
