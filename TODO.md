@@ -71,10 +71,18 @@ server.push({
 
 - Questions
 
+  - Where do we implement this?
+    - `node`
+      - Con: Needs to be aware of `sqlite` and `server`
+        - Circular dependency, because `server` already depends on `node`
+    - `sqlite`
+      - Con: Needs to bring `node` in, which has its own signal handler stuff
+    - Separate package
+      - Con: A lot of fragmentation
+  - Separate database (better performance) or same database (ease of management)?
   - How do we run the migration to create the schema?
     - On `migrate()`
     - On `backgroundJob()`
-  - Separate database (better performance) or same database (ease of management)?
 
 - Future
 
