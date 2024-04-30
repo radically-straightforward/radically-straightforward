@@ -24,9 +24,16 @@ CREATE INDEX IF NOT EXISTS "_backgroundJobsType" ON "_backgroundJobs" ("type");
   - Detect that a job was picked up and not finished (implicit failure)
   - Retry jobs that failed (explicitly (with an exception), or implicitly (see above))
   - At some point expire the job
-  - Have a way to force the worker to run
+  - Have a way to force the worker to run immediately
   - On graceful termination finish existing jobs (or just give up on the job and return it to the queue?)
   - Separate database, for better performance, or same database, for ease of management?
+
+- Implementation ideas
+
+  - Poll the database & HTTP server to force a worker to run immediately
+  - Triggers and user-defined function https://github.com/WiseLibs/better-sqlite3/blob/master/docs/api.md#functionname-options-function---this
+  - Watch for filesystem changes
+  - ZeroMQ to communicate between workers
 
 - References
 
@@ -37,6 +44,7 @@ CREATE INDEX IF NOT EXISTS "_backgroundJobsType" ON "_backgroundJobs" ("type");
   - https://www.npmjs.com/package/better-queue-sqlite
   - https://github.com/bensheldon/good_job
   - https://github.com/betterment/delayed
+  - https://webapp.io/blog/postgres-is-the-answer/
 
 ## Features
 
@@ -74,6 +82,12 @@ CREATE INDEX IF NOT EXISTS "_backgroundJobsType" ON "_backgroundJobs" ("type");
     - <https://cableready.stimulusreflex.com/>
     - <https://sockpuppet.argpar.se/>
     - <https://github.com/servicetitan/Stl.Fusion>
+    - https://www.liveviewjs.com/
+    - https://fly.io/blog/how-we-got-to-liveview/
+    - https://hypermedia.systems/
+    - https://news.ycombinator.com/item?id=38241304
+    - https://htmx.org/essays/right-click-view-source/
+    - https://htmx.org/essays/locality-of-behaviour/
 - Logo
 - Dedicated website?
 
