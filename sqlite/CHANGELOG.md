@@ -1,5 +1,7 @@
 # Changelog
 
+- Added automatic resource management.
+
 ## 1.1.0 · 2024-04-29
 
 - Introduced better defaults that avoid the `SQLITE_BUSY` error.

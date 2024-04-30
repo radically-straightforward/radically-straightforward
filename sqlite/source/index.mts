@@ -9,7 +9,7 @@ import BetterSQLite3Database from "better-sqlite3";
  *
  * 3. Better defaults for running SQLite on the server.
  *
- * 4. Automatic lifecycle management (close the database before process exit).
+ * 4. Automatic resource management (close the database before process exit).
  *
  * To appreciate the difference in ergonomics between `better-sqlite3` and `@radically-straightforward/sqlite`, consider the following example:
  *
