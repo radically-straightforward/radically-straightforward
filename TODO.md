@@ -1,6 +1,6 @@
 # TODO
 
-**SQLite as background job queue**
+## SQLite as a Background Job Queue
 
 ```sql
 CREATE TABLE IF NOT EXISTS "_backgroundJobs" (
@@ -8,13 +8,24 @@ CREATE TABLE IF NOT EXISTS "_backgroundJobs" (
   "createdAt" TEXT NOT NULL,
   "startAt" TEXT NULL,
   "startedAt" TEXT NULL,
-  "attempts" INTEGER NOT NULL,
+  "retries" INTEGER NOT NULL,
   "type" TEXT NOT NULL,
   "parameters" TEXT NOT NULL
 ) STRICT;
 CREATE INDEX IF NOT EXISTS "_backgroundJobsStartAt" ON "_backgroundJobs" ("startAt");
-CREATE INDEX IF NOT EXISTS "_backgroundJobsAttempts" ON "_backgroundJobs" ("attempts");
+CREATE INDEX IF NOT EXISTS "_backgroundJobsRetries" ON "_backgroundJobs" ("retries");
 CREATE INDEX IF NOT EXISTS "_backgroundJobsType" ON "_backgroundJobs" ("type");
+```
+
+```typescript
+database.backgroundJob({
+  type: "email",
+  parameters: {
+    to: "leandro@courselore.org",
+    subject: "Hello",
+    text: "Example of job",
+  },
+});
 ```
 
 - Features
@@ -23,7 +34,7 @@ CREATE INDEX IF NOT EXISTS "_backgroundJobsType" ON "_backgroundJobs" ("type");
   - Schedule jobs in the future
   - Detect that a job was picked up and not finished (implicit failure)
   - Retry jobs that failed (explicitly (with an exception), or implicitly (see above))
-  - At some point expire the job
+  - After a certain number of attempts, fail the job
   - Have a way to force the worker to run immediately
   - On graceful termination finish existing jobs (or just give up on the job and return it to the queue?)
   - Separate database, for better performance, or same database, for ease of management?
