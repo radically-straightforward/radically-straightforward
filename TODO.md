@@ -31,19 +31,18 @@ CREATE INDEX IF NOT EXISTS "_backgroundJobsType" ON "_backgroundJobs" ("type");
 - Implementation ideas
 
   - Poll the database & HTTP server to force a worker to run immediately
-  - Triggers and user-defined function https://github.com/WiseLibs/better-sqlite3/blob/master/docs/api.md#functionname-options-function---this
   - Watch for filesystem changes
   - ZeroMQ to communicate between workers
+  - Triggers and user-defined function (https://github.com/WiseLibs/better-sqlite3/blob/master/docs/api.md#functionname-options-function---this)
+    - This doesn’t work because only the same process that made the `INSERT`/`UPDATE`/etc. gets notified https://github.com/WiseLibs/better-sqlite3/issues/62
 
 - References
 
   - https://github.com/collectiveidea/delayed_job
-  - https://sqlite.org/forum/info/b047f5ef5b76edff
-  - https://github.com/StratoKit/strato-db/blob/master/src/EventQueue.js
-  - https://github.com/litements/litequeue
-  - https://www.npmjs.com/package/better-queue-sqlite
-  - https://github.com/bensheldon/good_job
   - https://github.com/betterment/delayed
+  - https://github.com/bensheldon/good_job
+  - https://github.com/litements/litequeue
+  - https://github.com/diamondio/better-queue-sqlite
   - https://webapp.io/blog/postgres-is-the-answer/
 
 ## Features
