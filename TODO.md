@@ -29,7 +29,7 @@ database.backgroundJob({
 
 const backgroundJob = database.backgroundJobWorker(
   { type: "email", interval: 5 * 1000, server },
-  ({to, subject, text}) => {
+  ({ to, subject, text }) => {
     // DO THE THING
   }
 );
@@ -54,7 +54,6 @@ server.push({
     response.end();
   },
 });
-
 ```
 
 - Features
@@ -71,6 +70,8 @@ server.push({
 - Questions
 
   - How do we run the migration to create the schema?
+    - On `migrate()`
+    - On `backgroundJob()`
   - Separate database (better performance) or same database (ease of management)?
 
 - Future
