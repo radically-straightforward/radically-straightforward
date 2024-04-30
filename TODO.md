@@ -26,26 +26,59 @@ database.backgroundJob({
     text: "Example of job",
   },
 });
+
+const backgroundJob = database.backgroundJobWorker(
+  { type: "email", interval: 5 * 1000, server },
+  ({to, subject, text}) => {
+    // DO THE THING
+  }
+);
+
+//////////////
+
+node.backgroundJob({ interval: 5 * 1000 }, async () => {
+  while (true) {
+    const job = database.shiftBackgroundJob("email");
+    if (job === undefined) break;
+    // TODO
+    await timers.setTimeout(200);
+  }
+});
+server.push({
+  method: "POST",
+  pathname: "/email",
+  handler: (request, response) => {
+    response.once("close", async () => {
+      backgroundJob.run();
+    });
+    response.end();
+  },
+});
+
 ```
 
 - Features
 
   - Schedule jobs
   - Schedule jobs in the future
-  - Detect that a job was picked up and not finished (implicit failure)
-  - Retry jobs that failed (explicitly (with an exception), or implicitly (see above))
-  - After a certain number of attempts, fail the job
+  - Explicit failure: An exception was thrown
+  - Implicit failure: A job was picked up and not finished in a certain amount of time
+  - Retry jobs that failed (explicitly or implicitly)
+  - After a certain number of retries, fail the job
   - Have a way to force the worker to run immediately
-  - On graceful termination finish existing jobs (or just give up on the job and return it to the queue?)
-  - Separate database, for better performance, or same database, for ease of management?
+  - On graceful termination finish existing jobs
 
-- Implementation ideas
+- Questions
 
-  - Poll the database & HTTP server to force a worker to run immediately
-  - Watch for filesystem changes
-  - ZeroMQ to communicate between workers
-  - Triggers and user-defined function (https://github.com/WiseLibs/better-sqlite3/blob/master/docs/api.md#functionname-options-function---this)
-    - This doesn’t work because only the same process that made the `INSERT`/`UPDATE`/etc. gets notified https://github.com/WiseLibs/better-sqlite3/issues/62
+  - How do we run the migration to create the schema?
+  - Separate database (better performance) or same database (ease of management)?
+
+- Future
+
+  - Force a worker to run immediately
+    - Watch for filesystem changes
+    - ZeroMQ to communicate between workers
+    - Redis or something like that
 
 - References
 
@@ -55,6 +88,10 @@ database.backgroundJob({
   - https://github.com/litements/litequeue
   - https://github.com/diamondio/better-queue-sqlite
   - https://webapp.io/blog/postgres-is-the-answer/
+
+---
+
+- Perhaps the database should manage its own lifecycle and `close()` itself
 
 ## Features
 
