@@ -1,4 +1,5 @@
 import childProcess from "node:child_process";
+import timers from "node:timers/promises";
 import * as utilities from "@radically-straightforward/utilities";
 import sql, { Database } from "@radically-straightforward/sqlite";
 import * as serverTypes from "@radically-straightforward/server";
@@ -94,4 +95,201 @@ export function childProcessKeepAlive(
       });
     },
   );
+}
+
+export class BackgroundJob {
+  #database: Database;
+  #server: serverTypes.Server | undefined;
+
+  constructor(database: Database, server?: serverTypes.Server) {
+    this.#database = database;
+    this.#server = server;
+    this.#database.executeTransaction(() => {
+      this.#database.execute(sql`
+        CREATE TABLE IF NOT EXISTS "_backgroundJobs" (
+          "id" INTEGER PRIMARY KEY AUTOINCREMENT,
+          "type" TEXT NOT NULL,
+          "createdAt" TEXT NOT NULL,
+          "startAt" TEXT NOT NULL,
+          "startedAt" TEXT NULL,
+          "retries" INTEGER NOT NULL,
+          "parameters" TEXT NOT NULL
+        ) STRICT;
+        CREATE INDEX IF NOT EXISTS "_backgroundJobsType" ON "_backgroundJobs" ("type");
+        CREATE INDEX IF NOT EXISTS "_backgroundJobsStartAt" ON "_backgroundJobs" ("startAt");
+        CREATE INDEX IF NOT EXISTS "_backgroundJobsStartedAt" ON "_backgroundJobs" ("startedAt");
+        CREATE INDEX IF NOT EXISTS "_backgroundJobsRetries" ON "_backgroundJobs" ("retries");
+      `);
+    });
+  }
+
+  add({
+    type,
+    startIn = 0,
+    parameters,
+  }: {
+    type: string;
+    startIn?: number;
+    parameters: any;
+  }): void {
+    this.#database.run(sql`
+      INSERT INTO "_backgroundJobs" (
+        "type",
+        "createdAt",
+        "startAt",
+        "retries",
+        "parameters"
+      )
+      VALUES (
+        ${type},
+        ${new Date().toISOString()},
+        ${new Date(Date.now() + startIn).toISOString()},
+        ${0},
+        ${JSON.stringify(parameters)}
+      )
+    `);
+  }
+
+  worker<Type>(
+    {
+      type,
+      timeout = 5 * 60 * 1000,
+      retryIn = 5 * 60 * 1000,
+      retries = 10,
+      ...nodeBackgroundJobOptions
+    }: {
+      type: string;
+      timeout?: number;
+      retryIn?: number;
+      retries?: number;
+    } & Parameters<typeof backgroundJob>[0],
+    backgroundJobFunction: (parameters: Type) => void | Promise<void>,
+  ): ReturnType<typeof backgroundJob> {
+    const workerBackgroundJob = backgroundJob(
+      nodeBackgroundJobOptions,
+      async () => {
+        this.#database.executeTransaction(() => {
+          for (const job of this.#database.all<{
+            id: number;
+            retries: number;
+            parameters: string;
+          }>(sql`
+              SELECT "id", "retries", "parameters"
+              FROM "_backgroundJobs"
+              WHERE
+                "startedAt" IS NOT NULL AND
+                "startedAt" < ${new Date(Date.now() - timeout).toISOString()}
+            `)) {
+            utilities.log(
+              "BACKGROUND JOB TIMEOUT",
+              type,
+              String(job.id),
+              job.parameters,
+            );
+            this.#database.run(sql`
+              UPDATE "_backgroundJobs"
+              SET
+                "startAt" = ${new Date(Date.now() + retryIn).toISOString()},
+                "startedAt" = NULL,
+                "retries" = ${job.retries + 1}
+              WHERE "id" = ${job.id}
+            `);
+          }
+        });
+        this.#database.executeTransaction(() => {
+          for (const job of this.#database.all<{
+            id: number;
+            retries: number;
+            parameters: string;
+          }>(sql`
+              SELECT "id", "parameters"
+              FROM "_backgroundJobs"
+              WHERE ${retries} <= "retries"
+            `)) {
+            utilities.log(
+              "BACKGROUND JOB FAIL",
+              type,
+              String(job.id),
+              job.parameters,
+            );
+            this.#database.run(sql`
+              DELETE FROM "_backgroundJobs" WHERE "id" = ${job.id}
+            `);
+          }
+        });
+        while (true) {
+          const job = this.#database.executeTransaction<
+            { id: number; retries: number; parameters: string } | undefined
+          >(() => {
+            const job = this.#database.get<{
+              id: number;
+              retries: number;
+              parameters: string;
+            }>(sql`
+                SELECT "id", "retries", "parameters"
+                FROM "_backgroundJobs"
+                WHERE
+                  "type" = ${type} AND
+                  "startAt" <= ${new Date().toISOString()} AND
+                  "startedAt" IS NULL
+                ORDER BY "id" ASC
+                LIMIT 1
+              `);
+            if (job === undefined) return undefined;
+            this.#database.run(sql`
+              UPDATE "_backgroundJobs"
+              SET "startedAt" = ${new Date().toISOString()}
+              WHERE "id" = ${job.id}
+            `);
+            return job;
+          });
+          if (job === undefined) break;
+          const start = process.hrtime.bigint();
+          try {
+            utilities.log("BACKGROUND JOB START", type, String(job.id));
+            await backgroundJobFunction(JSON.parse(job.parameters));
+            this.#database.run(sql`
+              DELETE FROM "_backgroundJobs" WHERE "id" = ${job.id}
+            `);
+            utilities.log(
+              "BACKGROUND JOB SUCCESS",
+              type,
+              String(job.id),
+              `${(process.hrtime.bigint() - start) / 1_000_000n}ms`,
+            );
+          } catch (error) {
+            utilities.log(
+              "BACKGROUND JOB ERROR",
+              type,
+              String(job.id),
+              `${(process.hrtime.bigint() - start) / 1_000_000n}ms`,
+              job.parameters,
+              String(error),
+              (error as Error)?.stack ?? "",
+            );
+            this.#database.run(sql`
+              UPDATE "_backgroundJobs"
+              SET
+                "startAt" = ${new Date(Date.now() + retryIn).toISOString()},
+                "startedAt" = NULL,
+                "retries" = ${job.retries + 1}
+              WHERE "id" = ${job.id}
+            `);
+          }
+          await timers.setTimeout(200);
+        }
+      },
+    );
+    this.#server?.push({
+      method: "POST",
+      pathname: `/${type}`,
+      handler: (request, response) => {
+        response.once("close", async () => {
+          workerBackgroundJob.run();
+        });
+        response.end();
+      },
+    });
+    return workerBackgroundJob;
+  }
 }
