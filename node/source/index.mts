@@ -1,5 +1,7 @@
 import childProcess from "node:child_process";
 import * as utilities from "@radically-straightforward/utilities";
+import sql, { Database } from "@radically-straightforward/sqlite";
+import * as serverTypes from "@radically-straightforward/server";
 
 let gracefulTerminationEmitted = false;
 for (const signal of [

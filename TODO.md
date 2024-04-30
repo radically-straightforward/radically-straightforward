@@ -3,6 +3,31 @@
 ## SQLite as a Background Job Queue
 
 ```typescript
+export class BackgroundJob {
+  #database: Database;
+  constructor(database: Database, s?: serverTypes.Route[]) {
+    this.#database = database;
+    this.#database.executeTransaction(() => {
+      this.#database.execute(sql`
+        CREATE TABLE IF NOT EXISTS "_backgroundJobs" (
+          "id" INTEGER PRIMARY KEY AUTOINCREMENT,
+          "createdAt" TEXT NOT NULL,
+          "startAt" TEXT NOT NULL,
+          "startedAt" TEXT NULL,
+          "retries" INTEGER NOT NULL,
+          "type" TEXT NOT NULL,
+          "parameters" TEXT NOT NULL
+        ) STRICT;
+        CREATE INDEX IF NOT EXISTS "_backgroundJobsStartAt" ON "_backgroundJobs" ("startAt");
+        CREATE INDEX IF NOT EXISTS "_backgroundJobsRetries" ON "_backgroundJobs" ("retries");
+        CREATE INDEX IF NOT EXISTS "_backgroundJobsType" ON "_backgroundJobs" ("type");        
+      `);
+    });
+  }
+}
+
+
+
 this.executeTransaction(() => {
   this.execute(sql`
     CREATE TABLE IF NOT EXISTS "_backgroundJobs" (
