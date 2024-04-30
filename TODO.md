@@ -2,22 +2,24 @@
 
 ## SQLite as a Background Job Queue
 
-```sql
-CREATE TABLE IF NOT EXISTS "_backgroundJobs" (
-  "id" INTEGER PRIMARY KEY AUTOINCREMENT,
-  "createdAt" TEXT NOT NULL,
-  "startAt" TEXT NULL,
-  "startedAt" TEXT NULL,
-  "retries" INTEGER NOT NULL,
-  "type" TEXT NOT NULL,
-  "parameters" TEXT NOT NULL
-) STRICT;
-CREATE INDEX IF NOT EXISTS "_backgroundJobsStartAt" ON "_backgroundJobs" ("startAt");
-CREATE INDEX IF NOT EXISTS "_backgroundJobsRetries" ON "_backgroundJobs" ("retries");
-CREATE INDEX IF NOT EXISTS "_backgroundJobsType" ON "_backgroundJobs" ("type");
-```
-
 ```typescript
+this.executeTransaction(() => {
+  this.execute(sql`
+    CREATE TABLE IF NOT EXISTS "_backgroundJobs" (
+      "id" INTEGER PRIMARY KEY AUTOINCREMENT,
+      "createdAt" TEXT NOT NULL,
+      "startAt" TEXT NOT NULL,
+      "startedAt" TEXT NULL,
+      "retries" INTEGER NOT NULL,
+      "type" TEXT NOT NULL,
+      "parameters" TEXT NOT NULL
+    ) STRICT;
+    CREATE INDEX IF NOT EXISTS "_backgroundJobsStartAt" ON "_backgroundJobs" ("startAt");
+    CREATE INDEX IF NOT EXISTS "_backgroundJobsRetries" ON "_backgroundJobs" ("retries");
+    CREATE INDEX IF NOT EXISTS "_backgroundJobsType" ON "_backgroundJobs" ("type");        
+  `);
+});
+
 database.backgroundJob({
   type: "email",
   parameters: {
