@@ -210,8 +210,6 @@ test(async () => {
     undefined,
   );
 
-  database.close();
-
   assert.deepEqual(
     sql`CREATE TABLE "users" ("id" INTEGER PRIMARY KEY AUTOINCREMENT, "name" TEXT)`,
     {

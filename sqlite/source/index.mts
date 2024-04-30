@@ -9,6 +9,8 @@ import BetterSQLite3Database from "better-sqlite3";
  *
  * 3. Better defaults for running SQLite on the server.
  *
+ * 4. Automatic lifecycle management (close the database before process exit).
+ *
  * To appreciate the difference in ergonomics between `better-sqlite3` and `@radically-straightforward/sqlite`, consider the following example:
  *
  * **`better-sqlite3`**
@@ -46,6 +48,8 @@ import BetterSQLite3Database from "better-sqlite3";
  *
  * 3. When you run the program above for the second time, it fails because the `users` table already exists. In this simple example you could work around that by using `CREATE TABLE IF NOT EXISTS`, but for anything more complicated you need a migration system.
  *
+ * 4. You must remember to call `close()` or some temporary files may be left behind even after a graceful termination.
+ *
  * **`@radically-straightforward/sqlite`**
  *
  * ```typescript
@@ -73,8 +77,6 @@ import BetterSQLite3Database from "better-sqlite3";
  *     `,
  *   ),
  * ); // => { id: 1, name: 'Leandro Facchinetti' }
- *
- * database.close();
  * ```
  *
  * 1. `@radically-straightforward/sqlite` manages the prepared statements for you, and makes sure to reuse them as much as possible.
@@ -86,9 +88,22 @@ import BetterSQLite3Database from "better-sqlite3";
  *    > **Note:** In Visual Studio Code you may install the **[es6-string-html](https://marketplace.visualstudio.com/items?itemName=Tobermory.es6-string-html)** extension to add syntax highlighting to `` sql`___` `` tagged templates.
  *
  * 3. You may run the program above many times and it will not fail, because it’s using `@radically-straightforward/sqlite`’s migration system.
+ *
+ * 4. If you don’t call `close()` explicitly, it’s called for you before process exit.
  */
 export class Database extends BetterSQLite3Database {
   #statements = new Map<string, BetterSQLite3Database.Statement>();
+  #beforeExitEventListener = () => {
+    this.close();
+  };
+
+  constructor(
+    filename?: string | Buffer,
+    options?: BetterSQLite3Database.Options,
+  ) {
+    super(filename, options);
+    process.once("beforeExit", this.#beforeExitEventListener);
+  }
 
   /**
    * A migration system based on [the steps for general schema changes in SQLite](https://www.sqlite.org/lang_altertable.html#making_other_kinds_of_table_schema_changes). The migration system implements steps 1–2, 10–12, and you must implement steps 3–9 in the migrations that you define.
@@ -282,6 +297,12 @@ export class Database extends BetterSQLite3Database {
    */
   executeTransaction<Type>(fn: () => Type): Type {
     return this.transaction(fn).immediate();
+  }
+
+  close() {
+    super.close();
+    process.off("beforeExit", this.#beforeExitEventListener);
+    return this;
   }
 
   /**
