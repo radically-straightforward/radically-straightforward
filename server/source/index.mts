@@ -10,6 +10,11 @@ import * as node from "@radically-straightforward/node";
 import * as utilities from "@radically-straightforward/utilities";
 
 /**
+ * A `Server` is an auxiliary type for convenience.
+ */
+export type Server = ReturnType<typeof server>;
+
+/**
  * A `Route` is a combination of some conditions that the request must satisfy for the `handler` to be called, and the `handler` that produces a response. An application is an Array of `Route`s.
  *
  * - **`method`:** The HTTP request method, for example `"GET"` or `/^PATCH|PUT$/`.

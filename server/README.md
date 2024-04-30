@@ -312,6 +312,14 @@ import * as serverTypes from "@radically-straightforward/server";
 
 <!-- DOCUMENTATION START: ./source/index.mts -->
 
+### `Server`
+
+```typescript
+export type Server = ReturnType<typeof server>;
+```
+
+A `Server` is an auxiliary type for convenience.
+
 ### `Route`
 
 ```typescript

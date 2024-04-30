@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.4 · 2024-04-30
+
+- Added the `Server` auxiliary type.
+
 ## 1.0.3 · 2024-04-30
 
 - Removed the `Route.local` option.
