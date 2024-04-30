@@ -12,8 +12,6 @@ import * as utilities from "@radically-straightforward/utilities";
 /**
  * A `Route` is a combination of some conditions that the request must satisfy for the `handler` to be called, and the `handler` that produces a response. An application is an Array of `Route`s.
  *
- * - **`local`:** Indicates that this `handler` should only be called if the request is coming from the same machine in which the server is running. This is useful to use the HTTP server for Inter-Process Communication (IPC).
- *
  * - **`method`:** The HTTP request method, for example `"GET"` or `/^PATCH|PUT$/`.
  *
  * - **`pathname`:** The [`pathname`](https://nodejs.org/api/url.html#url-strings-and-url-objects) part of the HTTP request. [Named capturing groups](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_expressions/Groups_and_backreferences) are available in the `handler` under `request.pathname`, for example, given `pathname: new RegExp("^/conversations/(?<conversationId>[0-9]+)$")`, the `conversationId` is available at `request.pathname.conversationId`.
@@ -23,7 +21,6 @@ import * as utilities from "@radically-straightforward/utilities";
  * - **`handler`:** The function that produces the response. It’s similar to a function that you’d provide to [`http.createServer()`](https://nodejs.org/api/http.html#httpcreateserveroptions-requestlistener) as a `requestListener`, with two differences: 1. The `handler` is called only if the request satisfies the conditions above; and 2. The `request` and `response` parameters are extended with extra functionality (see `Request` and `Response`). The `handler` may be synchronous or asynchronous.
  */
 export type Route = {
-  local?: boolean;
   method?: string | RegExp;
   pathname?: string | RegExp;
   error?: boolean;
@@ -558,8 +555,6 @@ export default function server({
               request.state = {};
               delete request.error;
               for (const route of routes) {
-                if (route.local && request.ip !== "127.0.0.1") continue;
-
                 if (
                   (typeof route.method === "string" &&
                     request.method !== route.method) ||

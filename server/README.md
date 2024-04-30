@@ -316,7 +316,6 @@ import * as serverTypes from "@radically-straightforward/server";
 
 ```typescript
 export type Route = {
-  local?: boolean;
   method?: string | RegExp;
   pathname?: string | RegExp;
   error?: boolean;
@@ -328,8 +327,6 @@ export type Route = {
 ```
 
 A `Route` is a combination of some conditions that the request must satisfy for the `handler` to be called, and the `handler` that produces a response. An application is an Array of `Route`s.
-
-- **`local`:** Indicates that this `handler` should only be called if the request is coming from the same machine in which the server is running. This is useful to use the HTTP server for Inter-Process Communication (IPC).
 
 - **`method`:** The HTTP request method, for example `"GET"` or `/^PATCH|PUT$/`.
 
