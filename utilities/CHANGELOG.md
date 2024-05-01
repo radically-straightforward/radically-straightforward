@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.0.2 · 2024-05-01
+
+- Added `timeout()`.
+
 ## 2.0.1 · 2024-04-26
 
 - `backgroundJob()` doesn’t stop when the job throws an exception.
