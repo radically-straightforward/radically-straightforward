@@ -125,11 +125,11 @@ export class BackgroundJobs {
   add({
     type,
     startIn = 0,
-    parameters,
+    parameters = null,
   }: {
     type: string;
     startIn?: number;
-    parameters: Parameters<typeof JSON.stringify>[0];
+    parameters?: Parameters<typeof JSON.stringify>[0];
   }): void {
     const jobId = this.#database.run(sql`
       INSERT INTO "_backgroundJobs" (

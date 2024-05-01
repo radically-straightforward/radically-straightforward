@@ -2,6 +2,8 @@ import test from "node:test";
 import http from "node:http";
 import timers from "node:timers/promises";
 import childProcess from "node:child_process";
+import { Database } from "@radically-straightforward/sqlite";
+import server from "@radically-straightforward/server";
 import * as node from "@radically-straightforward/node";
 
 test(
@@ -85,5 +87,42 @@ test(
       );
       return childProcessInstance;
     });
+  },
+);
+
+test(
+  "BackgroundJobs",
+  {
+    skip:
+      process.stdin.isTTY && process.argv[2] === "BackgroundJobs"
+        ? false
+        : `Run interactive test with ‘node ./build/index.test.mjs "BackgroundJobs"’.`,
+  },
+  async () => {
+    const backgroundJobs = new node.BackgroundJobs(
+      new Database(":memory:"),
+      server(),
+    );
+
+    backgroundJobs.add({ type: "a-job-with-no-worker" });
+
+    backgroundJobs.worker(
+      {
+        type: "a-job-which-times-out",
+        interval: 1000,
+        timeout: 1000,
+        retries: 2,
+      },
+      async () => {
+        await new Promise((resolve) => {});
+      },
+    );
+    backgroundJobs.add({
+      type: "a-job-which-times-out",
+      parameters: { name: "Leandro" },
+    });
+
+    console.log("BackgroundJobs: Press ⌃Z to continue...");
+    await new Promise((resolve) => process.on("SIGTSTP", resolve));
   },
 );
