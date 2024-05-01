@@ -97,7 +97,7 @@ export function childProcessKeepAlive(
   );
 }
 
-export class BackgroundJob {
+export class BackgroundJobBroker {
   #database: Database;
   #server: serverTypes.Server | undefined;
 
@@ -130,7 +130,7 @@ export class BackgroundJob {
   }: {
     type: string;
     startIn?: number;
-    parameters: any;
+    parameters: Parameters<typeof JSON.stringify>[0];
   }): void {
     this.#database.run(sql`
       INSERT INTO "_backgroundJobs" (
