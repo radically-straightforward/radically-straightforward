@@ -249,7 +249,7 @@ export class BackgroundJobs {
               type,
               String(backgroundJob.id),
             );
-            utilities.timeout(timeout, async () => {
+            await utilities.timeout(timeout, async () => {
               await job(JSON.parse(backgroundJob.parameters));
             });
             this.#database.run(sql`

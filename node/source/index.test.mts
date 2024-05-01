@@ -125,5 +125,8 @@ test(
 
     console.log("BackgroundJobs: Press ⌃Z to continue...");
     await new Promise((resolve) => process.once("SIGTSTP", resolve));
+
+    if (process.platform === "win32") process.exit();
+    else process.kill(process.pid);
   },
 );
