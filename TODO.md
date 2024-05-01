@@ -1,65 +1,50 @@
 # TODO
 
-## Features
+## Introduction
 
-- Application startup (process management)
-  - Different children processes
-  - Tunnel
-    - Start Caddy with `address` `http://localhost`, then create a port forwarding in Visual Studio Code to port 80, public.
-  - Profiling
-  - Source maps
-- Developer experience
-  - Better text editor support:
-    - Syntax highlighting
-    - IntelliSense
-  - TypeScript on browser JavaScript?
-
-## Documentation
-
-- Overarching story
+- Example application
+- Principles
   - Colocation (Tailwind, https://vuejs.org/guide/scaling-up/sfc.html, and so forth)
-  - Avoid DSLs
-  - Avoid distributed applications (a frontend that’s almost a separate application **is** a distributed application)
+  - Stay as close to the platform as possible (for example, avoid virtual DOM)
+  - Avoid Domain-Specific Languages (DSL) (for example, avoid CSS-in-JavaScript by the means of JavaScript objects) (use tagged templates instead)
+  - Avoid distributed applications (a frontend that’s a separate application communicating through an API is a distributed application)
   - Avoid external processes (for example, Redis)
-  - Avoid multiple files
+  - Avoid multiple source files
   - Resist the urge to abstract early, because may have the wrong abstraction, and a wrong abstraction is a bigger issue than no abstraction (repetition is okay, DRY isn’t always the way)
-  - Spaghetti code vs soup of unknown objects
-  - Related work
-    - <https://html-first.com/>
-    - <https://tailwindcss.com/>
-    - <https://htmx.org/>
-    - <https://alpinejs.dev/>
-    - <https://hotwire.dev>
-    - <https://github.com/defunkt/jquery-pjax>
-    - <https://laravel-livewire.com>
-    - <https://github.com/phoenixframework/phoenix_live_view>
-    - <https://cableready.stimulusreflex.com/>
-    - <https://sockpuppet.argpar.se/>
-    - <https://github.com/servicetitan/Stl.Fusion>
-    - https://www.liveviewjs.com/
-    - https://fly.io/blog/how-we-got-to-liveview/
-    - https://hypermedia.systems/
-    - https://news.ycombinator.com/item?id=38241304
-    - https://htmx.org/essays/right-click-view-source/
-    - https://htmx.org/essays/locality-of-behaviour/
-- Logo
-- Dedicated website?
+  - Spaghetti code vs soup of difficult-to-trace objects (https://www.youtube.com/watch?v=QM1iUe6IofM)
+- Related work
+  - <https://html-first.com/>
+  - <https://tailwindcss.com/>
+  - <https://htmx.org/>
+  - <https://alpinejs.dev/>
+  - <https://hotwire.dev>
+  - <https://github.com/defunkt/jquery-pjax>
+  - <https://laravel-livewire.com>
+  - <https://github.com/phoenixframework/phoenix_live_view>
+  - <https://cableready.stimulusreflex.com/>
+  - <https://sockpuppet.argpar.se/>
+  - <https://github.com/servicetitan/Stl.Fusion>
+  - https://www.liveviewjs.com/
+  - https://fly.io/blog/how-we-got-to-liveview/
+  - https://hypermedia.systems/
+  - https://news.ycombinator.com/item?id=38241304
+  - https://htmx.org/essays/right-click-view-source/
+  - https://htmx.org/essays/locality-of-behaviour/
 
-# Authoring
+## Authoring
 
-## SQL
-
-- `INTEGER PRIMARY KEY AUTOINCREMENT`
-- `STRICT`
-- `"quote"` table and column names
-
----
+### SQL
 
 - Include `"id" INTEGER PRIMARY KEY AUTOINCREMENT` in every table.
+- Use `STRICT`
 - Quote table and column names (for example, `"users"."name"`), to avoid conflicts with SQL reserved keywords and to help with syntax highlighting.
 - Put `` sql`___` `` on its own line because of a glitch in the syntax highlighting.
 
-## CSS
+### HTML
+
+- Use `key="___"` to control Live Navigation and Live Connection updates.
+
+### CSS
 
 - Define properties in the following order:
   1.  Font and text properties.
@@ -74,7 +59,7 @@
   10. Variations (for example, breakpoints and dark mode).
   11. Children, including `::before` and `::after`.
 - Don’t use the same set of breakpoints all the time. Analyze case by case, and set breakpoints accordingly. (And besides, CSS variables don’t work for setting breakpoints, because they’re defined in `:root`, and the media query lives outside the scope of a selector.)
-- Layers
+- Layers (not in the `@layer` sense)
   - Global styles (for example, font)
   - Components for things like form inputs and buttons
   - Inline styles everywhere else
@@ -94,132 +79,6 @@
     - Only interpolation of values, using CSS variables.
   - Compiled
     - No interpolation at all
-
-# TODO
-
-```typescript
-import childProcess from "node:child_process";
-import server from "@radically-straightforward/server";
-import * as serverTypes from "@radically-straightforward/server";
-import html, { HTML } from "@radically-straightforward/html";
-import css from "@radically-straightforward/css";
-import javascript from "@radically-straightforward/javascript";
-import * as caddy from "@radically-straightforward/caddy";
-
-const application = server();
-
-css`
-  @import "@radically-straightforward/javascript/static/index.css";
-
-  .tippy-box {
-    --background-color: blue;
-    --border-color: red;
-  }
-
-  [key="progress-bar"] {
-    background-color: pink;
-  }
-`;
-
-javascript`
-  import * as javascript from "@radically-straightforward/javascript/static/index.mjs";
-
-  javascript.configuration.environment = "development";
-`;
-
-application.push({
-  method: "GET",
-  handler: (request, response) => {
-    if (
-      request.liveConnection?.establish &&
-      request.liveConnection?.skipUpdateOnEstablish
-    )
-      response.end();
-  },
-});
-
-application.push({
-  method: "GET",
-  pathname: "/",
-  handler: (request, response) => {
-    response.redirect("/1");
-  },
-});
-
-application.push({
-  method: "GET",
-  pathname: "/1",
-  handler: (request, response) => {
-    response.end(
-      layout({
-        request,
-        response,
-        body: html`
-          <p>
-            ${new Date().toISOString()}: This is /1, <a href="/2">go to /2</a>.
-          </p>
-        `,
-      })
-    );
-  },
-});
-
-application.push({
-  method: "GET",
-  pathname: "/2",
-  handler: (request, response) => {
-    response.end(
-      layout({
-        request,
-        response,
-        body: html`
-          <p>
-            ${new Date().toISOString()}: This is /2, <a href="/1">go to /1</a>.
-          </p>
-        `,
-      })
-    );
-  },
-});
-
-function layout({
-  request,
-  response,
-  body,
-}: {
-  request: serverTypes.Request<{}, {}, {}, {}, {}>;
-  response: serverTypes.Response;
-  body: HTML;
-}): HTML {
-  return html`
-    <!DOCTYPE html>
-    <html>
-      <head>
-        <meta name="version" content="1.0.0" />
-        <link rel="stylesheet" href="/${caddy.staticFiles["index.css"]}" />
-        <script src="/${caddy.staticFiles["index.mjs"]}"></script>
-      </head>
-      <body
-        javascript="${javascript`
-          javascript.liveConnection(${request.id});
-        `}"
-      >
-        $${body}
-      </body>
-    </html>
-  `;
-}
-
-const caddyServer = childProcess.spawn(
-  "./node_modules/.bin/caddy",
-  ["run", "--adapter", "caddyfile", "--config", "-"],
-  { stdio: [undefined, "ignore", "ignore"] }
-);
-caddyServer.stdin.end(caddy.application());
-process.once("gracefulTermination", () => {
-  caddyServer.kill();
-});
-```
 
 ---
 
@@ -1023,3 +882,60 @@ Here’s a step-by-step guide of how to use these tools in Courselore:
 6. Stop the server and see the measurements at `./data/measurements/`.
 
    > **Note:** If you wish to keep these measurements, then rename the folder, because it will be overwritten the next time you run the server in profile mode.
+
+---
+
+---
+
+---
+
+## `@radically-straightforward/server`
+
+## `@radically-straightforward/sqlite`
+
+## `@radically-straightforward/html`
+
+## `@radically-straightforward/css`
+
+## `@radically-straightforward/javascript`
+
+- TypeScript in browser JavaScript.
+
+## `@radically-straightforward/utilities`
+
+## `@radically-straightforward/node`
+
+- Application startup (process management)
+  - Different children processes
+  - Tunnel
+    - Start Caddy with `address` `http://localhost`, then create a port forwarding in Visual Studio Code to port 80, public.
+  - Profiling
+  - Source maps
+
+## `@radically-straightforward/typescript`
+
+## `@radically-straightforward/documentation`
+
+## `@radically-straightforward/caddy`
+
+## `@radically-straightforward/build`
+
+## `@radically-straightforward/package`
+
+## `@radically-straightforward/production`
+
+## `@radically-straightforward/development`
+
+## `monitor`
+
+## Other
+
+- Better text editor support for tagged templates with 100% functional syntax highlighting and IntelliSense.
+
+## Marketing
+
+- Logo
+- Dedicated website
+- Conference talks
+- Videos
+- Podcasts
