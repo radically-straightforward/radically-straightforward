@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.0.3 · 2024-05-01
+
+- Added documentation for `timeout()`.
+
 ## 2.0.2 · 2024-05-01
 
 - Added `timeout()`.
