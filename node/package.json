@@ -27,7 +27,7 @@
     "test": "npm run prepare && node --test && prettier --check \"./README.md\" --check \"./CHANGELOG.md\" --check \"./package.json\" --check \"./tsconfig.json\" --check \"./source/**/*.mts\""
   },
   "dependencies": {
-    "@radically-straightforward/server": "^1.0.4",
+    "@radically-straightforward/server": "^1.0.5",
     "@radically-straightforward/sqlite": "^1.1.1",
     "@radically-straightforward/utilities": "^2.0.3"
   },
