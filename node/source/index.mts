@@ -97,7 +97,7 @@ export function childProcessKeepAlive(
   );
 }
 
-export class BackgroundJobBroker {
+export class BackgroundJobs {
   #database: Database;
   #server: serverTypes.Server | undefined;
 
@@ -109,7 +109,6 @@ export class BackgroundJobBroker {
         CREATE TABLE IF NOT EXISTS "_backgroundJobs" (
           "id" INTEGER PRIMARY KEY AUTOINCREMENT,
           "type" TEXT NOT NULL,
-          "createdAt" TEXT NOT NULL,
           "startAt" TEXT NOT NULL,
           "startedAt" TEXT NULL,
           "retries" INTEGER NOT NULL,
@@ -132,28 +131,27 @@ export class BackgroundJobBroker {
     startIn?: number;
     parameters: Parameters<typeof JSON.stringify>[0];
   }): void {
-    this.#database.run(sql`
+    const jobId = this.#database.run(sql`
       INSERT INTO "_backgroundJobs" (
         "type",
-        "createdAt",
         "startAt",
         "retries",
         "parameters"
       )
       VALUES (
         ${type},
-        ${new Date().toISOString()},
         ${new Date(Date.now() + startIn).toISOString()},
         ${0},
         ${JSON.stringify(parameters)}
       )
-    `);
+    `).lastInsertRowid;
+    utilities.log("BACKGROUND JOB ADD", type, String(jobId));
   }
 
   worker<Type>(
     {
       type,
-      timeout = 5 * 60 * 1000,
+      timeout = 10 * 60 * 1000,
       retryIn = 5 * 60 * 1000,
       retries = 10,
       ...nodeBackgroundJobOptions

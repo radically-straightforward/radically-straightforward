@@ -27,6 +27,14 @@
   - How do we run the migration to create the schema?
     - On `migrate()`
     - On `backgroundJob()`
+  - How to distribute work within a `backgroundJob` process
+    - Different `backgroundJob()` per `type`
+      - Pro: Simpler to implement
+      - Con: Too many jobs of different kinds may lead to thrashing
+      - Pro: If a certain type of job is too heavy, it doesn’t overwhelm a single process
+    - Poll of workers
+      - Pro: May work on multiple jobs of the same `type`, increasing throughput
+      - Con: You’d have to poll too often
 
 - Future
 
