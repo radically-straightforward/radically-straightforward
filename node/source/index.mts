@@ -250,7 +250,14 @@ export class BackgroundJobs {
               type,
               String(backgroundJob.id),
             );
-            await job(JSON.parse(backgroundJob.parameters));
+            await Promise.race([
+              job(JSON.parse(backgroundJob.parameters)),
+              new Promise((resolve, reject) =>
+                setTimeout(() => {
+                  reject("TIMEOUT");
+                }, timeout),
+              ),
+            ]);
             this.#database.run(sql`
               DELETE FROM "_backgroundJobs" WHERE "id" = ${backgroundJob.id}
             `);
