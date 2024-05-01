@@ -664,6 +664,6 @@ export default function server({
   return routes;
 
   function log(...messageParts: string[]): void {
-    utilities.log(String(port), ...messageParts);
+    utilities.log("SERVER", String(port), ...messageParts);
   }
 }

@@ -145,7 +145,7 @@ export class BackgroundJobs {
         ${JSON.stringify(parameters)}
       )
     `).lastInsertRowid;
-    utilities.log("BACKGROUND JOB ADD", type, String(jobId));
+    utilities.log("BACKGROUND JOB", "ADD", type, String(jobId));
   }
 
   worker<Type>(
@@ -180,7 +180,8 @@ export class BackgroundJobs {
                 "startedAt" < ${new Date(Date.now() - timeout).toISOString()}
             `)) {
             utilities.log(
-              "BACKGROUND JOB EXTERNAL TIMEOUT",
+              "BACKGROUND JOB",
+              "EXTERNAL TIMEOUT",
               type,
               String(backgroundJob.id),
               backgroundJob.retries === 0 ? backgroundJob.parameters : "",
@@ -206,7 +207,8 @@ export class BackgroundJobs {
                 ${retries} <= "retries"
             `)) {
             utilities.log(
-              "BACKGROUND JOB FAIL",
+              "BACKGROUND JOB",
+              "FAIL",
               type,
               String(backgroundJob.id),
             );
@@ -245,7 +247,8 @@ export class BackgroundJobs {
           const start = process.hrtime.bigint();
           try {
             utilities.log(
-              "BACKGROUND JOB START",
+              "BACKGROUND JOB",
+              "START",
               type,
               String(backgroundJob.id),
             );
@@ -256,14 +259,16 @@ export class BackgroundJobs {
               DELETE FROM "_backgroundJobs" WHERE "id" = ${backgroundJob.id}
             `);
             utilities.log(
-              "BACKGROUND JOB SUCCESS",
+              "BACKGROUND JOB",
+              "SUCCESS",
               type,
               String(backgroundJob.id),
               `${(process.hrtime.bigint() - start) / 1_000_000n}ms`,
             );
           } catch (error) {
             utilities.log(
-              "BACKGROUND JOB ERROR",
+              "BACKGROUND JOB",
+              "ERROR",
               type,
               String(backgroundJob.id),
               `${(process.hrtime.bigint() - start) / 1_000_000n}ms`,
