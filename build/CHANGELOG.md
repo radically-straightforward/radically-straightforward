@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.3 · 2024-05-01
+
+- Update dependencies.
+
 ## 1.0.2 · 2024-04-09
 
 - Removed the `define`d `process` from esbuild’s configuration. It led to issues with Tippy.js.
