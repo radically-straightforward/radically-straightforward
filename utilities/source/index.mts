@@ -353,3 +353,22 @@ export function backgroundJob(
   backgroundJob.run();
   return backgroundJob;
 }
+
+export async function timeout<Type>(
+  duration: number,
+  function_: () => Promise<Type>,
+): Promise<Type> {
+  let timeout: NodeJS.Timeout | undefined = undefined;
+  try {
+    return await Promise.race<Type>([
+      function_(),
+      new Promise((resolve, reject) => {
+        timeout = setTimeout(() => {
+          reject("TIMEOUT");
+        }, duration);
+      }),
+    ]);
+  } finally {
+    clearTimeout(timeout);
+  }
+}

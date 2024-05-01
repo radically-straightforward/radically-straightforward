@@ -152,3 +152,22 @@ test(
     console.log("backgroundJob(): Press ⌃Z to ‘run()’ and ⌃C to ‘stop()’...");
   },
 );
+
+test("timeout()", async () => {
+  await utilities.timeout(5000, async () => {
+    await utilities.sleep(1000);
+    console.log("timeout(): Succeeded within the timeout.");
+  });
+  await assert.rejects(async () => {
+    await utilities.timeout(5000, async () => {
+      await utilities.sleep(1000);
+      throw new Error("timeout(): Failed but didn’t timeout.");
+    });
+  });
+  await assert.rejects(async () => {
+    await utilities.timeout(1000, async () => {
+      await utilities.sleep(5000);
+      console.log("timeout(): Timed out but there isn’t a way to stop it.");
+    });
+  });
+});
