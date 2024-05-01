@@ -180,7 +180,7 @@ export class BackgroundJobs {
                 "startedAt" < ${new Date(Date.now() - timeout).toISOString()}
             `)) {
             utilities.log(
-              "BACKGROUND JOB TIMEOUT",
+              "BACKGROUND JOB IMPLICIT TIMEOUT",
               type,
               String(backgroundJob.id),
               backgroundJob.retries === 0 ? backgroundJob.parameters : "",
@@ -250,14 +250,17 @@ export class BackgroundJobs {
               type,
               String(backgroundJob.id),
             );
+            let rejectTimeout: NodeJS.Timeout | undefined = undefined;
             await Promise.race([
               job(JSON.parse(backgroundJob.parameters)),
-              new Promise((resolve, reject) =>
-                setTimeout(() => {
-                  reject("TIMEOUT");
-                }, timeout),
+              new Promise(
+                (resolve, reject) =>
+                  (rejectTimeout = setTimeout(() => {
+                    reject("EXPLICIT TIMEOUT");
+                  }, timeout)),
               ),
             ]);
+            clearTimeout(rejectTimeout);
             this.#database.run(sql`
               DELETE FROM "_backgroundJobs" WHERE "id" = ${backgroundJob.id}
             `);

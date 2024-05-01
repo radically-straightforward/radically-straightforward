@@ -111,6 +111,7 @@ test(
         type: "a-job-which-times-out",
         interval: 1000,
         timeout: 1000,
+        retryIn: 1000,
         retries: 2,
       },
       async () => {
