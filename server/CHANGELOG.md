@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.5 · 2024-05-01
+
+- Added the word `SERVER` to the logs.
+
 ## 1.0.4 · 2024-04-30
 
 - Added the `Server` auxiliary type.
