@@ -115,7 +115,7 @@ test(
         retries: 2,
       },
       async () => {
-        await new Promise((resolve) => {});
+        await timers.setTimeout(5000);
       },
     );
     backgroundJobs.add({
@@ -124,6 +124,6 @@ test(
     });
 
     console.log("BackgroundJobs: Press ⌃Z to continue...");
-    await new Promise((resolve) => process.on("SIGTSTP", resolve));
+    await new Promise((resolve) => process.once("SIGTSTP", resolve));
   },
 );
