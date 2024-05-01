@@ -99,7 +99,7 @@ test(
         : `Run interactive test with ‘node ./build/index.test.mjs "BackgroundJobs"’.`,
   },
   async () => {
-    const database = new Database(":memory:");
+    const database = await new Database(":memory:").migrate();
     const backgroundJobs = new node.BackgroundJobs(database, server());
 
     backgroundJobs.add({ type: "a-job-with-no-worker" });

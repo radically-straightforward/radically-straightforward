@@ -97,10 +97,47 @@ export function childProcessKeepAlive(
   );
 }
 
+/**
+ * A background job system that builds upon `backgroundJob()` to provide the following features:
+ *
+ * - Allow jobs to be worked on by multiple Node.js processes.
+ *
+ * - Persist background jobs so that they are run even if the process crashes.
+ *
+ * - Impose a timeout on jobs.
+ *
+ * - Retry jobs that failed.
+ *
+ * - Schedule jobs to run in the future.
+ *
+ * - Log the progress of a job throughout the system.
+ *
+ * - Allow a job to be forced to run as soon as possible, even across processes. This is useful, for example, in a web application that sends emails in a background job (because sending emails would otherwise slow down the request-response cycle), but needs to send a “Password Reset” email as soon as possible. Inter-process communication is available through an HTTP server that listens on `localhost`.
+ *
+ * **References**
+ *
+ * - https://github.com/collectiveidea/delayed_job
+ * - https://github.com/betterment/delayed
+ * - https://github.com/bensheldon/good_job
+ * - https://github.com/litements/litequeue
+ * - https://github.com/diamondio/better-queue-sqlite
+ */
 export class BackgroundJobs {
   #database: Database;
   #server: serverTypes.Server | undefined;
 
+  /**
+   * - **`database`:** A [`@radically-straightforward/sqlite`](https://github.com/radically-straightforward/radically-straightforward/tree/main/sqlite) database that stores the background jobs. You may use the same database as your application data, which is simpler to manage, or a separate database for background jobs, which may be faster because background jobs write to the database often and SQLite locks the database on writes.
+   *
+   * - **`server`:** A [`@radically-straightforward/server`](https://github.com/radically-straightforward/radically-straightforward/tree/main/server) that, if provided, makes available endpoints that forces jobs to run as soon as possible. For example, a job of type `email` may be forced to run as soon as possible with the following request:
+   *
+   *   ```javascript
+   *   await fetch("http://localhost:18000/email", {
+   *     method: "POST",
+   *     headers: { "CSRF-Protection": "true" },
+   *   });
+   *   ```
+   */
   constructor(database: Database, server?: serverTypes.Server) {
     this.#database = database;
     this.#server = server;
@@ -122,6 +159,13 @@ export class BackgroundJobs {
     });
   }
 
+  /**
+   * Add a job to be worked on.
+   *
+   * - **`startIn`:** Schedule a job to be run in the future.
+   *
+   * - **`parameters`:** Optional parameters that are serialized as JSON and then provided to the worker.
+   */
   add({
     type,
     startIn = 0,
@@ -148,6 +192,21 @@ export class BackgroundJobs {
     utilities.log("BACKGROUND JOB", "ADD", type, String(jobId));
   }
 
+  /**
+   * Define a worker for a given `type` of job.
+   *
+   * - **`interval`:** How often the worker polls the database for new jobs. Don’t make this number too small—if you need a job to run without delay, use the web server to force a worker to execute as soon as possible.
+   *
+   * - **`timeout`:** How long a job may run for before it’s considered timed out. There are two kinds of timeouts:
+   *
+   *   - **Internal Timeout:** The job was initiated and didn’t finish on time. Note that in this case the job may actually end up running to completion, despite being marked for retrying in the future. This is a consequence of using [`@radically-straightforward/utilities`](https://github.com/radically-straightforward/radically-straightforward/tree/main/utilities)’s `timeout()`.
+   *
+   *   - **External Timeout:** A job was found in the database with a starting date that is too old. This may happen because a process crashed while working on the job without the opportunity to clean things up.
+   *
+   * - **`retryIn`:** How long to wait for before retrying a job that threw an exception.
+   *
+   * - **`retries`:** How many times to retry a job before considering it failed.
+   */
   worker<Type>(
     {
       type,
