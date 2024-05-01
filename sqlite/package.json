@@ -35,7 +35,7 @@
   "devDependencies": {
     "@radically-straightforward/documentation": "^1.0.4",
     "@radically-straightforward/typescript": "^1.0.0",
-    "@types/node": "^20.12.7",
+    "@types/node": "^20.12.8",
     "prettier": "^3.2.5",
     "typescript": "^5.4.5"
   },
