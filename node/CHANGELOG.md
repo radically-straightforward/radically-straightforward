@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.1.3 · 2024-05-01
+
+- Added `BackgroundJobs`.
+
 ## 3.1.2 · 2024-04-28
 
 - Added `childProcessKeepAlive()`.
