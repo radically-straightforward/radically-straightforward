@@ -354,6 +354,9 @@ export function backgroundJob(
   return backgroundJob;
 }
 
+/**
+ * Run the given `function_` up to the timeout. If the timeout is reached, the returned promise rejects, but there is no way to guarantee that the `function_` execution will stop.
+ */
 export async function timeout<Type>(
   duration: number,
   function_: () => Promise<Type>,

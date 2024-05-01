@@ -280,4 +280,15 @@ Start a background job that runs every `interval`.
 
 > **Note:** If the job throws an exception, the exception is logged and the background job continues.
 
+### `timeout()`
+
+```typescript
+export async function timeout<Type>(
+  duration: number,
+  function_: () => Promise<Type>,
+): Promise<Type>;
+```
+
+Run the given `function_` up to the timeout. If the timeout is reached, the returned promise rejects, but there is no way to guarantee that the `function_` execution will stop.
+
 <!-- DOCUMENTATION END: ./source/index.mts -->
