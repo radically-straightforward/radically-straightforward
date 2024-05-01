@@ -2,7 +2,7 @@ import test from "node:test";
 import http from "node:http";
 import timers from "node:timers/promises";
 import childProcess from "node:child_process";
-import { Database } from "@radically-straightforward/sqlite";
+import sql, { Database } from "@radically-straightforward/sqlite";
 import server from "@radically-straightforward/server";
 import * as node from "@radically-straightforward/node";
 
@@ -99,12 +99,37 @@ test(
         : `Run interactive test with ‘node ./build/index.test.mjs "BackgroundJobs"’.`,
   },
   async () => {
-    const backgroundJobs = new node.BackgroundJobs(
-      new Database(":memory:"),
-      server(),
-    );
+    const database = new Database(":memory:");
+    const backgroundJobs = new node.BackgroundJobs(database, server());
 
     backgroundJobs.add({ type: "a-job-with-no-worker" });
+
+    database.run(sql`
+      INSERT INTO "_backgroundJobs" (
+        "type",
+        "startAt",
+        "startedAt",
+        "retries",
+        "parameters"
+      )
+      VALUES (
+        ${"a-job-which-was-left-behind"},
+        ${new Date(Date.now() - 20 * 60 * 1000).toISOString()},
+        ${new Date(Date.now() - 15 * 60 * 1000).toISOString()},
+        ${0},
+        ${JSON.stringify(null)}
+      )
+    `);
+    backgroundJobs.worker(
+      {
+        type: "a-job-which-was-left-behind",
+        interval: 10 * 60 * 1000,
+      },
+      () => {},
+    );
+
+    console.log("BackgroundJobs: Press ⌃Z to continue...");
+    await new Promise((resolve) => process.once("SIGTSTP", resolve));
 
     backgroundJobs.worker(
       {
@@ -121,6 +146,49 @@ test(
     backgroundJobs.add({
       type: "a-job-which-times-out",
       parameters: { name: "Leandro" },
+    });
+
+    console.log("BackgroundJobs: Press ⌃Z to continue...");
+    await new Promise((resolve) => process.once("SIGTSTP", resolve));
+
+    backgroundJobs.worker(
+      {
+        type: "a-job-which-throws-an-exception",
+        interval: 1000,
+        timeout: 1000,
+        retryIn: 1000,
+        retries: 2,
+      },
+      async () => {
+        throw new Error("AN ERROR");
+      },
+    );
+    backgroundJobs.add({
+      type: "a-job-which-throws-an-exception",
+      parameters: { name: "Leandro" },
+    });
+
+    console.log("BackgroundJobs: Press ⌃Z to continue...");
+    await new Promise((resolve) => process.once("SIGTSTP", resolve));
+
+    backgroundJobs.worker(
+      {
+        type: "a-job-which-is-forced-into-execution",
+        interval: 10 * 60 * 1000,
+      },
+      () => {},
+    );
+    backgroundJobs.add({
+      type: "a-job-which-is-forced-into-execution",
+      parameters: { name: "Leandro" },
+    });
+
+    console.log("BackgroundJobs: Press ⌃Z to continue...");
+    await new Promise((resolve) => process.once("SIGTSTP", resolve));
+
+    await fetch("http://localhost:18000/a-job-which-is-forced-into-execution", {
+      method: "POST",
+      headers: { "CSRF-Protection": "true" },
     });
 
     console.log("BackgroundJobs: Press ⌃Z to continue...");
