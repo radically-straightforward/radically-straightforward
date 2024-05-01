@@ -161,13 +161,13 @@ export class BackgroundJobs {
       retryIn?: number;
       retries?: number;
     } & Parameters<typeof backgroundJob>[0],
-    backgroundJobFunction: (parameters: Type) => void | Promise<void>,
+    job: (parameters: Type) => void | Promise<void>,
   ): ReturnType<typeof backgroundJob> {
     const workerBackgroundJob = backgroundJob(
       nodeBackgroundJobOptions,
       async () => {
         this.#database.executeTransaction(() => {
-          for (const job of this.#database.all<{
+          for (const backgroundJob of this.#database.all<{
             id: number;
             retries: number;
             parameters: string;
@@ -175,51 +175,52 @@ export class BackgroundJobs {
               SELECT "id", "retries", "parameters"
               FROM "_backgroundJobs"
               WHERE
+                "type" = ${type} AND
                 "startedAt" IS NOT NULL AND
                 "startedAt" < ${new Date(Date.now() - timeout).toISOString()}
             `)) {
             utilities.log(
               "BACKGROUND JOB TIMEOUT",
               type,
-              String(job.id),
-              job.parameters,
+              String(backgroundJob.id),
+              backgroundJob.retries === 0 ? backgroundJob.parameters : "",
             );
             this.#database.run(sql`
               UPDATE "_backgroundJobs"
               SET
-                "startAt" = ${new Date(Date.now() + retryIn).toISOString()},
+                "startAt" = ${new Date(Date.now()).toISOString()},
                 "startedAt" = NULL,
-                "retries" = ${job.retries + 1}
-              WHERE "id" = ${job.id}
+                "retries" = ${backgroundJob.retries + 1}
+              WHERE "id" = ${backgroundJob.id}
             `);
           }
         });
         this.#database.executeTransaction(() => {
-          for (const job of this.#database.all<{
+          for (const backgroundJob of this.#database.all<{
             id: number;
-            retries: number;
             parameters: string;
           }>(sql`
               SELECT "id", "parameters"
               FROM "_backgroundJobs"
-              WHERE ${retries} <= "retries"
+              WHERE
+                "type" = ${type} AND
+                ${retries} <= "retries"
             `)) {
             utilities.log(
               "BACKGROUND JOB FAIL",
               type,
-              String(job.id),
-              job.parameters,
+              String(backgroundJob.id),
             );
             this.#database.run(sql`
-              DELETE FROM "_backgroundJobs" WHERE "id" = ${job.id}
+              DELETE FROM "_backgroundJobs" WHERE "id" = ${backgroundJob.id}
             `);
           }
         });
         while (true) {
-          const job = this.#database.executeTransaction<
+          const backgroundJob = this.#database.executeTransaction<
             { id: number; retries: number; parameters: string } | undefined
           >(() => {
-            const job = this.#database.get<{
+            const backgroundJob = this.#database.get<{
               id: number;
               retries: number;
               parameters: string;
@@ -233,35 +234,39 @@ export class BackgroundJobs {
                 ORDER BY "id" ASC
                 LIMIT 1
               `);
-            if (job === undefined) return undefined;
+            if (backgroundJob === undefined) return undefined;
             this.#database.run(sql`
               UPDATE "_backgroundJobs"
               SET "startedAt" = ${new Date().toISOString()}
-              WHERE "id" = ${job.id}
+              WHERE "id" = ${backgroundJob.id}
             `);
-            return job;
+            return backgroundJob;
           });
-          if (job === undefined) break;
+          if (backgroundJob === undefined) break;
           const start = process.hrtime.bigint();
           try {
-            utilities.log("BACKGROUND JOB START", type, String(job.id));
-            await backgroundJobFunction(JSON.parse(job.parameters));
+            utilities.log(
+              "BACKGROUND JOB START",
+              type,
+              String(backgroundJob.id),
+            );
+            await job(JSON.parse(backgroundJob.parameters));
             this.#database.run(sql`
-              DELETE FROM "_backgroundJobs" WHERE "id" = ${job.id}
+              DELETE FROM "_backgroundJobs" WHERE "id" = ${backgroundJob.id}
             `);
             utilities.log(
               "BACKGROUND JOB SUCCESS",
               type,
-              String(job.id),
+              String(backgroundJob.id),
               `${(process.hrtime.bigint() - start) / 1_000_000n}ms`,
             );
           } catch (error) {
             utilities.log(
               "BACKGROUND JOB ERROR",
               type,
-              String(job.id),
+              String(backgroundJob.id),
               `${(process.hrtime.bigint() - start) / 1_000_000n}ms`,
-              job.parameters,
+              backgroundJob.retries === 0 ? backgroundJob.parameters : "",
               String(error),
               (error as Error)?.stack ?? "",
             );
@@ -270,8 +275,8 @@ export class BackgroundJobs {
               SET
                 "startAt" = ${new Date(Date.now() + retryIn).toISOString()},
                 "startedAt" = NULL,
-                "retries" = ${job.retries + 1}
-              WHERE "id" = ${job.id}
+                "retries" = ${backgroundJob.retries + 1}
+              WHERE "id" = ${backgroundJob.id}
             `);
           }
           await timers.setTimeout(200);
