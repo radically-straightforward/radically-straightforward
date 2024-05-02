@@ -181,9 +181,9 @@ export class Database extends BetterSQLite3Database {
               "id" INTEGER PRIMARY KEY AUTOINCREMENT,
               "type" TEXT NOT NULL,
               "startAt" TEXT NOT NULL,
+              "parameters" TEXT NOT NULL,
               "startedAt" TEXT NULL,
-              "retries" INTEGER NOT NULL,
-              "parameters" TEXT NOT NULL
+              "retries" INTEGER NULL
             ) STRICT;
             CREATE INDEX IF NOT EXISTS "_backgroundJobsType" ON "_backgroundJobs" ("type");
             CREATE INDEX IF NOT EXISTS "_backgroundJobsStartAt" ON "_backgroundJobs" ("startAt");
@@ -323,7 +323,7 @@ export class Database extends BetterSQLite3Database {
   backgroundJob<Type>(
     {
       type,
-      timeout = 10 * 60 * 1000,
+      timeout = 5 * 60 * 1000,
       retryIn = 5 * 60 * 1000,
       retries = 10,
     }: {
@@ -338,11 +338,11 @@ export class Database extends BetterSQLite3Database {
       this.executeTransaction(() => {
         for (const backgroundJob of this.all<{
           id: number;
-          retries: number;
           parameters: string;
+          retries: number | null;
         }>(
           sql`
-            SELECT "id", "retries", "parameters"
+            SELECT "id", "parameters", "retries"
             FROM "_backgroundJobs"
             WHERE
               "type" = ${type} AND
@@ -355,7 +355,7 @@ export class Database extends BetterSQLite3Database {
             "EXTERNAL TIMEOUT",
             type,
             String(backgroundJob.id),
-            backgroundJob.retries === 0 ? backgroundJob.parameters : "",
+            backgroundJob.retries === null ? backgroundJob.parameters : "",
           );
           this.run(
             sql`
@@ -363,7 +363,7 @@ export class Database extends BetterSQLite3Database {
               SET
                 "startAt" = ${new Date(Date.now()).toISOString()},
                 "startedAt" = NULL,
-                "retries" = ${backgroundJob.retries + 1}
+                "retries" = ${(backgroundJob.retries ?? 0) + 1}
               WHERE "id" = ${backgroundJob.id}
             `,
           );
@@ -378,6 +378,7 @@ export class Database extends BetterSQLite3Database {
             FROM "_backgroundJobs"
             WHERE
               "type" = ${type} AND
+              "retries" IS NOT NULL AND
               ${retries} <= "retries"
           `,
         )) {
@@ -396,21 +397,28 @@ export class Database extends BetterSQLite3Database {
       });
       while (true) {
         const backgroundJob = this.executeTransaction<
-          { id: number; retries: number; parameters: string } | undefined
+          | {
+              id: number;
+              parameters: string;
+              retries: number | null;
+            }
+          | undefined
         >(() => {
           const backgroundJob = this.get<{
             id: number;
-            retries: number;
             parameters: string;
+            retries: number | null;
           }>(
             sql`
-              SELECT "id", "retries", "parameters"
+              SELECT "id", "parameters", "retries"
               FROM "_backgroundJobs"
               WHERE
                 "type" = ${type} AND
                 "startAt" <= ${new Date().toISOString()} AND
-                "startedAt" IS NULL AND
-                "retries" < ${retries}
+                "startedAt" IS NULL AND (
+                  "retries" IS NULL OR
+                  "retries" < ${retries}
+                )
               ORDER BY "id" ASC
               LIMIT 1
             `,
@@ -456,7 +464,7 @@ export class Database extends BetterSQLite3Database {
             type,
             String(backgroundJob.id),
             `${(process.hrtime.bigint() - start) / 1_000_000n}ms`,
-            backgroundJob.retries === 0 ? backgroundJob.parameters : "",
+            backgroundJob.retries === null ? backgroundJob.parameters : "",
             String(error),
             (error as Error)?.stack ?? "",
           );
@@ -464,9 +472,9 @@ export class Database extends BetterSQLite3Database {
             sql`
               UPDATE "_backgroundJobs"
               SET
-                "startAt" = ${new Date(Date.now() + retryIn).toISOString()},
+                "startAt" = ${new Date(Date.now() + (error === "TIMEOUT" ? 0 : retryIn)).toISOString()},
                 "startedAt" = NULL,
-                "retries" = ${backgroundJob.retries + 1}
+                "retries" = ${(backgroundJob.retries ?? 0) + 1}
               WHERE "id" = ${backgroundJob.id}
             `,
           );
