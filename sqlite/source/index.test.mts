@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import timers from "node:timers/promises";
 import sql, { Database, Query } from "@radically-straightforward/sqlite";
 
-test(async () => {
+test("Database", async () => {
   const database = new Database(":memory:");
 
   const migrations: (Query | (() => void | Promise<void>))[] = [
@@ -301,3 +301,112 @@ test(async () => {
     sql`SELECT "id", "name" FROM "users" WHERE "name" = ${"Leandro Facchinetti"}$${` AND "age" IS NOT NULL`}`;
   });
 });
+
+test(
+  "backgroundJob()",
+  {
+    skip: process.stdin.isTTY
+      ? false
+      : `Run interactive test with ‘node ./build/index.test.mjs’.`,
+  },
+  async () => {
+    const database = await new Database(":memory:").migrate();
+
+    database.run(
+      sql`
+        INSERT INTO "_backgroundJobs" (
+          "type",
+          "startAt",
+          "parameters"
+        )
+        VALUES (
+          ${"a-job-with-no-worker"},
+          ${new Date().toISOString()},
+          ${JSON.stringify(null)}
+        )
+      `,
+    );
+
+    database.run(
+      sql`
+        INSERT INTO "_backgroundJobs" (
+          "type",
+          "startAt",
+          "startedAt",
+          "retries",
+          "parameters"
+        )
+        VALUES (
+          ${"a-job-which-was-left-behind"},
+          ${new Date(Date.now() - 20 * 60 * 1000).toISOString()},
+          ${new Date(Date.now() - 15 * 60 * 1000).toISOString()},
+          ${0},
+          ${JSON.stringify(null)}
+        )
+      `,
+    );
+    database.backgroundJob({ type: "a-job-which-was-left-behind" }, () => {});
+
+    console.log("BackgroundJobs: Press ⌃Z to continue...");
+    await new Promise((resolve) => process.once("SIGTSTP", resolve));
+
+    database.backgroundJob(
+      {
+        type: "a-job-which-times-out",
+        timeout: 1000,
+        retries: 2,
+      },
+      async () => {
+        await timers.setTimeout(5 * 1000);
+      },
+    );
+    database.run(
+      sql`
+        INSERT INTO "_backgroundJobs" (
+          "type",
+          "startAt",
+          "parameters"
+        )
+        VALUES (
+          ${"a-job-which-times-out"},
+          ${new Date().toISOString()},
+          ${JSON.stringify({ name: "Leandro" })}
+        )
+      `,
+    );
+
+    console.log("BackgroundJobs: Press ⌃Z to continue...");
+    await new Promise((resolve) => process.once("SIGTSTP", resolve));
+
+    database.backgroundJob(
+      {
+        type: "a-job-which-throws-an-exception",
+        retryIn: 1000,
+        retries: 2,
+      },
+      async () => {
+        throw new Error("AN ERROR");
+      },
+    );
+    database.run(
+      sql`
+        INSERT INTO "_backgroundJobs" (
+          "type",
+          "startAt",
+          "parameters"
+        )
+        VALUES (
+          ${"a-job-which-throws-an-exception"},
+          ${new Date().toISOString()},
+          ${JSON.stringify({ name: "Leandro" })}
+        )
+      `,
+    );
+
+    console.log("BackgroundJobs: Press ⌃Z to continue...");
+    await new Promise((resolve) => process.once("SIGTSTP", resolve));
+
+    if (process.platform === "win32") process.exit();
+    else process.kill(process.pid);
+  },
+);
