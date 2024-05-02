@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.1.2 · 2024-05-02
+
+- Added `backgroundJob()`.
+
 ## 1.1.1 · 2024-04-30
 
 - Added automatic resource management.
