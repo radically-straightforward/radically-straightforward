@@ -30,6 +30,7 @@
   },
   "dependencies": {
     "@radically-straightforward/node": "^3.1.4",
+    "@radically-straightforward/utilities": "^2.0.3",
     "@types/better-sqlite3": "^7.6.10",
     "better-sqlite3": "^9.6.0"
   },
