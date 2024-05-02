@@ -104,22 +104,24 @@ test(
 
     backgroundJobs.add({ type: "a-job-with-no-worker" });
 
-    database.run(sql`
-      INSERT INTO "_backgroundJobs" (
-        "type",
-        "startAt",
-        "startedAt",
-        "retries",
-        "parameters"
-      )
-      VALUES (
-        ${"a-job-which-was-left-behind"},
-        ${new Date(Date.now() - 20 * 60 * 1000).toISOString()},
-        ${new Date(Date.now() - 15 * 60 * 1000).toISOString()},
-        ${0},
-        ${JSON.stringify(null)}
-      )
-    `);
+    database.run(
+      sql`
+        INSERT INTO "_backgroundJobs" (
+          "type",
+          "startAt",
+          "startedAt",
+          "retries",
+          "parameters"
+        )
+        VALUES (
+          ${"a-job-which-was-left-behind"},
+          ${new Date(Date.now() - 20 * 60 * 1000).toISOString()},
+          ${new Date(Date.now() - 15 * 60 * 1000).toISOString()},
+          ${0},
+          ${JSON.stringify(null)}
+        )
+      `,
+    );
     backgroundJobs.worker(
       {
         type: "a-job-which-was-left-behind",
