@@ -158,6 +158,8 @@ test(
     else process.kill(process.pid);
   }
 );
+
+// Test that an internal timeout doesn’t use `retryIn`
 ```
 
 ---
