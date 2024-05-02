@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.1.4 · 2024-05-02
+
+- Moved `BackgroundJobs` into `@radically-straightforward/utilities`.
+
 ## 3.1.3 · 2024-05-01
 
 - Added `BackgroundJobs`.
