@@ -2,7 +2,6 @@ import childProcess from "node:child_process";
 import timers from "node:timers/promises";
 import * as utilities from "@radically-straightforward/utilities";
 import sql, { Database } from "@radically-straightforward/sqlite";
-import * as serverTypes from "@radically-straightforward/server";
 
 let gracefulTerminationEmitted = false;
 for (const signal of [
@@ -137,7 +136,7 @@ export class BackgroundJobs {
    *   });
    *   ```
    */
-  constructor(database: Database, server?: serverTypes.Server) {
+  constructor(database: Database) {
     this.#database = database;
     this.#database.executeTransaction(() => {
       this.#database.execute(
