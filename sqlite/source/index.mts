@@ -358,7 +358,7 @@ export class Database extends BetterSQLite3Database {
    *         text: "This was sent from a background job.",
    *       })}
    *     )
-   *   `
+   *   `,
    * );
    * ```
    *

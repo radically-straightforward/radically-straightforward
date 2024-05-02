@@ -306,7 +306,7 @@ database.run(
         text: "This was sent from a background job.",
       })}
     )
-  `
+  `,
 );
 ```
 
