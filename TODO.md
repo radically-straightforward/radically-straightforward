@@ -25,7 +25,6 @@
   - <https://sockpuppet.argpar.se/>
   - <https://github.com/servicetitan/Stl.Fusion>
   - https://www.liveviewjs.com/
-  - https://fly.io/blog/how-we-got-to-liveview/
   - https://hypermedia.systems/
   - https://news.ycombinator.com/item?id=38241304
   - https://htmx.org/essays/right-click-view-source/
