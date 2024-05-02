@@ -65,7 +65,8 @@
 - Principles
   - Colocation (Tailwind, https://vuejs.org/guide/scaling-up/sfc.html, and so forth)
   - Stay as close to the platform as possible (for example, avoid virtual DOM)
-  - Avoid Domain-Specific Languages (DSL) (for example, avoid CSS-in-JavaScript by the means of JavaScript objects) (use tagged templates instead)
+  - Avoid Domain-Specific Languages (DSL) (for example, what Rails does, CSS-in-JavaScript by the means of JavaScript objects, and so forth) (use tagged templates instead)
+  - Avoid acronyms and short names
   - Avoid distributed applications (a frontend that’s a separate application communicating through an API is a distributed application)
   - Avoid external processes (for example, Redis)
   - Avoid multiple source files
