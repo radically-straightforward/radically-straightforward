@@ -32,9 +32,11 @@ An extension of [`better-sqlite3`](https://www.npmjs.com/package/better-sqlite3)
 
 2. A migration system.
 
-3. Better defaults for running SQLite on the server.
+3. Better defaults for running SQLite on the server, avoiding the `SQLITE_BUSY` error.
 
 4. Automatic resource management (close the database before process exit).
+
+5. A background job mechanism.
 
 To appreciate the difference in ergonomics between `better-sqlite3` and `@radically-straightforward/sqlite`, consider the following example:
 
@@ -171,7 +173,7 @@ A migration may be:
 
 6. You may consult the status of your database schema with the [`PRAGMA user_version`](https://www.sqlite.org/pragma.html#pragma_user_version), which holds the number of migrations that have been run successfully.
 
-7. The migration system sets several `PRAGMA`s that make SQLite better suited for running on the server. See <https://kerkour.com/sqlite-for-servers>.
+7. The migration system sets several `PRAGMA`s that make SQLite better suited for running on the server, avoiding the `SQLITE_BUSY` error. See <https://kerkour.com/sqlite-for-servers>.
 
 **Implementation Notes**
 
@@ -249,6 +251,76 @@ executeTransaction<Type>(fn: () => Type): Type;
 ```
 
 Execute a function in a transaction. All the [caveats](https://github.com/WiseLibs/better-sqlite3/blob/bd55c76c1520c7796aa9d904fe65b3fb4fe7aac0/docs/api.md#caveats) about `better-sqlite3`’s transactions still apply. Transactions are `IMMEDIATE` to avoid `SQLITE_BUSY` errors. See <https://kerkour.com/sqlite-for-servers>.
+
+#### `Database.backgroundJob()`
+
+```typescript
+backgroundJob<Type>(
+    {
+      type,
+      timeout = 5 * 60 * 1000,
+      retryIn = 5 * 60 * 1000,
+      retries = 10,
+    }: {
+      type: string;
+      timeout?: number;
+      retryIn?: number;
+      retries?: number;
+    },
+    job: (parameters: Type) => void | Promise<void>,
+  ): ReturnType<typeof node.backgroundJob>;
+```
+
+A background job system that builds upon [`@radically-straightforward/node`](https://github.com/radically-straightforward/radically-straightforward/tree/main/node)’s `backgroundJob()` to provide the following features:
+
+- Persist background jobs in the database so that they are preserved to run later even if the process crashes.
+
+- Allow jobs to be worked on by multiple Node.js processes.
+
+- Impose a timeout on jobs.
+
+- Retry jobs that failed.
+
+- Schedule jobs to run in the future.
+
+- Log the progress of a job throughout the system.
+
+> **Note:** You may use the same database for application data and background jobs, which is simpler to manage, or separate databases for application data for background jobs, which may be faster because background jobs write to the database often and SQLite locks the database on writes.
+
+You may schedule a background job by `INSERT`ing it into the `_backgroundJobs` table that’s created by `migrate()`, for example:
+
+```typescript
+database.run(
+  sql`
+    INSERT INTO "_backgroundJobs" (
+      "type",
+      "startAt",
+      "parameters"
+    )
+    VALUES (
+      ${"email"},
+      ${new Date(Date.now() + 5 * 60 * 1000).toISOString()},
+      ${JSON.stringify({
+        from: "example@example.com",
+        to: "radically-straightforward@leafac.com",
+        text: "This was sent from a background job.",
+      })}
+    )
+  `
+);
+```
+
+> **Note:** A job that times out may actually end up running to completion, despite being marked for retrying in the future. This is a consequence of using [`@radically-straightforward/utilities`](https://github.com/radically-straightforward/radically-straightforward/tree/main/utilities)’s `timeout()`.
+
+> **Note:** A job may be found in the database with a starting date that is too old. This may happen because a process crashed while working on the job without the opportunity to clean things up. This job is logged as `EXTERNAL TIMEOUT` and scheduled for retry.
+
+**References**
+
+- https://github.com/collectiveidea/delayed_job
+- https://github.com/betterment/delayed
+- https://github.com/bensheldon/good_job
+- https://github.com/litements/litequeue
+- https://github.com/diamondio/better-queue-sqlite
 
 #### `Database.getStatement()`
 
