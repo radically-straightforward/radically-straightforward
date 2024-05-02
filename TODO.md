@@ -1,5 +1,7 @@
 # TODO
 
+- Should `server` do inter-process communication via a database, similar to background jobs?
+
 ## Introduction
 
 - Example application
