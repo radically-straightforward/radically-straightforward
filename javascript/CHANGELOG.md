@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.1 · 2024-05-03
+
+- Changed `javascript.configuration.environment` into a parameter passed to `liveConnection()`.
+
 ## 1.0.0 · 2024-04-28
 
 - The first usable release, including all the features of browser JavaScript.
