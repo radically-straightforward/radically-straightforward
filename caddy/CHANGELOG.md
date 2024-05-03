@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.4.1 · 2024-05-03
+
+- Changed `dynamicServerPorts`’s type from `string[]` to `number[]`.
+
 ## 1.4.0 · 2024-04-28
 
 - Added `start()`.
