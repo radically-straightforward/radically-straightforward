@@ -85,8 +85,8 @@ font-family: var(--font-family--sans-serif);
   Set `font-size` and `line-height` together, for example:
 
   ```css
-  font-size: var(--font-size--3);
-  line-height: var(--font-size--3--line-height);
+  font-size: var(--font-size--3-5);
+  line-height: var(--font-size--3-5--line-height);
   ```
   */
   --font-size--2-5: 0.625rem;
