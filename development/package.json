@@ -27,7 +27,7 @@
     "@radically-straightforward/build": "^1.0.3",
     "@radically-straightforward/css": "^1.0.0",
     "@radically-straightforward/documentation": "^1.0.4",
-    "@radically-straightforward/javascript": "^1.0.0",
+    "@radically-straightforward/javascript": "^1.0.1",
     "@radically-straightforward/package": "^2.0.0",
     "@radically-straightforward/typescript": "^1.0.0"
   }
