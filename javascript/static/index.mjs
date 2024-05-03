@@ -2,17 +2,6 @@ import * as utilities from "@radically-straightforward/utilities";
 import fastMyersDiff from "fast-myers-diff";
 import * as Tippy from "tippy.js";
 
-/**
- * Global configuration for browser JavaScript.
- *
- * **Example**
- *
- * ```javascript
- * javascript.configuration.environment = "development";
- * ```
- */
-export const configuration = { environment: "production" };
-
 async function liveNavigate(request, event = undefined) {
   if (event instanceof PopStateEvent) liveNavigate.abortController?.abort();
   else if (
@@ -147,15 +136,15 @@ window.onpopstate = async (event) => {
  *
  * If the `content` of the meta tag `<meta name="version" content="___" />` has changed, a Live Connection update doesn’t happen. Instead, a message is shown in a `tippy()` instructing to reload the page.
  *
- * If `configuration.environment === "development"` then the page reloads when the connection is closed and reopened, because presumably the server has been restarted after a code modification.
+ * If `reload` is `true` then the page reloads when the connection is closed and reopened, because presumably the server has been restarted after a code modification during development.
  */
-export async function liveConnection(requestId) {
+export async function liveConnection(requestId, { reload = false }) {
   let abortController;
   let abortControllerTimeout;
-  let reload = false;
+  let reloadOnConnect = false;
   liveConnection.backgroundJob ??= utilities.backgroundJob(
     {
-      interval: configuration.environment === "development" ? 200 : 5 * 1000,
+      interval: reload ? 200 : 5 * 1000,
       onStop: () => {
         abortController.abort();
         window.clearTimeout(abortControllerTimeout);
@@ -179,7 +168,7 @@ export async function liveConnection(requestId) {
           document.querySelector(`[key="global-error"]`) ??
           document.querySelector("body > :first-child")
         ).liveConnectionFailedToConnectTooltip?.hide();
-        if (reload) {
+        if (reloadOnConnect) {
           document.querySelector("body").isModified = false;
           window.location.reload();
           return;
@@ -221,16 +210,15 @@ export async function liveConnection(requestId) {
           theme: "error",
           arrow: false,
           interactive: true,
-          content:
-            configuration.environment === "development"
-              ? "Reloading…"
-              : "Failed to connect. Please check your internet connection and try reloading the page.",
+          content: reload
+            ? "Reloading…"
+            : "Failed to connect. Please check your internet connection and try reloading the page.",
         }).show();
         throw error;
       } finally {
         abortController.abort();
         window.clearTimeout(abortControllerTimeout);
-        reload = configuration.environment === "development";
+        reloadOnConnect = reload;
       }
     },
   );
