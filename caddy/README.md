@@ -89,14 +89,14 @@ export function application({
   untrustedStaticFilesRoots = [
     `/files/* "${path.join(process.cwd(), "data")}"`,
   ],
-  dynamicServerPorts = ["18000"],
+  dynamicServerPorts = [18000],
   email = undefined,
   hstsPreload = false,
 }: {
   address?: string;
   trustedStaticFilesRoots?: string[];
   untrustedStaticFilesRoots?: string[];
-  dynamicServerPorts?: string[];
+  dynamicServerPorts?: number[];
   email?: string;
   hstsPreload?: boolean;
 } = {}): Caddyfile;
