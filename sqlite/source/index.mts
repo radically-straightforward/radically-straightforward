@@ -174,7 +174,7 @@ export class Database extends BetterSQLite3Database {
     this.pragma<void>(`synchronous = NORMAL`);
     this.pragma<void>(`cache_size = 1000000000`);
     this.pragma<void>(`temp_store = MEMORY`);
-    this.pragma<void>(`foreign_keys = false`);
+    this.pragma<void>(`foreign_keys = FALSE`);
     try {
       this.executeTransaction(() => {
         this.execute(
@@ -235,7 +235,7 @@ export class Database extends BetterSQLite3Database {
           throw error;
         }
     } finally {
-      this.pragma<void>(`foreign_keys = true`);
+      this.pragma<void>(`foreign_keys = TRUE`);
     }
     return this;
   }
