@@ -193,6 +193,8 @@ test(
       assert.equal(response.headers.get("Cache-Control"), "no-store");
     }
 
+    console.log(`Check the data directory at ‘${caddy.dataDirectory()}’.`);
+
     node.exit();
   },
 );

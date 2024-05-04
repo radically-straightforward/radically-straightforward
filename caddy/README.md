@@ -181,6 +181,14 @@ export default function caddyfile(
 
 A [tagged template](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_literals#tagged_templates) for [Caddyfile](https://caddyserver.com/docs/quick-starts/caddyfile).
 
+### `dataDirectory()`
+
+```typescript
+export function dataDirectory(): string;
+```
+
+A best-effort to get the path to the [data directory in which Caddy stores TLS certificates](https://caddyserver.com/docs/conventions#data-directory).
+
 <!-- DOCUMENTATION END: ./source/index.mts -->
 
 ## Related Work

@@ -2,6 +2,7 @@ import path from "node:path";
 import url from "node:url";
 import fs from "node:fs/promises";
 import childProcess from "node:child_process";
+import os from "node:os";
 import * as node from "@radically-straightforward/node";
 
 /**
@@ -225,13 +226,13 @@ export default function caddyfile(
   return output;
 }
 
-/*
-TODO
-https://caddyserver.com/docs/conventions#data-directory
-OS	Data directory path
-Linux, BSD	$HOME/.local/share/caddy
-Windows	%AppData%\Caddy
-macOS	$HOME/Library/Application Support/Caddy
-Plan 9	$HOME/lib/caddy
-Android	$HOME/caddy (or /sdcard/caddy)
-*/
+/**
+ * A best-effort to get the path to the [data directory in which Caddy stores TLS certificates](https://caddyserver.com/docs/conventions#data-directory).
+ */
+export function dataDirectory(): string {
+  return process.platform === "win32"
+    ? path.join(process.env.AppData ?? os.homedir(), "Caddy")
+    : process.platform === "darwin"
+      ? path.join(os.homedir(), "Library/Application Support/Caddy")
+      : path.join(os.homedir(), ".local/share/caddy");
+}

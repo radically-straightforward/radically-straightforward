@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.4.2 · 2024-05-04
+
+- Added `dataDirectory()`.
+
 ## 1.4.1 · 2024-05-03
 
 - Changed `dynamicServerPorts`’s type from `string[]` to `number[]`.
