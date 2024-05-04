@@ -3,6 +3,7 @@ import assert from "node:assert/strict";
 import path from "node:path";
 import fs from "node:fs/promises";
 import timers from "node:timers/promises";
+import * as node from "@radically-straightforward/node";
 import server from "@radically-straightforward/server";
 import * as serverTypes from "@radically-straightforward/server";
 
@@ -915,7 +916,6 @@ Interact with the test server and run manual tests with ‘node ./build/index.te
 ============================================
 `,
     );
-    if (process.platform === "win32") process.exit();
-    else process.kill(process.pid);
+    node.exit();
   }
 });

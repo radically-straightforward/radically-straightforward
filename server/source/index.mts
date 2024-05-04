@@ -293,7 +293,6 @@ export default function server({
                       directoriesToDelete.add(path.dirname(value.path));
                       await fs.mkdir(path.dirname(value.path));
                       await fs.writeFile(value.path, file);
-                      // @ts-expect-error: https://github.com/DefinitelyTyped/DefinitelyTyped/pull/68985
                       if (file.truncated) {
                         response.statusCode = 413;
                         throw new Error("File too large.");
