@@ -224,3 +224,14 @@ export default function caddyfile(
   output += templateStrings.at(-1);
   return output;
 }
+
+/*
+TODO
+https://caddyserver.com/docs/conventions#data-directory
+OS	Data directory path
+Linux, BSD	$HOME/.local/share/caddy
+Windows	%AppData%\Caddy
+macOS	$HOME/Library/Application Support/Caddy
+Plan 9	$HOME/lib/caddy
+Android	$HOME/caddy (or /sdcard/caddy)
+*/
