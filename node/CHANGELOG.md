@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.1.5 · 2024-05-04
+
+- Added `exit()`.
+
 ## 3.1.4 · 2024-05-02
 
 - Moved `BackgroundJobs` into `@radically-straightforward/utilities`.

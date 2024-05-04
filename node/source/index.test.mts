@@ -87,3 +87,16 @@ test(
     });
   },
 );
+
+test(
+  "exit()",
+  {
+    skip:
+      process.stdin.isTTY && process.argv[2] === "exit()"
+        ? false
+        : `Run interactive test with ‘node ./build/index.test.mjs "exit()"’.`,
+  },
+  async () => {
+    node.exit();
+  },
+);
