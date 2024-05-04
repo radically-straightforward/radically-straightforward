@@ -5,6 +5,7 @@ import path from "node:path";
 import fs from "node:fs/promises";
 import http from "node:http";
 import timers from "node:timers/promises";
+import * as node from "@radically-straightforward/node";
 import * as caddy from "@radically-straightforward/caddy";
 
 test(
@@ -192,7 +193,6 @@ test(
       assert.equal(response.headers.get("Cache-Control"), "no-store");
     }
 
-    if (process.platform === "win32") process.exit();
-    else process.kill(process.pid);
+    node.exit();
   },
 );
