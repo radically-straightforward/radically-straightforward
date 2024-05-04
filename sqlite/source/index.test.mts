@@ -1,6 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import timers from "node:timers/promises";
+import * as node from "@radically-straightforward/node";
 import sql, { Database, Query } from "@radically-straightforward/sqlite";
 
 test("Database", async () => {
@@ -406,7 +407,6 @@ test(
     console.log("BackgroundJobs: Press ⌃Z to continue...");
     await new Promise((resolve) => process.once("SIGTSTP", resolve));
 
-    if (process.platform === "win32") process.exit();
-    else process.kill(process.pid);
+    node.exit();
   },
 );

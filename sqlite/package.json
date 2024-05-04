@@ -29,7 +29,7 @@
     "test": "npm run prepare && node --test && prettier --check \"./README.md\" --check \"./CHANGELOG.md\" --check \"./package.json\" --check \"./tsconfig.json\" --check \"./source/**/*.mts\""
   },
   "dependencies": {
-    "@radically-straightforward/node": "^3.1.4",
+    "@radically-straightforward/node": "^3.1.5",
     "@radically-straightforward/utilities": "^2.0.3",
     "@types/better-sqlite3": "^7.6.10",
     "better-sqlite3": "^9.6.0"
