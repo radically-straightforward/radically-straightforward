@@ -472,7 +472,7 @@ Tippy.default.setDefaultProps({
  *
  * Use `element.isValid = true` to force a subtree to be valid.
  *
- * `validate()` supports the `required`, `minlength`, and `maxlength` attributes, the `type="email"` input type, and custom validation.
+ * `validate()` supports the `required` and `minlength` attributes, the `type="email"` input type, and custom validation.
  *
  * For custom validation, use the `onvalidate` event and `throw new ValidationError()`, for example:
  *
@@ -521,13 +521,6 @@ export function validate(element) {
       )
         throw new ValidationError(
           `Minimum ${element.getAttribute("minlength")} characters.`,
-        );
-      if (
-        element.matches("[maxlength]") &&
-        element.value.length > Number(element.getAttribute("maxlength"))
-      )
-        throw new ValidationError(
-          `Maximum ${element.getAttribute("maxlength")} characters.`,
         );
       if (
         element.matches(`[type="email"]`) &&
