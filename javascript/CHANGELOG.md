@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.3 · 2024-05-06
+
+- Removed support for `maxlength`, because the browser doesn’t allow inputting more than that anyway.
+
 ## 1.0.2 · 2024-05-06
 
 - Added support for `maxlength`.
