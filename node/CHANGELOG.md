@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 3.1.6 · 2024-05-06
 
 - Changed `exit()` to try and support Windows better by manually emitting the `gracefulTermination` event.
 
