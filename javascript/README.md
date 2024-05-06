@@ -213,7 +213,7 @@ You may set the `disabled` attribute on a parent element to disable an entire su
 
 Use `element.isValid = true` to force a subtree to be valid.
 
-`validate()` supports the `required` and `minlength` attributes, the `type="email"` input type, and custom validation.
+`validate()` supports the `required`, `minlength`, and `maxlength` attributes, the `type="email"` input type, and custom validation.
 
 For custom validation, use the `onvalidate` event and `throw new ValidationError()`, for example:
 

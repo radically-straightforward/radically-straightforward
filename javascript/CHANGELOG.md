@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.2 · 2024-05-06
+
+- Added support for `maxlength`.
+
 ## 1.0.1 · 2024-05-03
 
 - Changed `javascript.configuration.environment` into a parameter passed to `liveConnection()`.
