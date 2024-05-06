@@ -95,9 +95,11 @@ export function childProcessKeepAlive(
 }
 
 /**
- * On Windows this is the same as `process.exit()`, but in other platforms that support signals this sends a `SIGTERM` to the process itself, which starts graceful termination.
+ * On platforms other than Windows, `exit()` sends a `SIGTERM` to the process itself, which starts graceful termination. On Windows, this `process.emit()`s the `gracefulTermination` event and `process.exit()`s.
  */
 export function exit(): void {
-  if (process.platform === "win32") process.exit();
-  else process.kill(process.pid);
+  if (process.platform === "win32") {
+    process.emit("gracefulTermination" as any);
+    process.exit();
+  } else process.kill(process.pid);
 }

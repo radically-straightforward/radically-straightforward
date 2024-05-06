@@ -128,6 +128,6 @@ node.childProcessKeepAlive(() =>
 export function exit(): void;
 ```
 
-On Windows this is the same as `process.exit()`, but in other platforms that support signals this sends a `SIGTERM` to the process itself, which starts graceful termination.
+On platforms other than Windows, `exit()` sends a `SIGTERM` to the process itself, which starts graceful termination. On Windows, this `process.emit()`s the `gracefulTermination` event and `process.exit()`s.
 
 <!-- DOCUMENTATION END: ./source/index.mts -->
