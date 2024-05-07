@@ -50,20 +50,21 @@ jobs:
           - macos
           - ubuntu
     runs-on: ${{ matrix.os }}-latest
+    defaults:
+      run:
+        working-directory: ./${{ matrix.package }}/
     steps:
       - uses: actions/checkout@main
       - uses: actions/setup-node@main
         with:
           node-version: latest
       - run: |
-          cd ./${{ matrix.application }}/
           npm install-ci-test
           npx package
-          cd ..
-          mv ./${{ matrix.application }}.${{ matrix.os == 'windows' && 'zip' || 'tar.gz' }} ./${{ matrix.application }}--${{ matrix.os }}--${{ startsWith(github.ref, format('refs/tags/{0}--', matrix.application)) && github.ref_name || github.sha }}.${{ matrix.os == 'windows' && 'zip' || 'tar.gz' }}
+          mv ../${{ matrix.application }}.${{ matrix.os == 'windows' && 'zip' || 'tar.gz' }} ../${{ matrix.application }}--${{ matrix.os }}--${{ startsWith(github.ref, format('refs/tags/{0}--', matrix.application)) && github.ref_name || github.sha }}.${{ matrix.os == 'windows' && 'zip' || 'tar.gz' }}
       - uses: actions/upload-artifact@main
         with:
-          path: ./${{ matrix.application }}--${{ matrix.os }}--${{ startsWith(github.ref, format('refs/tags/{0}--', matrix.application)) && github.ref_name || github.sha }}.${{ matrix.os == 'windows' && 'zip' || 'tar.gz' }}
+          path: ../${{ matrix.application }}--${{ matrix.os }}--${{ startsWith(github.ref, format('refs/tags/{0}--', matrix.application)) && github.ref_name || github.sha }}.${{ matrix.os == 'windows' && 'zip' || 'tar.gz' }}
           name: ${{ matrix.application }}--${{ matrix.os }}--${{ startsWith(github.ref, format('refs/tags/{0}--', matrix.application)) && github.ref_name || github.sha }}.${{ matrix.os == 'windows' && 'zip' || 'tar.gz' }}
 
   applications--release:
