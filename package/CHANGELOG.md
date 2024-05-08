@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.0.1 · 2024-05-08
+
+- Fixed an issue on Windows in which Node.js starting version 22 doesn’t allow for `execFile()` with `.cmd`.
+
 ## 2.0.0 · 2024-03-28
 
 - **Breaking Change:** Removed command-line parameters.
