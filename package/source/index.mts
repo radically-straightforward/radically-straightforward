@@ -10,10 +10,9 @@ import archiver from "archiver";
 import batch from "dedent";
 import sh from "dedent";
 
-await util.promisify(childProcess.exec)(
-  `npm${process.platform === "win32" ? ".cmd" : ""} dedupe`,
-  { env: { ...process.env, NODE_ENV: "production" } },
-);
+await util.promisify(childProcess.exec)("npm dedupe", {
+  env: { ...process.env, NODE_ENV: "production" },
+});
 
 await fs.mkdir("./node_modules/.bin", { recursive: true });
 await fs.cp(
