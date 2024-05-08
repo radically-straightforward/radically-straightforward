@@ -11,7 +11,9 @@ test(async () => {
   process.chdir(
     url.fileURLToPath(new URL("../example-application/", import.meta.url)),
   );
-  await util.promisify(childProcess.exec)("npm ci");
+  await util.promisify(childProcess.exec)(
+    `npm${process.platform === "win32" ? ".cmd" : ""} ci`,
+  );
   await util.promisify(childProcess.execFile)("node", [
     url.fileURLToPath(new URL("./index.mjs", import.meta.url)),
   ]);
@@ -43,7 +45,10 @@ test(async () => {
   ]);
   const result = await util
     .promisify(childProcess.exec)(
-      "./example-application/example-application examples of some extra command-line arguments",
+      `${path.join(
+        "./example-application/",
+        `example-application${process.platform === "win32" ? ".cmd" : ""}`,
+      )} examples of some extra command-line arguments`,
       { env: { ...process.env, EXAMPLE_PROGRAM: "true" } },
     )
     .catch((error) => error);
