@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.1.3 · 2024-05-08
+
+- Removed `PRAGMA`s from `migrate()`:
+  - `cache_size`: It consumed too much memory.
+  - `temp_store`: We don’t use temporary tables and indices, and the default of using files seems acceptable—again, we’re trying to control memory use.
+
 ## 1.1.2 · 2024-05-02
 
 - Added `backgroundJob()`.
