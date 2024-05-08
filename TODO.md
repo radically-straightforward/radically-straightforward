@@ -928,8 +928,6 @@ Here’s a step-by-step guide of how to use these tools in Courselore:
 
 ## `@radically-straightforward/development`
 
-## `monitor`
-
 ## Other
 
 - Better text editor support for tagged templates with 100% functional syntax highlighting and IntelliSense.
