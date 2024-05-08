@@ -170,10 +170,8 @@ export class Database extends BetterSQLite3Database {
     ...migrations: (Query | ((database: this) => void | Promise<void>))[]
   ): Promise<this> {
     this.pragma<void>(`journal_mode = WAL`);
-    this.pragma<void>(`busy_timeout = 5000`);
     this.pragma<void>(`synchronous = NORMAL`);
-    this.pragma<void>(`cache_size = 1000000000`);
-    this.pragma<void>(`temp_store = MEMORY`);
+    this.pragma<void>(`busy_timeout = 5000`);
     this.pragma<void>(`foreign_keys = FALSE`);
     try {
       this.executeTransaction(() => {
