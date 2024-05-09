@@ -1,9 +1,5 @@
 # Changelog
 
-## Unreleased
-
-- `start()` now logs the outputs of running Caddy.
-
 ## 1.4.2 · 2024-05-04
 
 - Added `dataDirectory()`.

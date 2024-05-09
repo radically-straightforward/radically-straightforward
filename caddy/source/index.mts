@@ -23,7 +23,7 @@ export function start({
         "node_modules/.bin/caddy",
       ),
       ["run", "--adapter", "caddyfile", "--config", "-"],
-      { stdio: [undefined, "inherit", "inherit"] },
+      { stdio: [undefined, "ignore", "ignore"] },
     );
     caddyChildProcess.stdin.end(
       application(applicationOptions) + extraCaddyfile,
