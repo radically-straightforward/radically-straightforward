@@ -67,7 +67,7 @@ This guide teaches you how to setup your development machine to work on a projec
 
 6. If you need to test the application on a phone follow these steps:
 
-   1. Establish a network connection between your development machine and the phone. The details of how to do that depends on your network, but often that amounts to having them on the same wifi. Take note of the name with which you may access the development machine from the phone:
+   1. Establish a network connection between your development machine and the phone. The details of how to do that depends on your network, but often that amounts to having them on the same wifi. Take note of the name with which you may access the development machine from the phone, for example:
 
       ```console
       $ hostname
