@@ -2,7 +2,7 @@
 
 This guide teaches you how to setup your development machine to work on a project that uses Radically Straightforward.
 
-> **If you get stuck, please [open an issue](<https://github.com/radically-straightforward/radically-straightforward/issues/new?title=Issue%20in%20Setting%20Up%20for%20Development&body=**What%20did%20you%20try%20to%20do?**%0A%0A**What%20did%20you%20expect%20to%20happen?**%0A%0A**What%20really%20happened?**%0A%0A**What%20error%20messages%20(if%20any)%20did%20you%20run%20into?**%0A%0A**Please%20provide%20as%20much%20relevant%20context%20as%20possible%20(operating%20system,%20browser,%20and%20so%20forth):**>).**
+> **If you get stuck, please [open an issue](<https://github.com/radically-straightforward/radically-straightforward/issues/new?title=Issue%20in%20Development&body=**What%20did%20you%20try%20to%20do?**%0A%0A**What%20did%20you%20expect%20to%20happen?**%0A%0A**What%20really%20happened?**%0A%0A**What%20error%20messages%20(if%20any)%20did%20you%20run%20into?**%0A%0A**Please%20provide%20as%20much%20relevant%20context%20as%20possible%20(operating%20system,%20browser,%20and%20so%20forth):**>).**
 
 1. Install the tools you need to work on Radically Straightforward applications:
 
