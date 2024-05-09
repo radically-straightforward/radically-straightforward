@@ -10,7 +10,7 @@ $ npm install --save-dev @radically-straightforward/javascript
 
 > **Note:** We recommend installing `@radically-straightforward/javascript` as a development dependency because `@radically-straightforward/build` removes the `` javascript`___` `` tagged templates from the server code and bundles the browser JavaScript.
 
-> **Note:** We recommend the **[es6-string-html](https://marketplace.visualstudio.com/items?itemName=Tobermory.es6-string-html)** Visual Studio Code extension to syntax highlight browser JavaScript in tagged templates.
+> **Note:** We recommend the **[ES6 String HTML](https://marketplace.visualstudio.com/items?itemName=Tobermory.es6-string-html)** Visual Studio Code extension to syntax highlight browser JavaScript in tagged templates.
 
 ## Usage
 
