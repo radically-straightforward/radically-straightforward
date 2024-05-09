@@ -1,4 +1,4 @@
-# Setting Up for Development
+# Development
 
 This guide teaches you how to setup your development machine to work on a project that uses Radically Straightforward.
 
