@@ -118,7 +118,7 @@ A Caddyfile template for an application.
 
 - **`email`:** The email of the system administrator, which is used by certificate authorities to contact about certificates. If `undefined`, then the server is run in development mode with local self-signed certificates.
 
-- **`hstsPreload`:** Whether the `Strict-Transport-Security` header should include the [`preload` directive](https://hstspreload.org/). This is `false` by default, but we recommended that in production you opt into preloading by setting `hstsPreload` to `true`.
+- **`hstsPreload`:** Whether the `Strict-Transport-Security` header should include the [`preload` directive](https://hstspreload.org/). This is `false` by default, but we recommended that in production you opt into preloading by setting `hstsPreload` to `true` and then submit your domain to the preload list.
 
 **Features**
 

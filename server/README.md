@@ -491,6 +491,20 @@ Live Connections were inspired by the projects above, but it’s conceptually si
 
 We expect that Live Connections are interoperable in the sense that other libraries and frameworks, even those implemented in other programming languages, may implement a similar idea.
 
+### Server-Sent Events
+
+- <https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events/Using_server-sent_events>
+
+The way Live Connections work is very similar (and inspired) by the stock browser functionality called Server-Sent Events. What sets them apart are:
+
+- We have more control over the HTTP request for a Live Connection. This is useful, for example, to include the `Live-Connection` HTTP header which identifies the original request and allows the server to avoid a redundant update as soon as the connection is established.
+
+- In Live Connection updates we use [JSON lines](https://jsonlines.org/) instead of the more obscure `text/event-stream` format.
+
+- We may see more HTTP features being available in Live Connections, whereas Server-Sent Events probably won’t see many improvements moving forward because it seems to be a low priority for browser developers. See <https://github.com/whatwg/html/issues/2177>.
+
+- We have observed some edge cases in which the Server-Sent Events connection was closed and not retried, while Live Connections retries are more reliable.
+
 ### Image/Video/Audio Proxy
 
 - <https://github.com/atmos/camo>

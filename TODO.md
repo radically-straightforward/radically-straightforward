@@ -71,37 +71,6 @@
 - Document: Don’t use `#ids`, because of specificity (use `key=""`s instead, for compatibility with `@radically-straightforward/javascript`)
 - Use classes for everything, not just tag name selectors, because you may want an `<a>` to look like a button, and a `button` to look like a link.
 
----
-
-- Document
-
-  - Reasons to prefer `fetch` over `EventSource`:
-    - Features such as headers.
-    - Implementors lost interest on `EventSource` (https://github.com/whatwg/html/issues/2177).
-    - Free to use a more sensible event-stream format, such as NDJSON, instead of the weird `text/event-stream` format.
-  - Reasons to have one event-stream connection per route, and close and reopen as you navigate, as opposed to a single persistent event-stream connection:
-    - Session management would be awkward
-    - Extra work to not have event-stream open for routes that don’t support them (otherwise it increases the server load for no good reason) (but most of the time people are on routes that support live updates, so it’s no big deal).
-    - The live-updates middleware benefits from appearing after authentication and retrieval of things like course information. It’d be awkward to have it as a global middleware.
-  - Reasons not to use the Visibility API:
-    - First, the obvious pro: We could disconnect the live-updates event-stream when the tab isn’t showing, reducing the load on the server.
-    - But we decided against it because we want to be able to have features such as changing a tab title to “2 unread messages,” even if the tab is on the background, and this requires the connection to the server to be kept alive.
-  - Assumptions on `onload`:
-    - It’s only safe to run `onload` once.
-    - The code will be run again on live-navigation & live-update, and there may be some continuity in the form of tooltips & event handlers.
-  - Redirects:
-    - Use 307 (temporary) & 308 (permanent) on normal redirects. (They preserve the HTTP method on the new request.)
-    - Use 303 on redirects after a `POST`. (It changes the HTTP method from `POST` to `GET` on the new request.) (Naturally, the same principle applies to other HTTP methods, including `PATCH`, `PUT`, `DELETE`, and so forth.)
-    - Don’t use 302 (temporary) & 301 (permanent), because some browsers may change the method on redirect. Prefer 307 & 308 instead.
-  - Curious fact about `.addEventListener("EVENT")` vs `.onEVENT = `: The order in which you put the `.onEVENT = ` adds an entry into the event listeners queue at that position, and subsequent `.onEVENT = `s replace that entry.
-
-- Tests:
-  - https://www.ssllabs.com/ssltest/
-  - Content-Security-Policy
-    - https://csp-evaluator.withgoogle.com
-    - https://securityheaders.com
-  - https://hstspreload.org
-
 <details>
 
 # My Version of morphdom
