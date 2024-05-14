@@ -76,6 +76,8 @@ export const staticFiles: { [key: string]: string } = JSON.parse(
  *
  * - Set the following security headers:
  *
+ *   > **Note:** These headers may be overwritten by the underlying application. This is useful if the application needs to tweak some security settings, for example, Content Security Policy (CSP).
+ *
  *   - **`Strict-Transport-Security`:** Tells the browser that moving forward it should only attempt to load this origin with HTTPS (not HTTP). The `hstsPreload` parameter controls whether to set the [`preload` directive](https://hstspreload.org/)—by default it’s `false`, but it’s recommended that you opt into preloading by setting `hstsPreload: true`.
  *
  *   - **`Cache-Control`:** Turns off HTTP caching. This is the best setting for the dynamic parts of the application: in the best case the cache may be stale, and in the worst case the cache may include private information that could leak even after signing out. For static files, we recommend that you overwrite this header to enable caching, for example, `header Cache-Control "public, max-age=31536000, immutable"`.
@@ -141,22 +143,22 @@ export function application({
     }
 
     ${address} {
-      header Strict-Transport-Security "max-age=31536000; includeSubDomains${
+      header ?Strict-Transport-Security "max-age=31536000; includeSubDomains${
         hstsPreload ? `; preload` : ``
       }"
-      header Cache-Control no-store
-      header X-Content-Type-Options nosniff
-      header X-XSS-Protection 0
-      header Permissions-Policy "interest-cohort=()"
-      header Origin-Agent-Cluster "?1"
-      header Content-Security-Policy "default-src 'self'; style-src 'self' 'unsafe-inline'; frame-src 'none'; object-src 'none'; form-action 'self'; frame-ancestors 'none'"
-      header Cross-Origin-Resource-Policy same-origin
-      header Cross-Origin-Embedder-Policy require-corp
-      header Cross-Origin-Opener-Policy same-origin
-      header X-Frame-Options DENY
-      header X-Permitted-Cross-Domain-Policies none
-      header X-DNS-Prefetch-Control off
-      header Referrer-Policy no-referrer
+      header ?Cache-Control no-store
+      header ?X-Content-Type-Options nosniff
+      header ?X-XSS-Protection 0
+      header ?Permissions-Policy "interest-cohort=()"
+      header ?Origin-Agent-Cluster "?1"
+      header ?Content-Security-Policy "default-src 'self'; style-src 'self' 'unsafe-inline'; frame-src 'none'; object-src 'none'; form-action 'self'; frame-ancestors 'none'"
+      header ?Cross-Origin-Resource-Policy same-origin
+      header ?Cross-Origin-Embedder-Policy require-corp
+      header ?Cross-Origin-Opener-Policy same-origin
+      header ?X-Frame-Options DENY
+      header ?X-Permitted-Cross-Domain-Policies none
+      header ?X-DNS-Prefetch-Control off
+      header ?Referrer-Policy no-referrer
 
       route {
         ${trustedStaticFilesRoots

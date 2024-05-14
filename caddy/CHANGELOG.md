@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.4.3 · 2024-05-14
+
+- Changed the headers added by Caddy such that they may be overwritten by the underlying application. This is useful if the application needs to tweak some security settings, for example, Content Security Policy (CSP).
+
 ## 1.4.2 · 2024-05-04
 
 - Added `dataDirectory()`.
