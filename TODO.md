@@ -1,42 +1,44 @@
 # TODO
 
-- Should `server` do inter-process communication via a database, similar to background jobs?
-- Documentation
-  - How to setup an application with multiple processes
-  - Prettier, nodemon, and other recommended third-party packages
-- First run of Caddy may not work, because it needs to set trust store.
-  - Silence verbose logs in Caddy and let it output logs.
-
 ## Introduction
 
 - Example application
+  - Basic
+  - Complete
+    - How to setup an application with multiple processes
+    - Prettier, nodemon, and other recommended third-party packages
 - Principles
-  - Colocation (Tailwind, https://vuejs.org/guide/scaling-up/sfc.html, and so forth)
-  - Stay as close to the platform as possible (for example, avoid virtual DOM)
-  - Avoid Domain-Specific Languages (DSL) (for example, what Rails does, CSS-in-JavaScript by the means of JavaScript objects, and so forth) (use tagged templates instead)
-  - Avoid acronyms and short names
-  - Avoid distributed applications (a frontend that’s a separate application communicating through an API is a distributed application)
-  - Avoid external processes (for example, Redis)
-  - Avoid multiple source files
-  - Resist the urge to abstract early, because may have the wrong abstraction, and a wrong abstraction is a bigger issue than no abstraction (repetition is okay, DRY isn’t always the way)
-  - Spaghetti code vs soup of difficult-to-trace objects (https://www.youtube.com/watch?v=QM1iUe6IofM)
+  - Colocation
+    - https://htmx.org/essays/locality-of-behaviour/
+    - https://kentcdodds.com/blog/colocation
+    - https://tailwindcss.com/docs/utility-first
+    - https://vuejs.org/guide/scaling-up/sfc.html
+    - Place code in as few files as possible
+    - Use procedural instead of object-oriented code
+      - https://www.youtube.com/watch?v=QM1iUe6IofM
+    - Avoid distributed applications (a frontend that’s a separate application communicating through an API is a distributed application)
+    - Avoid external processes (for example, Redis)
+  - Stay as close to the platform as possible
+    - Language: Avoid Domain-Specific Languages (DSL), for example, what Rails does, CSS-in-JavaScript by the means of JavaScript objects, and so forth (use tagged templates instead)
+    - APIs: Avoid virtual DOM
+  - Use descriptive names (avoid abbreviations)
+  - It’s better to have no abstraction at all than the wrong abstraction: it’s okay to repeat yourself a little, before DRYing
 - Related work
-  - <https://html-first.com/>
-  - <https://tailwindcss.com/>
-  - <https://htmx.org/>
-  - <https://alpinejs.dev/>
-  - <https://hotwire.dev>
-  - <https://github.com/defunkt/jquery-pjax>
-  - <https://laravel-livewire.com>
-  - <https://github.com/phoenixframework/phoenix_live_view>
-  - <https://cableready.stimulusreflex.com/>
-  - <https://sockpuppet.argpar.se/>
-  - <https://github.com/servicetitan/Stl.Fusion>
+  - https://html-first.com/
+  - https://tailwindcss.com/
+  - https://htmx.org/
+  - https://alpinejs.dev/
+  - https://hotwire.dev
+  - https://github.com/defunkt/jquery-pjax
+  - https://laravel-livewire.com
+  - https://github.com/phoenixframework/phoenix_live_view
+  - https://cableready.stimulusreflex.com/
+  - https://sockpuppet.argpar.se/
+  - https://github.com/servicetitan/Stl.Fusion
   - https://www.liveviewjs.com/
   - https://hypermedia.systems/
   - https://news.ycombinator.com/item?id=38241304
   - https://htmx.org/essays/right-click-view-source/
-  - https://htmx.org/essays/locality-of-behaviour/
 
 ## Authoring
 
@@ -382,7 +384,6 @@ One (perhaps valuable) difference between `morph()` and other solutions like `mo
 - webpack (perhaps others) should be able to remove blocks of test from within the code when bundling.
 - References
   - https://github.com/facebook/jest/tree/main/packages/jest-snapshot
-  - https://kentcdodds.com/blog/colocation
   - https://users.rust-lang.org/t/should-unit-tests-really-be-put-in-the-same-file-as-the-source/62153/4
   - The D Programming Language supports writing unit tests inline with source
   - Pyret
