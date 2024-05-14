@@ -5,7 +5,7 @@
 - Example application
   - Basic
   - Complete
-    - How to setup an application with multiple processes
+    - Multiple processes
     - Prettier, nodemon, and other recommended third-party packages
 - Principles
   - Colocation

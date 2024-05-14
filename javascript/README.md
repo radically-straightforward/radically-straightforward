@@ -83,6 +83,8 @@ An `<a>` or `<form>` may opt out of Live Navigation by setting the property `ele
 
 When the page is loaded, the browser JavaScript in the ``javascript="${javascript`___`}"`` attribute is executed. This is made to work along with the [`@radically-straightforward/build`](https://github.com/radically-straightforward/radically-straightforward/tree/main/build) package, which extracts browser JavaScript from the server code.
 
+The browser JavaScript in ``javascript="${javascript`___`}"`` attributes may run on the same element on Live Navigation and on Live Connection updates. If you used something like `addEventListener()` the same event listener would be added repeated. Instead, you should use something like the `onclick` property.
+
 ### Custom Form Validation
 
 The default browser form validation is limited in many ways:
