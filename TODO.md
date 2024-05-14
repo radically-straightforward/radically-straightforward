@@ -5,40 +5,35 @@
 - Example application
   - Basic
   - Complete
-    - Multiple processes
-    - Prettier, nodemon, and other recommended third-party packages
 - Principles
   - Colocation
+  - It’s better to have no abstraction at all than the wrong abstraction: it’s okay to repeat yourself a little, before DRYing
+- Principles in action
+  - Server-Side Rendering: Avoid distributed applications (a frontend that’s a separate application communicating through an API is a distributed application)
+    - https://github.com/phoenixframework/phoenix_live_view
+      - https://livewire.laravel.com/
+      - https://stimulusreflex.com/
+      - https://sockpuppet.argpar.se/
+      - https://www.liveviewjs.com/
+    - https://hotwire.dev
+      - https://github.com/turbolinks/turbolinks
+      - https://github.com/defunkt/jquery-pjax
+  - Avoid external processes (for example, Redis, and use SQLite instead of Postgres)
+  - Inline CSS and browser JavaScript
     - https://htmx.org/essays/locality-of-behaviour/
     - https://kentcdodds.com/blog/colocation
+    - https://adamwathan.me/css-utility-classes-and-separation-of-concerns/
     - https://tailwindcss.com/docs/utility-first
     - https://vuejs.org/guide/scaling-up/sfc.html
-    - Place code in as few files as possible
-    - Use procedural instead of object-oriented code
-      - https://www.youtube.com/watch?v=QM1iUe6IofM
-    - Avoid distributed applications (a frontend that’s a separate application communicating through an API is a distributed application)
-    - Avoid external processes (for example, Redis)
-  - Stay as close to the platform as possible
+    - https://html-first.com/
+    - https://alpinejs.dev/
+  - Use procedural instead of object-oriented code
+    - https://www.youtube.com/watch?v=QM1iUe6IofM
+  - Place code in as few files as possible
     - Language: Avoid Domain-Specific Languages (DSL), for example, what Rails does, CSS-in-JavaScript by the means of JavaScript objects, and so forth (use tagged templates instead)
     - APIs: Avoid virtual DOM
+  - Stay as close to the platform as possible
   - Use descriptive names (avoid abbreviations)
-  - It’s better to have no abstraction at all than the wrong abstraction: it’s okay to repeat yourself a little, before DRYing
-- Related work
-  - https://html-first.com/
-  - https://tailwindcss.com/
-  - https://htmx.org/
-  - https://alpinejs.dev/
-  - https://hotwire.dev
-  - https://github.com/defunkt/jquery-pjax
-  - https://laravel-livewire.com
-  - https://github.com/phoenixframework/phoenix_live_view
-  - https://cableready.stimulusreflex.com/
-  - https://sockpuppet.argpar.se/
-  - https://github.com/servicetitan/Stl.Fusion
-  - https://www.liveviewjs.com/
-  - https://hypermedia.systems/
-  - https://news.ycombinator.com/item?id=38241304
-  - https://htmx.org/essays/right-click-view-source/
 
 ## Authoring
 
@@ -64,95 +59,19 @@
   6.  Interactions (for example, `cursor`).
   7.  Transformations.
   8.  Animations.
-  9.  States (for example, `:hover`).
+  9.  States (in chronological order, for example, `:hover`, `:focus-within`, `:active`).
   10. Variations (for example, breakpoints and dark mode).
   11. Children, including `::before` and `::after`.
 - Don’t use the same set of breakpoints all the time. Analyze case by case, and set breakpoints accordingly. (And besides, CSS variables don’t work for setting breakpoints, because they’re defined in `:root`, and the media query lives outside the scope of a selector.)
-- Layers (not in the `@layer` sense)
+- Levels of abstraction
+  - Inline styles
+  - Extract a CSS class (for example, `.button`)
+  - Extract a function that produces HTML (for example, `userAvatar()`)
   - Global styles (for example, font)
-  - Components for things like form inputs and buttons
-  - Inline styles everywhere else
-- Extraction: Often it doesn’t make sense to extract CSS, because it doesn’t make sense without the corresponding HTML structure. It makes more sense to extract HTML & CSS into a function.
 - Document: Don’t use `#ids`, because of specificity (use `key=""`s instead, for compatibility with `@radically-straightforward/javascript`)
 - Use classes for everything, not just tag name selectors, because you may want an `<a>` to look like a button, and a `button` to look like a link.
-- Interpolation
-  - What I think of as interpolation many libraries call “dynamic” properties/styles/etc.
-  - Astroturf
-    - Allows two types of interpolation:
-      - Values, using CSS variables.
-      - Blocks, using extra classes.
-        - Doesn’t seem to support nesting, because that requires you to parse the CSS & extract the classes nested inside.
-  - vanilla-extract
-    - Doesn’t seem to allow for interpolation.
-  - Linaria
-    - Only interpolation of values, using CSS variables.
-  - Compiled
-    - No interpolation at all
 
 ---
-
-- Live Connection
-  - Detect that you’re offline.
-  - Detect a server version update. (Trigger a reload in that case)
-  - Live Reload in development.
-  - Live Update when there’s a new version of the page.
-
----
-
-- It’d be nice to allow for client-side templating from within server-side templating:
-
-```javascript
-response.send(html`
-  <div javascript="${javascript`
-    this.insertAdjacentHTML("beforestart", html`[...] ${HAVE THIS RESOLVE ON THE CLIENT} [...]`);
-  `}"></div>
-`);
-
-```
-
----
-
-Pulling client-side JavaScript into a `<script>` tag, as opposed to leaving it inline:
-
-Pros:
-
-- Clean up the Inspector in the Developer Tools.
-- Potential to reduce the size of HTML.
-- Aligns with the treatment of CSS, and even of HTMLForJavaScript, to some extent.
-
-Cons:
-
-- Introduces one layer of indirection in the Inspector.
-- The size reduction could have happened with gzip, which sometimes is even better.
-- Slows things down on the server because it has to compute the hash of all client-side JavaScript. (The same is true of CSS, by the way.)
-
----
-
-One (perhaps valuable) difference between `morph()` and other solutions like `morphdom`: `morph()` does’t destroy the `to` tree, while `morphdom` does.
-
-```css
-[live-navigation] * {
-  cursor: wait !important;
-}
-.[live-navigation] {
-  &,
-  & *,
-  & ::before,
-  & ::after {
-    cursor: wait !important;
-  }
-}
-```
-
-- `key=""` may be understood to imply uniqueness at first glance
-
-  - Perhaps it would be nicer to have more structure in the key besides just a string.
-
-- Currently `onload` may be adding a bunch of repeated JavaScript, adding to the size of the page. Perhaps we should do something similar to what we do in `local-css`?
-
-  - Note that modifying the `textContent` of `<script>` tag only has immediate effect the first time(!) Subsequent modifications aren’t picked up by the browser (but you can always `eval()`).
-
-- Make `onload` an `AsyncFunction`?
 
 - Document
 
@@ -668,6 +587,16 @@ Here’s a step-by-step guide of how to use these tools in Courselore:
 ## `@radically-straightforward/javascript`
 
 - TypeScript in browser JavaScript.
+- Client-side templating from within server-side templating:
+
+  ```javascript
+  response.end(html`
+    <div javascript="${javascript`
+      this.insertAdjacentHTML("beforestart", html`[...] ${HAVE THIS RESOLVE ON THE CLIENT} [...]`);
+    `}"></div>
+  `);
+
+  ```
 
 ## `@radically-straightforward/utilities`
 
