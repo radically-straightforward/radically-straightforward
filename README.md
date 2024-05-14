@@ -10,3 +10,8 @@ We’re still working on the high-level documentation telling the overarching st
 $ npm install @radically-straightforward/production
 $ npm install --save-dev @radically-straightforward/development
 ```
+
+## Guides
+
+- [**Development**](/guides/development.md)
+- [**Deployment**](/guides/deployment.md)
