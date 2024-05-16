@@ -13,5 +13,5 @@ $ npm install --save-dev @radically-straightforward/development
 
 ## Guides
 
-- [**Development**](/guides/development.md)
-- [**Deployment**](/guides/deployment.md)
+- [**Deployment**](https://github.com/radically-straightforward/radically-straightforward/blob/main/guides/deployment.md)
+- [**Development**](https://github.com/radically-straightforward/radically-straightforward/blob/main/guides/development.md)
