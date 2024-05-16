@@ -29,7 +29,17 @@ This guide teaches you how to install a project that uses Radically Straightforw
 
    > **Note:** We recommend that you use [DigitalOcean’s Monitoring](https://docs.digitalocean.com/products/monitoring/) and [Uptime](https://docs.digitalocean.com/products/uptime/) features to alert you of any issues on the server.
 
+## Backup and Migration
+
+All the application data is stored under the `data/` directory. You may perform backups and migrations to new machines by copying that directory, for example:
+
+```console
+$ rsync -a --delete --progress root@EXAMPLE-APPLICATION.com:EXAMPLE-APPLICATION/data/ /path/to/backup/
+```
+
 ## Upgrade
+
+> **Always backup before an upgrade.**
 
 > **Note:** For major updates there are breaking changing requiring extra steps which are documented in the changelog.
 
@@ -47,12 +57,4 @@ Download a new version of the application, replace it in the installation direct
 # systemctl start EXAMPLE-APPLICATION
 # systemctl enable EXAMPLE-APPLICATION
 # rm -rf /root/EXAMPLE-APPLICATION--deploy/
-```
-
-## Backup and Migration
-
-All the application data is stored under the `data/` directory. You may perform backups and migrations to new machines by copying that directory, for example:
-
-```console
-$ rsync -a --delete --progress root@EXAMPLE-APPLICATION.com:EXAMPLE-APPLICATION/data/ /path/to/backup/
 ```
