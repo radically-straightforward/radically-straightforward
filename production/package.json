@@ -24,7 +24,7 @@
     "test": ""
   },
   "dependencies": {
-    "@radically-straightforward/caddy": "^1.4.3",
+    "@radically-straightforward/caddy": "^2.0.0",
     "@radically-straightforward/html": "^1.0.0",
     "@radically-straightforward/node": "^3.1.6",
     "@radically-straightforward/server": "^1.0.5",
