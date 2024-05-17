@@ -110,7 +110,7 @@ A Caddyfile template for an application.
 
 - **`hstsPreload`:** Whether the `Strict-Transport-Security` header should include the [`preload` directive](https://hstspreload.org/). This is `false` by default, but we recommended that in production you opt into preloading by setting `hstsPreload` to `true` and then submit your domain to the preload list.
 
-- **`ports`:** Ports for the dynamic part of the application—usually several processes of a Node.js server.
+- **`ports`:** Ports for the dynamic part of the application to which Caddy reverse proxies—usually several processes of a Node.js server.
 
 - **`trustedStaticFilesRoots`:** [Caddy `root` directives](https://caddyserver.com/docs/caddyfile/directives/root) for static files that are **trusted** by the application, for example, the application’s CSS and browser JavaScript.
 
