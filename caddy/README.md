@@ -82,23 +82,21 @@ A mapping from static file names to their hashed names, as produced by [`@radica
 
 ```typescript
 export function application({
-  address = "localhost",
+  hostname = "localhost",
+  systemAdministratorEmail = undefined,
+  hstsPreload = false,
+  ports = [18000],
   trustedStaticFilesRoots = [
     `* "${path.join(url.fileURLToPath(new URL("..", import.meta.url)).split("/node_modules/")[0], "build/static/")}"`,
   ],
-  untrustedStaticFilesRoots = [
-    `/files/* "${path.join(process.cwd(), "data")}"`,
-  ],
-  dynamicServerPorts = [18000],
-  email = undefined,
-  hstsPreload = false,
+  untrustedStaticFilesRoots = [],
 }: {
-  address?: string;
+  hostname?: string;
+  systemAdministratorEmail?: string;
+  hstsPreload?: boolean;
+  ports?: number[];
   trustedStaticFilesRoots?: string[];
   untrustedStaticFilesRoots?: string[];
-  dynamicServerPorts?: number[];
-  email?: string;
-  hstsPreload?: boolean;
 } = {}): Caddyfile;
 ```
 
@@ -106,19 +104,19 @@ A Caddyfile template for an application.
 
 **Parameters**
 
-- **`address`:** The [`address` of the site block](https://caddyserver.com/docs/caddyfile/concepts#addresses). Usually the `address` is the [`hostname`](https://nodejs.org/api/url.html#url-strings-and-url-objects) part of the application’s URL, for example, `example.com` (notably, the `hostname` doesn’t include neither the protocol nor the port).
+- **`hostname`:** The [`hostname`](https://nodejs.org/api/url.html#url-strings-and-url-objects) part of the application’s URL, for example, `example.com`.
+
+- **`systemAdministratorEmail`:** The email of the system administrator is used by certificate authorities to contact about certificates. If `undefined`, then the server is run in development mode with local self-signed certificates.
+
+- **`hstsPreload`:** Whether the `Strict-Transport-Security` header should include the [`preload` directive](https://hstspreload.org/). This is `false` by default, but we recommended that in production you opt into preloading by setting `hstsPreload` to `true` and then submit your domain to the preload list.
+
+- **`ports`:** Ports for the dynamic part of the application—usually several processes of a Node.js server.
 
 - **`trustedStaticFilesRoots`:** [Caddy `root` directives](https://caddyserver.com/docs/caddyfile/directives/root) for static files that are **trusted** by the application, for example, the application’s CSS and browser JavaScript.
 
 - **`untrustedStaticFilesRoots`:** Similar to `trustedStaticFilesRoots`, but for static files that are **untrusted** by the application, for example, user-uploaded avatars, attachments to messages, and so forth.
 
   > **Note:** Both `trustedStaticFilesRoots` and `untrustedStaticFilesRoots` must refer to **immutable** files. You may use [`@radically-straightforward/build`](https://github.com/radically-straightforward/radically-straightforward/tree/main/build) to build CSS, browser JavaScript, and other static files with immutable and unique file names. Your application should create immutable and unique file names for user-uploaded avatars, attachments to messages, and so forth.
-
-- **`dynamicServerPorts`:** Ports for the dynamic part of the application—usually several processes of a Node.js server.
-
-- **`email`:** The email of the system administrator, which is used by certificate authorities to contact about certificates. If `undefined`, then the server is run in development mode with local self-signed certificates.
-
-- **`hstsPreload`:** Whether the `Strict-Transport-Security` header should include the [`preload` directive](https://hstspreload.org/). This is `false` by default, but we recommended that in production you opt into preloading by setting `hstsPreload` to `true` and then submit your domain to the preload list.
 
 **Features**
 

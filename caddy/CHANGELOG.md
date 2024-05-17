@@ -1,5 +1,14 @@
 # Changelog
 
+## 2.0.0 · 2024-05-17
+
+**Breaking Changes**
+
+- Changed `address` into `hostname`.
+- Changed `email` into `systemAdministratorEmail`.
+- Changed `dynamicServerPorts` into `ports`.
+- Changed the default for `untrustedStaticFilesRoots` from ``[`/files/* "${path.join(process.cwd(), "data")}"`]`` to `[]`.
+
 ## 1.4.3 · 2024-05-14
 
 - Changed the headers added by Caddy such that they may be overwritten by the underlying application. This is useful if the application needs to tweak some security settings, for example, Content Security Policy (CSP).

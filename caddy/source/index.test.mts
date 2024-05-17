@@ -77,6 +77,9 @@ test(
 
     caddy.start({
       trustedStaticFilesRoots: [`* "./example-application/_/build/static/"`],
+      untrustedStaticFilesRoots: [
+        `/files/* "${path.join(process.cwd(), "data")}"`,
+      ],
     });
 
     await timers.setTimeout(2 * 1000);
