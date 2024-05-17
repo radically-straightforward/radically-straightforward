@@ -195,7 +195,7 @@ test(
     {
       const response = await fetch("https://localhost/");
       assert.equal(response.status, 502);
-      assert.equal(response.headers.get("Cache-Control"), "no-store");
+      assert.equal(response.headers.get("Cache-Control"), null);
     }
 
     console.log(`Check the data directory at ‘${caddy.dataDirectory()}’.`);
