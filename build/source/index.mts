@@ -23,13 +23,11 @@ const {
     "file-to-copy-with-hash": {
       type: "string",
       multiple: true,
-      short: "f",
       default: [],
     },
     "file-to-copy-without-hash": {
       type: "string",
       multiple: true,
-      short: "F",
       default: [],
     },
   },
