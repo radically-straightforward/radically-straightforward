@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import html, { HTML } from "@radically-straightforward/html";
-import * as htmlHelpers from "@radically-straightforward/html";
+import * as htmlUtilities from "@radically-straightforward/html";
 
 test("html`___`", () => {
   assert.equal(html`<p>Leandro Facchinetti</p>`, `<p>Leandro Facchinetti</p>`);
@@ -97,7 +97,7 @@ test("html`___`", () => {
 
 test("sanitize()", () => {
   assert.equal(
-    htmlHelpers.sanitize(
+    htmlUtilities.sanitize(
       `"Leandro Facchinetti \u{0}\b<radically-straightforward@leafac.com>" & 'Louie'`,
     ),
     `&quot;Leandro Facchinetti &lt;radically-straightforward@leafac.com&gt;&quot; &amp; &apos;Louie&apos;`,
@@ -106,7 +106,7 @@ test("sanitize()", () => {
 
 test("escape()", () => {
   assert.equal(
-    htmlHelpers.escape(
+    htmlUtilities.escape(
       `"Leandro Facchinetti <radically-straightforward@leafac.com>" & 'Louie'`,
     ),
     `&quot;Leandro Facchinetti &lt;radically-straightforward@leafac.com&gt;&quot; &amp; &apos;Louie&apos;`,
@@ -115,7 +115,7 @@ test("escape()", () => {
 
 test("invalidXMLCharacters", () => {
   assert.equal(
-    `abc\u{0}\bdef💩`.replace(htmlHelpers.invalidXMLCharacters, ""),
+    `abc\u{0}\bdef💩`.replace(htmlUtilities.invalidXMLCharacters, ""),
     `abcdef💩`,
   );
 });

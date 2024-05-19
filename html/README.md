@@ -24,7 +24,7 @@ $ npm install @radically-straightforward/html
 
 ```typescript
 import html, { HTML } from "@radically-straightforward/html";
-import * as htmlHelpers from "@radically-straightforward/html";
+import * as htmlUtilities from "@radically-straightforward/html";
 ```
 
 <!-- DOCUMENTATION START: ./source/index.mts -->
