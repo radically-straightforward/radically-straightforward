@@ -280,9 +280,7 @@ export function documentMount(content, event = new Event("DOMContentLoaded")) {
 /**
  * > **Note:** This is a low-level function—in most cases you want to call `mount()` instead.
  *
- * Morph the contents of the `from` container element into the contents of the `to` container element with minimal DOM manipulation by using a diffing algorithm.
- *
- * If the `to` element is a string, then it’s first converted into an element with `stringToElement()`.
+ * Morph the contents of the `from` element into the contents of the `to` element with minimal DOM manipulation by using a diffing algorithm.
  *
  * Elements may provide a `key="___"` attribute to help identify them with respect to the diffing algorithm. This is similar to [React’s `key`s](https://react.dev/learn/rendering-lists#keeping-list-items-in-order-with-key), but sibling elements may have the same `key` (at the risk of potentially getting them mixed up if they’re reordered).
  *
@@ -290,9 +288,9 @@ export function documentMount(content, event = new Event("DOMContentLoaded")) {
  *
  * - When `from.liveConnectionUpdate` is `false`, `morph()` doesn’t do anything. This is useful for elements which contain browser state that must be preserved on Live Connection updates, for example, the container of dynamically-loaded content (see `mount()`).
  *
- * - When `fromChildNode.liveConnectionUpdate` is `false`, `morph()` doesn’t remove that `fromChildNode` even if it’s missing among `to`’s child nodes. This is useful for elements that should remain on the page but wouldn’t be sent by server again in a Live Connection update, for example, an indicator of unread messages.
+ * - When `from.liveConnectionUpdate` or any of `from`’s parents is `new Set(["style", "hidden", "disabled", "value", "checked"])` or any subset thereof, the mentioned attributes and properties are updated even in a Live Connection update (normally these attributes and properties represent browser state and are skipped in Live Connection updates). This is useful, for example, for forms with hidden fields which must be updated by the server.
  *
- * - When `fromChildNode.liveConnectionUpdate` or any of `fromChildNode`’s parents is `new Set(["style", "hidden", "disabled", "value", "checked"])` or any subset thereof, the mentioned attributes are updated even in a Live Connection update (normally these attributes represent browser state and are skipped in Live Connection updates). This is useful, for example, for forms with hidden fields which must be updated by the server.
+ * - When `fromChildNode.liveConnectionUpdate` is `false`, `morph()` doesn’t remove that `fromChildNode` even if it’s missing among `to`’s child nodes. This is useful for elements that should remain on the page but wouldn’t be sent by server again in a Live Connection update, for example, an indicator of unread messages.
  *
  * > **Note:** `to` is expected to already belong to the `document`. You may need to call [`importNode()`](https://developer.mozilla.org/en-US/docs/Web/API/Document/importNode) or [`adoptNode()`](https://developer.mozilla.org/en-US/docs/Web/API/Document/adoptNode) on a node before passing it to `morph()`. `documentStringToElement()` does that for you.
  *
@@ -316,6 +314,37 @@ export function morph(from, to, event = undefined) {
     from.liveConnectionUpdate === false
   )
     return;
+  for (const attribute of new Set([
+    ...from.getAttributeNames(),
+    ...to.getAttributeNames(),
+  ])) {
+    if (
+      event?.detail?.liveConnectionUpdate &&
+      (attribute === "style" ||
+        attribute === "hidden" ||
+        attribute === "disabled" ||
+        attribute === "value" ||
+        attribute === "checked") &&
+      !parents(from).some((element) =>
+        element.liveConnectionUpdate?.has?.(attribute),
+      )
+    )
+      continue;
+    if (to.getAttribute(attribute) === null) from.removeAttribute(attribute);
+    else if (from.getAttribute(attribute) !== to.getAttribute(attribute))
+      from.setAttribute(attribute, to.getAttribute(attribute));
+  }
+  if (from.matches("input, textarea"))
+    for (const property of ["value", "checked"]) {
+      if (
+        event?.detail?.liveConnectionUpdate &&
+        !parents(from).some((element) =>
+          element.liveConnectionUpdate?.has?.(property),
+        )
+      )
+        continue;
+      if (from[property] !== to[property]) from[property] = to[property];
+    }
   const key = (node) =>
     `${node.nodeType}--${
       node.nodeType === node.ELEMENT_NODE
@@ -378,36 +407,8 @@ export function morph(from, to, event = undefined) {
   for (const nodes of toRemove.values())
     for (const node of nodes) from.removeChild(node);
   for (const { node, nodeAfter } of toAdd) from.insertBefore(node, nodeAfter);
-  for (const { from, to } of toMorph) {
-    if (from.nodeType !== from.ELEMENT_NODE) continue;
-    for (const attribute of new Set([
-      ...from.getAttributeNames(),
-      ...to.getAttributeNames(),
-      ...(from.matches("input, textarea") ? ["value", "checked"] : []),
-    ])) {
-      if (
-        event?.detail?.liveConnectionUpdate &&
-        (attribute === "style" ||
-          attribute === "hidden" ||
-          attribute === "disabled" ||
-          attribute === "value" ||
-          attribute === "checked") &&
-        !parents(from).some((element) =>
-          element.liveConnectionUpdate?.has?.(attribute),
-        )
-      )
-        continue;
-      if (to.getAttribute(attribute) === null) from.removeAttribute(attribute);
-      else if (from.getAttribute(attribute) !== to.getAttribute(attribute))
-        from.setAttribute(attribute, to.getAttribute(attribute));
-      if (
-        (attribute === "value" || attribute === "checked") &&
-        from[attribute] !== to[attribute]
-      )
-        from[attribute] = to[attribute];
-    }
-    morph(from, to, event);
-  }
+  for (const { from, to } of toMorph)
+    if (from.nodeType === from.ELEMENT_NODE) morph(from, to, event);
 }
 
 /**
