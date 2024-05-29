@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.4 · 2024-05-29
+
+- Changed `morph()` such that it morphs the attributes of the element with which it was called, not only its children.
+
 ## 1.0.3 · 2024-05-06
 
 - Removed support for `maxlength`, because the browser doesn’t allow inputting more than that anyway.
