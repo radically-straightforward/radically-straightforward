@@ -767,3 +767,12 @@ The `.visually-hidden--interactive` variation makes the element visible when in 
   clip-path: inset(50%);
   white-space: nowrap;
 }
+
+/*
+The `.noninteractive` class makes **the children** of an element not interactive. The element to which the `.noninteractive` class is applied remains interactive. This is useful, for example, in a drag-and-drop interaction: you set `<body>` as `.noninteractive` and set a custom `cursor`.
+*/
+
+.noninteractive * {
+  user-select: none;
+  pointer-events: none;
+}
