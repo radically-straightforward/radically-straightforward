@@ -1,6 +1,7 @@
 import childProcess from "node:child_process";
 import * as utilities from "@radically-straightforward/utilities";
 
+process.setMaxListeners(50);
 let gracefulTerminationEmitted = false;
 for (const signal of [
   "SIGINT",

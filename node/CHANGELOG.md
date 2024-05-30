@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.1.7 · 2024-05-30
+
+- Increased `process.setMaxListeners()` from the default of 10 to 50, because `gracefulTermination`, `backgroundJob()`s, and so forth often lead to more event listeners, which generates a warning.
+
 ## 3.1.6 · 2024-05-06
 
 - Changed `exit()` to try and support Windows better by manually emitting the `gracefulTermination` event.
