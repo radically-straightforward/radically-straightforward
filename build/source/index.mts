@@ -210,13 +210,16 @@ await fs.mkdir("./static/", { recursive: true });
 await fs.writeFile(
   "./static/index.css",
   (
-    await postcss([postcssLightDarkFunction()]).process(css`
-      ${[...globalCSSs].join("")}
+    await postcss([postcssLightDarkFunction()]).process(
+      css`
+        ${[...globalCSSs].join("")}
 
-      @layer __RADICALLY_STRAIGHTFORWARD__INLINE__ {
-        ${[...inlineCSSs].join("")}
-      }
-    `)
+        @layer __RADICALLY_STRAIGHTFORWARD__INLINE__ {
+          ${[...inlineCSSs].join("")}
+        }
+      `,
+      { from: undefined },
+    )
   ).css,
 );
 await fs.writeFile(
