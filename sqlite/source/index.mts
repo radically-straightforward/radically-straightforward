@@ -592,7 +592,17 @@ export type Query = {
  */
 export default function sql(
   templateStrings: TemplateStringsArray,
-  ...substitutions: any[]
+  ...substitutions: (
+    | number
+    | string
+    | bigint
+    | Buffer
+    | null
+    | undefined
+    | Array<number | string | bigint | Buffer | null | undefined>
+    | Set<number | string | bigint | Buffer | null | undefined>
+    | Query
+  )[]
 ): Query {
   const templateParts = [...templateStrings];
   const query: Query = { sourceParts: [], parameters: [] };
@@ -606,18 +616,6 @@ export default function sql(
     if (substitution instanceof Set) substitution = [...substitution];
     if (templatePart.endsWith("$")) {
       templatePart = templatePart.slice(0, -1);
-      if (
-        !Array.isArray(substitution.sourceParts) ||
-        substitution.sourceParts.length === 0 ||
-        substitution.sourceParts.some(
-          (sourcePart: any) => typeof sourcePart !== "string",
-        ) ||
-        !Array.isArray(substitution.parameters) ||
-        substitution.sourceParts.length !== substitution.parameters.length + 1
-      )
-        throw new Error(
-          `Failed to interpolate raw query ‘${substitution}’ because it wasn’t created with the sql\`___\` tagged template.`,
-        );
       const substitutionQuery = substitution as Query;
       if (substitutionQuery.sourceParts.length === 1)
         templateParts[substitutionsIndex + 1] = `${templatePart}${
