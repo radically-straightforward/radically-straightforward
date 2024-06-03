@@ -28,15 +28,15 @@
     "test": "npm run prepare && node --test && prettier --check \"./README.md\" --check \"./CHANGELOG.md\" --check \"./package.json\" --check \"./tsconfig.json\" --check \"./source/**/*.mts\""
   },
   "dependencies": {
-    "@babel/core": "^7.24.5",
-    "@babel/generator": "^7.24.5",
-    "prettier": "^3.2.5"
+    "@babel/core": "^7.24.6",
+    "@babel/generator": "^7.24.6",
+    "prettier": "^3.3.0"
   },
   "devDependencies": {
     "@radically-straightforward/typescript": "^1.0.0",
     "@types/babel__core": "^7.20.5",
     "@types/babel__generator": "^7.6.8",
-    "@types/node": "^20.12.8",
+    "@types/node": "^20.14.0",
     "dedent": "^1.5.3",
     "typescript": "^5.4.5"
   },

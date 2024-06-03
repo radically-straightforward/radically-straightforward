@@ -31,13 +31,13 @@
     "test": "npm run prepare && node --test && prettier --check \"./README.md\" --check \"./CHANGELOG.md\" --check \"./package.json\" --check \"./scripts.mjs\" --check \"./scripts.test.mjs\" --check \"./tsconfig.json\" --check \"./source/**/*.mts\""
   },
   "dependencies": {
-    "@radically-straightforward/node": "^3.1.5"
+    "@radically-straightforward/node": "^3.1.7"
   },
   "devDependencies": {
     "@radically-straightforward/documentation": "^1.0.4",
     "@radically-straightforward/typescript": "^1.0.0",
-    "@types/node": "^20.12.8",
-    "prettier": "^3.2.5",
+    "@types/node": "^20.14.0",
+    "prettier": "^3.3.0",
     "typescript": "^5.4.5"
   },
   "prettier": {}

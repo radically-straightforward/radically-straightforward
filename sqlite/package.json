@@ -29,16 +29,16 @@
     "test": "npm run prepare && node --test && prettier --check \"./README.md\" --check \"./CHANGELOG.md\" --check \"./package.json\" --check \"./tsconfig.json\" --check \"./source/**/*.mts\""
   },
   "dependencies": {
-    "@radically-straightforward/node": "^3.1.5",
+    "@radically-straightforward/node": "^3.1.7",
     "@radically-straightforward/utilities": "^2.0.3",
     "@types/better-sqlite3": "^7.6.10",
-    "better-sqlite3": "^9.6.0"
+    "better-sqlite3": "^11.0.0"
   },
   "devDependencies": {
     "@radically-straightforward/documentation": "^1.0.4",
     "@radically-straightforward/typescript": "^1.0.0",
-    "@types/node": "^20.12.8",
-    "prettier": "^3.2.5",
+    "@types/node": "^20.14.0",
+    "prettier": "^3.3.0",
     "typescript": "^5.4.5"
   },
   "prettier": {}
