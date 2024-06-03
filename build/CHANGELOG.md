@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.4 · 2024-06-03
+
+- Added support for CSS function `light-dark()` with [PostCSS Light Dark Function](https://github.com/csstools/postcss-plugins/tree/88bdf6b0a1411d863c43f6c1b990e09a300a8811/plugins/postcss-light-dark-function).
+
 ## 1.0.3 · 2024-05-01
 
 - Update dependencies.
