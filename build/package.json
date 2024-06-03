@@ -30,11 +30,13 @@
   "dependencies": {
     "@babel/core": "^7.24.6",
     "@babel/generator": "^7.24.6",
+    "@csstools/postcss-light-dark-function": "^1.0.5",
     "@radically-straightforward/css": "^1.0.1",
     "@radically-straightforward/javascript": "^1.0.4",
     "base-x": "^4.0.0",
     "esbuild": "^0.21.4",
     "globby": "^14.0.1",
+    "postcss": "^8.4.38",
     "prettier": "^3.3.0",
     "xxhash-addon": "^2.0.3"
   },

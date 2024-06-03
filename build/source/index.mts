@@ -7,6 +7,8 @@ import { globby } from "globby";
 import babel from "@babel/core";
 import babelGenerator from "@babel/generator";
 import prettier from "prettier";
+import postcss from "postcss";
+import postcssLightDarkFunction from "@csstools/postcss-light-dark-function";
 import esbuild from "esbuild";
 import xxhash from "xxhash-addon";
 import baseX from "base-x";
@@ -207,13 +209,15 @@ for (const source of await globby("./build/**/*.mjs")) {
 await fs.mkdir("./static/", { recursive: true });
 await fs.writeFile(
   "./static/index.css",
-  css`
-    ${[...globalCSSs].join("")}
+  (
+    await postcss([postcssLightDarkFunction()]).process(css`
+      ${[...globalCSSs].join("")}
 
-    @layer __RADICALLY_STRAIGHTFORWARD__INLINE__ {
-      ${[...inlineCSSs].join("")}
-    }
-  `,
+      @layer __RADICALLY_STRAIGHTFORWARD__INLINE__ {
+        ${[...inlineCSSs].join("")}
+      }
+    `)
+  ).css,
 );
 await fs.writeFile(
   "./static/index.mjs",
