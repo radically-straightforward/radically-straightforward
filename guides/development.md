@@ -85,7 +85,7 @@ This guide teaches you how to setup your development machine to work on a projec
    4. Run the application with the hostname that may be accessed by the phone, for example:
 
       ```console
-      $ env HOSTNAME=YOUR-HOSTNAME.local npm start
+      $ env HOSTNAME=YOUR-HOSTNAME npm start
       ```
 
-   5. On the phone, visit `https://YOUR-HOSTNAME.local`.
+   5. On the phone, visit `https://YOUR-HOSTNAME`.
