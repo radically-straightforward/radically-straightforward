@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.1.4 · 2024-06-03
+
+- In `` sql`___` ``, replaced the runtime type check with a TypeScript type.
+
 ## 1.1.3 · 2024-05-08
 
 - Removed `PRAGMA`s from `migrate()`:
