@@ -346,7 +346,17 @@ An auxiliary type that represents a database query. This is what’s generated b
 ```typescript
 export default function sql(
   templateStrings: TemplateStringsArray,
-  ...substitutions: any[]
+  ...substitutions: (
+    | number
+    | string
+    | bigint
+    | Buffer
+    | null
+    | undefined
+    | Array<number | string | bigint | Buffer | null | undefined>
+    | Set<number | string | bigint | Buffer | null | undefined>
+    | Query
+  )[]
 ): Query;
 ```
 
