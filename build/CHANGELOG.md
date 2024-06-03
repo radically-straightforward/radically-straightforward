@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.0.5 · 2024-06-03
+
+- Silence warning from PostCSS:
+
+  > Without `from` option PostCSS could generate wrong source map and will not find Browserslist config. Set it to CSS file path or to `undefined` to prevent this warning.
+
 ## 1.0.4 · 2024-06-03
 
 - Added support for CSS function `light-dark()` with [PostCSS Light Dark Function](https://github.com/csstools/postcss-plugins/tree/88bdf6b0a1411d863c43f6c1b990e09a300a8811/plugins/postcss-light-dark-function).
