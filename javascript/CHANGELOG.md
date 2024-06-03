@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.5 · 2024-06-03
+
+- Fixed an issue with `<form>`s whose `method` weren’t `GET` or `POST`.
+
 ## 1.0.4 · 2024-05-29
 
 - Changed `morph()` such that it morphs the attributes of the element with which it was called, not only its children.
