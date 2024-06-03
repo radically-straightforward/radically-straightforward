@@ -89,7 +89,9 @@ window.onclick = async (event) => {
 };
 window.onsubmit = async (event) => {
   const method = (
-    event.submitter?.getAttribute("formmethod") ?? event.target.method
+    event.submitter?.getAttribute("formmethod") ??
+    event.target.getAttribute("method") ??
+    event.target.method
   ).toUpperCase();
   const action =
     event.submitter?.getAttribute("formaction") ?? event.target.action;
