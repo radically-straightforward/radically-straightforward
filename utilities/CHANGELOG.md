@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.0.4 · 2024-06-04
+
+- Changed `emailRegExp` to allow `=` before the `@`.
+
 ## 2.0.3 · 2024-05-01
 
 - Added documentation for `timeout()`.
