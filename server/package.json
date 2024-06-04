@@ -28,14 +28,14 @@
   },
   "dependencies": {
     "@radically-straightforward/node": "^3.1.7",
-    "@radically-straightforward/utilities": "^2.0.3",
+    "@radically-straightforward/utilities": "^2.0.4",
     "busboy": "^1.6.0"
   },
   "devDependencies": {
     "@radically-straightforward/documentation": "^1.0.4",
     "@radically-straightforward/typescript": "^1.0.0",
     "@types/busboy": "^1.5.4",
-    "@types/node": "^20.14.0",
+    "@types/node": "^20.14.1",
     "prettier": "^3.3.0",
     "typescript": "^5.4.5"
   },
