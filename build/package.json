@@ -32,7 +32,7 @@
     "@babel/generator": "^7.24.6",
     "@csstools/postcss-light-dark-function": "^1.0.5",
     "@radically-straightforward/css": "^1.0.1",
-    "@radically-straightforward/javascript": "^1.0.4",
+    "@radically-straightforward/javascript": "^1.0.5",
     "base-x": "^4.0.0",
     "esbuild": "^0.21.4",
     "globby": "^14.0.1",
@@ -44,7 +44,7 @@
     "@radically-straightforward/typescript": "^1.0.0",
     "@types/babel__core": "^7.20.5",
     "@types/babel__generator": "^7.6.8",
-    "@types/node": "^20.14.0",
+    "@types/node": "^20.14.1",
     "typescript": "^5.4.5"
   },
   "prettier": {}
