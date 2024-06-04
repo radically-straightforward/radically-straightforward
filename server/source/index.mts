@@ -589,6 +589,7 @@ export default function server({
                     String(error),
                     (error as Error)?.stack ?? "",
                   );
+                  response.statusCode = 500;
                   request.error = error;
                 }
 

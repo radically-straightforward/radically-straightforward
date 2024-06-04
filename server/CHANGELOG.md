@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.6 · 2024-06-04
+
+- Changed the error handler so that it defaults to a HTTP status code of 500.
+
 ## 1.0.5 · 2024-05-01
 
 - Added the word `SERVER` to the logs.

@@ -519,7 +519,6 @@ test(async () => {
       handler: (request, response) => {
         trace.push("REACHABLE ERROR HANDLER");
         trace.push(String(request.error));
-        response.statusCode = 422;
         response.end();
       },
     });
@@ -531,7 +530,7 @@ test(async () => {
       },
     });
 
-    assert.equal((await fetch("http://localhost:18000/error")).status, 422);
+    assert.equal((await fetch("http://localhost:18000/error")).status, 500);
     assert.deepEqual(trace, [
       "BEFORE ERROR",
       "REACHABLE ERROR HANDLER",
