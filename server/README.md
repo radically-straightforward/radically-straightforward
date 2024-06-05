@@ -388,6 +388,8 @@ An extension of [Node.js’s `http.IncomingMessage`](https://nodejs.org/api/http
 
 - **`error:`** In error handlers, this is the error that was thrown.
 
+  > **Note:** There’s an special kind of error that may be thrown, which is the string `"validation"`. This sets the HTTP response status to [422](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/422) instead of [500](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500).
+
 - **`liveConnection:`** If this is a Live Connection, then this property is set to a `RequestLiveConnection` containing more information about the state of the Live Connection.
 
 ### `RequestBodyFile`

@@ -90,6 +90,7 @@
   - Currently a Live Connection update sends a whole new page to the browser, even if only a small occurred. To solve this, we could have the server hold on to the latest rendering, diff on the server instead of the browser, and send a transcript of what the browser needs to do to to morph the page. This is what Phoenix LiveView does.
 - Image/Video/Audio Proxy
   - Edge cases
+    - Test destinations like `localhost`, `127.0.0.1`, and so forth
     - Test redirect loop
     - Test timeout
     - Limit size?

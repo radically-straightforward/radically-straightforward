@@ -516,6 +516,8 @@ test(async () => {
 
     application.push({
       error: true,
+      method: "GET",
+      pathname: "/error",
       handler: (request, response) => {
         trace.push("REACHABLE ERROR HANDLER");
         trace.push(String(request.error));
@@ -525,6 +527,8 @@ test(async () => {
 
     application.push({
       error: true,
+      method: "GET",
+      pathname: "/error",
       handler: (request, response) => {
         trace.push("UNREACHABLE ERROR HANDLER");
       },
@@ -536,6 +540,30 @@ test(async () => {
       "REACHABLE ERROR HANDLER",
       "Error: ERROR",
     ]);
+  }
+
+  {
+    application.push({
+      method: "GET",
+      pathname: "/validation",
+      handler: (request, response) => {
+        throw "validation";
+      },
+    });
+
+    application.push({
+      error: true,
+      method: "GET",
+      pathname: "/validation",
+      handler: (request, response) => {
+        response.end();
+      },
+    });
+
+    assert.equal(
+      (await fetch("http://localhost:18000/validation")).status,
+      422,
+    );
   }
 
   {
