@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.7 · 2024-06-05
+
+- Introduced an `error` that’s the string `"validation"`, which sets the default HTTP status code to 422 instead of 500.
+
 ## 1.0.6 · 2024-06-04
 
 - Changed the error handler so that it defaults to a HTTP status code of 500.
