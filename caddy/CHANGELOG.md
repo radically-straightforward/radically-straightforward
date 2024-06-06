@@ -2,6 +2,10 @@
 
 ## 2.0.1 · 2024-06-06
 
+- Fix forwarded headers (`X-Forwarded-*`) when tunneling.
+
+## 2.0.1 · 2024-06-06
+
 - Added the `tunnel` option to the `application()` configuration.
 
 ## 2.0.0 · 2024-05-17
