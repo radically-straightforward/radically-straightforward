@@ -1,6 +1,6 @@
 {
   "name": "@radically-straightforward/caddy",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "description": "☁️ Install Caddy as an npm package",
   "keywords": [
     "caddy",
