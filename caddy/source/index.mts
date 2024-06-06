@@ -201,6 +201,7 @@ export function application({
           .map((port) => `http://localhost:${port}`)
           .join(" ")} {
             lb_policy cookie
+            ${tunnel ? caddyfile`trusted_proxies private_ranges` : caddyfile``}
           }
       }
     }
