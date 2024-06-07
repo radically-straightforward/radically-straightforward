@@ -28,6 +28,8 @@ Then, use `@radically-straightforward/package` to produce a package for distribu
 $ npx package
 ```
 
+> **Note:** Running this command has some side-effects, for example, removing development dependencies and copying the Node.js executable into `node_modules/.bin/`. This tool has been designed to [run in a build server, for example, GitHub Actions](https://github.com/leafac/kill-the-newsletter/blob/33fda2645c79d81856ef9c9d47ae246df33e5f8f/.github/workflows/main.yml#L19). If you run it locally, then you may want to copy the project directory to a different location and run `npx package` on the copy.
+
 The package will be available as a sibling of the application directory, for example:
 
 - `example-application/`
