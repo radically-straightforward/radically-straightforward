@@ -126,9 +126,10 @@ test("intern()", () => {
 test(
   "backgroundJob()",
   {
-    skip: process.stdin.isTTY
-      ? false
-      : "Run interactive test with ‘node ./build/index.test.mjs’.",
+    skip:
+      process.stdin.isTTY && process.argv[2] === "backgroundJob()"
+        ? false
+        : `Run interactive test with ‘node ./build/index.test.mjs "backgroundJob()"’.`,
   },
   async () => {
     const backgroundJob = utilities.backgroundJob(
@@ -171,3 +172,29 @@ test("timeout()", async () => {
     });
   });
 });
+
+test(
+  "foregroundJob()",
+  {
+    skip:
+      process.stdin.isTTY && process.argv[2] === "foregroundJob()"
+        ? false
+        : `Run interactive test with ‘node ./build/index.test.mjs "foregroundJob()"’.`,
+  },
+  async () => {
+    const foregroundJob = utilities.foregroundJob(async () => {
+      console.log("foregroundJob(): Running foreground job...");
+      await utilities.sleep(3 * 1000);
+      console.log("foregroundJob(): ...finished running foreground job.");
+      if (Math.random() < 0.3)
+        throw new Error(
+          "There’s a 30% chance that the foreground job results in error.",
+        );
+    });
+    process.on("SIGTSTP", () => {
+      foregroundJob();
+    });
+    console.log("foregroundJob(): Press ⌃Z to run foreground job...");
+    setInterval(() => {});
+  },
+);

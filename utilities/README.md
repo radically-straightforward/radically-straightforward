@@ -291,4 +291,20 @@ export async function timeout<Type>(
 
 Run the given `function_` up to the timeout. If the timeout is reached, the returned promise rejects, but there is no way to guarantee that the `function_` execution will stop.
 
+### `foregroundJob()`
+
+```typescript
+export function foregroundJob(
+  job: () => void | Promise<void>,
+): () => Promise<void>;
+```
+
+Controls the execution of the given `job` such that it can’t execute until the previous execution finished.
+
+This is useful, for example, for an autocomplete feature in which an event listener of the `keydown` event `fetch()`es from the server. If the function is called while it’s running, then it schedules itself to be executed again as soon as it completes.
+
+This is different from `backgroundJob()` because it doesn’t run periodically—it only runs when it’s called.
+
+This is different from Lodash’s [`debounce()`](https://lodash.com/docs/4.17.15#debounce) and [`throttle()`](https://lodash.com/docs/4.17.15#throttle) because it isn’t based on timed delays—it’s designed for when the `job` itself is slow.
+
 <!-- DOCUMENTATION END: ./source/index.mts -->

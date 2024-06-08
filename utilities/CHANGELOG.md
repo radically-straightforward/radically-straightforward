@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.0.5 · 2024-06-08
+
+- Added `foregroundJob()`.
+
 ## 2.0.4 · 2024-06-04
 
 - Changed `emailRegExp` to allow `=` before the `@`.
