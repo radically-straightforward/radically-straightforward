@@ -15,19 +15,14 @@ import baseX from "base-x";
 import css, { CSS } from "@radically-straightforward/css";
 import { JavaScript } from "@radically-straightforward/javascript";
 
-const {
-  values: {
-    "file-to-copy-with-hash": filesToCopyWithHash,
-    "file-to-copy-without-hash": filesToCopyWithoutHash,
-  },
-} = util.parseArgs({
+const commandLineArguments = util.parseArgs({
   options: {
-    "file-to-copy-with-hash": {
+    "copy-with-hash": {
       type: "string",
       multiple: true,
       default: [],
     },
-    "file-to-copy-without-hash": {
+    "copy-without-hash": {
       type: "string",
       multiple: true,
       default: [],
@@ -267,7 +262,10 @@ await fs.writeFile(
 );
 
 const baseFileHash = baseX("ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789");
-for (const source of await globby(["./static/", ...filesToCopyWithHash!])) {
+for (const source of await globby([
+  "./static/",
+  ...commandLineArguments.values["copy-with-hash"]!,
+])) {
   const destination = path.join(
     "./build/static/",
     `${source.replace(new RegExp("^(?:\\./)?(?:static/)?"), "").slice(0, -path.extname(source).length)}--${baseFileHash.encode(
@@ -285,7 +283,7 @@ await fs.writeFile("./build/static.json", JSON.stringify(paths, undefined, 2));
 for (const source of await globby([
   "./static/favicon.ico",
   "./static/apple-touch-icon.png",
-  ...filesToCopyWithoutHash!,
+  ...commandLineArguments.values["copy-without-hash"]!,
 ])) {
   const destination = path.join(
     "./build/static/",

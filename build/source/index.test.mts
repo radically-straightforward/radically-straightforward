@@ -94,11 +94,11 @@ test(async () => {
 
   await util.promisify(childProcess.execFile)("node", [
     url.fileURLToPath(new URL("./index.mjs", import.meta.url)),
-    "--file-to-copy-with-hash",
+    "--copy-with-hash",
     "./outside-static/outside-static.txt",
-    "--file-to-copy-without-hash",
+    "--copy-without-hash",
     "./static/example.txt",
-    "--file-to-copy-without-hash",
+    "--copy-without-hash",
     "./outside-static/outside-static.txt",
   ]);
   const paths = JSON.parse(await fs.readFile("./build/static.json", "utf-8"));

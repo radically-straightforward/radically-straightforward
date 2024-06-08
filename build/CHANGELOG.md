@@ -1,12 +1,13 @@
 # Changelog
 
-## 1.0.6 · 2024-06-08
+## 2.0.0 · 2024-06-08
 
-- Add defaults for globs `--file-to-copy-with-hash` and `--file-to-copy-without-hash`.
+- **Breaking Change:** Renamed command-line parameters `--file-to-copy-with-hash` and `--file-to-copy-without-hash` into `--copy-with-hash` and `--copy-without-hash`.
+- Added defaults for globs `--file-to-copy-with-hash` and `--file-to-copy-without-hash`.
 
 ## 1.0.5 · 2024-06-03
 
-- Silence warning from PostCSS:
+- Silenced warning from PostCSS:
 
   > Without `from` option PostCSS could generate wrong source map and will not find Browserslist config. Set it to CSS file path or to `undefined` to prevent this warning.
 
