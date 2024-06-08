@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.6 · 2024-06-08
+
+- Add defaults for globs `--file-to-copy-with-hash` and `--file-to-copy-without-hash`.
+
 ## 1.0.5 · 2024-06-03
 
 - Silence warning from PostCSS:

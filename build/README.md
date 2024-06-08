@@ -93,8 +93,8 @@ $ npx build
 
 > **Parameters**
 >
-> - **`--file-to-copy-with-hash`:** [Globs](https://www.npmjs.com/package/globby) of files to be copied into `build/static/`, for example, images, videos, and audios. The file names are appended with a hash of their contents to generate immutable names, for example, `image.jpg` may turn into `image--JF98DJ2LL.jpg`. Consult `build/static.json` for a mapping between the names (or use [`@radically-straightforward/caddy`](https://github.com/radically-straightforward/radically-straightforward/tree/main/caddy)’s `staticFiles`, which reads from `build/static.json`). The `--file-to-copy-with-hash` parameter may be provided multiple times for multiple globs.
-> - **`--file-to-copy-without-hash`:** The same as `--file-to-copy-with-hash`, but the names of the files are preserved. This is useful for `favicon.ico` and other files which must have particular names.
+> - **`--file-to-copy-with-hash`:** [Globs](https://www.npmjs.com/package/globby) of files to be copied into `build/static/`, for example, images, videos, and audios. The file names are appended with a hash of their contents to generate immutable names, for example, `image.jpg` may turn into `image--JF98DJ2LL.jpg`. Consult `build/static.json` for a mapping between the names (or use [`@radically-straightforward/caddy`](https://github.com/radically-straightforward/radically-straightforward/tree/main/caddy)’s `staticFiles`, which reads from `build/static.json`). The `--file-to-copy-with-hash` parameter may be provided multiple times for multiple globs. By default the glob `./static/` is already included.
+> - **`--file-to-copy-without-hash`:** The same as `--file-to-copy-with-hash`, but the names of the files are preserved. This is useful for `favicon.ico` and other files which must have particular names. By default the globs `./static/favicon.ico` and `./static/apple-touch-icon.png` are already included.
 
 `@radically-straightforward/build` does the following:
 
