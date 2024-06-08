@@ -269,7 +269,7 @@ await fs.writeFile(
 );
 
 const baseFileHash = baseX("ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789");
-for (const source of await globby(filesToCopyWithHash!)) {
+for (const source of await globby(["./static/", ...filesToCopyWithHash!])) {
   const destination = path.join(
     "./build/static/",
     `${source.replace(new RegExp("^(?:\\./)?(?:static/)?"), "").slice(0, -path.extname(source).length)}--${baseFileHash.encode(
@@ -284,7 +284,11 @@ for (const source of await globby(filesToCopyWithHash!)) {
 
 await fs.writeFile("./build/static.json", JSON.stringify(paths, undefined, 2));
 
-for (const source of await globby(filesToCopyWithoutHash!)) {
+for (const source of await globby([
+  "./static/favicon.ico",
+  "./static/apple-touch-icon.png",
+  ...filesToCopyWithoutHash!,
+])) {
   const destination = path.join(
     "./build/static/",
     source.replace(new RegExp("^(?:\\./)?(?:static/)?"), ""),
