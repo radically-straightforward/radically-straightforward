@@ -206,9 +206,8 @@ for (const source of await globby("./build/**/*.mjs")) {
   );
 }
 
-await fs.mkdir("./static/", { recursive: true });
 await fs.writeFile(
-  "./static/index.css",
+  "./index.css",
   (
     await postcss([postcssLightDarkFunction()]).process(
       css`
@@ -223,15 +222,14 @@ await fs.writeFile(
   ).css,
 );
 await fs.writeFile(
-  "./static/index.mjs",
+  "./index.mjs",
   [...globalJavaScripts, ...inlineJavaScripts].join(""),
 );
 let esbuildResult: esbuild.BuildResult;
 try {
   esbuildResult = await esbuild.build({
-    absWorkingDir: path.resolve("./static/"),
     entryPoints: ["./index.css", "./index.mjs"],
-    outdir: "../build/static/",
+    outdir: "./build/static/",
     entryNames: "[dir]/[name]--[hash]",
     assetNames: "[dir]/[name]--[hash]",
     loader: { ".woff2": "file", ".woff": "file", ".ttf": "file" },
@@ -242,8 +240,8 @@ try {
     metafile: true,
   });
 } finally {
-  await fs.unlink("./static/index.css");
-  await fs.unlink("./static/index.mjs");
+  await fs.unlink("./index.css");
+  await fs.unlink("./index.mjs");
 }
 
 const paths: { [key: string]: string } = {};
@@ -252,7 +250,7 @@ for (const [output, { entryPoint }] of Object.entries(
   esbuildResult.metafile?.outputs ?? {},
 ))
   if (entryPoint === "index.css" || entryPoint === "index.mjs")
-    paths[entryPoint] = output.slice("../build/static/".length);
+    paths[entryPoint] = output.slice("build/static/".length);
 
 await fs.writeFile(
   path.join("./build/static/", paths["index.css"]),

@@ -85,42 +85,21 @@ test(async () => {
     `,
   );
   await fs.mkdir("./static/", { recursive: true });
+  await fs.writeFile("./static/favicon.ico", "Favicon");
   await fs.writeFile("./static/example.txt", "Example");
-  await fs.mkdir("./static/select-subdirectory/", { recursive: true });
-  await fs.writeFile(
-    "./static/select-subdirectory/select-subdirectory--example.txt",
-    "Select subdirectory",
-  );
-  await fs.mkdir("./static/all-subdirectory/", { recursive: true });
-  for (let index = 0; index < 5; index++)
-    await fs.writeFile(
-      `./static/all-subdirectory/all-subdirectory--example--${index}.txt`,
-      `All subdirectory: ${index}`,
-    );
+  await fs.mkdir("./static/subdirectory/", { recursive: true });
+  await fs.writeFile("./static/subdirectory/subdirectory.txt", "Subdirectory");
   await fs.mkdir("./outside-static/", { recursive: true });
-  await fs.writeFile(
-    "./outside-static/outside-static--example.txt",
-    "Outside static",
-  );
+  await fs.writeFile("./outside-static/outside-static.txt", "Outside static");
 
   await util.promisify(childProcess.execFile)("node", [
     url.fileURLToPath(new URL("./index.mjs", import.meta.url)),
     "--file-to-copy-with-hash",
-    "./static/example.txt",
-    "--file-to-copy-with-hash",
-    "./static/select-subdirectory/select-subdirectory--example.txt",
-    "--file-to-copy-with-hash",
-    "./static/all-subdirectory/",
-    "--file-to-copy-with-hash",
-    "./outside-static/outside-static--example.txt",
+    "./outside-static/outside-static.txt",
     "--file-to-copy-without-hash",
     "./static/example.txt",
     "--file-to-copy-without-hash",
-    "./static/select-subdirectory/select-subdirectory--example.txt",
-    "--file-to-copy-without-hash",
-    "./static/all-subdirectory/",
-    "--file-to-copy-without-hash",
-    "./outside-static/outside-static--example.txt",
+    "./outside-static/outside-static.txt",
   ]);
   const paths = JSON.parse(await fs.readFile("./build/static.json", "utf-8"));
 
@@ -137,14 +116,18 @@ test(async () => {
       path.join("./build/static/", paths["index.css"]),
       "utf-8",
     ),
-    "@layer __RADICALLY_STRAIGHTFORWARD__GLOBAL__{p{background-color:#00f}body{background-color:red}@media (min-width: 400px){.a .b{--csstools-light-dark-toggle--0: var(--csstools-color-scheme--dark) white;background-color:var(--csstools-light-dark-toggle--0, black);background-color:light-dark(white,black)}}.user{background-color:green}}@layer __RADICALLY_STRAIGHTFORWARD__INLINE__{@layer idnnykdflodmu{[css~=idnnykdflodmu]{background-color:pink}}@layer xbjbuzxiqpcpj{[css~=xbjbuzxiqpcpj]{background-color:purple}[css~=xbjbuzxiqpcpj]:hover{-webkit-appearance:none;appearance:none}}}\n/*# sourceMappingURL=index--I6FHK3AA.css.map */\n",
+    "@layer __RADICALLY_STRAIGHTFORWARD__GLOBAL__{p{background-color:#00f}body{background-color:red}@media (min-width: 400px){.a .b{--csstools-light-dark-toggle--0: var(--csstools-color-scheme--dark) white;background-color:var(--csstools-light-dark-toggle--0, black);background-color:light-dark(white,black)}}.user{background-color:green}}@layer __RADICALLY_STRAIGHTFORWARD__INLINE__{@layer idnnykdflodmu{[css~=idnnykdflodmu]{background-color:pink}}@layer xbjbuzxiqpcpj{[css~=xbjbuzxiqpcpj]{background-color:purple}[css~=xbjbuzxiqpcpj]:hover{-webkit-appearance:none;appearance:none}}}\n/*# sourceMappingURL=index--6FVPXCQW.css.map */\n",
   );
   assert.equal(
     await fs.readFile(
       path.join("./build/static/", paths["index.mjs"]),
       "utf-8",
     ),
-    '(()=>{var o=hi="Hi";console.log(o);console.log("Global users");javascript?.execute?.functions?.set?.("funyrgvdgmnyff",async function(e,n,s){console.log(n,s)});javascript?.execute?.functions?.set?.("ywdosramhnhmk",async function(e){console.log("Users")});})();\n//# sourceMappingURL=index--Z4UDJY4Q.js.map\n',
+    '(()=>{var o=hi="Hi";console.log(o);console.log("Global users");javascript?.execute?.functions?.set?.("funyrgvdgmnyff",async function(e,n,s){console.log(n,s)});javascript?.execute?.functions?.set?.("ywdosramhnhmk",async function(e){console.log("Users")});})();\n//# sourceMappingURL=index--OA5S3TJX.js.map\n',
+  );
+  assert.equal(
+    await fs.readFile("./build/static/favicon.ico", "utf-8"),
+    "Favicon",
   );
   assert.equal(
     await fs.readFile(
@@ -154,58 +137,26 @@ test(async () => {
     "Example",
   );
   assert.equal(
-    await fs.readFile(
-      path.join(
-        "./build/static/",
-        paths["select-subdirectory/select-subdirectory--example.txt"],
-      ),
-      "utf-8",
-    ),
-    "Select subdirectory",
-  );
-  for (let index = 0; index < 5; index++)
-    assert.equal(
-      await fs.readFile(
-        path.join(
-          "./build/static/",
-          paths[`all-subdirectory/all-subdirectory--example--${index}.txt`],
-        ),
-        "utf-8",
-      ),
-      `All subdirectory: ${index}`,
-    );
-  assert.equal(
-    await fs.readFile(
-      path.join(
-        "./build/static/",
-        paths["outside-static/outside-static--example.txt"],
-      ),
-      "utf-8",
-    ),
-    "Outside static",
-  );
-  assert.equal(
     await fs.readFile("./build/static/example.txt", "utf-8"),
     "Example",
   );
   assert.equal(
     await fs.readFile(
-      "./build/static/select-subdirectory/select-subdirectory--example.txt",
+      path.join("./build/static/", paths["subdirectory/subdirectory.txt"]),
       "utf-8",
     ),
-    "Select subdirectory",
+    "Subdirectory",
   );
-  for (let index = 0; index < 5; index++)
-    assert.equal(
-      await fs.readFile(
-        `./build/static/all-subdirectory/all-subdirectory--example--${index}.txt`,
-        "utf-8",
-      ),
-      `All subdirectory: ${index}`,
-    );
   assert.equal(
     await fs.readFile(
-      "./build/static/outside-static/outside-static--example.txt",
+      path.join("./build/static/", paths["outside-static/outside-static.txt"]),
+      "utf-8",
+    ),
+    "Outside static",
+  );
+  assert.equal(
+    await fs.readFile(
+      "./build/static/outside-static/outside-static.txt",
       "utf-8",
     ),
     "Outside static",
