@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.0.7 · 2024-06-09
+
+- **Important Change:** `@radically-straightforward/javascript/static/index.css` now `@import`s `@radically-straightforward/css/static/index.css`, so you don’t need to import it by hand.
+- Fixed the presentation of `global-error`.
+
 ## 1.0.6 · 2024-06-09
 
 - Changed defaults for Tippy and progress bar appearance.
