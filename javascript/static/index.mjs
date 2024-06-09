@@ -195,6 +195,7 @@ export async function liveConnection(requestId, { reload = false }) {
         }
       } catch (error) {
         if (connected) return;
+        document.querySelector('[key="global-error"]')?.remove();
         liveConnection.failedToConnectGlobalError = document
           .querySelector("body")
           .insertAdjacentElement(
