@@ -243,10 +243,10 @@ export function mount(element, content, event = undefined) {
 export function documentMount(content, event = new Event("DOMContentLoaded")) {
   if (typeof content === "string") content = documentStringToElement(content);
   const documentVersion = document
-    .querySelector(`meta[name="version"]`)
+    .querySelector('meta[name="version"]')
     ?.getAttribute("content");
   const contentVersion = content
-    .querySelector(`meta[name="version"]`)
+    .querySelector('meta[name="version"]')
     ?.getAttribute("content");
   if (
     typeof documentVersion === "string" &&
@@ -254,16 +254,13 @@ export function documentMount(content, event = new Event("DOMContentLoaded")) {
     documentVersion !== contentVersion
   ) {
     document.querySelector("body").isModified = false;
-    tippy({
-      element:
-        document.querySelector(`[key="global-error"]`) ??
-        document.querySelector("body > :first-child"),
-      elementProperty: "documentMountNewServerVersionTooltip",
-      trigger: "manual",
-      hideOnClick: false,
-      theme: "error",
-      content: "There has been an update. Please reload the page.",
-    }).show();
+    document.querySelector('[key="global-error"]')?.remove();
+    document
+      .querySelector("body")
+      .insertAdjacentHTML(
+        "beforeend",
+        `<div key="global-error">There has been an update. Please reload the page.</div>`,
+      );
     return;
   }
   morph(document.querySelector("html"), content, event);
