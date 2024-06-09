@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.6 · 2024-06-09
+
+- Changed defaults for Tippy and progress bar appearance.
+
 ## 1.0.5 · 2024-06-03
 
 - Fixed an issue with `<form>`s whose `method` weren’t `GET` or `POST`.

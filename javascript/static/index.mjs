@@ -57,8 +57,6 @@ async function liveNavigate(request, event = undefined) {
       trigger: "manual",
       hideOnClick: false,
       theme: "error",
-      arrow: false,
-      interactive: true,
       content: "Something went wrong. Please try reloading the page.",
     }).show();
     throw error;
@@ -210,8 +208,6 @@ export async function liveConnection(requestId, { reload = false }) {
           trigger: "manual",
           hideOnClick: false,
           theme: "error",
-          arrow: false,
-          interactive: true,
           content: reload
             ? "Reloading…"
             : "Failed to connect. Please check your internet connection and try reloading the page.",
@@ -269,8 +265,6 @@ export function documentMount(content, event = new Event("DOMContentLoaded")) {
       trigger: "manual",
       hideOnClick: false,
       theme: "error",
-      arrow: false,
-      interactive: true,
       content: "There has been an update. Please reload the page.",
     }).show();
     return;
@@ -543,8 +537,8 @@ export function validate(element) {
       tippy({
         element: target,
         elementProperty: "validationErrorTooltip",
-        theme: "error",
         trigger: "manual",
+        theme: "error",
         content: error.message,
       }).show();
       target.focus();
