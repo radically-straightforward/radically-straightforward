@@ -1,5 +1,5 @@
-@import "tippy.js/dist/tippy.css";
 @import "@radically-straightforward/css/static/index.css";
+@import "tippy.js/dist/tippy.css";
 
 [key="global-error"] {
   color: light-dark(var(--color--red--800), var(--color--red--200));
