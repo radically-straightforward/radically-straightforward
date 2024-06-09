@@ -32,7 +32,7 @@
   "types": "./build/index.d.mts",
   "scripts": {
     "prepare": "tsc && documentation",
-    "test": "npm run prepare && node --test && prettier --check \"./README.md\" --check \"./CHANGELOG.md\" --check \"./package.json\" --check \"./tsconfig.json\" --check \"./source/**/*.mts\" --check \"./static/**/*.mjs\""
+    "test": "npm run prepare && node --test && prettier --check \"./README.md\" --check \"./CHANGELOG.md\" --check \"./package.json\" --check \"./tsconfig.json\" --check \"./source/**/*.mts\" --check \"./static/**/*.{css,mjs}\""
   },
   "dependencies": {
     "@radically-straightforward/utilities": "^2.0.5",

@@ -458,7 +458,10 @@ export function tippy({
   return element[elementProperty];
 }
 Tippy.default.setDefaultProps({
-  arrow: Tippy.roundArrow + Tippy.roundArrow,
+  ignoreAttributes: true,
+  arrow: false,
+  offset: [0, 0],
+  interactive: true,
   duration: window.matchMedia("(prefers-reduced-motion: reduce)").matches
     ? 1
     : 150,
