@@ -49,16 +49,12 @@ async function liveNavigate(request, event = undefined) {
     if (error.name === "AbortError") return;
     if (!(event instanceof PopStateEvent) && request.method === "GET")
       window.history.pushState(null, "", request.url);
-    tippy({
-      element:
-        document.querySelector(`[key="global-error"]`) ??
-        document.querySelector("body > :first-child"),
-      elementProperty: "liveNavigationErrorTooltip",
-      trigger: "manual",
-      hideOnClick: false,
-      theme: "error",
-      content: "Something went wrong. Please try reloading the page.",
-    }).show();
+    document
+      .querySelector("body")
+      .insertAdjacentHTML(
+        "beforeend",
+        `<div key="global-error">Something went wrong. Please try reloading the page.</div>`,
+      );
     throw error;
   } finally {
     progressBar.remove();
@@ -440,7 +436,7 @@ window.addEventListener("DOMContentLoaded", (event) => {
 export function tippy({
   event = undefined,
   element,
-  elementProperty = "tooltip",
+  elementProperty = "tippy",
   content,
   ...tippyProps
 }) {
