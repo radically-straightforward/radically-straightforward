@@ -2,6 +2,7 @@
 @import "tippy.js/dist/tippy.css";
 
 [key="global-error"] {
+  text-align: center;
   color: light-dark(var(--color--red--800), var(--color--red--200));
   background-color: light-dark(var(--color--red--50), var(--color--red--950));
   max-width: var(--space--96);

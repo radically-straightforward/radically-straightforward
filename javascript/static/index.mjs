@@ -160,10 +160,8 @@ export async function liveConnection(requestId, { reload = false }) {
         });
         if (response.status !== 200) throw response;
         connected = true;
-        (
-          document.querySelector(`[key="global-error"]`) ??
-          document.querySelector("body > :first-child")
-        ).liveConnectionFailedToConnectTooltip?.hide();
+        liveConnection.failedToConnectGlobalError?.remove();
+        delete liveConnection.failedToConnectGlobalError;
         if (reloadOnConnect) {
           document.querySelector("body").isModified = false;
           window.location.reload();
@@ -196,18 +194,18 @@ export async function liveConnection(requestId, { reload = false }) {
         }
       } catch (error) {
         if (connected) return;
-        tippy({
-          element:
-            document.querySelector(`[key="global-error"]`) ??
-            document.querySelector("body > :first-child"),
-          elementProperty: "liveConnectionFailedToConnectTooltip",
-          trigger: "manual",
-          hideOnClick: false,
-          theme: "error",
-          content: reload
-            ? "Reloading…"
-            : "Failed to connect. Please check your internet connection and try reloading the page.",
-        }).show();
+        liveConnection.failedToConnectGlobalError = document
+          .querySelector("body")
+          .insertAdjacentElement(
+            "beforeend",
+            stringToElement(
+              `<div key="global-error">${
+                reload
+                  ? "Reloading…"
+                  : "Failed to connect. Please check your internet connection and try reloading the page."
+              }</div>`,
+            ).firstElementChild,
+          );
         throw error;
       } finally {
         abortController.abort();
@@ -218,6 +216,7 @@ export async function liveConnection(requestId, { reload = false }) {
   );
 }
 liveConnection.backgroundJob = undefined;
+liveConnection.failedToConnectGlobalError = undefined;
 
 /**
  * `morph()` the `element` container to include `content`. `execute()` the browser JavaScript in the `element`. Protect the `element` from changing in Live Connection updates.
