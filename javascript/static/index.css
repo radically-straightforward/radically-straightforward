@@ -1,16 +1,38 @@
 @import "tippy.js/dist/tippy.css";
+@import "@radically-straightforward/css/static/index.css";
+
+[key="global-error"] {
+  color: light-dark(var(--color--red--800), var(--color--red--200));
+  background-color: light-dark(var(--color--red--50), var(--color--red--950));
+  max-width: var(--space--96);
+  padding: var(--space--1) var(--space--2);
+  border: var(--border-width--1) solid
+    light-dark(var(--color--red--400), var(--color--red--600));
+  border-radius: var(--border-radius--1);
+  box-shadow: var(--box-shadow--4);
+  margin: 0 auto;
+  position: fixed;
+  top: var(--space--8);
+  left: var(--space--2);
+  right: var(--space--2);
+}
 
 [key="progress-bar"] {
-  background-color: #3b82f6;
-  height: 4px;
-  border-bottom: 1px solid #1d4ed8;
-  border-right: 1px solid #1d4ed8;
-  box-shadow:
-    0 4px 6px -1px rgb(0 0 0 / 0.1),
-    0 2px 4px -2px rgb(0 0 0 / 0.1);
+  background-color: light-dark(
+    var(--color--blue--500),
+    var(--color--blue--500)
+  );
+  height: var(--space--1);
+  border-bottom: var(--border-width--1) solid
+    light-dark(var(--color--blue--700), var(--color--blue--700));
+  border-right: var(--border-width--1) solid
+    light-dark(var(--color--blue--700), var(--color--blue--700));
+  box-shadow: var(--box-shadow--4);
   position: fixed;
-  top: 0;
-  right: 0;
-  left: 0;
-  transition: width 300ms cubic-bezier(0.4, 0, 0.2, 1);
+  top: var(--space--0);
+  right: var(--space--0);
+  left: var(--space--0);
+  transition-property: width;
+  transition-duration: var(--transition-duration--300);
+  transition-timing-function: var(--transition-timing-function--ease-in-out);
 }
