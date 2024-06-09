@@ -49,6 +49,7 @@ async function liveNavigate(request, event = undefined) {
     if (error.name === "AbortError") return;
     if (!(event instanceof PopStateEvent) && request.method === "GET")
       window.history.pushState(null, "", request.url);
+    document.querySelector('[key="global-error"]')?.remove();
     document
       .querySelector("body")
       .insertAdjacentHTML(
