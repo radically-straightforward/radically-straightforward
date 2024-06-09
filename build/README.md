@@ -28,7 +28,7 @@ const application = server();
 css`
   /* Global CSS, including ‘@font-face’s, typography, ‘.classes’, and so forth. */
 
-  @import "@radically-straightforward/css/static/index.css";
+  @import "@radically-straightforward/javascript/static/index.css";
 
   body {
     background-color: blue;

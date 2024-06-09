@@ -104,6 +104,8 @@ To use this framework:
    /* ... */
    ```
 
+   > **Note:** `@radically-straightforward/javascript` already includes this file. If you’re importing `@radically-straightforward/javascript/static/index.css` you don’t need to import `@radically-straightforward/css/static/index.css` as well.
+
 3. Learn about the framework, particularly the design system, by reading the [the source](./static/index.css).
 
 4. (Optional but recommended) Transpile for broader browser support and bundle your CSS. This framework uses modern CSS features, for example, CSS Nesting and properties that need to be prefixed. We recommend [`@radically-straightforward/build`](https://npm.im/@radically-straightforward/build).
