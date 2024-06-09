@@ -73,7 +73,7 @@ Live Navigation enhances `<form>`s in the following ways:
 
 - The `CSRF-Protection` HTTP header is set, to satisfy [`@radically-straightforward/server`’s CSRF Protection mechanism](https://github.com/radically-straightforward/radically-straightforward/tree/main/server#csrf-protection).
 
-If the pages include the `<meta name="version" content="___" />` meta tag and the versions differ, then Live Navigation is disabled and the user is alerted through a `tippy()` to reload the page. The `tippy()` is attached to an element with `key="global-error"` or the `<body>`’s first child.
+If the pages include the `<meta name="version" content="___" />` meta tag and the versions differ, then Live Navigation is disabled and the user is alerted to reload the page through an element with `key="global-error"` which you may style.
 
 When loading a new page, a progress bar is displayed on an element with `key="progress-bar"` that is the last child of `<body>`. This element may be styled via CSS.
 
@@ -111,7 +111,7 @@ export async function liveConnection(requestId, { reload = false });
 
 Open a [Live Connection](https://github.com/radically-straightforward/radically-straightforward/tree/main/server#live-connection) to the server.
 
-If a connection can’t be established, then an error message is shown in a `tippy()`. The `tippy()` is attached to an element with `key="global-error"` or the `<body>`’s first child.
+If a connection can’t be established, then an error message is shown in an element with `key="global-error"` which you may style.
 
 If the `content` of the meta tag `<meta name="version" content="___" />` has changed, a Live Connection update doesn’t happen. Instead, a message is shown in a `tippy()` instructing to reload the page.
 
@@ -135,7 +135,7 @@ export function documentMount(content, event = new Event("DOMContentLoaded"));
 
 Similar to `mount()`, but suited for morphing the entire `document`. For example, it dispatches the `event` to the `window`.
 
-If the `document` and the `content` have `<meta name="version" content="___" />` with different `content`s, then `documentMount()` displays an error message in a `tippy()` and doesn’t mount the new document. The `tippy()` is attached to an element with `key="global-error"` or the `<body>`’s first child.
+If the `document` and the `content` have `<meta name="version" content="___" />` with different `content`s, then `documentMount()` displays an error message in an element with `key="global-error"` which you may style.
 
 ### `morph()`
 
@@ -189,7 +189,7 @@ Execute the functions defined by the `javascript="___"` attribute, which is set 
 export function tippy({
   event = undefined,
   element,
-  elementProperty = "tooltip",
+  elementProperty = "tippy",
   content,
   ...tippyProps
 });

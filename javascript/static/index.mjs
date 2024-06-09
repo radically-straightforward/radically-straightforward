@@ -129,7 +129,7 @@ window.onpopstate = async (event) => {
 /**
  * Open a [Live Connection](https://github.com/radically-straightforward/radically-straightforward/tree/main/server#live-connection) to the server.
  *
- * If a connection can’t be established, then an error message is shown in a `tippy()`. The `tippy()` is attached to an element with `key="global-error"` or the `<body>`’s first child.
+ * If a connection can’t be established, then an error message is shown in an element with `key="global-error"` which you may style.
  *
  * If the `content` of the meta tag `<meta name="version" content="___" />` has changed, a Live Connection update doesn’t happen. Instead, a message is shown in a `tippy()` instructing to reload the page.
  *
@@ -238,7 +238,7 @@ export function mount(element, content, event = undefined) {
  *
  * Similar to `mount()`, but suited for morphing the entire `document`. For example, it dispatches the `event` to the `window`.
  *
- * If the `document` and the `content` have `<meta name="version" content="___" />` with different `content`s, then `documentMount()` displays an error message in a `tippy()` and doesn’t mount the new document. The `tippy()` is attached to an element with `key="global-error"` or the `<body>`’s first child.
+ * If the `document` and the `content` have `<meta name="version" content="___" />` with different `content`s, then `documentMount()` displays an error message in an element with `key="global-error"` which you may style.
  */
 export function documentMount(content, event = new Event("DOMContentLoaded")) {
   if (typeof content === "string") content = documentStringToElement(content);
