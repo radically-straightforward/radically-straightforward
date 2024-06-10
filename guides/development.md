@@ -63,7 +63,7 @@ This guide teaches you how to setup your development machine to work on a projec
    $ npm start
    ```
 
-   Visit <https://localhost>.
+   Visit the address that will be printed to the console, for example `https://leafac--macbook`.
 
 6. If you need to test the application on a phone follow these steps:
 
