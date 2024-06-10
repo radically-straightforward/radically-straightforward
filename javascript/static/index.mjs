@@ -131,7 +131,7 @@ window.onpopstate = async (event) => {
  *
  * If a connection can’t be established, then an error message is shown in an element with `key="global-error"` which you may style.
  *
- * If the `content` of the meta tag `<meta name="version" content="___" />` has changed, a Live Connection update doesn’t happen. Instead, a message is shown in a `tippy()` instructing to reload the page.
+ * If the `content` of the meta tag `<meta name="version" content="___" />` has changed, a Live Connection update doesn’t happen. Instead, an error message is shown in an element with `key="global-error"` which you may style.
  *
  * If `reload` is `true` then the page reloads when the connection is closed and reopened, because presumably the server has been restarted after a code modification during development.
  */
