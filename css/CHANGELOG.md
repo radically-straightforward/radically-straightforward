@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.3 · 2024-06-10
+
+- Added `-webkit-tap-highlight-color: transparent;` to remove tap highlight on Android.
+
 ## 1.0.2 · 2024-06-10
 
 - Added `touch-action: none;` to the `.noninteractive` class to allow for the `pointermove` event to work.
