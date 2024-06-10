@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.2 · 2024-06-10
+
+- Added `touch-action: none;` to the `.noninteractive` class to allow for the `pointermove` event to work.
+
 ## 1.0.1 · 2024-05-30
 
 - Added the `.noninteractive` class.
