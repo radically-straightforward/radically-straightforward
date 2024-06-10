@@ -775,4 +775,5 @@ The `.noninteractive` class makes **the children** of an element not interactive
 .noninteractive * {
   user-select: none;
   pointer-events: none;
+  touch-action: none;
 }
