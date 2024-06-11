@@ -429,7 +429,10 @@ window.addEventListener("DOMContentLoaded", (event) => {
 });
 
 /**
- * Create a [Tippy.js](https://atomiks.github.io/tippyjs/) tippy. This is different from calling Tippy’s constructor because if `tippy()` is called multiple times on the same `element` with the same `elementProperty`, then it doesn’t create new tippys but `mount()`s the `content`.
+ * Create a [Tippy.js](https://atomiks.github.io/tippyjs/) tippy. This is different from calling Tippy’s constructor for the following reasons:
+ *
+ * 1. If `tippy()` is called multiple times on the same `element` with the same `elementProperty`, then it doesn’t create new tippys but `mount()`s the `content`.
+ * 2. The defaults are different, for example, `arrow` is `false`.
  */
 export function tippy({
   event = undefined,
@@ -441,19 +444,19 @@ export function tippy({
   element[elementProperty] ??= Tippy.default(element, {
     content: document.createElement("div"),
   });
-  element[elementProperty].setProps(tippyProps);
+  element[elementProperty].setProps({
+    ignoreAttributes: true,
+    arrow: false,
+    offset: [0, 0],
+    touch: tippyProps.interactive ?? false,
+    duration: window.matchMedia("(prefers-reduced-motion: reduce)").matches
+      ? 1
+      : 150,
+    ...tippyProps,
+  });
   mount(element[elementProperty].props.content, content, event);
   return element[elementProperty];
 }
-Tippy.default.setDefaultProps({
-  ignoreAttributes: true,
-  arrow: false,
-  offset: [0, 0],
-  interactive: true,
-  duration: window.matchMedia("(prefers-reduced-motion: reduce)").matches
-    ? 1
-    : 150,
-});
 
 /**
  * Validate `element` (usually a `<form>`) and its `children()`.
