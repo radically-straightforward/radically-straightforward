@@ -1,6 +1,6 @@
 # Changelog
 
-## 1.0.8 · 2024-06-11
+## 1.0.9 · 2024-06-11
 
 - Changed the defaults for `tippy()`.
 
