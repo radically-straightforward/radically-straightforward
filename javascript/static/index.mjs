@@ -432,7 +432,24 @@ window.addEventListener("DOMContentLoaded", (event) => {
  * Create a [Tippy.js](https://atomiks.github.io/tippyjs/) tippy. This is different from calling Tippy’s constructor for the following reasons:
  *
  * 1. If `tippy()` is called multiple times on the same `element` with the same `elementProperty`, then it doesn’t create new tippys but `mount()`s the `content`.
- * 2. The defaults are different, for example, `arrow` is `false`.
+ *
+ * 2. The defaults are different:
+ *
+ *    - **`ignoreAttributes`:** Set to `true` because we active `tippy()` via JavaScript, not HTML `data` attributes.
+ *
+ *    - **`arrow`:** Set to `false`, because most user interface `tippy()`s don’t use an arrow.
+ *
+ *    - **`offset`:** Set to `[0, 0]`, because `arrow` has been set to `false` so it doesn’t make sense to distance the `tippy()` from the trigger.
+ *
+ *    - **`touch`:** Set is only set to `true` by default if:
+ *
+ *      - `interactive` is set to `true`, because most noninteractive `tippy()`s don’t work well on touch devices (see https://atomiks.github.io/tippyjs/v6/misc/#touch-devices), but most interactive `tippy()`s work well on touch devices (usually they’re menus).
+ *
+ *      - `trigger` is set to `"manual"`, because we understand it to mean that you want to control the showing of the `tippy()` programmatically.
+ *
+ *    - **`hideOnClick`:** Set to `false` if `trigger` is `"manual"`, because we understand it to mean that you want to control the showing of the `tippy()` programmatically.
+ *
+ *    - **`duration`:** Respect `prefers-reduced-motion: reduce` by default.
  */
 export function tippy({
   event = undefined,
@@ -448,7 +465,8 @@ export function tippy({
     ignoreAttributes: true,
     arrow: false,
     offset: [0, 0],
-    touch: tippyProps.interactive ?? false,
+    touch: tippyProps.interactive === true || tippyProps.trigger === "manual",
+    hideOnClick: tippyProps.trigger !== "manual",
     duration: window.matchMedia("(prefers-reduced-motion: reduce)").matches
       ? 1
       : 150,
@@ -535,6 +553,7 @@ export function validate(element) {
         element: target,
         elementProperty: "validationErrorTooltip",
         trigger: "manual",
+        hideOnClick: true,
         theme: "error",
         content: error.message,
       }).show();
@@ -687,7 +706,6 @@ export function relativizeDateTimeElement(
   tippy({
     element: target,
     elementProperty: "relativizeDateTimeElementTooltip",
-    touch: false,
     content: `${localizeDateTime(dateString)} (${formatUTCDateTime(
       dateString,
     )})`,
