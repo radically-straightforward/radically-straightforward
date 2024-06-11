@@ -230,7 +230,7 @@ application.push({
 
 Visit <http://localhost:18000/conversations/10>.
 
-Send an immediate update with the following snippet:
+Send an immediate update with one of the following snippets:
 
 ```typescript
 await fetch("http://localhost:18000/__live-connections", {
@@ -238,6 +238,10 @@ await fetch("http://localhost:18000/__live-connections", {
   headers: { "CSRF-Protection": "true" },
   body: new URLSearchParams({ pathname: "^/conversations/10$" }),
 });
+```
+
+```console
+$ curl --request POST --header "CSRF-Protection: true" --data "pathname=^/conversations/10$" "http://localhost:18000/__live-connections"
 ```
 
 > **Compared to Other Libraries**
