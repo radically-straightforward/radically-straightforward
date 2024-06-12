@@ -1,6 +1,6 @@
 {
   "name": "@radically-straightforward/development",
-  "version": "1.0.18",
+  "version": "1.0.19",
   "description": "🧰 Radically Straightforward packages for development",
   "keywords": [
     "radically straightforward",
@@ -24,7 +24,7 @@
     "test": ""
   },
   "dependencies": {
-    "@radically-straightforward/build": "^2.0.0",
+    "@radically-straightforward/build": "^2.0.1",
     "@radically-straightforward/css": "^1.0.3",
     "@radically-straightforward/documentation": "^1.0.4",
     "@radically-straightforward/javascript": "^1.0.9",
