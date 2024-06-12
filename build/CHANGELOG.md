@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.0.1 · 2024-06-12
+
+- Fixed an issue in which nested CSS expressions weren’t extracted correctly.
+
 ## 2.0.0 · 2024-06-08
 
 - **Breaking Change:** Renamed command-line parameters `--file-to-copy-with-hash` and `--file-to-copy-without-hash` into `--copy-with-hash` and `--copy-without-hash`.
