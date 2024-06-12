@@ -510,8 +510,6 @@ font-family: var(--font-family--sans-serif);
   --space---288: -72rem;
   --space--320: 80rem;
   --space---320: -80rem;
-  --space--prose: 65ch;
-  --space---prose: -65ch;
 
   --aspect-ratio--square: 1 / 1;
   --aspect-ratio--video: 16 / 9;

@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- Removed `--space--prose`.
+
 ## 1.0.3 · 2024-06-10
 
 - Added `-webkit-tap-highlight-color: transparent;` to remove tap highlight on Android.
