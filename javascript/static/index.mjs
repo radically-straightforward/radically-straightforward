@@ -667,8 +667,11 @@ export function isModified(element) {
       (element.matches("input, textarea") &&
         element.closest("[disabled]") === null &&
         !parents(element).some((element) => element.isModified === false) &&
-        (element.value !== element.defaultValue ||
-          element.checked !== element.defaultChecked))
+        (((element.type === "checkbox" || element.type === "radio") &&
+          element.checked !== element.defaultChecked) ||
+          (element.type !== "checkbox" &&
+            element.type !== "radio" &&
+            element.value !== element.defaultValue)))
     )
       return true;
   return false;
