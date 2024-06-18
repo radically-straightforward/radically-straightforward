@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.10 · 2024-06-18
+
+- Fixed the treatment of `<input type="checkbox">` and `<input type="radio">` in `isModified()`.
+
 ## 1.0.9 · 2024-06-11
 
 - Changed the defaults for `tippy()`.
