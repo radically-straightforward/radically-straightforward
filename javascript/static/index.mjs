@@ -639,13 +639,16 @@ export function reset(element) {
   const elements = children(element);
   for (const element of elements) {
     if (!element.matches("input, textarea")) continue;
-    if (element.value !== element.defaultValue) {
-      element.value = element.defaultValue;
-      element.onchange?.();
-    }
-    if (element.checked !== element.defaultChecked) {
-      element.checked = element.defaultChecked;
-      element.onchange?.();
+    if (element.type === "checkbox" || element.type === "radio") {
+      if (element.checked !== element.defaultChecked) {
+        element.checked = element.defaultChecked;
+        element.onchange?.();
+      }
+    } else {
+      if (element.value !== element.defaultValue) {
+        element.value = element.defaultValue;
+        element.onchange?.();
+      }
     }
   }
 }
