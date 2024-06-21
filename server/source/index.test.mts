@@ -308,6 +308,43 @@ test(async () => {
   }
 
   {
+    application.push({
+      method: "GET",
+      pathname: "/flash",
+      handler: (request, response) => {
+        response.end(request.getFlash() ?? "No flash");
+      },
+    });
+    application.push({
+      method: "POST",
+      pathname: "/flash",
+      handler: (request, response) => {
+        response.setFlash("Yes flash");
+        response.redirect();
+      },
+    });
+    assert.equal(
+      await (await fetch("http://localhost:18000/flash")).text(),
+      "No flash",
+    );
+    const response = await fetch("http://localhost:18000/flash", {
+      redirect: "manual",
+      method: "POST",
+      headers: { "CSRF-Protection": "true" },
+    });
+    assert.equal(
+      await (
+        await fetch("http://localhost:18000/flash", {
+          headers: {
+            Cookie: response.headers.get("Set-Cookie")!.split(";")[0],
+          },
+        })
+      ).text(),
+      "Yes flash",
+    );
+  }
+
+  {
     const response = await fetch("http://localhost:18000/_health");
     assert.equal(response.status, 200);
     assert.equal(response.headers.get("Content-Type"), null);

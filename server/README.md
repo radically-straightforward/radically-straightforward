@@ -363,6 +363,7 @@ export type Request<Pathname, Search, Cookies, Body, State> =
     cookies: Partial<Cookies>;
     body: Partial<Body>;
     state: Partial<State>;
+    getFlash: () => string | undefined;
     error?: unknown;
     liveConnection?: RequestLiveConnection;
   };
@@ -389,6 +390,8 @@ An extension of [Node.js’s `http.IncomingMessage`](https://nodejs.org/api/http
 - **`body`:** The request body parsed into an object. Uses [busboy](https://www.npmjs.com/package/busboy). It supports `Content-Type`s `application/x-www-form-urlencoded` (the default type of form submission in browsers) and `multipart/form-data` (used for uploading files). Form fields become strings, and files become `RequestBodyFile` objects. The files are saved to disk in a temporary directory and deleted after the response is sent—if you wish to keep the files you must move them to a permanent location. If a field name ends in `[]`, for example, `colors[]`, then multiple occurrences of the same field are captured into an array—this is useful for `<input type="checkbox" />`s with the same `name`, and for uploading multiple files. Note that this depends on user input, so it’s important to validate explicitly (the generic `Body` in TypeScript is `Partial<>` to encourage you to perform these validations).
 
 - **`state`:** An object to communicate state across multiple `handler`s that handle the same request, for example, a handler may authenticate a user and set a `request.state.user` property for subsequent `handler`s to use. Note that the generic `State` in TypeScript is `Partial<>` because the state may not be set depending on which `handler`s ran previously—you may either use runtime checks that the expected `state` is set, or use, for example, `request.state.user!` if you’re sure that the state is set by other means.
+
+- **`getFlash()`:** Get a flash message that was set by a previous `response` that `setFlash()` and then `redirect()`ed. This is useful, for example, for a message such as “User settings updated successfully.”
 
 - **`error:`** In error handlers, this is the error that was thrown.
 
@@ -427,6 +430,7 @@ Information about a Live Connection that is available under `request.liveConnect
 export type Response = http.ServerResponse & {
   setCookie: (key: string, value: string, maxAge?: number) => Response;
   deleteCookie: (key: string) => Response;
+  setFlash: (message: string) => Response;
   redirect: (
     destination?: string,
     type?: "see-other" | "temporary" | "permanent",
@@ -446,6 +450,8 @@ An extension of [Node.js’s `http.ServerResponse`](https://nodejs.org/api/http.
   > - The `SameSite` cookie option is set to `None`, which is necessary for things like SAML to work (for example, when the Identity Provider sends a `POST` request back to the application’s Assertion Consumer Service (ACS), the application needs the cookies to determine if there’s a previously established session).
 
 - **`deleteCookie`:** Sets an expired [`Set-Cookie` header](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Set-Cookie) without a value and with the same secure settings used by `setCookie`. Also updates the `request.cookies` object so that the new cookies are visible from within the request itself.
+
+- **`setFlash()`:** Set a flash message that will be available to the next `request` via `getFlash()` (the next `request` typically is the result of a `redirect()`ion. This is useful, for example, for a message such as “User settings updated successfully.”
 
 - **`redirect`:** Sends the [`Location` header](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Location) and an HTTP status of [303 (`"see-other"`)](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/303) (default), [307 (`"temporary"`)](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/307), or [308 (`"permanent"`)](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/308). Note that there are no options for the legacy statuses of [301](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/301) and [302](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/302), because they may lead some clients to change the HTTP method of the redirected request by mistake. The `destination` parameter is relative to `request.URL`, for example, if no `destination` is provided, then the default is to redirect to the same `request.URL`.
 
