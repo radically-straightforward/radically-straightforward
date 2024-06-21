@@ -58,6 +58,8 @@ export type Route = {
  *
  * - **`state`:** An object to communicate state across multiple `handler`s that handle the same request, for example, a handler may authenticate a user and set a `request.state.user` property for subsequent `handler`s to use. Note that the generic `State` in TypeScript is `Partial<>` because the state may not be set depending on which `handler`s ran previously—you may either use runtime checks that the expected `state` is set, or use, for example, `request.state.user!` if you’re sure that the state is set by other means.
  *
+ * - **`getFlash()`:** Get a flash message that was set by a previous `response` that `setFlash()` and then `redirect()`ed. This is useful, for example, for a message such as “User settings updated successfully.”
+ *
  * - **`error:`** In error handlers, this is the error that was thrown.
  *
  *   > **Note:** There’s an special kind of error that may be thrown, which is the string `"validation"`. This sets the HTTP response status to [422](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/422) instead of [500](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500).
@@ -76,6 +78,7 @@ export type Request<Pathname, Search, Cookies, Body, State> =
     cookies: Partial<Cookies>;
     body: Partial<Body>;
     state: Partial<State>;
+    getFlash: () => string | undefined;
     error?: unknown;
     liveConnection?: RequestLiveConnection;
   };
@@ -111,11 +114,14 @@ export type RequestLiveConnection = {
  *
  * - **`deleteCookie`:** Sets an expired [`Set-Cookie` header](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Set-Cookie) without a value and with the same secure settings used by `setCookie`. Also updates the `request.cookies` object so that the new cookies are visible from within the request itself.
  *
+ * - **`setFlash()`:** Set a flash message that will be available to the next `request` via `getFlash()` (the next `request` typically is the result of a `redirect()`ion. This is useful, for example, for a message such as “User settings updated successfully.”
+ *
  * - **`redirect`:** Sends the [`Location` header](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Location) and an HTTP status of [303 (`"see-other"`)](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/303) (default), [307 (`"temporary"`)](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/307), or [308 (`"permanent"`)](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/308). Note that there are no options for the legacy statuses of [301](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/301) and [302](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/302), because they may lead some clients to change the HTTP method of the redirected request by mistake. The `destination` parameter is relative to `request.URL`, for example, if no `destination` is provided, then the default is to redirect to the same `request.URL`.
  */
 export type Response = http.ServerResponse & {
   setCookie: (key: string, value: string, maxAge?: number) => Response;
   deleteCookie: (key: string) => Response;
+  setFlash: (message: string) => Response;
   redirect: (
     destination?: string,
     type?: "see-other" | "temporary" | "permanent",
@@ -145,6 +151,7 @@ export default function server({
   csrfProtectionExceptionPathname?: string | RegExp;
 } = {}): Route[] {
   const routes = new Array<Route>();
+  const flashes = new Map<string, string>();
   const liveConnections = new Set<LiveConnection>();
 
   const httpServer = http
@@ -320,6 +327,14 @@ export default function server({
           });
           await Promise.all(filesPromises);
         }
+
+        request.getFlash = () => {
+          if (typeof request.cookies.flash !== "string") return undefined;
+          const flash = flashes.get(request.cookies.flash);
+          flashes.delete(request.cookies.flash);
+          response.deleteCookie("flash");
+          return flash;
+        };
 
         if (process.env.NODE_ENV !== "production" && request.method !== "GET")
           request.log(JSON.stringify(request.body, undefined, 2));
@@ -525,6 +540,13 @@ export default function server({
                 ...((response.getHeader("Set-Cookie") as string[]) ?? []),
                 `__Host-${encodeURIComponent(key)}=; Max-Age=0; Path=/; Secure; HttpOnly; SameSite=None`,
               ]);
+              return response;
+            };
+
+            response.setFlash = (message: string): typeof response => {
+              const flashIdentifier = utilities.randomString();
+              flashes.set(flashIdentifier, message);
+              response.setCookie("flash", flashIdentifier, 2 * 60);
               return response;
             };
 
