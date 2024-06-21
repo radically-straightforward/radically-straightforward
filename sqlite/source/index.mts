@@ -111,7 +111,7 @@ export class Database extends BetterSQLite3Database {
   }
 
   /**
-   * A migration system based on [the steps for general schema changes in SQLite](https://www.sqlite.org/lang_altertable.html#making_other_kinds_of_table_schema_changes). The migration system implements steps 1–2, 10–12, and you must implement steps 3–9 in the migrations that you define.
+   * A migration system based on [the steps for general schema changes in SQLite](https://www.sqlite.org/lang_altertable.html#making_other_kinds_of_table_schema_changes). The migration system implements steps 1–2, 11–12, and you must implement steps 3–10 in the migrations that you define.
    *
    * A migration may be:
    *
@@ -208,16 +208,6 @@ export class Database extends BetterSQLite3Database {
           const migration = migrations[migrationIndex];
           if (typeof migration === "function") await migration(this);
           else this.execute(migration);
-          const foreignKeyViolations =
-            this.pragma<unknown[]>("foreign_key_check");
-          if (foreignKeyViolations.length !== 0)
-            throw new Error(
-              `Foreign key violations in migration:\n${JSON.stringify(
-                foreignKeyViolations,
-                undefined,
-                2,
-              )}`,
-            );
           this.pragma<void>(`user_version = ${migrationIndex + 1}`);
           this.execute(
             sql`
