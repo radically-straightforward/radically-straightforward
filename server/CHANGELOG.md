@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.8 · 2024-06-21
+
+- Added support for flash via `response.setFlash()` and `request.getFlash()`.
+
 ## 1.0.7 · 2024-06-05
 
 - Introduced an `error` that’s the string `"validation"`, which sets the default HTTP status code to 422 instead of 500.
