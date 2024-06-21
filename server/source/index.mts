@@ -421,7 +421,7 @@ export default function server({
                 liveConnection.skipUpdateOnEstablish = false;
                 if (!(liveConnection.response.socket?.destroyed ?? true))
                   liveConnection.update?.();
-                await timers.setTimeout(200);
+                await timers.setTimeout(200, undefined, { ref: false });
               }
             });
             response.end();
@@ -546,6 +546,12 @@ export default function server({
             response.setFlash = (message: string): typeof response => {
               const flashIdentifier = utilities.randomString();
               flashes.set(flashIdentifier, message);
+              setTimeout(
+                () => {
+                  flashes.delete(flashIdentifier);
+                },
+                2 * 60 * 1000,
+              ).unref();
               response.setCookie("flash", flashIdentifier, 2 * 60);
               return response;
             };
