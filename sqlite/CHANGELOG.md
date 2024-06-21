@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.1.5 · 2024-06-21
+
+- In `migrate()`, removed [step 10](https://www.sqlite.org/lang_altertable.html#making_other_kinds_of_table_schema_changes). If you wish to perform that check, you may do so in your migration, but we don’t do it by default because it’s slow in big databases.
+
 ## 1.1.4 · 2024-06-03
 
 - In `` sql`___` ``, replaced the runtime type check with a TypeScript type.

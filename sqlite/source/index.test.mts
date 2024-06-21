@@ -182,16 +182,6 @@ test("Database", async () => {
   }
 
   await assert.rejects(async () => {
-    await database.migrate(
-      ...migrations,
-      sql`
-        INSERT INTO "posts" ("content", "author")
-        VALUES (${"Nonexistent author."}, 999999);
-      `,
-    );
-  });
-
-  await assert.rejects(async () => {
     await database.migrate(...migrations, async () => {
       database.execute(
         sql`
