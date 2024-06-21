@@ -11,7 +11,7 @@
     light-dark(var(--color--red--400), var(--color--red--600));
   border-radius: var(--border-radius--1);
   box-shadow: var(--box-shadow--4);
-  margin: 0 auto;
+  margin: var(--space--0) auto;
   position: fixed;
   top: var(--space--8);
   left: var(--space--2);
