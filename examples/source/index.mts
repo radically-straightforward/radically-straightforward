@@ -1,11 +1,11 @@
 import fs from "node:fs/promises";
 
-const defaultModel = JSON.parse(
-  await fs.readFile(new URL("../models/default.json", import.meta.url), "utf-8")
+const textModel = JSON.parse(
+  await fs.readFile(new URL("../text/model.json", import.meta.url), "utf-8"),
 );
 
 export function text({
-  model = defaultModel,
+  model = textModel,
   length = 10,
 }: {
   model?: {
@@ -65,8 +65,8 @@ export function text({
               ? ""
               : "."
             : Math.random() < 0.8
-            ? "?"
-            : "!")
+              ? "?"
+              : "!"),
       );
     }
     paragraphs.push(sentences.join(" "));
