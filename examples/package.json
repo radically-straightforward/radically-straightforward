@@ -36,6 +36,7 @@
     "linkedom": "^0.18.3"
   },
   "devDependencies": {
+    "@radically-straightforward/documentation": "^1.0.4",
     "@radically-straightforward/typescript": "^1.0.0",
     "@types/node": "^20.14.8",
     "typescript": "^5.5.2"
