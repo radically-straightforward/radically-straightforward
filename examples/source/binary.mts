@@ -6,7 +6,7 @@ import { DOMParser } from "linkedom";
 switch (process.argv[2]) {
   case "collect": {
     const corpus = JSON.parse(
-      await fs.readFile("corpus.json", "utf-8").catch(() => JSON.stringify({}))
+      await fs.readFile("corpus.json", "utf-8").catch(() => JSON.stringify({})),
     );
     const urls = new Set<string>();
     for (const url of JSON.parse(await fs.readFile("urls.json", "utf-8"))) {
@@ -29,11 +29,11 @@ switch (process.argv[2]) {
         for (const link of paragraph.querySelectorAll("a")) {
           const url = new URL(
             link.getAttribute("href"),
-            "https://en.wikipedia.org/"
+            "https://en.wikipedia.org/",
           ).href;
           if (
             url.match(
-              new RegExp("^https://en.wikipedia.org/wiki/[A-Za-z0-9_%]+$")
+              new RegExp("^https://en.wikipedia.org/wiki/[A-Za-z0-9_%]+$"),
             ) === null
           )
             continue;
@@ -48,7 +48,7 @@ switch (process.argv[2]) {
 
   case "train": {
     const corpus = JSON.parse(
-      await fs.readFile("corpus.json", "utf-8").catch(() => JSON.stringify({}))
+      await fs.readFile("corpus.json", "utf-8").catch(() => JSON.stringify({})),
     );
     const model: {
       [predecessor: string]: {
