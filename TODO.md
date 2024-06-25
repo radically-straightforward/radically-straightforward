@@ -114,6 +114,8 @@
 
 ## `@radically-straightforward/sqlite`
 
+- `database.backgroundJob` may not need to sleep for 200ms between jobs.
+
 ## `@radically-straightforward/html`
 
 ## `@radically-straightforward/css`
@@ -162,6 +164,7 @@
 
 ## Other
 
+- `unref` the `setTimeout`s.
 - Better text editor support for tagged templates with 100% functional syntax highlighting and IntelliSense.
 
 ## Marketing
