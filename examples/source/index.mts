@@ -1,14 +1,23 @@
-export default (
-  model: {
+import fs from "node:fs/promises";
+
+const defaultModel = JSON.parse(
+  await fs.readFile(new URL("../models/default.json", import.meta.url), "utf-8")
+);
+
+export function text({
+  model = defaultModel,
+  length = 10,
+}: {
+  model?: {
     [predecessor: string]: {
       [successor: string]: {
         count: number;
         percentile: number;
       };
     };
-  },
-  length: number
-): string => {
+  };
+  length?: number;
+} = {}): string {
   const paragraphs = new Array<string>();
   const paragraphsLength = Math.max(length, 1);
   while (paragraphs.length < paragraphsLength) {
@@ -63,4 +72,4 @@ export default (
     paragraphs.push(sentences.join(" "));
   }
   return paragraphs.join("\n\n");
-};
+}
