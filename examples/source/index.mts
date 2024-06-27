@@ -15,7 +15,7 @@ export function text({
   length?: number;
 } = {}): string {
   const paragraphs = new Array<string>();
-  const paragraphsLength = Math.max(length, 1);
+  const paragraphsLength = length === 0 ? 1 : length;
   while (paragraphs.length < paragraphsLength) {
     const sentences = new Array<string>();
     const sentencesLength =
@@ -51,12 +51,12 @@ export function text({
             ];
           if (word.includes(" ")) continue;
           words.push(word);
-          break;
+          continue addWord;
         }
       }
       sentences.push(
         words.join(" ").replace(/./, (character) => character.toUpperCase()) +
-          (Math.random() < 0.8
+          (Math.random() < 0.9
             ? length === 0
               ? ""
               : "."
