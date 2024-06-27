@@ -1,9 +1,5 @@
 import fs from "node:fs/promises";
 
-const textModel = JSON.parse(
-  await fs.readFile(new URL("../text/model.json", import.meta.url), "utf-8"),
-);
-
 export function text({
   model = textModel,
   length = 10,
@@ -73,3 +69,6 @@ export function text({
   }
   return paragraphs.join("\n\n");
 }
+const textModel = JSON.parse(
+  await fs.readFile(new URL("../text/model.json", import.meta.url), "utf-8"),
+);
