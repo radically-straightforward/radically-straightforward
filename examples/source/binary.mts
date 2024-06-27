@@ -5,7 +5,13 @@ import { DOMParser } from "linkedom";
 
 switch (process.argv[2]) {
   case "collect": {
-    const corpus = JSON.parse(
+    const corpus: {
+      [url: string]: {
+        collectedAt: string;
+        words: string[];
+        html: string;
+      };
+    } = JSON.parse(
       await fs.readFile("corpus.json", "utf-8").catch(() => JSON.stringify({})),
     );
     const urls = new Set<string>();
@@ -19,7 +25,7 @@ switch (process.argv[2]) {
         .join(" ")
         .toLowerCase()
         .split(/[^a-z']+/)
-        .filter((word: string) => word !== "");
+        .filter((word) => word !== "");
       corpus[url] = {
         collectedAt: new Date().toISOString(),
         words,
@@ -47,9 +53,13 @@ switch (process.argv[2]) {
   }
 
   case "train": {
-    const corpus = JSON.parse(
-      await fs.readFile("corpus.json", "utf-8").catch(() => JSON.stringify({})),
-    );
+    const corpus: {
+      [url: string]: {
+        collectedAt: string;
+        words: string[];
+        html: string;
+      };
+    } = JSON.parse(await fs.readFile("corpus.json", "utf-8"));
     const model: {
       [predecessor: string]: {
         [successor: string]: {
@@ -58,7 +68,7 @@ switch (process.argv[2]) {
         };
       };
     } = {};
-    for (const { words } of Object.values<{ words: string[] }>(corpus))
+    for (const { words } of Object.values(corpus))
       for (
         let predecessorLength = 1;
         predecessorLength <= 2;
