@@ -1,10 +1,10 @@
 {
   "name": "@radically-straightforward/examples",
   "version": "1.0.0",
-  "description": "🥸 Example data for demonstration and testing",
+  "description": "🥸 Example data for testing",
   "keywords": [
-    "demonstration data",
     "test data",
+    "fake data",
     "fake avatar",
     "fake text",
     "markov chains",

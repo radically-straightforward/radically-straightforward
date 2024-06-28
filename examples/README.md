@@ -1,6 +1,6 @@
 # Radically Straightforward · Examples
 
-**🥸 Example data for demonstration and testing**
+**🥸 Example data for testing**
 
 ## Installation
 
