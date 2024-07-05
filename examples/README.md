@@ -97,3 +97,9 @@ The default `model` mostly talks about food. You may train your own `model` on o
 The folder `avatars/` contains 263 examples of faces.
 
 These people don’t exist, the faces were collected from https://github.com/NVlabs/stylegan2 / https://drive.google.com/drive/folders/1mTeo3J3Jo6aYImBshLM6XRl_Ua8fqgVW and resized to 256×256px with `avatars/index.mjs`.
+
+## Related Work
+
+### [Faker](https://www.npmjs.com/package/@faker-js/faker), [casual](https://www.npmjs.com/package/casual), and so forth
+
+These other libraries don’t include text that can be trained on arbitrary topics and avatars.
