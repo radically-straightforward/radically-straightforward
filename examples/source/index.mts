@@ -363,9 +363,9 @@ export function name(): string {
  *    This produces a file called `model.json` which includes the model, and its contents can be provided to `text()` as the `model`.
  *
  *    At this point you may delete the files `urls.json` and `corpus.json` if you wish.
- * 
+ *
  * **References**
- * 
+ *
  * - https://healeycodes.com/generating-text-with-markov-chains
  * - https://www.youtube.com/watch?v=eGFJ8vugIWA
  */
