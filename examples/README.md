@@ -10,6 +10,12 @@ $ npm install @radically-straightforward/examples
 
 ## Usage
 
+```typescript
+import * as examples from "./index.mjs";
+```
+
+<!-- DOCUMENTATION: ./source/index.mts -->
+
 `urls.json`
 
 ```json
