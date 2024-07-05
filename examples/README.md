@@ -16,22 +16,6 @@ import * as examples from "./index.mjs";
 
 <!-- DOCUMENTATION: ./source/index.mts -->
 
-`urls.json`
-
-```json
-["https://en.wikipedia.org/wiki/Maple_syrup"]
-```
-
-```console
-$ node ../build/cli.mjs collect
-```
-
-Iterate
-
-```console
-$ node ../build/cli.mjs train
-```
-
 # Fake Avatars
 
 263 images of people who don’t really exist for your testing & demonstration purposes. Images pulled from https://github.com/NVlabs/stylegan2 / https://drive.google.com/drive/folders/1mTeo3J3Jo6aYImBshLM6XRl_Ua8fqgVW and resized to 256×256px, which is a reasonable size for an avatar, using the `index.mjs` script.
