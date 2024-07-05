@@ -85,15 +85,15 @@ The default `model` mostly talks about food. You may train your own `model` on o
 
    At this point you may delete the files `urls.json` and `corpus.json` if you wish.
 
-<!-- DOCUMENTATION END: ./source/index.mts -->
-
-# Fake Avatars
-
-263 images of people who don’t really exist for your testing & demonstration purposes. Images pulled from https://github.com/NVlabs/stylegan2 / https://drive.google.com/drive/folders/1mTeo3J3Jo6aYImBshLM6XRl_Ua8fqgVW and resized to 256×256px, which is a reasonable size for an avatar, using the `index.mjs` script.
-
-Install with `npm install fake-avatars` or hotlink from, for example, https://leafac.github.io/fake-avatars/avatars/webp/5.webp or https://leafac.github.io/fake-avatars/avatars/png/5.png.
-
-## References
+**References**
 
 - https://healeycodes.com/generating-text-with-markov-chains
 - https://www.youtube.com/watch?v=eGFJ8vugIWA
+
+<!-- DOCUMENTATION END: ./source/index.mts -->
+
+### Avatars
+
+The folder `avatars/` contains 263 examples of faces.
+
+These people don’t exist, the faces were collected from https://github.com/NVlabs/stylegan2 / https://drive.google.com/drive/folders/1mTeo3J3Jo6aYImBshLM6XRl_Ua8fqgVW and resized to 256×256px with `avatars/index.mjs`.
