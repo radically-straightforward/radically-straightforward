@@ -30,6 +30,6 @@
     "@radically-straightforward/node": "^3.1.7",
     "@radically-straightforward/server": "^1.0.8",
     "@radically-straightforward/sqlite": "^1.1.5",
-    "@radically-straightforward/utilities": "^2.0.5"
+    "@radically-straightforward/utilities": "^2.0.6"
   }
 }
