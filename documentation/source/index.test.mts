@@ -6,8 +6,8 @@ import fs from "node:fs/promises";
 import url from "node:url";
 import childProcess from "node:child_process";
 import util from "node:util";
-import markdown from "dedent";
-import typescript from "dedent";
+import { dedent as markdown } from "@radically-straightforward/utilities";
+import { dedent as typescript } from "@radically-straightforward/utilities";
 
 test(async () => {
   process.chdir(
@@ -106,7 +106,7 @@ test(async () => {
       **\`exampleOfParameter\`:** Example of some documentation about a parameter.
       
       **Return:** Example of some documentation about the return value.
-     
+      
       ### \`exampleOfVariableDeclaration\`
       
       \`\`\`typescript
