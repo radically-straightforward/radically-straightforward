@@ -76,7 +76,8 @@ export function capitalize(string: string): string {
  * Consider the following example:
  *
  * ```javascript
- * const exampleOfInterpolatedString = "example of\n an interpolated string including a newline and indentation";
+ * const exampleOfInterpolatedString =
+ *   "example of\n an interpolated string including a newline and indentation";
  *
  * dedentPackage`
  *   Here is an

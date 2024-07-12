@@ -89,7 +89,8 @@ This different comes in play when the interpolated string contains newlines and 
 Consider the following example:
 
 ```javascript
-const exampleOfInterpolatedString = "example of\n an interpolated string including a newline and indentation";
+const exampleOfInterpolatedString =
+  "example of\n an interpolated string including a newline and indentation";
 
 dedentPackage`
   Here is an
