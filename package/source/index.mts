@@ -7,8 +7,8 @@ import util from "node:util";
 import fsStream from "node:fs";
 import stream from "node:stream/promises";
 import archiver from "archiver";
-import batch from "dedent";
-import sh from "dedent";
+import { dedent as batch } from "@radically-straightforward/utilities";
+import { dedent as sh } from "@radically-straightforward/utilities";
 
 await util.promisify(childProcess.exec)(
   `npm${process.platform === "win32" ? ".cmd" : ""} dedupe`,

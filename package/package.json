@@ -27,8 +27,8 @@
     "test": "npm run prepare && node --test && prettier --check \"./README.md\" --check \"./CHANGELOG.md\" --check \"./package.json\" --check \"./tsconfig.json\" --check \"./source/**/*.mts\""
   },
   "dependencies": {
-    "archiver": "^7.0.1",
-    "dedent": "^1.5.3"
+    "@radically-straightforward/utilities": "^2.0.6",
+    "archiver": "^7.0.1"
   },
   "devDependencies": {
     "@radically-straightforward/typescript": "^1.0.0",
