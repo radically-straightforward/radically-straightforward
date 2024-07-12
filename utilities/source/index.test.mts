@@ -51,6 +51,22 @@ test("capitalize()", () => {
   );
 });
 
+test("dedent()", () => {
+  const exampleOfInterpolatedString =
+    "example of\n an interpolated string including a newline and indentation";
+
+  assert.equal(
+    utilities.dedent`
+      Here is an
+
+      ${exampleOfInterpolatedString}
+
+      followed by some more text.
+    `,
+    "Here is an\n\nexample of\n an interpolated string including a newline and indentation\n\nfollowed by some more text.",
+  );
+});
+
 test("isDate()", () => {
   assert(utilities.isDate("2024-04-01T14:57:46.638Z"));
   assert(!utilities.isDate("2024-04-01T14:57:46.68Z"));

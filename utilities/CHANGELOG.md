@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.0.6 · 2024-07-12
+
+- Added `dedent()`.
+
 ## 2.0.5 · 2024-06-08
 
 - Added `foregroundJob()`.

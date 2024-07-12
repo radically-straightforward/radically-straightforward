@@ -71,6 +71,45 @@ export function capitalize(string: string): string;
 
 Capitalizes the first letter of a string. It’s different from [Lodash’s `capitalize()`](https://lodash.com/docs/4.17.15#capitalize) in that it doesn’t lowercase the rest of the string.
 
+### `dedent()`
+
+```typescript
+export function dedent(
+  templateStrings: TemplateStringsArray,
+  ...substitutions: any[]
+);
+```
+
+Removes indentation from a [tagged template](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_literals#tagged_templates) for more readable code.
+
+This is different from [the dedent package](https://www.npmjs.com/package/dedent) in the order of execution: the dedent package resolves interpolations first and removes indentation second, while `dedent()` removes indentation first and resolves interpolations second.
+
+This different comes in play when the interpolated string contains newlines and indentation: with the dedent package the interpolated string must be aware of the context in which it’s used or it may break the dedenting, but with `dedent()` the dedenting works regardless of the string being interpolated.
+
+Consider the following example:
+
+```javascript
+const exampleOfInterpolatedString = "example of\n an interpolated string including a newline and indentation";
+
+dedentPackage`
+  Here is an
+
+  ${exampleOfInterpolatedString}
+
+  followed by some more text.
+`;
+// => "Here is an\n\n example of\nan interpolated string including a newline and indentation\n\n followed by some more text."
+
+utilities.dedent`
+  Here is an
+
+  ${exampleOfInterpolatedString}
+
+  followed by some more text.
+`;
+// => "Here is an\n\nexample of\n an interpolated string including a newline and indentation\n\nfollowed by some more text."
+```
+
 ### `isDate()`
 
 ```typescript
