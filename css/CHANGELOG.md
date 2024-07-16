@@ -1,8 +1,9 @@
 # Changelog
 
-## Unreleased
+## 1.0.4 · 2024-07-16
 
 - Removed `--space--prose`.
+- Reset `<button>` text alignment.
 
 ## 1.0.3 · 2024-06-10
 
