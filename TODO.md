@@ -115,6 +115,11 @@
 ## `@radically-straightforward/sqlite`
 
 - `database.backgroundJob` may not need to sleep for 200ms between jobs.
+- Reasons to continue using `better-sqlite3` instead of `node:sqlite` for now:
+  - We don’t know which compile-time flags they’re using.
+  - Transactions.
+  - `PRAGMA`s.
+  - `iterate()`.
 
 ## `@radically-straightforward/html`
 
