@@ -5,7 +5,6 @@ import path from "node:path";
 import fs from "node:fs/promises";
 import childProcess from "node:child_process";
 import util from "node:util";
-import url from "node:url";
 import css from "@radically-straightforward/css";
 import javascript from "@radically-straightforward/javascript";
 
@@ -100,7 +99,7 @@ test(async () => {
   await fs.writeFile("./outside-static/outside-static.txt", "Outside static");
 
   await util.promisify(childProcess.execFile)("node", [
-    url.fileURLToPath(new URL("./index.mjs", import.meta.url)),
+    path.join(import.meta.dirname, "index.mjs"),
     "--copy-with-hash",
     "./outside-static/outside-static.txt",
     "--copy-without-hash",
