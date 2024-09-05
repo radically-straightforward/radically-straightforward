@@ -1,3 +1,4 @@
+import path from "node:path";
 import fs from "node:fs/promises";
 
 /**
@@ -439,5 +440,8 @@ export function text({
   return paragraphs.join("\n\n");
 }
 const textModel = JSON.parse(
-  await fs.readFile(new URL("../text/model.json", import.meta.url), "utf-8"),
+  await fs.readFile(
+    path.join(import.meta.dirname, "../text/model.json"),
+    "utf-8",
+  ),
 );
