@@ -3,7 +3,6 @@ import assert from "node:assert/strict";
 import os from "node:os";
 import path from "node:path";
 import fs from "node:fs/promises";
-import url from "node:url";
 import childProcess from "node:child_process";
 import util from "node:util";
 import { dedent as markdown } from "@radically-straightforward/utilities";
@@ -81,7 +80,7 @@ test(async () => {
     `,
   );
   await util.promisify(childProcess.execFile)("node", [
-    url.fileURLToPath(new URL("./index.mjs", import.meta.url)),
+    path.join(import.meta.dirname, "index.mjs"),
   ]);
   assert.equal(
     await fs.readFile("README.md", "utf-8"),
@@ -173,7 +172,7 @@ test(async () => {
     `,
   );
   await util.promisify(childProcess.execFile)("node", [
-    url.fileURLToPath(new URL("./index.mjs", import.meta.url)),
+    path.join(import.meta.dirname, "index.mjs"),
   ]);
   assert.equal(
     await fs.readFile("README.md", "utf-8"),
