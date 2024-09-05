@@ -17,9 +17,7 @@ export function start({
   node.childProcessKeepAlive(() => {
     const caddyChildProcess = childProcess.spawn(
       path.join(
-        url
-          .fileURLToPath(new URL("..", import.meta.url))
-          .split("/node_modules/")[0],
+        path.join(import.meta.dirname, "..").split("/node_modules/")[0],
         "node_modules/.bin/caddy",
       ),
       ["run", "--adapter", "caddyfile", "--config", "-"],
@@ -39,10 +37,8 @@ export const staticFiles: { [key: string]: string } = JSON.parse(
   await fs
     .readFile(
       path.join(
-        url
-          .fileURLToPath(new URL(".", import.meta.url))
-          .split("/node_modules/")[0],
-        "./build/static.json",
+        import.meta.dirname.split("/node_modules/")[0],
+        "build/static.json",
       ),
       "utf-8",
     )
@@ -121,9 +117,7 @@ export function application({
   ports = [18000],
   trustedStaticFilesRoots = [
     `* "${path.join(
-      url
-        .fileURLToPath(new URL("..", import.meta.url))
-        .split("/node_modules/")[0],
+      path.join(import.meta.dirname, "..").split("/node_modules/")[0],
       "build/static/",
     )}"`,
   ],

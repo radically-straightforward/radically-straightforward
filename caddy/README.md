@@ -87,7 +87,7 @@ export function application({
   hstsPreload = false,
   ports = [18000],
   trustedStaticFilesRoots = [
-    `* "${path.join(url.fileURLToPath(new URL("..", import.meta.url)).split("/node_modules/")[0], "build/static/")}"`,
+    `* "${path.join(path.join(import.meta.dirname, "..").split("/node_modules/")[0], "build/static/")}"`,
   ],
   untrustedStaticFilesRoots = [],
   tunnel = false,
