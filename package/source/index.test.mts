@@ -5,17 +5,14 @@ import path from "node:path";
 import fs from "node:fs/promises";
 import childProcess from "node:child_process";
 import util from "node:util";
-import url from "node:url";
 
 test(async () => {
-  process.chdir(
-    url.fileURLToPath(new URL("../example-application/", import.meta.url)),
-  );
+  process.chdir(path.join(import.meta.dirname, "../example-application/"));
   await util.promisify(childProcess.exec)(
     `npm${process.platform === "win32" ? ".cmd" : ""} ci`,
   );
   await util.promisify(childProcess.execFile)("node", [
-    url.fileURLToPath(new URL("./index.mjs", import.meta.url)),
+    path.join(import.meta.dirname, "index.mjs"),
   ]);
   process.chdir(
     await fs.mkdtemp(
@@ -23,20 +20,20 @@ test(async () => {
     ),
   );
   await fs.copyFile(
-    new URL(
+    path.join(
+      import.meta.dirname,
       `../example-application.${
         process.platform === "win32" ? "zip" : "tar.gz"
       }`,
-      import.meta.url,
     ),
     `example-application.${process.platform === "win32" ? "zip" : "tar.gz"}`,
   );
   await fs.unlink(
-    new URL(
+    path.join(
+      import.meta.dirname,
       `../example-application.${
         process.platform === "win32" ? "zip" : "tar.gz"
       }`,
-      import.meta.url,
     ),
   );
   await util.promisify(childProcess.execFile)("tar", [
