@@ -1,9 +1,8 @@
 import path from "node:path";
-import url from "node:url";
 import fs from "node:fs/promises";
 
 const tsconfig = path.join(
-  url.fileURLToPath(new URL(".", import.meta.url)).split("/node_modules/")[0],
+  import.meta.dirname.split("/node_modules/")[0],
   "tsconfig.json",
 );
 if ((await fs.access(tsconfig).catch(() => false)) === false)
