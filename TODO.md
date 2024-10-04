@@ -111,6 +111,11 @@
 - Convenient Defaults
   - Rate limiting
     - Could be done on Caddy with extension
+- Cache the rendering of the HTML
+  - https://guides.rubyonrails.org/caching_with_rails.html
+  - Storage:
+    - In memory of the Node.js process (separate caches per process)
+    - In SQLite database (shared cache)
 
 ## `@radically-straightforward/sqlite`
 
@@ -138,9 +143,31 @@
   `);
   ```
 
-- Cache server responses to show a preview while fetching a page.
-- Prefetch
-  - https://getquick.link/
+- Live Navigation
+  - Cache server responses to show a preview while fetching a page.
+    - Advantages:
+      - It’ll potentially be a bit faster.
+    - Disadvantages:
+      - It complicates the implementation.
+      - It uses more memory on the client side.
+    - Make sure to clear cache on sign-out or the back button will reveal private information.
+  - Pre-fetching
+    - There are some links that have side-effects, for example, changing the most recently visited course and conversation
+    - Potential workaround: Have some flag that the request is a pre-fetching (say, an HTTP header) and don’t perform these side-effects
+    - All links in viewport
+      - https://getquick.link/
+    - Link under cursor
+      - https://www.peterbe.com/plog/aggressively-prefetching-everything-you-might-click
+      - https://www.mskog.com/posts/instant-page-loads-with-turbolinks-and-prefetch
+      - http://instantclick.io
+    - Predictive prefetching: https://www.tensorflow.org/js/tutorials/applications/predictive_prefetching
+    - References:
+      - https://web.dev/speculative-prerendering/
+  - The submission of a form resets the state of the rest of the page.
+    - For example, start editing the title of a conversation, then click on “Pin”. The editing form will go away.
+    - For example, when you’re filling in the “Start a New Conversation” form, and you do a search on the sidebar.
+- Live Connection
+  - Partials could have their own Live Connection lifecycle
 
 ## `@radically-straightforward/utilities`
 
