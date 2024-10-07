@@ -108,9 +108,6 @@
     - Have pre-sessions with synchronizer tokens for signed out users to protect against login CSRF.
   - In case the implementation of the synchronizer token doesn’t go well, try to use the [double-submit pattern](https://cheatsheetseries.owasp.org/cheatsheets/Cross-Site_Request_Forgery_Prevention_Cheat_Sheet.html#alternative-using-a-double-submit-cookie-pattern).
     - It requires a secret known by the server to implement most securely. Note how everything boils down to the server recognizing itself by seeing a secret piece of data that it created.
-- Convenient Defaults
-  - Rate limiting
-    - Could be done on Caddy with extension
 - Cache the rendering of the HTML
   - https://guides.rubyonrails.org/caching_with_rails.html
   - Storage:
@@ -174,17 +171,27 @@
 ## `@radically-straightforward/node`
 
 - Application startup (process management)
-  - Different children processes
   - Tunnel
     - Start Caddy with `address` `http://localhost`, then create a port forwarding in Visual Studio Code to port 80, public.
   - Profiling
-  - Source maps
+  - Children processes could tell main process that they’re ready, this way we could do things like, for example, only start Caddy when the `web` processes are ready to receive requests. This is what worker threads & clusters call being `online`. If we do that, then we can enable Caddy’s active health checks.
+  - If a child process crashes too many times in a short period, then crash the main process.
 
 ## `@radically-straightforward/typescript`
 
 ## `@radically-straightforward/documentation`
 
 ## `@radically-straightforward/caddy`
+
+- There’s an issue when running for the first time: Caddy may ask for your password, but you may not see it.
+  - It still works if you see it and type in the password, even as other stuff has scrolled by.
+  - Potential solutions:
+    - If Caddy configuration directory doesn’t exist, run Caddy on the foreground
+    - Run Caddy before spawning other children processes (but how do you know that Caddy is done?)
+    - Document this quirk.
+- Rate limiting
+  - https://github.com/mholt/caddy-ratelimit
+  - https://github.com/RussellLuo/caddy-ext/tree/master/ratelimit
 
 ## `@radically-straightforward/build`
 
