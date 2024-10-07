@@ -176,6 +176,10 @@
   - Profiling
   - Children processes could tell main process that they’re ready, this way we could do things like, for example, only start Caddy when the `web` processes are ready to receive requests. This is what worker threads & clusters call being `online`. If we do that, then we can enable Caddy’s active health checks.
   - If a child process crashes too many times in a short period, then crash the main process.
+- Performance monitoring
+  - Requests that are slow to answer
+  - Background jobs queue that grows too long
+  - Process crashes
 
 ## `@radically-straightforward/typescript`
 
