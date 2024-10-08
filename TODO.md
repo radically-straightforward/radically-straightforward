@@ -108,20 +108,8 @@
     - Have pre-sessions with synchronizer tokens for signed out users to protect against login CSRF.
   - In case the implementation of the synchronizer token doesn’t go well, try to use the [double-submit pattern](https://cheatsheetseries.owasp.org/cheatsheets/Cross-Site_Request_Forgery_Prevention_Cheat_Sheet.html#alternative-using-a-double-submit-cookie-pattern).
     - It requires a secret known by the server to implement most securely. Note how everything boils down to the server recognizing itself by seeing a secret piece of data that it created.
-- Cache the rendering of the HTML
-  - https://guides.rubyonrails.org/caching_with_rails.html
-  - Storage:
-    - In memory of the Node.js process (separate caches per process / cache is flushed between restarts)
-    - In SQLite database (shared cache among processes / cache is persisted between restarts)
 
 ## `@radically-straightforward/sqlite`
-
-- `database.backgroundJob` may not need to sleep for 200ms between jobs.
-- Reasons to continue using `better-sqlite3` instead of `node:sqlite` for now:
-  - We don’t know which compile-time flags they’re using.
-  - Transactions.
-  - `PRAGMA`s.
-  - `iterate()`.
 
 ## `@radically-straightforward/html`
 
