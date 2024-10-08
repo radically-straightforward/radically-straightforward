@@ -111,8 +111,8 @@
 - Cache the rendering of the HTML
   - https://guides.rubyonrails.org/caching_with_rails.html
   - Storage:
-    - In memory of the Node.js process (separate caches per process)
-    - In SQLite database (shared cache)
+    - In memory of the Node.js process (separate caches per process / cache is flushed between restarts)
+    - In SQLite database (shared cache among processes / cache is persisted between restarts)
 
 ## `@radically-straightforward/sqlite`
 
