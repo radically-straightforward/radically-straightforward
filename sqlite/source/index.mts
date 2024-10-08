@@ -16,6 +16,8 @@ import * as node from "@radically-straightforward/node";
  *
  * 5. A background job mechanism.
  *
+ * 6. A caching mechanism.
+ *
  * To appreciate the difference in ergonomics between `better-sqlite3` and `@radically-straightforward/sqlite`, consider the following example:
  *
  * **`better-sqlite3`**
@@ -189,6 +191,15 @@ export class Database extends BetterSQLite3Database {
             CREATE INDEX IF NOT EXISTS "_backgroundJobsStartAt" ON "_backgroundJobs" ("startAt");
             CREATE INDEX IF NOT EXISTS "_backgroundJobsStartedAt" ON "_backgroundJobs" ("startedAt");
             CREATE INDEX IF NOT EXISTS "_backgroundJobsRetries" ON "_backgroundJobs" ("retries");
+
+            create table if not exists "_cache" (
+              "id" integer primary key autoincrement,
+              "key" text not null,
+              "value" text not null,
+              "usedAt" text not null
+            ) strict;
+            create index if not exists "_index_cache_key" on "_cache" ("key");
+            create index if not exists "_index_cache_usedAt" on "_cache" ("usedAt");
           `,
         );
       });
@@ -524,6 +535,48 @@ export class Database extends BetterSQLite3Database {
         await timers.setTimeout(200);
       }
     });
+  }
+
+  async cache(
+    key: string,
+    valueGenerator: () => Promise<string>,
+  ): Promise<string> {
+    let value: string;
+    const valueRow = this.get<{ id: number; value: string }>(
+      sql`
+        select "id", "value" from "_cache" where "key" = ${key};
+      `,
+    );
+    if (valueRow === undefined) {
+      value = await valueGenerator();
+      this.run(
+        sql`
+          insert into "_cache" ("key", "value", "usedAt")
+          values (
+            ${key},
+            ${value},
+            ${new Date().toISOString()}
+          );
+        `,
+      );
+      this.run(
+        sql`
+          delete from "_cache"
+          order by "usedAt" desc
+          limit -1 offset 10000;
+        `,
+      );
+    } else {
+      value = valueRow.value;
+      this.run(
+        sql`
+          update "_cache"
+          set "usedAt" = ${new Date().toISOString()}
+          where ${valueRow.id};
+        `,
+      );
+    }
+    return value;
   }
 
   close(): this {
