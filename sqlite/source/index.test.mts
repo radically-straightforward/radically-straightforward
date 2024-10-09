@@ -9,21 +9,21 @@ test("Database", async () => {
 
   const migrations: (Query | (() => void | Promise<void>))[] = [
     sql`
-      CREATE TABLE "users" (
-        "id" INTEGER PRIMARY KEY AUTOINCREMENT,
-        "name" TEXT
-      );
-      CREATE TABLE "posts" (
-        "id" INTEGER PRIMARY KEY AUTOINCREMENT,
-        "content" TEXT,
-        "author" INTEGER NOT NULL REFERENCES "users" ON DELETE CASCADE
-      );
+      create table "users" (
+        "id" integer primary key autoincrement,
+        "name" text not null
+      ) strict;
+      create table "posts" (
+        "id" integer primary key autoincrement,
+        "content" text not null,
+        "author" integer not null references "users"
+      ) strict;
     `,
 
     async () => {
       database.execute(
         sql`
-          INSERT INTO "users" ("name") VALUES (${"Leandro Facchinetti"});
+          insert into "users" ("name") values (${"Leandro Facchinetti"});
         `,
       );
     },
@@ -33,7 +33,7 @@ test("Database", async () => {
   assert.deepEqual(
     database.run(
       sql`
-        INSERT INTO "users" ("name") VALUES (${"David Adler"})
+        insert into "users" ("name") values (${"David Adler"});
       `,
     ),
     { changes: 1, lastInsertRowid: 2 },
@@ -42,7 +42,7 @@ test("Database", async () => {
   assert.deepEqual(
     database.get<{ id: number; name: string }>(
       sql`
-        INSERT INTO "users" ("name") VALUES (${"Louie Renner"}) RETURNING *
+        insert into "users" ("name") values (${"Louie Renner"}) returning *;
       `,
     ),
     { id: 3, name: "Louie Renner" },
@@ -51,7 +51,7 @@ test("Database", async () => {
   assert.deepEqual(
     database.get<{ id: number; name: string }>(
       sql`
-        SELECT "id", "name" FROM "users" WHERE "id" = 1
+        select "id", "name" from "users" where "id" = 1;
       `,
     ),
     { id: 1, name: "Leandro Facchinetti" },
@@ -60,7 +60,7 @@ test("Database", async () => {
   assert.equal(
     database.get<{ id: number; name: string }>(
       sql`
-        SELECT "id", "name" FROM "users" WHERE "id" = 500
+        select "id", "name" from "users" where "id" = 500;
       `,
     ),
     undefined,
@@ -69,7 +69,7 @@ test("Database", async () => {
   assert.deepEqual(
     database.all<{ id: number; name: string }>(
       sql`
-        SELECT "id", "name" FROM "users" ORDER BY "id" ASC
+        select "id", "name" from "users" order by "id" asc;
       `,
     ),
     [
@@ -82,7 +82,7 @@ test("Database", async () => {
   assert.deepEqual(
     database.all<{ id: number; name: string }>(
       sql`
-        SELECT "id", "name" FROM "users" WHERE "name" IN ${[]}
+        select "id", "name" from "users" where "name" in ${[]};
       `,
     ),
     [],
@@ -91,10 +91,10 @@ test("Database", async () => {
   assert.deepEqual(
     database.all<{ id: number; name: string }>(
       sql`
-        SELECT "id", "name" FROM "users" WHERE "name" IN ${[
+        select "id", "name" from "users" where "name" in ${[
           "Leandro Facchinetti",
           "David Adler",
-        ]}
+        ]};
       `,
     ),
     [
@@ -106,10 +106,10 @@ test("Database", async () => {
   assert.deepEqual(
     database.all<{ id: number; name: string }>(
       sql`
-        SELECT "id", "name" FROM "users" WHERE "name" IN ${new Set([
+        select "id", "name" from "users" where "name" in ${new Set([
           "Leandro Facchinetti",
           "David Adler",
-        ])}
+        ])};
       `,
     ),
     [
@@ -122,7 +122,7 @@ test("Database", async () => {
     [
       ...database.iterate<{ id: number; name: string }>(
         sql`
-          SELECT "id", "name" FROM "users" ORDER BY "id" ASC
+          select "id", "name" from "users" order by "id" asc;
         `,
       ),
     ],
@@ -139,7 +139,7 @@ test("Database", async () => {
     database.executeTransaction<void>(() => {
       database.run(
         sql`
-          INSERT INTO "users" ("name") VALUES (${"Abigail Wall"})
+          insert into "users" ("name") values (${"Abigail Wall"});
         `,
       );
       throw new Error();
@@ -148,7 +148,7 @@ test("Database", async () => {
   assert.equal(
     database.get<{ id: number; name: string }>(
       sql`
-        SELECT "id", "name" FROM "users" WHERE "name" = ${"Abigail Wall"}
+        select "id", "name" from "users" where "name" = ${"Abigail Wall"};
       `,
     ),
     undefined,
@@ -157,7 +157,7 @@ test("Database", async () => {
     database.executeTransaction<ReturnType<Database["run"]>>(() => {
       return database.run(
         sql`
-          INSERT INTO "users" ("name") VALUES (${"Abigail Wall"})
+          insert into "users" ("name") values (${"Abigail Wall"});
         `,
       );
     }),
@@ -166,7 +166,7 @@ test("Database", async () => {
   assert.deepEqual(
     database.all<{ id: number; name: string }>(
       sql`
-        SELECT "id", "name" FROM "users" WHERE "name" = ${"Abigail Wall"}
+        select "id", "name" from "users" where "name" = ${"Abigail Wall"};
       `,
     ),
     [{ id: 4, name: "Abigail Wall" }],
@@ -185,7 +185,7 @@ test("Database", async () => {
     await database.migrate(...migrations, async () => {
       database.execute(
         sql`
-          INSERT INTO "users" ("name") VALUES (${"Jeppe"})
+          insert into "users" ("name") values (${"Jeppe"});
         `,
       );
       await timers.setTimeout();
@@ -195,101 +195,101 @@ test("Database", async () => {
   assert.equal(
     database.get<{ id: number; name: string }>(
       sql`
-        SELECT "id", "name" FROM "users" WHERE "name" = ${"Jeppe"}
+        select "id", "name" from "users" where "name" = ${"Jeppe"};
       `,
     ),
     undefined,
   );
 
   assert.deepEqual(
-    sql`CREATE TABLE "users" ("id" INTEGER PRIMARY KEY AUTOINCREMENT, "name" TEXT)`,
+    sql`create table "users" ("id" integer primary key autoincrement, "name" text);`,
     {
       sourceParts: [
-        `CREATE TABLE "users" ("id" INTEGER PRIMARY KEY AUTOINCREMENT, "name" TEXT)`,
+        `create table "users" ("id" integer primary key autoincrement, "name" text);`,
       ],
       parameters: [],
     },
   );
 
   assert.deepEqual(
-    sql`INSERT INTO "users" ("name") VALUES (${"Leandro Facchinetti"})`,
+    sql`insert into "users" ("name") values (${"Leandro Facchinetti"});`,
     {
-      sourceParts: [`INSERT INTO "users" ("name") VALUES (`, `)`],
+      sourceParts: [`insert into "users" ("name") values (`, `);`],
       parameters: ["Leandro Facchinetti"],
     },
   );
 
   assert.deepEqual(
-    sql`SELECT "id", "name" FROM "users" WHERE "name" IN ${[]}`,
+    sql`select "id", "name" from "users" where "name" in ${[]};`,
     {
-      sourceParts: [`SELECT "id", "name" FROM "users" WHERE "name" IN ()`],
+      sourceParts: [`select "id", "name" from "users" where "name" in ();`],
       parameters: [],
     },
   );
 
   assert.deepEqual(
-    sql`SELECT "id", "name" FROM "users" WHERE "name" IN ${[
+    sql`select "id", "name" from "users" where "name" in ${[
       "Leandro Facchinetti",
       "David Adler",
-    ]}`,
+    ]};`,
     {
       sourceParts: [
-        `SELECT "id", "name" FROM "users" WHERE "name" IN (`,
+        `select "id", "name" from "users" where "name" in (`,
         `,`,
-        `)`,
+        `);`,
       ],
       parameters: ["Leandro Facchinetti", "David Adler"],
     },
   );
 
   assert.deepEqual(
-    sql`SELECT "id", "name" FROM "users" WHERE "name" IN ${new Set([])}`,
+    sql`select "id", "name" from "users" where "name" in ${new Set([])};`,
     {
-      sourceParts: [`SELECT "id", "name" FROM "users" WHERE "name" IN ()`],
+      sourceParts: [`select "id", "name" from "users" where "name" in ();`],
       parameters: [],
     },
   );
 
   assert.deepEqual(
-    sql`SELECT "id", "name" FROM "users" WHERE "name" IN ${new Set([
+    sql`select "id", "name" from "users" where "name" in ${new Set([
       "Leandro Facchinetti",
       "David Adler",
-    ])}`,
+    ])};`,
     {
       sourceParts: [
-        `SELECT "id", "name" FROM "users" WHERE "name" IN (`,
+        `select "id", "name" from "users" where "name" in (`,
         `,`,
-        `)`,
+        `);`,
       ],
       parameters: ["Leandro Facchinetti", "David Adler"],
     },
   );
 
   assert.deepEqual(
-    sql`SELECT "id", "name" FROM "users" WHERE "name" = ${"Leandro Facchinetti"}$${sql` AND "age" IS NOT NULL`}`,
+    sql`select "id", "name" from "users" where "name" = ${"Leandro Facchinetti"}$${sql` and "age" is not null`};`,
     {
       sourceParts: [
-        `SELECT "id", "name" FROM "users" WHERE "name" = `,
-        ` AND "age" IS NOT NULL`,
+        `select "id", "name" from "users" where "name" = `,
+        ` and "age" is not null;`,
       ],
       parameters: ["Leandro Facchinetti"],
     },
   );
 
   assert.deepEqual(
-    sql`SELECT "id", "name" FROM "users" WHERE "name" = ${"Leandro Facchinetti"}$${sql` AND "age" = ${33}`}`,
+    sql`select "id", "name" from "users" where "name" = ${"Leandro Facchinetti"}$${sql` and "age" = ${33}`};`,
     {
       sourceParts: [
-        `SELECT "id", "name" FROM "users" WHERE "name" = `,
-        ` AND "age" = `,
-        ``,
+        `select "id", "name" from "users" where "name" = `,
+        ` and "age" = `,
+        `;`,
       ],
       parameters: ["Leandro Facchinetti", 33],
     },
   );
 
   assert.throws(() => {
-    sql`SELECT "id", "name" FROM "users" WHERE "name" = ${"Leandro Facchinetti"}$${` AND "age" IS NOT NULL`}`;
+    sql`select "id", "name" from "users" where "name" = ${"Leandro Facchinetti"}$${` and "age" is not null`};`;
   });
 });
 
@@ -305,35 +305,35 @@ test(
 
     database.run(
       sql`
-        INSERT INTO "_backgroundJobs" (
+        insert into "_backgroundJobs" (
           "type",
           "startAt",
           "parameters"
         )
-        VALUES (
+        values (
           ${"a-job-with-no-worker"},
           ${new Date().toISOString()},
           ${JSON.stringify(null)}
-        )
+        );
       `,
     );
 
     database.run(
       sql`
-        INSERT INTO "_backgroundJobs" (
+        insert into "_backgroundJobs" (
           "type",
           "startAt",
           "startedAt",
           "retries",
           "parameters"
         )
-        VALUES (
+        values (
           ${"a-job-which-was-left-behind"},
           ${new Date(Date.now() - 20 * 60 * 1000).toISOString()},
           ${new Date(Date.now() - 15 * 60 * 1000).toISOString()},
           ${0},
           ${JSON.stringify(null)}
-        )
+        );
       `,
     );
     database.backgroundJob({ type: "a-job-which-was-left-behind" }, () => {});
@@ -353,16 +353,16 @@ test(
     );
     database.run(
       sql`
-        INSERT INTO "_backgroundJobs" (
+        insert into "_backgroundJobs" (
           "type",
           "startAt",
           "parameters"
         )
-        VALUES (
+        values (
           ${"a-job-which-times-out"},
           ${new Date().toISOString()},
           ${JSON.stringify({ name: "Leandro" })}
-        )
+        );
       `,
     );
 
@@ -381,16 +381,16 @@ test(
     );
     database.run(
       sql`
-        INSERT INTO "_backgroundJobs" (
+        insert into "_backgroundJobs" (
           "type",
           "startAt",
           "parameters"
         )
-        VALUES (
+        values (
           ${"a-job-which-throws-an-exception"},
           ${new Date().toISOString()},
           ${JSON.stringify({ name: "Leandro" })}
-        )
+        );
       `,
     );
 
