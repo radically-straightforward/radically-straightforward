@@ -38,6 +38,8 @@ An extension of [`better-sqlite3`](https://www.npmjs.com/package/better-sqlite3)
 
 5. A background job mechanism.
 
+6. A caching mechanism.
+
 To appreciate the difference in ergonomics between `better-sqlite3` and `@radically-straightforward/sqlite`, consider the following example:
 
 **`better-sqlite3`**
@@ -49,20 +51,20 @@ const database = new Database("example.db");
 
 database.exec(
   `
-    CREATE TABLE "users" (
-      "id" INTEGER PRIMARY KEY AUTOINCREMENT,
-      "name" TEXT
-    ) STRICT;
+    create table "users" (
+      "id" integer primary key autoincrement,
+      "name" text not null
+    ) strict;
   `,
 );
 
 const insertStatement = database.prepare(
-  `INSERT INTO "users" ("name") VALUES (?)`,
+  `insert into "users" ("name") values (?);`,
 );
 insertStatement.run("Leandro Facchinetti");
 
 const selectStatement = database.prepare(
-  `SELECT "id", "name" FROM "users" WHERE "name" = ?`,
+  `select "id", "name" from "users" where "name" = ?;`,
 );
 console.log(selectStatement.get("Leandro Facchinetti")); // => { id: 1, name: 'Leandro Facchinetti' }
 
@@ -73,7 +75,7 @@ database.close();
 
 2. The queries and their corresponding binding parameters are specified separately. In this simple example they’re just one line apart, but in general they could be far from each other, which makes the program more difficult to maintain.
 
-3. When you run the program above for the second time, it fails because the `users` table already exists. In this simple example you could work around that by using `CREATE TABLE IF NOT EXISTS`, but for anything more complicated you need a migration system.
+3. When you run the program above for the second time, it fails because the `users` table already exists. In this simple example you could work around that by using `create table if not exists`, but for anything more complicated you need a migration system.
 
 4. You must remember to call `close()` or some temporary files may be left behind even after a graceful termination.
 
@@ -84,23 +86,23 @@ import sql, { Database } from "@radically-straightforward/sqlite";
 
 const database = await new Database("example.db").migrate(
   sql`
-    CREATE TABLE "users" (
-      "id" INTEGER PRIMARY KEY AUTOINCREMENT,
-      "name" TEXT
-    ) STRICT;
+    create table "users" (
+      "id" integer primary key autoincrement,
+      "name" text not null
+    ) strict;
   `,
 );
 
 database.run(
   sql`
-    INSERT INTO "users" ("name") VALUES (${"Leandro Facchinetti"})
+    insert into "users" ("name") values (${"Leandro Facchinetti"});
   `,
 );
 
 console.log(
   database.get(
     sql`
-      SELECT "id", "name" FROM "users" WHERE "name" = ${"Leandro Facchinetti"}
+      select "id", "name" from "users" where "name" = ${"Leandro Facchinetti"};
     `,
   ),
 ); // => { id: 1, name: 'Leandro Facchinetti' }
@@ -134,10 +136,10 @@ A migration may be:
 
    ```javascript
    sql`
-     CREATE TABLE "users" (
-       "id" INTEGER PRIMARY KEY AUTOINCREMENT,
-       "name" TEXT
-     ) STRICT;
+     create table "users" (
+       "id" integer primary key autoincrement,
+       "name" text not null
+     ) strict;
    `;
    ```
 
@@ -147,7 +149,7 @@ A migration may be:
    async () => {
      database.execute(
        sql`
-         INSERT INTO "users" ("name") VALUES (${"Leandro Facchinetti"});
+         insert into "users" ("name") values (${"Leandro Facchinetti"});
        `,
      );
    };
@@ -171,15 +173,15 @@ A migration may be:
 
    > **Why?** This makes managing migrations more straightforward, and in any non-trivial case rollback is impossible anyway (for example, if a migration involves dropping a table, then rolling it back would involve bringing back data that has been deleted).
 
-6. You may consult the status of your database schema with the [`PRAGMA user_version`](https://www.sqlite.org/pragma.html#pragma_user_version), which holds the number of migrations that have been run successfully.
+6. You may consult the status of your database schema with the [`pragma user_version`](https://www.sqlite.org/pragma.html#pragma_user_version), which holds the number of migrations that have been run successfully.
 
-7. The migration system sets several `PRAGMA`s that make SQLite better suited for running on the server, avoiding the `SQLITE_BUSY` error. See <https://kerkour.com/sqlite-for-servers>.
+7. The migration system sets several `pragma`s that make SQLite better suited for running on the server, avoiding the `SQLITE_BUSY` error. See <https://kerkour.com/sqlite-for-servers>.
 
 **Implementation Notes**
 
 - `migrate()` must be its own separate method instead of being part of the constructor because migrations may be asynchronous.
 
-- We manage transactions by hand with `BEGIN IMMEDIATE` instead of using `executeTransaction()` because migrations are [the one exception](https://github.com/WiseLibs/better-sqlite3/blob/bd55c76c1520c7796aa9d904fe65b3fb4fe7aac0/docs/api.md#caveats) in which it makes sense to have an asynchronous function in the middle of a transaction, given that migrations don’t run in parallel.
+- We manage transactions by hand with `begin immediate` instead of using `executeTransaction()` because migrations are [the one exception](https://github.com/WiseLibs/better-sqlite3/blob/bd55c76c1520c7796aa9d904fe65b3fb4fe7aac0/docs/api.md#caveats) in which it makes sense to have an asynchronous function in the middle of a transaction, given that migrations don’t run in parallel.
 
 #### `Database.execute()`
 
@@ -187,7 +189,7 @@ A migration may be:
 execute(query: Query): this;
 ```
 
-Execute DDL statements, for example, `CREATE TABLE`, `DROP INDEX`, and so forth. Multiple statements may be included in the same query.
+Execute DDL statements, for example, `create table`, `drop index`, and so forth. Multiple statements may be included in the same query.
 
 #### `Database.run()`
 
@@ -195,7 +197,7 @@ Execute DDL statements, for example, `CREATE TABLE`, `DROP INDEX`, and so forth.
 run(query: Query): BetterSQLite3Database.RunResult;
 ```
 
-Run a DML statement, for example, `INSERT`, `UPDATE`, `DELETE`, and so forth.
+Run a DML statement, for example, `insert`, `update`, `delete`, and so forth.
 
 #### `Database.get()`
 
@@ -203,11 +205,11 @@ Run a DML statement, for example, `INSERT`, `UPDATE`, `DELETE`, and so forth.
 get<Type>(query: Query): Type | undefined;
 ```
 
-Run a `SELECT` statement that returns a single result.
+Run a `select` statement that returns a single result.
 
-> **Note:** If the `SELECT` statement returns multiple results, only the first result is returned, so it’s better to write statements that return a single result (for example, using `LIMIT`).
+> **Note:** If the `select` statement returns multiple results, only the first result is returned, so it’s better to write statements that return a single result (for example, using `limit`).
 
-> **Note:** You may also use `get()` to run an [`INSERT ___ RETURNING ___` statement](https://www.sqlite.org/lang_returning.html), but you probably shouldn’t use `RETURNING`, because it runs into issues in edge cases. Instead, you should use `run()`, get the `lastInsertRowid`, and perform a follow-up `SELECT`. See <https://github.com/WiseLibs/better-sqlite3/issues/654> and <https://github.com/WiseLibs/better-sqlite3/issues/657>.
+> **Note:** You may also use `get()` to run an [`insert ___ returning ___` statement](https://www.sqlite.org/lang_returning.html), but you probably shouldn’t use `returning`, because it runs into issues in edge cases. Instead, you should use `run()`, get the `lastInsertRowid`, and perform a follow-up `select`. See <https://github.com/WiseLibs/better-sqlite3/issues/654> and <https://github.com/WiseLibs/better-sqlite3/issues/657>.
 
 > **Note:** The `Type` parameter is [an assertion](https://www.typescriptlang.org/docs/handbook/2/everyday-types.html#type-assertions). If you’d like to make sure that the values returned from the database are of a certain type, you must implement a runtime check instead. See <https://github.com/DefinitelyTyped/DefinitelyTyped/issues/50794>, <https://github.com/DefinitelyTyped/DefinitelyTyped/discussions/62205>, and <https://github.com/DefinitelyTyped/DefinitelyTyped/pull/65035>. Note that the `get() as ___` pattern also works because by default `Type` is `unknown`.
 
@@ -217,9 +219,9 @@ Run a `SELECT` statement that returns a single result.
 all<Type>(query: Query): Type[];
 ```
 
-Run a `SELECT` statement that returns multiple results as an Array.
+Run a `select` statement that returns multiple results as an Array.
 
-> **Note:** We recommend including an explicit `ORDER BY` clause to specify the order of the results.
+> **Note:** We recommend including an explicit `order by` clause to specify the order of the results.
 
 > **Note:** If the results are big and you don’t want to load them all at once, then use `iterate()` instead.
 
@@ -229,7 +231,7 @@ Run a `SELECT` statement that returns multiple results as an Array.
 iterate<Type>(query: Query): IterableIterator<Type>;
 ```
 
-Run a `SELECT` statement that returns multiple results as an iterator.
+Run a `select` statement that returns multiple results as an iterator.
 
 > **Note:** If the results are small and you may load them all at once, then use `all()` instead.
 
@@ -242,7 +244,7 @@ pragma<Type>(
   ): Type;
 ```
 
-Run a `PRAGMA`. Similar to `better-sqlite3`’s `pragma()`, but includes the `Type` assertion similar to other methods.
+Run a `pragma`. Similar to `better-sqlite3`’s `pragma()`, but includes the `Type` assertion similar to other methods.
 
 #### `Database.executeTransaction()`
 
@@ -250,7 +252,7 @@ Run a `PRAGMA`. Similar to `better-sqlite3`’s `pragma()`, but includes the `Ty
 executeTransaction<Type>(fn: () => Type): Type;
 ```
 
-Execute a function in a transaction. All the [caveats](https://github.com/WiseLibs/better-sqlite3/blob/bd55c76c1520c7796aa9d904fe65b3fb4fe7aac0/docs/api.md#caveats) about `better-sqlite3`’s transactions still apply. Transactions are `IMMEDIATE` to avoid `SQLITE_BUSY` errors. See <https://kerkour.com/sqlite-for-servers>.
+Execute a function in a transaction. All the [caveats](https://github.com/WiseLibs/better-sqlite3/blob/bd55c76c1520c7796aa9d904fe65b3fb4fe7aac0/docs/api.md#caveats) about `better-sqlite3`’s transactions still apply. Transactions are `immediate` to avoid `SQLITE_BUSY` errors. See <https://kerkour.com/sqlite-for-servers>.
 
 #### `Database.backgroundJob()`
 
@@ -287,17 +289,17 @@ A background job system that builds upon [`@radically-straightforward/node`](htt
 
 > **Note:** You may use the same database for application data and background jobs, which is simpler to manage, or separate databases for application data for background jobs, which may be faster because background jobs write to the database often and SQLite locks the database on writes.
 
-You may schedule a background job by `INSERT`ing it into the `_backgroundJobs` table that’s created by `migrate()`, for example:
+You may schedule a background job by `insert`ing it into the `_backgroundJobs` table that’s created by `migrate()`, for example:
 
 ```typescript
 database.run(
   sql`
-    INSERT INTO "_backgroundJobs" (
+    insert into "_backgroundJobs" (
       "type",
       "startAt",
       "parameters"
     )
-    VALUES (
+    values (
       ${"email"},
       ${new Date(Date.now() + 5 * 60 * 1000).toISOString()},
       ${JSON.stringify({
@@ -305,7 +307,7 @@ database.run(
         to: "radically-straightforward@leafac.com",
         text: "This was sent from a background job.",
       })}
-    )
+    );
   `,
 );
 ```
@@ -321,6 +323,40 @@ database.run(
 - https://github.com/bensheldon/good_job
 - https://github.com/litements/litequeue
 - https://github.com/diamondio/better-queue-sqlite
+
+#### `Database.cache()`
+
+```typescript
+async cache(
+    key: string,
+    valueGenerator: () => string | Promise<string>,
+  ): Promise<string>;
+```
+
+A simple cache mechanism backed by the SQLite database.
+
+If the `key` is not found, then the `valueGenerator()` is called and its result is stored. If the `key` is found, then the stored `value` is returned and `valueGenerator()` is not called.
+
+The cache holds at most `this.cacheSize` items (by default `10_000`). As new items are added, the least recently used (LRU) items are deleted.
+
+The `key` must contain all the information that identifies the `value`, for example, `` `messages/${message.id}/updatedAt/${message.updatedAt}` ``. As the `message` is updated, old cache entries aren’t expired explicitly, but fall out of the cache as new items are added.
+
+This cache is appropriate for storing server-side HTML that’s expensive to compute, memoized values in dynamic programming, and so forth.
+
+The advantages of using SQLite instead of something like a `Map` in the JavaScript process itself are that the cache persists across application restarts, and that the cache may be shared across multiple processes of the same application.
+
+The advantage of using SQLite instead of something like Redis or Memcached is that it’s less infrastructure to maintain.
+
+You may want to have the cache in the same database as the application, because it’s simpler. Or you may prefer to have the cache in a dedicated database, because the cache involves a lot of writes, which could slow down other parts of the application.
+
+**References**
+
+- <https://guides.rubyonrails.org/caching_with_rails.html#low-level-caching>
+- <https://signalvnoise.com/posts/3113-how-key-based-cache-expiration-works>
+
+**Implementation Notes**
+
+- We don’t use a transaction between consulting the cache and updating the cache so that things are as fast as possible: a transaction would lock writes to the database for longer—not to mention that `valueGenerator()` may be asynchronous, and it runs between these two steps. As a consequence, in case of a race condition, the `key` may appear multiple times in the cache. But that isn’t an issue, because the `key` isn’t `unique` in the schema, so no uniqueness constraint violation happens, and if the cache is being used correctly and `valueGenerator()` returns the same value every time, then both `key`s will have the same `value`, and one of them will not be used and naturally fall out of the cache at some point.
 
 #### `Database.getStatement()`
 
@@ -365,22 +401,22 @@ A tagged template to generate a database query.
 Interpolation is turned into binding parameters to protect from SQL injection, for example:
 
 ```javascript
-sql`INSERT INTO "users" ("name") VALUES (${"Leandro Facchinetti"})`;
+sql`insert into "users" ("name") values (${"Leandro Facchinetti"});`;
 ```
 
-Arrays and Sets may be interpolated for `IN` clauses, for example:
+Arrays and Sets may be interpolated for `in` clauses, for example:
 
 ```javascript
-sql`SELECT "id", "name" FROM "users" WHERE "name" IN ${[
+sql`select "id", "name" from "users" where "name" in ${[
   "Leandro Facchinetti",
   "David Adler",
-]}`;
+]};`;
 ```
 
 You may use the pattern `$${___}` (note the two `$`) to interpolate a clause within a query, for example:
 
 ```javascript
-sql`SELECT "id", "name" FROM "users" WHERE "name" = ${"Leandro Facchinetti"}$${sql` AND "age" = ${33}`}`;
+sql`select "id", "name" from "users" where "name" = ${"Leandro Facchinetti"}$${sql` and "age" = ${33}`};`;
 ```
 
 > **Note:** This is useful, for example, to build queries for advanced search forms by conditionally including clauses for fields that have been filled in.
