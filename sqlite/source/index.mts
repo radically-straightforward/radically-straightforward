@@ -541,10 +541,35 @@ export class Database extends BetterSQLite3Database {
   }
 
   cacheSize = 10_000;
-  /** TODO */
+  /**
+   * A simple cache mechanism backed by the SQLite database.
+   *
+   * If the `key` is not found, then the `valueGenerator()` is called and its result is stored. If the `key` is found, then the stored `value` is returned and `valueGenerator()` is not called.
+   *
+   * The cache holds at most `this.cacheSize` items (by default `10_000`). As new items are added, the least recently used (LRU) items are deleted.
+   *
+   * The `key` must contain all the information that identifies the `value`, for example, `` `messages/${message.id}/updatedAt/${message.updatedAt}` ``. As the `message` is updated, old cache entries aren’t expired explicitly, but fall out of the cache as new items are added.
+   *
+   * This cache is appropriate for storing server-side HTML that’s expensive to compute, memoized values in dynamic programming, and so forth.
+   *
+   * The advantages of using SQLite instead of something like a `Map` in the JavaScript process itself are that the cache persists across application restarts, and that the cache may be shared across multiple processes of the same application.
+   *
+   * The advantage of using SQLite instead of something like Redis or Memcached is that it’s less infrastructure to maintain.
+   *
+   * You may want to have the cache in the same database as the application, because it’s simpler. Or you may prefer to have the cache in a dedicated database, because the cache involves a lot of writes, which could slow down other parts of the application.
+   *
+   * **References**
+   *
+   * - <https://guides.rubyonrails.org/caching_with_rails.html#low-level-caching>
+   * - <https://signalvnoise.com/posts/3113-how-key-based-cache-expiration-works>
+   *
+   * **Implementation Notes**
+   *
+   * - We don’t use a transaction between consulting the cache and updating the cache so that things are as fast as possible: a transaction would lock writes to the database for longer—not to mention that `valueGenerator()` may be asynchronous, and it runs between these two steps. As a consequence, in case of a race condition, the `key` may appear multiple times in the cache. But that isn’t an issue, because the `key` isn’t `unique` in the schema, so no uniqueness constraint violation happens, and if the cache is being used correctly and `valueGenerator()` returns the same value every time, then both `key`s will have the same `value`, and one of them will not be used and naturally fall out of the cache at some point.
+   */
   async cache(
     key: string,
-    valueGenerator: () => Promise<string>,
+    valueGenerator: () => string | Promise<string>,
   ): Promise<string> {
     let value: string;
     const valueRow = this.get<{ id: number; value: string }>(
@@ -568,7 +593,7 @@ export class Database extends BetterSQLite3Database {
         sql`
           delete from "_cache"
           order by "usedAt" desc
-          limit -1 offset 10000;
+          limit -1 offset ${this.cacheSize};
         `,
       );
     } else {
