@@ -202,32 +202,17 @@ test("Database", async () => {
   );
 
   database.cacheSize = 3;
-  assert.equal(
-    await database.cache("1", () => "1"),
-    "1",
-  );
-  assert.equal(
-    await database.cache("2", () => "2"),
-    "2",
-  );
-  assert.equal(
-    await database.cache("3", () => "3"),
-    "3",
-  );
+  assert.equal(await database.cache("1", () => "1"), "1");
+  assert.equal(await database.cache("2", () => "2"), "2");
+  assert.equal(await database.cache("3", () => "3"), "3");
   assert.equal(
     await database.cache("1", () => {
       throw new Error();
     }),
     "1",
   );
-  assert.equal(
-    await database.cache("4", () => "4"),
-    "4",
-  );
-  assert.equal(
-    await database.cache("2", () => "a new 2"),
-    "a new 2",
-  );
+  assert.equal(await database.cache("4", () => "4"), "4");
+  assert.equal(await database.cache("2", () => "a new 2"), "a new 2");
 
   assert.deepEqual(
     sql`create table "users" ("id" integer primary key autoincrement, "name" text);`,
