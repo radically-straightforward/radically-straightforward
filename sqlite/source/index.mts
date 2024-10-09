@@ -602,7 +602,7 @@ export class Database extends BetterSQLite3Database {
         sql`
           update "_cache"
           set "usedAt" = ${new Date().toISOString()}
-          where ${valueRow.id};
+          where "id" = ${valueRow.id};
         `,
       );
     }

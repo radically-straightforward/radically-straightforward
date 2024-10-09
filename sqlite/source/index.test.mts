@@ -1,6 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import timers from "node:timers/promises";
+import * as utilities from "@radically-straightforward/utilities";
 import * as node from "@radically-straightforward/node";
 import sql, { Database, Query } from "@radically-straightforward/sqlite";
 
@@ -203,15 +204,20 @@ test("Database", async () => {
 
   database.cacheSize = 3;
   assert.equal(await database.cache("1", () => "1"), "1");
+  await utilities.sleep(10);
   assert.equal(await database.cache("2", () => "2"), "2");
+  await utilities.sleep(10);
   assert.equal(await database.cache("3", () => "3"), "3");
+  await utilities.sleep(10);
   assert.equal(
     await database.cache("1", () => {
       throw new Error();
     }),
     "1",
   );
+  await utilities.sleep(10);
   assert.equal(await database.cache("4", () => "4"), "4");
+  await utilities.sleep(10);
   assert.equal(await database.cache("2", () => "a new 2"), "a new 2");
 
   assert.deepEqual(
