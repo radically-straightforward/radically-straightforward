@@ -29,20 +29,20 @@ import * as node from "@radically-straightforward/node";
  *
  * database.exec(
  *   `
- *     CREATE TABLE "users" (
- *       "id" INTEGER PRIMARY KEY AUTOINCREMENT,
- *       "name" TEXT
- *     ) STRICT;
+ *     create table "users" (
+ *       "id" integer primary key autoincrement,
+ *       "name" text not null
+ *     ) strict;
  *   `,
  * );
  *
  * const insertStatement = database.prepare(
- *   `INSERT INTO "users" ("name") VALUES (?)`,
+ *   `insert into "users" ("name") values (?);`,
  * );
  * insertStatement.run("Leandro Facchinetti");
  *
  * const selectStatement = database.prepare(
- *   `SELECT "id", "name" FROM "users" WHERE "name" = ?`,
+ *   `select "id", "name" from "users" where "name" = ?;`,
  * );
  * console.log(selectStatement.get("Leandro Facchinetti")); // => { id: 1, name: 'Leandro Facchinetti' }
  *
@@ -53,7 +53,7 @@ import * as node from "@radically-straightforward/node";
  *
  * 2. The queries and their corresponding binding parameters are specified separately. In this simple example they’re just one line apart, but in general they could be far from each other, which makes the program more difficult to maintain.
  *
- * 3. When you run the program above for the second time, it fails because the `users` table already exists. In this simple example you could work around that by using `CREATE TABLE IF NOT EXISTS`, but for anything more complicated you need a migration system.
+ * 3. When you run the program above for the second time, it fails because the `users` table already exists. In this simple example you could work around that by using `create table if not exists`, but for anything more complicated you need a migration system.
  *
  * 4. You must remember to call `close()` or some temporary files may be left behind even after a graceful termination.
  *
@@ -64,23 +64,23 @@ import * as node from "@radically-straightforward/node";
  *
  * const database = await new Database("example.db").migrate(
  *   sql`
- *     CREATE TABLE "users" (
- *       "id" INTEGER PRIMARY KEY AUTOINCREMENT,
- *       "name" TEXT
- *     ) STRICT;
+ *     create table "users" (
+ *       "id" integer primary key autoincrement,
+ *       "name" text not null
+ *     ) strict;
  *   `,
  * );
  *
  * database.run(
  *   sql`
- *     INSERT INTO "users" ("name") VALUES (${"Leandro Facchinetti"})
+ *     insert into "users" ("name") values (${"Leandro Facchinetti"});
  *   `,
  * );
  *
  * console.log(
  *   database.get(
  *     sql`
- *       SELECT "id", "name" FROM "users" WHERE "name" = ${"Leandro Facchinetti"}
+ *       select "id", "name" from "users" where "name" = ${"Leandro Facchinetti"};
  *     `,
  *   ),
  * ); // => { id: 1, name: 'Leandro Facchinetti' }
@@ -99,7 +99,6 @@ import * as node from "@radically-straightforward/node";
  * 4. If you don’t call `close()` explicitly, it’s called for you before process exit.
  */
 export class Database extends BetterSQLite3Database {
-  #statements = new Map<string, BetterSQLite3Database.Statement>();
   #beforeExitEventListener = () => {
     this.close();
   };
@@ -121,10 +120,10 @@ export class Database extends BetterSQLite3Database {
    *
    *    ```javascript
    *    sql`
-   *      CREATE TABLE "users" (
-   *        "id" INTEGER PRIMARY KEY AUTOINCREMENT,
-   *        "name" TEXT
-   *      ) STRICT;
+   *      create table "users" (
+   *        "id" integer primary key autoincrement,
+   *        "name" text not null
+   *      ) strict;
    *    `;
    *    ```
    *
@@ -134,7 +133,7 @@ export class Database extends BetterSQLite3Database {
    *    async () => {
    *      database.execute(
    *        sql`
-   *          INSERT INTO "users" ("name") VALUES (${"Leandro Facchinetti"});
+   *          insert into "users" ("name") values (${"Leandro Facchinetti"});
    *        `,
    *      );
    *    };
@@ -158,39 +157,43 @@ export class Database extends BetterSQLite3Database {
    *
    *    > **Why?** This makes managing migrations more straightforward, and in any non-trivial case rollback is impossible anyway (for example, if a migration involves dropping a table, then rolling it back would involve bringing back data that has been deleted).
    *
-   * 6. You may consult the status of your database schema with the [`PRAGMA user_version`](https://www.sqlite.org/pragma.html#pragma_user_version), which holds the number of migrations that have been run successfully.
+   * 6. You may consult the status of your database schema with the [`pragma user_version`](https://www.sqlite.org/pragma.html#pragma_user_version), which holds the number of migrations that have been run successfully.
    *
-   * 7. The migration system sets several `PRAGMA`s that make SQLite better suited for running on the server, avoiding the `SQLITE_BUSY` error. See <https://kerkour.com/sqlite-for-servers>.
+   * 7. The migration system sets several `pragma`s that make SQLite better suited for running on the server, avoiding the `SQLITE_BUSY` error. See <https://kerkour.com/sqlite-for-servers>.
    *
    * **Implementation Notes**
    *
    * - `migrate()` must be its own separate method instead of being part of the constructor because migrations may be asynchronous.
    *
-   * - We manage transactions by hand with `BEGIN IMMEDIATE` instead of using `executeTransaction()` because migrations are [the one exception](https://github.com/WiseLibs/better-sqlite3/blob/bd55c76c1520c7796aa9d904fe65b3fb4fe7aac0/docs/api.md#caveats) in which it makes sense to have an asynchronous function in the middle of a transaction, given that migrations don’t run in parallel.
+   * - We manage transactions by hand with `begin immediate` instead of using `executeTransaction()` because migrations are [the one exception](https://github.com/WiseLibs/better-sqlite3/blob/bd55c76c1520c7796aa9d904fe65b3fb4fe7aac0/docs/api.md#caveats) in which it makes sense to have an asynchronous function in the middle of a transaction, given that migrations don’t run in parallel.
    */
   async migrate(
     ...migrations: (Query | ((database: this) => void | Promise<void>))[]
   ): Promise<this> {
-    this.pragma<void>(`journal_mode = WAL`);
-    this.pragma<void>(`synchronous = NORMAL`);
+    this.pragma<void>(`journal_mode = wal`);
+    this.pragma<void>(`synchronous = normal`);
     this.pragma<void>(`busy_timeout = 5000`);
-    this.pragma<void>(`foreign_keys = FALSE`);
+    this.pragma<void>(`foreign_keys = false`);
     try {
       this.executeTransaction(() => {
         this.execute(
           sql`
-            CREATE TABLE IF NOT EXISTS "_backgroundJobs" (
-              "id" INTEGER PRIMARY KEY AUTOINCREMENT,
-              "type" TEXT NOT NULL,
-              "startAt" TEXT NOT NULL,
-              "parameters" TEXT NOT NULL,
-              "startedAt" TEXT NULL,
-              "retries" INTEGER NULL
-            ) STRICT;
-            CREATE INDEX IF NOT EXISTS "_backgroundJobsType" ON "_backgroundJobs" ("type");
-            CREATE INDEX IF NOT EXISTS "_backgroundJobsStartAt" ON "_backgroundJobs" ("startAt");
-            CREATE INDEX IF NOT EXISTS "_backgroundJobsStartedAt" ON "_backgroundJobs" ("startedAt");
-            CREATE INDEX IF NOT EXISTS "_backgroundJobsRetries" ON "_backgroundJobs" ("retries");
+            create table if not exists "_backgroundJobs" (
+              "id" integer primary key autoincrement,
+              "type" text not null,
+              "startAt" Text not null,
+              "parameters" text not null,
+              "startedAt" text null,
+              "retries" integer null
+            ) strict;
+            drop index if exists "_backgroundJobsType";
+            drop index if exists "_backgroundJobsStartAt";
+            drop index if exists "_backgroundJobsStartedAt";
+            drop index if exists "_backgroundJobsRetries";
+            create index if not exists "_index_backgroundJobs_type" on "_backgroundJobs" ("type");
+            create index if not exists "_index_backgroundJobs_startAt" on "_backgroundJobs" ("startAt");
+            create index if not exists "_index_backgroundJobs_startedAt" on "_backgroundJobs" ("startedAt");
+            create index if not exists "_index_backgroundJobs_retries" on "_backgroundJobs" ("retries");
 
             create table if not exists "_cache" (
               "id" integer primary key autoincrement,
@@ -213,7 +216,7 @@ export class Database extends BetterSQLite3Database {
         try {
           this.execute(
             sql`
-              BEGIN IMMEDIATE;
+              begin immediate;
             `,
           );
           const migration = migrations[migrationIndex];
@@ -222,25 +225,25 @@ export class Database extends BetterSQLite3Database {
           this.pragma<void>(`user_version = ${migrationIndex + 1}`);
           this.execute(
             sql`
-              COMMIT;
+              commit;
             `,
           );
         } catch (error) {
           this.execute(
             sql`
-              ROLLBACK;
+              rollback;
             `,
           );
           throw error;
         }
     } finally {
-      this.pragma<void>(`foreign_keys = TRUE`);
+      this.pragma<void>(`foreign_keys = true`);
     }
     return this;
   }
 
   /**
-   * Execute DDL statements, for example, `CREATE TABLE`, `DROP INDEX`, and so forth. Multiple statements may be included in the same query.
+   * Execute DDL statements, for example, `create table`, `drop index`, and so forth. Multiple statements may be included in the same query.
    */
   execute(query: Query): this {
     let source = "";
@@ -253,7 +256,7 @@ export class Database extends BetterSQLite3Database {
         query.sourceParts[parametersIndex] +
         this.get<{ parameter: string }>(
           sql`
-            SELECT quote(${query.parameters[parametersIndex]}) AS "parameter"
+            select quote(${query.parameters[parametersIndex]}) as "parameter";
           `,
         )!.parameter;
     source += query.sourceParts.at(-1);
@@ -261,18 +264,18 @@ export class Database extends BetterSQLite3Database {
   }
 
   /**
-   * Run a DML statement, for example, `INSERT`, `UPDATE`, `DELETE`, and so forth.
+   * Run a DML statement, for example, `insert`, `update`, `delete`, and so forth.
    */
   run(query: Query): BetterSQLite3Database.RunResult {
     return this.getStatement(query).run(...query.parameters);
   }
 
   /**
-   * Run a `SELECT` statement that returns a single result.
+   * Run a `select` statement that returns a single result.
    *
-   * > **Note:** If the `SELECT` statement returns multiple results, only the first result is returned, so it’s better to write statements that return a single result (for example, using `LIMIT`).
+   * > **Note:** If the `select` statement returns multiple results, only the first result is returned, so it’s better to write statements that return a single result (for example, using `limit`).
    *
-   * > **Note:** You may also use `get()` to run an [`INSERT ___ RETURNING ___` statement](https://www.sqlite.org/lang_returning.html), but you probably shouldn’t use `RETURNING`, because it runs into issues in edge cases. Instead, you should use `run()`, get the `lastInsertRowid`, and perform a follow-up `SELECT`. See <https://github.com/WiseLibs/better-sqlite3/issues/654> and <https://github.com/WiseLibs/better-sqlite3/issues/657>.
+   * > **Note:** You may also use `get()` to run an [`insert ___ returning ___` statement](https://www.sqlite.org/lang_returning.html), but you probably shouldn’t use `returning`, because it runs into issues in edge cases. Instead, you should use `run()`, get the `lastInsertRowid`, and perform a follow-up `select`. See <https://github.com/WiseLibs/better-sqlite3/issues/654> and <https://github.com/WiseLibs/better-sqlite3/issues/657>.
    *
    * > **Note:** The `Type` parameter is [an assertion](https://www.typescriptlang.org/docs/handbook/2/everyday-types.html#type-assertions). If you’d like to make sure that the values returned from the database are of a certain type, you must implement a runtime check instead. See <https://github.com/DefinitelyTyped/DefinitelyTyped/issues/50794>, <https://github.com/DefinitelyTyped/DefinitelyTyped/discussions/62205>, and <https://github.com/DefinitelyTyped/DefinitelyTyped/pull/65035>. Note that the `get() as ___` pattern also works because by default `Type` is `unknown`.
    */
@@ -283,9 +286,9 @@ export class Database extends BetterSQLite3Database {
   }
 
   /**
-   * Run a `SELECT` statement that returns multiple results as an Array.
+   * Run a `select` statement that returns multiple results as an Array.
    *
-   * > **Note:** We recommend including an explicit `ORDER BY` clause to specify the order of the results.
+   * > **Note:** We recommend including an explicit `order by` clause to specify the order of the results.
    *
    * > **Note:** If the results are big and you don’t want to load them all at once, then use `iterate()` instead.
    */
@@ -294,7 +297,7 @@ export class Database extends BetterSQLite3Database {
   }
 
   /**
-   * Run a `SELECT` statement that returns multiple results as an iterator.
+   * Run a `select` statement that returns multiple results as an iterator.
    *
    * > **Note:** If the results are small and you may load them all at once, then use `all()` instead.
    */
@@ -305,7 +308,7 @@ export class Database extends BetterSQLite3Database {
   }
 
   /**
-   * Run a `PRAGMA`. Similar to `better-sqlite3`’s `pragma()`, but includes the `Type` assertion similar to other methods.
+   * Run a `pragma`. Similar to `better-sqlite3`’s `pragma()`, but includes the `Type` assertion similar to other methods.
    */
   pragma<Type>(
     source: string,
@@ -315,7 +318,7 @@ export class Database extends BetterSQLite3Database {
   }
 
   /**
-   * Execute a function in a transaction. All the [caveats](https://github.com/WiseLibs/better-sqlite3/blob/bd55c76c1520c7796aa9d904fe65b3fb4fe7aac0/docs/api.md#caveats) about `better-sqlite3`’s transactions still apply. Transactions are `IMMEDIATE` to avoid `SQLITE_BUSY` errors. See <https://kerkour.com/sqlite-for-servers>.
+   * Execute a function in a transaction. All the [caveats](https://github.com/WiseLibs/better-sqlite3/blob/bd55c76c1520c7796aa9d904fe65b3fb4fe7aac0/docs/api.md#caveats) about `better-sqlite3`’s transactions still apply. Transactions are `immediate` to avoid `SQLITE_BUSY` errors. See <https://kerkour.com/sqlite-for-servers>.
    */
   executeTransaction<Type>(fn: () => Type): Type {
     return this.transaction(fn).immediate();
@@ -338,17 +341,17 @@ export class Database extends BetterSQLite3Database {
    *
    * > **Note:** You may use the same database for application data and background jobs, which is simpler to manage, or separate databases for application data for background jobs, which may be faster because background jobs write to the database often and SQLite locks the database on writes.
    *
-   * You may schedule a background job by `INSERT`ing it into the `_backgroundJobs` table that’s created by `migrate()`, for example:
+   * You may schedule a background job by `insert`ing it into the `_backgroundJobs` table that’s created by `migrate()`, for example:
    *
    * ```typescript
    * database.run(
    *   sql`
-   *     INSERT INTO "_backgroundJobs" (
+   *     insert into "_backgroundJobs" (
    *       "type",
    *       "startAt",
    *       "parameters"
    *     )
-   *     VALUES (
+   *     values (
    *       ${"email"},
    *       ${new Date(Date.now() + 5 * 60 * 1000).toISOString()},
    *       ${JSON.stringify({
@@ -356,7 +359,7 @@ export class Database extends BetterSQLite3Database {
    *         to: "radically-straightforward@leafac.com",
    *         text: "This was sent from a background job.",
    *       })}
-   *     )
+   *     );
    *   `,
    * );
    * ```
@@ -395,12 +398,12 @@ export class Database extends BetterSQLite3Database {
           retries: number | null;
         }>(
           sql`
-            SELECT "id", "parameters", "retries"
-            FROM "_backgroundJobs"
-            WHERE
-              "type" = ${type} AND
-              "startedAt" IS NOT NULL AND
-              "startedAt" < ${new Date(Date.now() - timeout).toISOString()}
+            select "id", "parameters", "retries"
+            from "_backgroundJobs"
+            where
+              "type" = ${type} and
+              "startedAt" is not null and
+              "startedAt" < ${new Date(Date.now() - timeout).toISOString()};
           `,
         )) {
           utilities.log(
@@ -412,12 +415,12 @@ export class Database extends BetterSQLite3Database {
           );
           this.run(
             sql`
-              UPDATE "_backgroundJobs"
-              SET
+              update "_backgroundJobs"
+              set
                 "startAt" = ${new Date(Date.now()).toISOString()},
-                "startedAt" = NULL,
+                "startedAt" = null,
                 "retries" = ${(backgroundJob.retries ?? 0) + 1}
-              WHERE "id" = ${backgroundJob.id}
+              where "id" = ${backgroundJob.id};
             `,
           );
         }
@@ -427,12 +430,12 @@ export class Database extends BetterSQLite3Database {
           id: number;
         }>(
           sql`
-            SELECT "id"
-            FROM "_backgroundJobs"
-            WHERE
-              "type" = ${type} AND
-              "retries" IS NOT NULL AND
-              ${retries} <= "retries"
+            select "id"
+            from "_backgroundJobs"
+            where
+              "type" = ${type} and
+              "retries" is not null and
+              ${retries} <= "retries";
           `,
         )) {
           utilities.log(
@@ -443,7 +446,7 @@ export class Database extends BetterSQLite3Database {
           );
           this.run(
             sql`
-              DELETE FROM "_backgroundJobs" WHERE "id" = ${backgroundJob.id}
+              delete from "_backgroundJobs" where "id" = ${backgroundJob.id};
             `,
           );
         }
@@ -463,25 +466,25 @@ export class Database extends BetterSQLite3Database {
             retries: number | null;
           }>(
             sql`
-              SELECT "id", "parameters", "retries"
-              FROM "_backgroundJobs"
-              WHERE
-                "type" = ${type} AND
-                "startAt" <= ${new Date().toISOString()} AND
-                "startedAt" IS NULL AND (
-                  "retries" IS NULL OR
+              select "id", "parameters", "retries"
+              from "_backgroundJobs"
+              where
+                "type" = ${type} and
+                "startAt" <= ${new Date().toISOString()} and
+                "startedAt" is null and (
+                  "retries" is null or
                   "retries" < ${retries}
                 )
-              ORDER BY "id" ASC
-              LIMIT 1
+              order by "id" asc
+              limit 1;
             `,
           );
           if (backgroundJob === undefined) return undefined;
           this.run(
             sql`
-              UPDATE "_backgroundJobs"
-              SET "startedAt" = ${new Date().toISOString()}
-              WHERE "id" = ${backgroundJob.id}
+              update "_backgroundJobs"
+              set "startedAt" = ${new Date().toISOString()}
+              where "id" = ${backgroundJob.id};
             `,
           );
           return backgroundJob;
@@ -500,7 +503,7 @@ export class Database extends BetterSQLite3Database {
           });
           this.run(
             sql`
-              DELETE FROM "_backgroundJobs" WHERE "id" = ${backgroundJob.id}
+              delete from "_backgroundJobs" where "id" = ${backgroundJob.id};
             `,
           );
           utilities.log(
@@ -523,12 +526,12 @@ export class Database extends BetterSQLite3Database {
           );
           this.run(
             sql`
-              UPDATE "_backgroundJobs"
-              SET
+              update "_backgroundJobs"
+              set
                 "startAt" = ${new Date(Date.now() + (error === "TIMEOUT" ? 0 : retryIn)).toISOString()},
-                "startedAt" = NULL,
+                "startedAt" = null,
                 "retries" = ${(backgroundJob.retries ?? 0) + 1}
-              WHERE "id" = ${backgroundJob.id}
+              where "id" = ${backgroundJob.id};
             `,
           );
         }
@@ -537,6 +540,8 @@ export class Database extends BetterSQLite3Database {
     });
   }
 
+  cacheSize = 10_000;
+  /** TODO */
   async cache(
     key: string,
     valueGenerator: () => Promise<string>,
@@ -585,6 +590,7 @@ export class Database extends BetterSQLite3Database {
     return this;
   }
 
+  #statements = new Map<string, BetterSQLite3Database.Statement>();
   /**
    * An internal method that returns a `better-sqlite3` prepared statement for a given query. Normally you don’t have to use this, but it’s available for advanced use-cases in which you’d like to manipulate a prepared statement (for example, to set [`safeIntegers()`](https://github.com/WiseLibs/better-sqlite3/blob/bd55c76c1520c7796aa9d904fe65b3fb4fe7aac0/docs/integer.md#getting-bigints-from-the-database)).
    */
@@ -613,22 +619,22 @@ export type Query = {
  * Interpolation is turned into binding parameters to protect from SQL injection, for example:
  *
  * ```javascript
- * sql`INSERT INTO "users" ("name") VALUES (${"Leandro Facchinetti"})`;
+ * sql`insert into "users" ("name") values (${"Leandro Facchinetti"});`;
  * ```
  *
- * Arrays and Sets may be interpolated for `IN` clauses, for example:
+ * Arrays and Sets may be interpolated for `in` clauses, for example:
  *
  * ```javascript
- * sql`SELECT "id", "name" FROM "users" WHERE "name" IN ${[
+ * sql`select "id", "name" from "users" where "name" in ${[
  *   "Leandro Facchinetti",
  *   "David Adler",
- * ]}`;
+ * ]};`;
  * ```
  *
  * You may use the pattern `$${___}` (note the two `$`) to interpolate a clause within a query, for example:
  *
  * ```javascript
- * sql`SELECT "id", "name" FROM "users" WHERE "name" = ${"Leandro Facchinetti"}$${sql` AND "age" = ${33}`}`;
+ * sql`select "id", "name" from "users" where "name" = ${"Leandro Facchinetti"}$${sql` and "age" = ${33}`};`;
  * ```
  *
  * > **Note:** This is useful, for example, to build queries for advanced search forms by conditionally including clauses for fields that have been filled in.
