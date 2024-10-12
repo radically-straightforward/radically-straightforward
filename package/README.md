@@ -56,6 +56,18 @@ Finally `@radically-straightforward/package` creates a `.zip` (Windows) or a `.t
 
 > **Note:** The `$PACKAGE` environment variable is set to the directory containing your application.
 
+## Node API
+
+```js
+import { packageApp } from "@radically-straightforward/package"
+
+await packageApp({
+    entry: "build/index.mjs",
+    skipDedupe: false,
+    packageManager: "npm"
+})
+```
+
 ## Related Work
 
 ### [`caxa`](https://www.npmjs.com/package/caxa)
