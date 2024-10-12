@@ -58,10 +58,13 @@ Finally `@radically-straightforward/package` creates a `.zip` (Windows) or a `.t
 
 ## Node API
 
-```
+```js
 import { packageApp } from "@radically-straightforward/package"
 
-await packageApp()
+await packageApp({
+ skipDedupe: false,
+ packageManager: "npm"
+})
 ```
 
 ## Related Work
