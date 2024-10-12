@@ -22,6 +22,7 @@
     "access": "public"
   },
   "bin": "./build/index.mjs",
+  "main": "build/lib.mjs",
   "scripts": {
     "prepare": "tsc",
     "test": "npm run prepare && node --test && prettier --check \"./README.md\" --check \"./CHANGELOG.md\" --check \"./package.json\" --check \"./tsconfig.json\" --check \"./source/**/*.mts\""
