@@ -62,8 +62,9 @@ Finally `@radically-straightforward/package` creates a `.zip` (Windows) or a `.t
 import { packageApp } from "@radically-straightforward/package"
 
 await packageApp({
- skipDedupe: false,
- packageManager: "npm"
+    entry: "build/index.mjs",
+    skipDedupe: false,
+    packageManager: "npm"
 })
 ```
 

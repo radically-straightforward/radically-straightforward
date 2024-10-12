@@ -12,9 +12,20 @@ import { dedent as sh } from "@radically-straightforward/utilities";
  * Options for packaging an application into an executable
  */
 export type PackageAppOptions = {
-  /** Whether to skip the deduplication step */
+  /**
+   * Executable entry.
+   * Defaults to "build/index.mjs"
+   */
+  entry: string;
+  /**
+   * Whether to skip the deduplication step
+   * Defaults to false
+  */
   skipDedupe: boolean;
-  /** Package manager to use */
+  /**
+   * Package manager to use
+   * Defaults to "npm"
+  */
   packageManager: "npm" | "yarn" | "pnpm";
 };
 
@@ -24,6 +35,7 @@ export type PackageAppOptions = {
  */
 export async function packageApp(givenOptions: Partial<PackageAppOptions>) {
   const options: PackageAppOptions = {
+    entry: "build/index.mjs",
     skipDedupe: false,
     packageManager: "npm",
     ...givenOptions,
@@ -48,8 +60,7 @@ export async function packageApp(givenOptions: Partial<PackageAppOptions>) {
       : archiver("tar", { gzip: true });
   const archiveStream = fsStream.createWriteStream(
     path.join(
-      `../${path.basename(process.cwd())}.${
-        process.platform === "win32" ? "zip" : "tar.gz"
+      `../${path.basename(process.cwd())}.${process.platform === "win32" ? "zip" : "tar.gz"
       }`,
     ),
   );
@@ -60,7 +71,7 @@ export async function packageApp(givenOptions: Partial<PackageAppOptions>) {
       batch`
       @echo off
       set PACKAGE=%~dp0_
-      "%PACKAGE%/node_modules/.bin/node" "%PACKAGE%/build/index.mjs" %*
+      "%PACKAGE%/node_modules/.bin/node" "%PACKAGE%/${options.entry}" %*
     `,
       {
         name: `${path.basename(process.cwd())}/${path.basename(
@@ -73,7 +84,7 @@ export async function packageApp(givenOptions: Partial<PackageAppOptions>) {
       sh`
       #!/usr/bin/env sh
       export PACKAGE="$(dirname "$0")/_"
-      exec "$PACKAGE/node_modules/.bin/node" "$PACKAGE/build/index.mjs" "$@"
+      exec "$PACKAGE/node_modules/.bin/node" "$PACKAGE/${options.entry}" "$@"
     `,
       {
         name: `${path.basename(process.cwd())}/${path.basename(process.cwd())}`,
