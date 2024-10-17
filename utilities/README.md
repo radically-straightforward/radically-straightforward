@@ -111,6 +111,79 @@ utilities.dedent`
 // => "Here is an\n\nexample of\n an interpolated string including a newline and indentation\n\nfollowed by some more text."
 ```
 
+### `tokenize()`
+
+```typescript
+export function tokenize(
+  text: string,
+  {
+    stopWords = new Set(),
+    stem = (token) => token,
+  }: {
+    stopWords?: Set<string>;
+    stem?: (token: string) => string;
+  } = {},
+): {
+  token: string;
+  start: number;
+  end: number;
+}[];
+```
+
+Processes text into tokens that can be used for full-text search.
+
+The part that breaks the text into tokens matches the behavior of [SQLite’s Unicode61 Tokenizer](https://www.sqlite.org/fts5.html#unicode61_tokenizer).
+
+The `stopWords` are removed from the text. They are expected to be the result of `normalizeToken()`.
+
+The `stem()` allows you to implement, for example, [SQLite’s Porter Tokenizer](https://www.sqlite.org/fts5.html#porter_tokenizer).
+
+Reasons to use `tokenize()` instead of SQLite’s Tokenizers:
+
+1. `tokenize()` provides a source map, linking each to token back to the ranges in `text` where they came from. This is useful in `utilities.highlight()`. [SQLite’s own `highlight()` function](https://www.sqlite.org/fts5.html#the_highlight_function) doesn’t allow you to, for example, do full-text search on just the text from a message, while `highlight()`ing the message including markup.
+2. The `stopWords` may be removed.
+3. The `stem()` may support other languages (SQLite’s Porter Tokenizer only supports English).
+
+When using `tokenize()`, it’s appropriate to rely on the default tokenizer in SQLite, Unicode61.
+
+**Example**
+
+```typescript
+import * as utilities from "@radically-straightforward/utilities";
+import natural from "natural";
+
+const text = `Peanut allergy peanut butter is sometimes used.`;
+
+const stopWords = new Set(
+  natural.stopwords.map((stopWord) => utilities.normalizeToken(stopWord))
+);
+
+console.log(
+  utilities.tokenize(text, { stopWords, stem: natural.PorterStemmer.stem })
+);
+// =>
+// [
+//   { token: 'peanut', start: 0, end: 6 },
+//   { token: 'allergi', start: 7, end: 14 },
+//   { token: 'peanut', start: 15, end: 21 },
+//   { token: 'butter', start: 22, end: 28 },
+//   { token: 'sometim', start: 32, end: 41 },
+//   { token: 'us', start: 42, end: 46 }
+// ]
+```
+
+### `normalizeToken()`
+
+```typescript
+export function normalizeToken(token: string): string;
+```
+
+Normalize a token for `utilities.tokenize()`. It removes accents, for example, `ú` turns into `u`. It lower cases, for example, `HeLlO` becomes `hello`.
+
+**References**
+
+- https://stackoverflow.com/a/37511463
+
 ### `isDate()`
 
 ```typescript
