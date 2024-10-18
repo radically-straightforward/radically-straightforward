@@ -177,17 +177,24 @@ export function tokenize(
   text: string,
   {
     stopWords = new Set(),
+    stopWordsAction = "delete",
     stem = (token) => token,
-  }: { stopWords?: Set<string>; stem?: (token: string) => string } = {},
-): { token: string; start: number; end: number }[] {
+  }: {
+    stopWords?: Set<string>;
+    stopWordsAction?: "delete" | "mark";
+    stem?: (token: string) => string;
+  } = {},
+): { token: string; tokenIsStopWord: boolean; start: number; end: number }[] {
   return [...text.matchAll(/[\p{Letter}\p{Number}\p{Private_Use}]+/gu)].flatMap(
     (match) => {
       const token = normalizeToken(match[0]);
-      return stopWords.has(token)
+      const tokenIsStopWord = stopWords.has(token);
+      return tokenIsStopWord && stopWordsAction === "delete"
         ? []
         : [
             {
               token: stem(token),
+              tokenIsStopWord,
               start: match.index,
               end: match.index + match[0].length,
             },
@@ -214,17 +221,17 @@ export function normalizeToken(token: string): string {
  * Highlight the `search` terms in `text`. Similar to [SQLite’s `highlight()` function](https://www.sqlite.org/fts5.html#the_highlight_function), but because it’s implemented at the application level, it can work with `text` including markup by parsing the markup into DOM and traversing the DOM using `highlight()` on each [Text Node](https://developer.mozilla.org/en-US/docs/Web/API/Text).
  *
  * `search` is the `token` part of the value returned by `tokenize()`.
- * 
+ *
  * **Example**
- * 
+ *
  * ```typescript
  * import * as utilities from "@radically-straightforward/utilities";
  * import natural from "natural";
- * 
+ *
  * const stopWords = new Set(
  *   natural.stopwords.map((stopWord) => utilities.normalizeToken(stopWord))
  * );
- * 
+ *
  * console.log(
  *   utilities.highlight(
  *     "For my peanuts allergy peanut butter is sometimes used.",
@@ -266,6 +273,52 @@ export function highlight(
         highlightedTokens[highlightedTokensIndex + 1]?.start ?? text.length,
       );
   return highlightedText;
+}
+
+/**
+ * TODO
+ */
+export function snippet(
+  text: string,
+  search: Set<string>,
+  {
+    surroundingTokens = 5,
+    ...highlightOptions
+  }: { surroundingTokens?: number } & Parameters<typeof highlight>[2] = {},
+): string {
+  const textTokens = tokenize(text, {
+    ...highlightOptions,
+    stopWordsAction: "mark",
+  });
+  const textTokenMatchIndex = textTokens.findIndex(
+    (tokenWithPosition) =>
+      tokenWithPosition.tokenIsStopWord === false &&
+      search.has(tokenWithPosition.token),
+  );
+  if (textTokenMatchIndex === -1)
+    throw new Error(`‘snippet()’ called with no matching token.`);
+  const textTokenSnippetIndexStart = Math.max(
+    0,
+    textTokenMatchIndex - surroundingTokens,
+  );
+  const textTokenSnippetIndexEnd = Math.min(
+    textTokens.length - 1,
+    textTokenMatchIndex + surroundingTokens,
+  );
+  return highlight(
+    (textTokenSnippetIndexStart === 0 ? "" : "… ") +
+      text.slice(
+        textTokenSnippetIndexStart === 0
+          ? 0
+          : textTokens[textTokenSnippetIndexStart].start,
+        textTokenSnippetIndexEnd === textTokens.length - 1
+          ? text.length
+          : textTokens[textTokenSnippetIndexEnd].end,
+      ) +
+      (textTokenSnippetIndexEnd === textTokens.length - 1 ? "" : " …"),
+    search,
+    highlightOptions,
+  );
 }
 
 /**

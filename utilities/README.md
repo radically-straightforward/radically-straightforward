@@ -118,13 +118,16 @@ export function tokenize(
   text: string,
   {
     stopWords = new Set(),
+    stopWordsAction = "delete",
     stem = (token) => token,
   }: {
     stopWords?: Set<string>;
+    stopWordsAction?: "delete" | "mark";
     stem?: (token: string) => string;
   } = {},
 ): {
   token: string;
+  tokenIsStopWord: boolean;
   start: number;
   end: number;
 }[];
@@ -232,6 +235,23 @@ console.log(
 );
 // => `For my <span class="highlight">peanuts</span> allergy <span class="highlight">peanut</span> butter is sometimes used.`
 ```
+
+### `snippet()`
+
+```typescript
+export function snippet(
+  text: string,
+  search: Set<string>,
+  {
+    surroundingTokens = 5,
+    ...highlightOptions
+  }: {
+    surroundingTokens?: number;
+  } & Parameters<typeof highlight>[2] = {},
+): string;
+```
+
+TODO
 
 ### `isDate()`
 
