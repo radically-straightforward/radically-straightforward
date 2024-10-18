@@ -164,12 +164,12 @@ export function dedent(
  * );
  * // =>
  * // [
- * //   { token: 'peanut', start: 7, end: 14 },
- * //   { token: 'allergi', start: 15, end: 22 },
- * //   { token: 'peanut', start: 23, end: 29 },
- * //   { token: 'butter', start: 30, end: 36 },
- * //   { token: 'sometim', start: 40, end: 49 },
- * //   { token: 'us', start: 50, end: 54 }
+ * //   { token: 'peanut', tokenIsStopWord: false, start: 7, end: 14 },
+ * //   { token: 'allergi', tokenIsStopWord: false, start: 15, end: 22 },
+ * //   { token: 'peanut', tokenIsStopWord: false, start: 23, end: 29 },
+ * //   { token: 'butter', tokenIsStopWord: false, start: 30, end: 36 },
+ * //   { token: 'sometim', tokenIsStopWord: false, start: 40, end: 49 },
+ * //   { token: 'us', tokenIsStopWord: false, start: 50, end: 54 }
  * // ]
  * ```
  */
@@ -276,7 +276,52 @@ export function highlight(
 }
 
 /**
- * TODO
+ * Extract a snippet from a long `text` that includes the `search` terms.
+ *
+ * **Example**
+ * ```typescript
+ * import * as utilities from "@radically-straightforward/utilities";
+ * import natural from "natural";
+ *
+ * const stopWords = new Set(
+ *   natural.stopwords.map((stopWord) => utilities.normalizeToken(stopWord))
+ * );
+ *
+ * console.log(
+ *   utilities.snippet(
+ *     utilities.dedent`
+ *       Typically mixed in these languages the. Paste extracted from sugarcane or sugar beet was the genesis of contemporary. British brought western style pastry to the spouts mounted on sledges or wagons. Toss their pancakes as well liked by.
+ *
+ *       Locally e g i aquatica. Hardness whiteness and gloss and.
+ *
+ *       Extensively planted as ornamental trees by homeowners businesses and. Yh t ritarit poor knights once only a dessert.
+ *
+ *       A shortbread base and was then only known. Pies of meat particularly beef chicken or turkey gravy and mixed vegetables potatoes. A level the name for an extended time to incorporate. Of soup beer bread and onions before they left for work in restaurants?
+ *
+ *       For my peanuts allergy peanut butter is sometimes used.
+ *
+ *       Is transformed from an inferior ovary i e one. They declined in popularity with the correct humidity. Christmas foods to be referred to as xoc l tl. Which part or all of them contain cocoa butter while maintaining.
+ *
+ *       Potato was called morgenmete and the united states? Used oil in place of. These sandwiches were not as sweet fillings include.
+ *
+ *       Granola mixed with achiote because. Has undergone multiple changes since then until. Made before making white chocolate they say. Confectionery recipes for them proliferated ' the.
+ *
+ *       Outdoorsman horace kephart recommended it in central america. Chickpea flour and certain areas of the peter.
+ *
+ *       Wan are the results two classic ways of manually tempering chocolate. Cost cocoa beans is ng g which is a. Croatian serbian and slovene pala. Km mi further south revealed that sweet potatoes have been identified from grinding. Rabanadas are a range of apple sauce depending on its consistency. Retail value rose percent latin?
+ *
+ *       Ghee and tea aid the body it is the largest pies of the era. In turkey ak tma in areas of central europe formerly belonging to!
+ *     `,
+ *     new Set(
+ *       utilities
+ *         .tokenize("peanuts", { stopWords, stem: natural.PorterStemmer.stem })
+ *         .map((tokenWithPosition) => tokenWithPosition.token)
+ *     ),
+ *     { stopWords, stem: natural.PorterStemmer.stem }
+ *   )
+ * );
+ * // => `… work in restaurants? For my <span class="highlight">peanuts</span> allergy <span class="highlight">peanut</span> butter is sometimes …`
+ * ```
  */
 export function snippet(
   text: string,
