@@ -143,7 +143,7 @@ export function dedent(
  *
  * When using `tokenize()`, it’s appropriate to rely on the default tokenizer in SQLite, Unicode61.
  *
- * We recommend using [Natural](https://naturalnode.github.io/natural/) for [`stopWords`](https://github.com/NaturalNode/natural/tree/791df0bb8011c6caa8fc2a3a00f75deed4b3a855/lib/natural/util) and [`stem()`](https://github.com/NaturalNode/natural/tree/791df0bb8011c6caa8fc2a3a00f75deed4b3a855/lib/natural/stemmers)
+ * We recommend using [Natural](https://naturalnode.github.io/natural/) for [`stopWords`](https://github.com/NaturalNode/natural/tree/791df0bb8011c6caa8fc2a3a00f75deed4b3a855/lib/natural/util) and [`stem()`](https://github.com/NaturalNode/natural/tree/791df0bb8011c6caa8fc2a3a00f75deed4b3a855/lib/natural/stemmers).
  *
  * **Example**
  *
@@ -151,14 +151,15 @@ export function dedent(
  * import * as utilities from "@radically-straightforward/utilities";
  * import natural from "natural";
  *
- * const text = `Peanut allergy peanut butter is sometimes used.`;
- *
  * const stopWords = new Set(
  *   natural.stopwords.map((stopWord) => utilities.normalizeToken(stopWord))
  * );
  *
  * console.log(
- *   utilities.tokenize(text, { stopWords, stem: natural.PorterStemmer.stem })
+ *   utilities.tokenize("Peanut allergy peanut butter is sometimes used.", {
+ *     stopWords,
+ *     stem: natural.PorterStemmer.stem,
+ *   })
  * );
  * // =>
  * // [
@@ -206,6 +207,39 @@ export function normalizeToken(token: string): string {
     .normalize("NFKD")
     .replace(/\p{Diacritic}/gu, "")
     .toLowerCase();
+}
+
+/**
+ * TODO
+ */
+export function highlight(
+  text: string,
+  search: Set<string>,
+  {
+    start = `<span class="highlight">`,
+    end = `</span>`,
+    ...tokenizeOptions
+  }: { start?: string; end?: string } & Parameters<typeof tokenize>[1] = {},
+): string {
+  let highlightedText = "";
+  const highlightedTokens = tokenize(text, tokenizeOptions).filter(
+    (tokenWithPosition) => search.has(tokenWithPosition.token),
+  );
+  highlightedText += text.slice(0, highlightedTokens[0]?.start ?? text.length);
+  for (const highlightedTokensIndex of highlightedTokens.keys()) {
+    highlightedText +=
+      start +
+      text.slice(
+        highlightedTokens[highlightedTokensIndex].start,
+        highlightedTokens[highlightedTokensIndex].end,
+      ) +
+      end +
+      text.slice(
+        highlightedTokens[highlightedTokensIndex].end,
+        highlightedTokens[highlightedTokensIndex + 1]?.start ?? text.length,
+      );
+  }
+  return highlightedText;
 }
 
 /**

@@ -142,9 +142,11 @@ Reasons to use `tokenize()` instead of SQLite’s Tokenizers:
 
 1. `tokenize()` provides a source map, linking each to token back to the ranges in `text` where they came from. This is useful in `utilities.highlight()`. [SQLite’s own `highlight()` function](https://www.sqlite.org/fts5.html#the_highlight_function) doesn’t allow you to, for example, do full-text search on just the text from a message, while `highlight()`ing the message including markup.
 2. The `stopWords` may be removed.
-3. The `stem()` may support other languages (SQLite’s Porter Tokenizer only supports English).
+3. The `stem()` may support other languages, while SQLite’s Porter Tokenizer only supports English.
 
 When using `tokenize()`, it’s appropriate to rely on the default tokenizer in SQLite, Unicode61.
+
+We recommend using [Natural](https://naturalnode.github.io/natural/) for [`stopWords`](https://github.com/NaturalNode/natural/tree/791df0bb8011c6caa8fc2a3a00f75deed4b3a855/lib/natural/util) and [`stem()`](https://github.com/NaturalNode/natural/tree/791df0bb8011c6caa8fc2a3a00f75deed4b3a855/lib/natural/stemmers).
 
 **Example**
 
@@ -152,14 +154,15 @@ When using `tokenize()`, it’s appropriate to rely on the default tokenizer in 
 import * as utilities from "@radically-straightforward/utilities";
 import natural from "natural";
 
-const text = `Peanut allergy peanut butter is sometimes used.`;
-
 const stopWords = new Set(
   natural.stopwords.map((stopWord) => utilities.normalizeToken(stopWord))
 );
 
 console.log(
-  utilities.tokenize(text, { stopWords, stem: natural.PorterStemmer.stem })
+  utilities.tokenize("Peanut allergy peanut butter is sometimes used.", {
+    stopWords,
+    stem: natural.PorterStemmer.stem,
+  })
 );
 // =>
 // [
@@ -183,6 +186,25 @@ Normalize a token for `utilities.tokenize()`. It removes accents, for example, `
 **References**
 
 - https://stackoverflow.com/a/37511463
+
+### `highlight()`
+
+```typescript
+export function highlight(
+  text: string,
+  search: Set<string>,
+  {
+    start = `<span class="highlight">`,
+    end = `</span>`,
+    ...tokenizeOptions
+  }: {
+    start?: string;
+    end?: string;
+  } & Parameters<typeof tokenize>[1] = {},
+): string;
+```
+
+TODO
 
 ### `isDate()`
 
