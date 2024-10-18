@@ -154,24 +154,25 @@ We recommend using [Natural](https://naturalnode.github.io/natural/) for [`stopW
 import * as utilities from "@radically-straightforward/utilities";
 import natural from "natural";
 
-const stopWords = new Set(
-  natural.stopwords.map((stopWord) => utilities.normalizeToken(stopWord))
-);
-
 console.log(
-  utilities.tokenize("Peanut allergy peanut butter is sometimes used.", {
-    stopWords,
-    stem: natural.PorterStemmer.stem,
-  })
+  utilities.tokenize(
+    "For my peanuts allergy peanut butter is sometimes used.",
+    {
+      stopWords: new Set(
+        natural.stopwords.map((stopWord) => utilities.normalizeToken(stopWord))
+      ),
+      stem: (token) => natural.PorterStemmer.stem(token),
+    }
+  )
 );
 // =>
 // [
-//   { token: 'peanut', start: 0, end: 6 },
-//   { token: 'allergi', start: 7, end: 14 },
-//   { token: 'peanut', start: 15, end: 21 },
-//   { token: 'butter', start: 22, end: 28 },
-//   { token: 'sometim', start: 32, end: 41 },
-//   { token: 'us', start: 42, end: 46 }
+//   { token: 'peanut', start: 7, end: 14 },
+//   { token: 'allergi', start: 15, end: 22 },
+//   { token: 'peanut', start: 23, end: 29 },
+//   { token: 'butter', start: 30, end: 36 },
+//   { token: 'sometim', start: 40, end: 49 },
+//   { token: 'us', start: 50, end: 54 }
 // ]
 ```
 

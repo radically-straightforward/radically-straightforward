@@ -127,7 +127,7 @@ export function dedent(
 }
 
 /**
- * Processes text into tokens that can be used for full-text search.
+ * Process text into tokens that can be used for full-text search.
  *
  * The part that breaks the text into tokens matches the behavior of [SQLite’s Unicode61 Tokenizer](https://www.sqlite.org/fts5.html#unicode61_tokenizer).
  *
@@ -137,7 +137,7 @@ export function dedent(
  *
  * Reasons to use `tokenize()` instead of SQLite’s Tokenizers:
  *
- * 1. `tokenize()` provides a source map, linking each to token back to the ranges in `text` where they came from. This is useful in `utilities.highlight()`. [SQLite’s own `highlight()` function](https://www.sqlite.org/fts5.html#the_highlight_function) doesn’t allow you to, for example, do full-text search on just the text from a message, while `highlight()`ing the message including markup.
+ * 1. `tokenize()` provides a source map, linking each to token back to the ranges in `text` where they came from. This is useful in `highlight()`. [SQLite’s own `highlight()` function](https://www.sqlite.org/fts5.html#the_highlight_function) doesn’t allow you to, for example, do full-text search on just the text from a message, while `highlight()`ing the message including markup.
  * 2. The `stopWords` may be removed.
  * 3. The `stem()` may support other languages, while SQLite’s Porter Tokenizer only supports English.
  *
@@ -151,24 +151,25 @@ export function dedent(
  * import * as utilities from "@radically-straightforward/utilities";
  * import natural from "natural";
  *
- * const stopWords = new Set(
- *   natural.stopwords.map((stopWord) => utilities.normalizeToken(stopWord))
- * );
- *
  * console.log(
- *   utilities.tokenize("Peanut allergy peanut butter is sometimes used.", {
- *     stopWords,
- *     stem: natural.PorterStemmer.stem,
- *   })
+ *   utilities.tokenize(
+ *     "For my peanuts allergy peanut butter is sometimes used.",
+ *     {
+ *       stopWords: new Set(
+ *         natural.stopwords.map((stopWord) => utilities.normalizeToken(stopWord))
+ *       ),
+ *       stem: (token) => natural.PorterStemmer.stem(token),
+ *     }
+ *   )
  * );
  * // =>
  * // [
- * //   { token: 'peanut', start: 0, end: 6 },
- * //   { token: 'allergi', start: 7, end: 14 },
- * //   { token: 'peanut', start: 15, end: 21 },
- * //   { token: 'butter', start: 22, end: 28 },
- * //   { token: 'sometim', start: 32, end: 41 },
- * //   { token: 'us', start: 42, end: 46 }
+ * //   { token: 'peanut', start: 7, end: 14 },
+ * //   { token: 'allergi', start: 15, end: 22 },
+ * //   { token: 'peanut', start: 23, end: 29 },
+ * //   { token: 'butter', start: 30, end: 36 },
+ * //   { token: 'sometim', start: 40, end: 49 },
+ * //   { token: 'us', start: 50, end: 54 }
  * // ]
  * ```
  */
@@ -196,7 +197,7 @@ export function tokenize(
 }
 
 /**
- * Normalize a token for `utilities.tokenize()`. It removes accents, for example, `ú` turns into `u`. It lower cases, for example, `HeLlO` becomes `hello`.
+ * Normalize a token for `tokenize()`. It removes accents, for example, turning `ú` into `u`. It lower cases, for example, turning `HeLlO` into `hello`.
  *
  * **References**
  *
@@ -210,7 +211,15 @@ export function normalizeToken(token: string): string {
 }
 
 /**
- * TODO
+ * Highlight the `search` terms in `text`. Similar to [SQLite’s `highlight()` function](https://www.sqlite.org/fts5.html#the_highlight_function), but because it’s implemented at the application level, it can work with `text` including markup by parsing the markup into DOM and traversing the DOM using `highlight()` on each [Text Node](https://developer.mozilla.org/en-US/docs/Web/API/Text).
+ *
+ * `search` is the `token` part of the value returned by `tokenize()`.
+ * 
+ * **Example**
+ * 
+ * ```typescript
+
+ * ```
  */
 export function highlight(
   text: string,
@@ -226,7 +235,7 @@ export function highlight(
     (tokenWithPosition) => search.has(tokenWithPosition.token),
   );
   highlightedText += text.slice(0, highlightedTokens[0]?.start ?? text.length);
-  for (const highlightedTokensIndex of highlightedTokens.keys()) {
+  for (const highlightedTokensIndex of highlightedTokens.keys())
     highlightedText +=
       start +
       text.slice(
@@ -238,7 +247,6 @@ export function highlight(
         highlightedTokens[highlightedTokensIndex].end,
         highlightedTokens[highlightedTokensIndex + 1]?.start ?? text.length,
       );
-  }
   return highlightedText;
 }
 
