@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.0.7 · 2024-10-18
+
+- Added `tokenize()`, `normalizeToken()`, `highlight()`, and `snippet()`.
+
 ## 2.0.6 · 2024-07-12
 
 - Added `dedent()`.
