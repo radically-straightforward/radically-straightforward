@@ -130,7 +130,7 @@ export function tokenize(
 }[];
 ```
 
-Processes text into tokens that can be used for full-text search.
+Process text into tokens that can be used for full-text search.
 
 The part that breaks the text into tokens matches the behavior of [SQLite’s Unicode61 Tokenizer](https://www.sqlite.org/fts5.html#unicode61_tokenizer).
 
@@ -140,7 +140,7 @@ The `stem()` allows you to implement, for example, [SQLite’s Porter Tokenizer]
 
 Reasons to use `tokenize()` instead of SQLite’s Tokenizers:
 
-1. `tokenize()` provides a source map, linking each to token back to the ranges in `text` where they came from. This is useful in `utilities.highlight()`. [SQLite’s own `highlight()` function](https://www.sqlite.org/fts5.html#the_highlight_function) doesn’t allow you to, for example, do full-text search on just the text from a message, while `highlight()`ing the message including markup.
+1. `tokenize()` provides a source map, linking each to token back to the ranges in `text` where they came from. This is useful in `highlight()`. [SQLite’s own `highlight()` function](https://www.sqlite.org/fts5.html#the_highlight_function) doesn’t allow you to, for example, do full-text search on just the text from a message, while `highlight()`ing the message including markup.
 2. The `stopWords` may be removed.
 3. The `stem()` may support other languages, while SQLite’s Porter Tokenizer only supports English.
 
@@ -182,7 +182,7 @@ console.log(
 export function normalizeToken(token: string): string;
 ```
 
-Normalize a token for `utilities.tokenize()`. It removes accents, for example, `ú` turns into `u`. It lower cases, for example, `HeLlO` becomes `hello`.
+Normalize a token for `tokenize()`. It removes accents, for example, turning `ú` into `u`. It lower cases, for example, turning `HeLlO` into `hello`.
 
 **References**
 
@@ -205,7 +205,33 @@ export function highlight(
 ): string;
 ```
 
-TODO
+Highlight the `search` terms in `text`. Similar to [SQLite’s `highlight()` function](https://www.sqlite.org/fts5.html#the_highlight_function), but because it’s implemented at the application level, it can work with `text` including markup by parsing the markup into DOM and traversing the DOM using `highlight()` on each [Text Node](https://developer.mozilla.org/en-US/docs/Web/API/Text).
+
+`search` is the `token` part of the value returned by `tokenize()`.
+
+**Example**
+
+```typescript
+import * as utilities from "@radically-straightforward/utilities";
+import natural from "natural";
+
+const stopWords = new Set(
+  natural.stopwords.map((stopWord) => utilities.normalizeToken(stopWord))
+);
+
+console.log(
+  utilities.highlight(
+    "For my peanuts allergy peanut butter is sometimes used.",
+    new Set(
+      utilities
+        .tokenize("peanuts", { stopWords, stem: natural.PorterStemmer.stem })
+        .map((tokenWithPosition) => tokenWithPosition.token)
+    ),
+    { stopWords, stem: natural.PorterStemmer.stem }
+  )
+);
+// => `For my <span class="highlight">peanuts</span> allergy <span class="highlight">peanut</span> butter is sometimes used.`
+```
 
 ### `isDate()`
 

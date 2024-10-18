@@ -218,7 +218,25 @@ export function normalizeToken(token: string): string {
  * **Example**
  * 
  * ```typescript
-
+ * import * as utilities from "@radically-straightforward/utilities";
+ * import natural from "natural";
+ * 
+ * const stopWords = new Set(
+ *   natural.stopwords.map((stopWord) => utilities.normalizeToken(stopWord))
+ * );
+ * 
+ * console.log(
+ *   utilities.highlight(
+ *     "For my peanuts allergy peanut butter is sometimes used.",
+ *     new Set(
+ *       utilities
+ *         .tokenize("peanuts", { stopWords, stem: natural.PorterStemmer.stem })
+ *         .map((tokenWithPosition) => tokenWithPosition.token)
+ *     ),
+ *     { stopWords, stem: natural.PorterStemmer.stem }
+ *   )
+ * );
+ * // => `For my <span class="highlight">peanuts</span> allergy <span class="highlight">peanut</span> butter is sometimes used.`
  * ```
  */
 export function highlight(
