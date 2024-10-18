@@ -156,11 +156,11 @@ export function dedent(
  *     "For my peanuts allergy peanut butter is sometimes used.",
  *     {
  *       stopWords: new Set(
- *         natural.stopwords.map((stopWord) => utilities.normalizeToken(stopWord))
+ *         natural.stopwords.map((stopWord) => utilities.normalizeToken(stopWord)),
  *       ),
  *       stem: (token) => natural.PorterStemmer.stem(token),
- *     }
- *   )
+ *     },
+ *   ),
  * );
  * // =>
  * // [
@@ -229,7 +229,7 @@ export function normalizeToken(token: string): string {
  * import natural from "natural";
  *
  * const stopWords = new Set(
- *   natural.stopwords.map((stopWord) => utilities.normalizeToken(stopWord))
+ *   natural.stopwords.map((stopWord) => utilities.normalizeToken(stopWord)),
  * );
  *
  * console.log(
@@ -238,10 +238,10 @@ export function normalizeToken(token: string): string {
  *     new Set(
  *       utilities
  *         .tokenize("peanuts", { stopWords, stem: natural.PorterStemmer.stem })
- *         .map((tokenWithPosition) => tokenWithPosition.token)
+ *         .map((tokenWithPosition) => tokenWithPosition.token),
  *     ),
- *     { stopWords, stem: natural.PorterStemmer.stem }
- *   )
+ *     { stopWords, stem: natural.PorterStemmer.stem },
+ *   ),
  * );
  * // => `For my <span class="highlight">peanuts</span> allergy <span class="highlight">peanut</span> butter is sometimes used.`
  * ```
@@ -284,7 +284,7 @@ export function highlight(
  * import natural from "natural";
  *
  * const stopWords = new Set(
- *   natural.stopwords.map((stopWord) => utilities.normalizeToken(stopWord))
+ *   natural.stopwords.map((stopWord) => utilities.normalizeToken(stopWord)),
  * );
  *
  * console.log(
@@ -315,10 +315,10 @@ export function highlight(
  *     new Set(
  *       utilities
  *         .tokenize("peanuts", { stopWords, stem: natural.PorterStemmer.stem })
- *         .map((tokenWithPosition) => tokenWithPosition.token)
+ *         .map((tokenWithPosition) => tokenWithPosition.token),
  *     ),
- *     { stopWords, stem: natural.PorterStemmer.stem }
- *   )
+ *     { stopWords, stem: natural.PorterStemmer.stem },
+ *   ),
  * );
  * // => `… work in restaurants? For my <span class="highlight">peanuts</span> allergy <span class="highlight">peanut</span> butter is sometimes …`
  * ```
