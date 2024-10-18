@@ -254,6 +254,7 @@ export function snippet(
 Extract a snippet from a long `text` that includes the `search` terms.
 
 **Example**
+
 ```typescript
 import * as utilities from "@radically-straightforward/utilities";
 import natural from "natural";
