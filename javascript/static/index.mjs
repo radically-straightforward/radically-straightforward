@@ -309,15 +309,16 @@ export function morph(from, to, event = undefined) {
     ...to.getAttributeNames(),
   ])) {
     if (
-      event?.detail?.liveConnectionUpdate &&
-      (attribute === "style" ||
-        attribute === "hidden" ||
-        attribute === "disabled" ||
-        attribute === "value" ||
-        attribute === "checked") &&
-      !parents(from).some((element) =>
-        element.liveConnectionUpdate?.has?.(attribute),
-      )
+      attribute === "state" ||
+      (event?.detail?.liveConnectionUpdate &&
+        (attribute === "style" ||
+          attribute === "hidden" ||
+          attribute === "disabled" ||
+          attribute === "value" ||
+          attribute === "checked") &&
+        !parents(from).some((element) =>
+          element.liveConnectionUpdate?.has?.(attribute),
+        ))
     )
       continue;
     if (to.getAttribute(attribute) === null) from.removeAttribute(attribute);
