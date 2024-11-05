@@ -274,11 +274,13 @@ export function documentMount(content, event = new Event("DOMContentLoaded")) {
  *
  * Elements may provide a `key="___"` attribute to help identify them with respect to the diffing algorithm. This is similar to [React’s `key`s](https://react.dev/learn/rendering-lists#keeping-list-items-in-order-with-key), but sibling elements may have the same `key` (at the risk of potentially getting them mixed up if they’re reordered).
  *
+ * Elements may define a `state="___"` attribute, typically through the `state___()` methods below, which is not morphed on Live Connection updates, and is meant to include browser state, for example, whether a sidebar is open.
+ *
  * When `morph()` is called to perform a Live Connection update (that is,`event?.detail.liveConnectionUpdate`is `true`), elements may set a `liveConnectionUpdate` attribute, which controls the behavior of `morph()` in the following ways:
  *
  * - When `from.liveConnectionUpdate` is `false`, `morph()` doesn’t do anything. This is useful for elements which contain browser state that must be preserved on Live Connection updates, for example, the container of dynamically-loaded content (see `mount()`).
  *
- * - When `from.liveConnectionUpdate` or any of `from`’s parents is `new Set(["style", "hidden", "disabled", "value", "checked"])` or any subset thereof, the mentioned attributes and properties are updated even in a Live Connection update (normally these attributes and properties represent browser state and are skipped in Live Connection updates). This is useful, for example, for forms with hidden fields which must be updated by the server.
+ * - When `from.liveConnectionUpdate` or any of `from`’s parents is `new Set(["state", "style", "hidden", "open", "disabled", "value", "checked"])` or any subset thereof, the mentioned attributes and properties are updated even in a Live Connection update (normally these attributes and properties represent browser state and are skipped in Live Connection updates). This is useful, for example, for forms with hidden fields which must be updated by the server.
  *
  * - When `fromChildNode.liveConnectionUpdate` is `false`, `morph()` doesn’t remove that `fromChildNode` even if it’s missing among `to`’s child nodes. This is useful for elements that should remain on the page but wouldn’t be sent by server again in a Live Connection update, for example, an indicator of unread messages.
  *
@@ -309,16 +311,17 @@ export function morph(from, to, event = undefined) {
     ...to.getAttributeNames(),
   ])) {
     if (
-      attribute === "state" ||
-      (event?.detail?.liveConnectionUpdate &&
-        (attribute === "style" ||
-          attribute === "hidden" ||
-          attribute === "disabled" ||
-          attribute === "value" ||
-          attribute === "checked") &&
-        !parents(from).some((element) =>
-          element.liveConnectionUpdate?.has?.(attribute),
-        ))
+      event?.detail?.liveConnectionUpdate &&
+      (attribute === "state" ||
+        attribute === "style" ||
+        attribute === "hidden" ||
+        attribute === "open" ||
+        attribute === "disabled" ||
+        attribute === "value" ||
+        attribute === "checked") &&
+      !parents(from).some((element) =>
+        element.liveConnectionUpdate?.has?.(attribute),
+      )
     )
       continue;
     if (to.getAttribute(attribute) === null) from.removeAttribute(attribute);
@@ -400,6 +403,46 @@ export function morph(from, to, event = undefined) {
   for (const { node, nodeAfter } of toAdd) from.insertBefore(node, nodeAfter);
   for (const { from, to } of toMorph)
     if (from.nodeType === from.ELEMENT_NODE) morph(from, to, event);
+}
+
+/**
+ * TODO
+ */
+export function stateAdd(element, token) {
+  const state = new Set(
+    (element.getAttribute("state") ?? "")
+      .split(" ")
+      .filter((token) => token !== ""),
+  );
+  state.add(token);
+  element.setAttribute("state", [...state].join(" "));
+}
+
+/**
+ * TODO
+ */
+export function stateRemove(element, token) {
+  const state = new Set(
+    (element.getAttribute("state") ?? "")
+      .split(" ")
+      .filter((token) => token !== ""),
+  );
+  state.delete(token);
+  element.setAttribute("state", [...state].join(" "));
+}
+
+/**
+ * TODO
+ */
+export function stateToggle(element, token) {
+  const state = new Set(
+    (element.getAttribute("state") ?? "")
+      .split(" ")
+      .filter((token) => token !== ""),
+  );
+  if (state.has(token)) state.delete(token);
+  else state.add(token);
+  element.setAttribute("state", [...state].join(" "));
 }
 
 /**
