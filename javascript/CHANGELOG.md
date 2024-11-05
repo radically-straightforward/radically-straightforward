@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.11 · 2024-11-05
+
+- Added the notion of `state="___"` to hold browser state. This affects `morph()` and introduces the `stateAdd()`, `stateRemove()`, and `stateToggle()` functions.
+
 ## 1.0.10 · 2024-06-18
 
 - Fixed the treatment of `<input type="checkbox">` and `<input type="radio">` in `isModified()`.
