@@ -1,8 +1,12 @@
 # Changelog
 
+## 2.0.2 · 2024-11-07
+
+- Added the `extraGlobalOptions` parameter. See https://github.com/radically-straightforward/radically-straightforward/issues/16.
+
 ## 2.0.1 · 2024-06-06
 
-- Fix forwarded headers (`X-Forwarded-*`) when tunneling.
+- Fixed forwarded headers (`X-Forwarded-*`) when tunneling.
 
 ## 2.0.1 · 2024-06-06
 

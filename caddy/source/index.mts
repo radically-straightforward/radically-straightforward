@@ -65,6 +65,8 @@ export const staticFiles: { [key: string]: string } = JSON.parse(
  *
  * - **`tunnel`:** A feature for use in development that forces the server to listen on `http://localhost`, making it compatible with [Visual Studio Code’s Local Port Forwarding](https://code.visualstudio.com/docs/editor/port-forwarding).
  *
+ * - **`extraGlobalOptions`:** Extra [Caddyfile global options](https://caddyserver.com/docs/caddyfile/options). Useful, for example, to set HTTP ports other than the default.
+ *
  * **Features**
  *
  * - Turn off [Caddy’s administrative API endpoint](https://caddyserver.com/docs/api). This keeps things simple, at the cost of requiring an application restart to change Caddy’s configurations.
@@ -122,6 +124,7 @@ export function application({
   ],
   untrustedStaticFilesRoots = [],
   tunnel = false,
+  extraGlobalOptions = caddyfile``,
 }: {
   hostname?: string;
   systemAdministratorEmail?: string;
@@ -130,11 +133,13 @@ export function application({
   trustedStaticFilesRoots?: string[];
   untrustedStaticFilesRoots?: string[];
   tunnel?: boolean;
+  extraGlobalOptions?: Caddyfile;
 } = {}): Caddyfile {
   return caddyfile`
     {
       admin off
       ${systemAdministratorEmail !== undefined ? `email ${systemAdministratorEmail}` : `local_certs`}
+      ${extraGlobalOptions}
     }
 
     ${tunnel ? "http://localhost" : hostname} {

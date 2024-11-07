@@ -91,6 +91,7 @@ export function application({
   ],
   untrustedStaticFilesRoots = [],
   tunnel = false,
+  extraGlobalOptions = caddyfile``,
 }: {
   hostname?: string;
   systemAdministratorEmail?: string;
@@ -99,6 +100,7 @@ export function application({
   trustedStaticFilesRoots?: string[];
   untrustedStaticFilesRoots?: string[];
   tunnel?: boolean;
+  extraGlobalOptions?: Caddyfile;
 } = {}): Caddyfile;
 ```
 
@@ -121,6 +123,8 @@ A Caddyfile template for an application.
   > **Note:** Both `trustedStaticFilesRoots` and `untrustedStaticFilesRoots` must refer to **immutable** files. You may use [`@radically-straightforward/build`](https://github.com/radically-straightforward/radically-straightforward/tree/main/build) to build CSS, browser JavaScript, and other static files with immutable and unique file names. Your application should create immutable and unique file names for user-uploaded avatars, attachments to messages, and so forth.
 
 - **`tunnel`:** A feature for use in development that forces the server to listen on `http://localhost`, making it compatible with [Visual Studio Code’s Local Port Forwarding](https://code.visualstudio.com/docs/editor/port-forwarding).
+
+- **`extraGlobalOptions`:** Extra [Caddyfile global options](https://caddyserver.com/docs/caddyfile/options). Useful, for example, to set HTTP ports other than the default.
 
 **Features**
 
