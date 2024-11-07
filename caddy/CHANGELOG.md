@@ -1,6 +1,6 @@
 # Changelog
 
-## 2.0.2 · 2024-11-07
+## 2.0.3 · 2024-11-07
 
 - Added the `extraGlobalOptions` parameter. See https://github.com/radically-straightforward/radically-straightforward/issues/16.
 
