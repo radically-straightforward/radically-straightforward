@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.5 · 2024-11-08
+
+- Changed the `.noninteractive` class into the `[state~="noninteractive"]` state.
+
 ## 1.0.4 · 2024-07-16
 
 - Removed `--space--prose`.
