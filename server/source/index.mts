@@ -19,7 +19,7 @@ export type Server = ReturnType<typeof server>;
  *
  * - **`method`:** The HTTP request method, for example `"GET"` or `/^PATCH|PUT$/`.
  *
- * - **`pathname`:** The [`pathname`](https://nodejs.org/api/url.html#url-strings-and-url-objects) part of the HTTP request. [Named capturing groups](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_expressions/Groups_and_backreferences) are available in the `handler` under `request.pathname`, for example, given `pathname: new RegExp("^/conversations/(?<conversationId>[0-9]+)$")`, the `conversationId` is available at `request.pathname.conversationId`.
+ * - **`pathname`:** The [`pathname`](https://nodejs.org/api/url.html#url-strings-and-url-objects) part of the HTTP request. [Named capturing groups](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_expressions/Groups_and_backreferences) are available in the `handler` under `request.pathname`, for example, given `pathname: new RegExp("^/conversations/(?<conversationPublicId>[0-9]+)$")`, the `conversationPublicId` is available at `request.pathname.conversationPublicId`.
  *
  * - **`error`:** Indicates that this `handler` should only be called if a previous `handler` threw an exception.
  *
