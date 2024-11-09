@@ -22,6 +22,7 @@ This CSS reset covers more than other CSS resets and normalizers, for example, i
 ::before,
 ::after {
   font: inherit;
+  font-synthesis: none;
   /* Reset `<button>` text alignment. */
   text-align: left;
   text-decoration: inherit;

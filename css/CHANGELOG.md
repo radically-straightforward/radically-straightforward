@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.6 · 2024-11-09
+
+- Added [`font-synthesis: none;`](https://developer.mozilla.org/en-US/docs/Web/CSS/font-synthesis) to CSS Reset.
+
 ## 1.0.5 · 2024-11-08
 
 - Changed the `.noninteractive` class into the `[state~="noninteractive"]` state.
