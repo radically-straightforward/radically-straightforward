@@ -51,7 +51,7 @@ export const staticFiles: { [key: string]: string } = JSON.parse(
  *
  * - **`hostname`:** The [`hostname`](https://nodejs.org/api/url.html#url-strings-and-url-objects) part of the application’s URL, for example, `example.com`.
  *
- * - **`systemAdministratorEmail`:** The email of the system administrator is used by certificate authorities to contact about certificates. If `undefined`, then the server is run in development mode with local self-signed certificates.
+ * - **`systemAdministratorEmail`:** The email of the system administrator is used by certificate authorities to contact about certificates. If `undefined`, then the server is run in development mode with the `hostname` `localhost` and a local self-signed certificate.
  *
  * - **`hstsPreload`:** Whether the `Strict-Transport-Security` header should include the [`preload` directive](https://hstspreload.org/). This is `false` by default, but we recommended that in production you opt into preloading by setting `hstsPreload` to `true` and then submit your domain to the preload list.
  *
@@ -62,8 +62,6 @@ export const staticFiles: { [key: string]: string } = JSON.parse(
  * - **`untrustedStaticFilesRoots`:** Similar to `trustedStaticFilesRoots`, but for static files that are **untrusted** by the application, for example, user-uploaded avatars, attachments to messages, and so forth.
  *
  *   > **Note:** Both `trustedStaticFilesRoots` and `untrustedStaticFilesRoots` must refer to **immutable** files. You may use [`@radically-straightforward/build`](https://github.com/radically-straightforward/radically-straightforward/tree/main/build) to build CSS, browser JavaScript, and other static files with immutable and unique file names. Your application should create immutable and unique file names for user-uploaded avatars, attachments to messages, and so forth.
- *
- * - **`tunnel`:** A feature for use in development that forces the server to listen on `http://localhost`, making it compatible with [Visual Studio Code’s Local Port Forwarding](https://code.visualstudio.com/docs/editor/port-forwarding).
  *
  * - **`extraGlobalOptions`:** Extra [Caddyfile global options](https://caddyserver.com/docs/caddyfile/options). Useful, for example, to set HTTP ports other than the default.
  *
@@ -123,7 +121,6 @@ export function application({
     )}"`,
   ],
   untrustedStaticFilesRoots = [],
-  tunnel = false,
   extraGlobalOptions = caddyfile``,
 }: {
   hostname?: string;
@@ -132,7 +129,6 @@ export function application({
   ports?: number[];
   trustedStaticFilesRoots?: string[];
   untrustedStaticFilesRoots?: string[];
-  tunnel?: boolean;
   extraGlobalOptions?: Caddyfile;
 } = {}): Caddyfile {
   return caddyfile`
@@ -142,7 +138,7 @@ export function application({
       ${extraGlobalOptions}
     }
 
-    ${tunnel ? "http://localhost" : hostname} {
+    ${systemAdministratorEmail !== undefined ? hostname : `localhost`} {
       header ?Strict-Transport-Security "max-age=31536000; includeSubDomains${
         hstsPreload ? `; preload` : ``
       }"
@@ -199,7 +195,6 @@ export function application({
           .map((port) => `http://localhost:${port}`)
           .join(" ")} {
             lb_policy cookie
-            ${tunnel ? caddyfile`trusted_proxies private_ranges` : caddyfile``}
           }
       }
     }

@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.0.4 · 2024-11-12
+
+- Removed the `tunnel` parameter, which became unnecessary because Visual Studio Code Port Forwarding feature supports HTTPS.
+
 ## 2.0.3 · 2024-11-07
 
 - Added the `extraGlobalOptions` parameter. See https://github.com/radically-straightforward/radically-straightforward/issues/16.
