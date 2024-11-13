@@ -63,29 +63,4 @@ This guide teaches you how to setup your development machine to work on a projec
    $ npm start
    ```
 
-   Visit the address that will be printed to the console, for example `https://leafac--macbook`.
-
-6. If you need to test the application on a phone follow these steps:
-
-   1. Establish a network connection between your development machine and the phone. The details of how to do that depends on your network, but often that amounts to having them on the same wifi. Take note of the name with which you may access the development machine from the phone, for example:
-
-      ```console
-      $ hostname
-      YOUR-HOSTNAME
-      ```
-
-   2. Send the root TLS certificate from the development machine to the phone. You may use any file transferring tool between development machine and phone, for example, AirDrop. The location of the TLS certificate may be determined with the following command:
-
-      ```console
-      $ node --print "(async () => path.join((await import('@radically-straightforward/caddy')).dataDirectory(), 'pki/authorities/local/root.crt'))()"
-      ```
-
-   3. On the phone, **install** and **trust** the certificate. The details of how to do that depends on your phone.
-
-   4. Run the application with the hostname that may be accessed by the phone, for example:
-
-      ```console
-      $ env HOSTNAME=YOUR-HOSTNAME npm start
-      ```
-
-   5. On the phone, visit `https://YOUR-HOSTNAME`.
+   Visit <https://localhost>.
