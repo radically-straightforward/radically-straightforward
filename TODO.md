@@ -86,6 +86,7 @@
     - Node.js already sets `Content-Length` if you use `end()`. If you use `write()` Node.js sets chunked transfer.
     - If necessary we could use `Buffer.byteLength()` to determine the `Content-Length`
 - Live Connection
+  - Live Connections for partials
   - Don’t traverse the set of connections: Index by `request.id` and by `request.URL.pathname` (with hierarchical indexing, similar to proposal for `utilities.intern`)
   - Currently a Live Connection update sends a whole new page to the browser, even if only a small occurred. To solve this, we could have the server hold on to the latest rendering, diff on the server instead of the browser, and send a transcript of what the browser needs to do to to morph the page. This is what Phoenix LiveView does.
 - Image/Video/Audio Proxy
