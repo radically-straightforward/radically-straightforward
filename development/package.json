@@ -24,7 +24,7 @@
     "test": ""
   },
   "dependencies": {
-    "@radically-straightforward/build": "^2.0.1",
+    "@radically-straightforward/build": "^2.0.3",
     "@radically-straightforward/css": "^1.0.6",
     "@radically-straightforward/documentation": "^1.0.4",
     "@radically-straightforward/javascript": "^2.0.0",
