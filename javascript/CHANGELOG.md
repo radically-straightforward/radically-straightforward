@@ -1,5 +1,12 @@
 # Changelog
 
+## 2.0.0 · 2024-11-19
+
+- **Breaking Change:** Renamed `stringToElement()` into `stringToElements()` and created a new specialized version of `stringToElements()` called `stringToElement()` for when the given `string` is a single element and the `<div>` wrapper is unnecessary.
+- Changed `execute()` in two ways:
+  1. It executes `javascript="___"` of the `element` on which it’s called, consistent with `morph()`, which morphs the attributes of the `element` on which it’s called.
+  2. It returns the `element`, to make it more convenient (fluent interface), particularly when used in conjunction with `stringToElement()` and `insertAdjacentElement()`.
+
 ## 1.0.11 · 2024-11-05
 
 - Added the notion of `state="___"` to hold browser state. This affects `morph()` and introduces the `stateAdd()`, `stateRemove()`, and `stateToggle()` functions.

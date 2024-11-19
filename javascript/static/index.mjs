@@ -15,7 +15,7 @@ async function liveNavigate(request, event = undefined) {
     .querySelector("body")
     .insertAdjacentElement(
       "beforeend",
-      stringToElement(`<div key="progress-bar"></div>`).firstElementChild,
+      stringToElement(`<div key="progress-bar"></div>`),
     );
   backgroundJob(progressBar, "progressBar", { interval: 1000 }, () => {
     progressBar.style.width =
@@ -206,7 +206,7 @@ export async function liveConnection(requestId, { reload = false }) {
                   ? "Reloading…"
                   : "Failed to connect. Please check your internet connection and try reloading the page."
               }</div>`,
-            ).firstElementChild,
+            ),
           );
         throw error;
       } finally {
@@ -224,7 +224,7 @@ liveConnection.failedToConnectGlobalError = undefined;
  * `morph()` the `element` container to include `content`. `execute()` the browser JavaScript in the `element`. Protect the `element` from changing in Live Connection updates.
  */
 export function mount(element, content, event = undefined) {
-  if (typeof content === "string") content = stringToElement(content);
+  if (typeof content === "string") content = stringToElements(content);
   element.isAttached = true;
   delete element.liveConnectionUpdate;
   morph(element, content, event);
@@ -457,7 +457,10 @@ export function stateToggle(element, token) {
  * Execute the functions defined by the `javascript="___"` attribute, which is set by [`@radically-straightforward/build`](https://github.com/radically-straightforward/radically-straightforward/tree/main/build) when extracting browser JavaScript. You must call this when you insert new elements in the DOM, for example, when mounting content.
  */
 export function execute(element, event = undefined) {
-  const elements = element.querySelectorAll("[javascript]");
+  const elements = [
+    ...(element.matches("[javascript]") ? [element] : []),
+    ...element.querySelectorAll("[javascript]"),
+  ];
   for (const element of elements) {
     if (
       event?.detail?.liveConnectionUpdate &&
@@ -472,6 +475,7 @@ export function execute(element, event = undefined) {
       .get(javascript.function)
       .call(element, event, ...javascript.arguments);
   }
+  return element;
 }
 execute.functions = new Map();
 window.addEventListener("DOMContentLoaded", (event) => {
@@ -852,16 +856,23 @@ export function formatUTCDateTime(dateString) {
 }
 
 /**
- * Convert a string into a DOM element. The string may have multiple siblings without a common parent, so `stringToElement()` returns a `<div>` containing the elements.
+ * Convert a string into a DOM element. The string may have multiple siblings without a common parent, so `stringToElements()` returns a `<div>` containing the elements.
  */
-export function stringToElement(string) {
+export function stringToElements(string) {
   const element = document.createElement("div");
   element.innerHTML = string;
   return element;
 }
 
 /**
- * Similar to `stringToElement()` but for a `string` which is a whole document, for example, starting `<!DOCTYPE html>`. [`document.adoptNode()`](https://developer.mozilla.org/en-US/docs/Web/API/Document/adoptNode) is used so that the resulting element belongs to the current `document`.
+ * A specialized version of `stringToElements()` for when the `string` is a single element and the wrapper `<div>` is unnecessary.
+ */
+export function stringToElement(string) {
+  return stringToElements(string).firstElementChild;
+}
+
+/**
+ * Similar to `stringToElement()` but for a `string` which is a whole document, for example, starting with `<!DOCTYPE html>`. [`document.adoptNode()`](https://developer.mozilla.org/en-US/docs/Web/API/Document/adoptNode) is used so that the resulting element belongs to the current `document`.
  */
 export function documentStringToElement(string) {
   return document.adoptNode(

@@ -419,13 +419,21 @@ export function formatUTCDateTime(dateString);
 
 Format a datetime into a representation that is user friendly.
 
+### `stringToElements()`
+
+```typescript
+export function stringToElements(string);
+```
+
+Convert a string into a DOM element. The string may have multiple siblings without a common parent, so `stringToElements()` returns a `<div>` containing the elements.
+
 ### `stringToElement()`
 
 ```typescript
 export function stringToElement(string);
 ```
 
-Convert a string into a DOM element. The string may have multiple siblings without a common parent, so `stringToElement()` returns a `<div>` containing the elements.
+A specialized version of `stringToElements()` for when the `string` is a single element and the wrapper `<div>` is unnecessary.
 
 ### `documentStringToElement()`
 
@@ -433,7 +441,7 @@ Convert a string into a DOM element. The string may have multiple siblings witho
 export function documentStringToElement(string);
 ```
 
-Similar to `stringToElement()` but for a `string` which is a whole document, for example, starting `<!DOCTYPE html>`. [`document.adoptNode()`](https://developer.mozilla.org/en-US/docs/Web/API/Document/adoptNode) is used so that the resulting element belongs to the current `document`.
+Similar to `stringToElement()` but for a `string` which is a whole document, for example, starting with `<!DOCTYPE html>`. [`document.adoptNode()`](https://developer.mozilla.org/en-US/docs/Web/API/Document/adoptNode) is used so that the resulting element belongs to the current `document`.
 
 ### `backgroundJob()`
 
