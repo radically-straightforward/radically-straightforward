@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.7 · 2024-11-20
+
+- Fixed `@keyframes` that were nested, and PostCSS used to unnest but esbuild doesn’t unnest.
+
 ## 1.0.6 · 2024-11-09
 
 - Added [`font-synthesis: none;`](https://developer.mozilla.org/en-US/docs/Web/CSS/font-synthesis) to CSS Reset.
