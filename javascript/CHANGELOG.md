@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- Added `stateContains()`.
+
 ## 2.0.0 · 2024-11-19
 
 - **Breaking Change:** Renamed `stringToElement()` into `stringToElements()` and created a new specialized version of `stringToElements()` called `stringToElement()` for when the given `string` is a single element and the `<div>` wrapper is unnecessary.
