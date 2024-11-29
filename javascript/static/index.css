@@ -16,6 +16,7 @@
   top: var(--space--8);
   left: var(--space--2);
   right: var(--space--2);
+  z-index: 1000;
 }
 
 [key="progress-bar"] {
@@ -33,6 +34,7 @@
   top: var(--space--0);
   right: var(--space--0);
   left: var(--space--0);
+  z-index: 2000;
   transition-property: width;
   transition-duration: var(--transition-duration--300);
   transition-timing-function: var(--transition-timing-function--ease-in-out);

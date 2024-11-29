@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- **Breaking Change:** Removed `.visually-hidden` and `.visually-hidden--interactive`. Use `position: absolute; visibility: hidden; pointer-events: none;` instead.
+
 ## 1.0.7 · 2024-11-20
 
 - Fixed `@keyframes` that were nested, and PostCSS used to unnest but esbuild doesn’t unnest.

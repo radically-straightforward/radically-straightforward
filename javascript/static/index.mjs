@@ -611,10 +611,7 @@ export function validate(element) {
       element.onvalidate?.();
     } catch (error) {
       if (!(error instanceof ValidationError)) throw error;
-      const target =
-        element.closest(
-          "[hidden], .visually-hidden, .visually-hidden--interactive:not(:focus):not(:focus-within):not(:active)",
-        )?.parentElement ?? element;
+      const target = element.closest("[hidden]")?.parentElement ?? element; // TODO: This line may be unnecessary.
       tippy({
         element: target,
         elementProperty: "validationErrorTooltip",

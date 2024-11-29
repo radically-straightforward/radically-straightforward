@@ -732,45 +732,6 @@ font-family: var(--font-family--sans-serif);
 /*
 ## Helpers
 
-The `.visually-hidden` class makes an element hidden from the visual version of the website, but readable by screen readers.
-
-Also useful for form elements that should be focusable, but not visible, for example:
-
-```html
-<label>
-  <input type="radio" class="visually-hidden" />
-  Example
-</label>
-```
-
-The `.visually-hidden--interactive` variation makes the element visible when in focus, which is useful, for example, for “Skip to Content” links at the start of the page.
-
-**References**
-
-- <https://github.com/twbs/bootstrap/blob/7d9adb702d96f9eb4706afb12cd73c9654979575/scss/mixins/_visually-hidden.scss>
-- <https://tailwindcss.com/docs/screen-readers>
-- <https://www.a11yproject.com/posts/2013-01-11-how-to-hide-content/>
-- <https://hugogiraudel.com/2016/10/13/css-hide-and-seek/>
-- <https://github.com/twbs/bootstrap/issues/25686>
-- <https://accessibility.18f.gov/hidden-content/>
-- <https://stackoverflow.com/questions/8570050/page-jumps-to-the-top-when-checkbox-is-clicked>
-*/
-
-.visually-hidden,
-.visually-hidden--interactive:not(:focus):not(:focus-within):not(:active) {
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  border: 0;
-  margin: -1px;
-  position: absolute;
-  left: -100px;
-  overflow: hidden;
-  clip-path: inset(50%);
-  white-space: nowrap;
-}
-
-/*
 The `[state~="noninteractive"]` state makes **the children** of an element not interactive. The element to which the `[state~="noninteractive"]` state is applied remains interactive. This is useful, for example, in a drag-and-drop interaction: you set `<body>` as `[state~="noninteractive"]` and set a custom `cursor`.
 */
 
