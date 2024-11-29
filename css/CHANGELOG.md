@@ -3,6 +3,7 @@
 ## Unreleased
 
 - **Breaking Change:** Removed `.visually-hidden` and `.visually-hidden--interactive`. Use `position: absolute; visibility: hidden; pointer-events: none;` instead.
+- Added `visibility` to `--transition-property--opacity`, so that you can transition the entry and the exit of elements.
 
 ## 1.0.7 · 2024-11-20
 
