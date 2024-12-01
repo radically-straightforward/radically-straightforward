@@ -8,6 +8,7 @@
 - Principles
   - Colocation
   - It’s better to have no abstraction at all than the wrong abstraction: it’s okay to repeat yourself a little, before DRYing
+  - Keep up with latest version of dependencies, and use the latest features
 - Principles in action
   - Server-Side Rendering: Avoid distributed applications (a frontend that’s a separate application communicating through an API is a distributed application)
     - https://github.com/phoenixframework/phoenix_live_view
