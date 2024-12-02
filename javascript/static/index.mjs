@@ -1,3 +1,4 @@
+import html from "@radically-straightforward/html";
 import * as utilities from "@radically-straightforward/utilities";
 import fastMyersDiff from "fast-myers-diff";
 import * as floatingUI from "@floating-ui/dom";
@@ -15,7 +16,7 @@ async function liveNavigate(request, event = undefined) {
     .querySelector("body")
     .insertAdjacentElement(
       "beforeend",
-      stringToElement(`<div key="progress-bar"></div>`),
+      stringToElement(html`<div key="progress-bar"></div>`),
     );
   backgroundJob(progressBar, "progressBar", { interval: 1000 }, () => {
     progressBar.style.width =
@@ -199,13 +200,13 @@ export async function liveConnection(requestId, { reload = false }) {
           .querySelector("body")
           .insertAdjacentElement(
             "beforeend",
-            stringToElement(
-              `<div key="global-error">${
-                reload
+            stringToElement(html`
+              <div key="global-error">
+                ${reload
                   ? "Reloading…"
-                  : "Failed to connect. Please check your internet connection and try reloading the page."
-              }</div>`,
-            ),
+                  : "Failed to connect. Please check your internet connection and try reloading the page."}
+              </div>
+            `),
           );
         throw error;
       } finally {
