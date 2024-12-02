@@ -557,13 +557,13 @@ export function popover(
       if (target.matches('[state~="open"]')) return;
       await target.showPopover();
       window.setTimeout(() => {
-        const originalDocumentOnclick = document.onclick;
-        document.onclick = (event) => {
+        const originalWindowOnclick = window.onclick;
+        window.onclick = (event) => {
           if (closeOnFirstSubsequentClick || !target.contains(event.target)) {
             target.hidePopover();
-            document.onclick = originalDocumentOnclick;
+            window.onclick = originalWindowOnclick;
           }
-          originalDocumentOnclick?.();
+          originalWindowOnclick?.();
         };
       });
     };
@@ -1092,9 +1092,9 @@ export let shiftKey = false;
 }
 
 for (const eventType of ["focusin", "focusout"])
-  document.addEventListener(eventType, (event) => {
+  window.addEventListener(eventType, (event) => {
     window.setTimeout(() => {
-      for (const element of javascript.parents(event.target))
+      for (const element of parents(event.target))
         element[`on${eventType}`]?.(event);
     });
   });
