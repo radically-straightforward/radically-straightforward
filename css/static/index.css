@@ -732,7 +732,7 @@ font-family: var(--font-family--sans-serif);
 /*
 ## Helpers
 
-The `[state~="noninteractive"]` state makes **the children** of an element not interactive. The element to which the `[state~="noninteractive"]` state is applied remains interactive. This is useful, for example, in a drag-and-drop interaction: you set `<body>` as `[state~="noninteractive"]` and set a custom `cursor`.
+The `[state~="noninteractive"]` state makes **the children** of an element not interactive. The element to which the `[state~="noninteractive"]` state is applied remains interactive so that you can, for example, set a custom `cursor` on it. This is useful, for example, in a drag-and-drop interaction: you set `<body>` as `[state~="noninteractive"]` and set a custom `cursor`.
 */
 
 [state~="noninteractive"] * {
