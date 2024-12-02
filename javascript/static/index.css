@@ -27,6 +27,168 @@
     visibility: hidden;
     opacity: var(--opacity--0);
   }
+  &.popover--error {
+    color: light-dark(var(--color--red--800), var(--color--red--200));
+    background-color: light-dark(var(--color--red--50), var(--color--red--950));
+    border-color: light-dark(var(--color--red--400), var(--color--red--600));
+  }
+  &.popover--red {
+    color: light-dark(var(--color--red--800), var(--color--red--200));
+    background-color: light-dark(var(--color--red--50), var(--color--red--950));
+    border-color: light-dark(var(--color--red--400), var(--color--red--600));
+  }
+  &.popover--orange {
+    color: light-dark(var(--color--orange--800), var(--color--orange--200));
+    background-color: light-dark(
+      var(--color--orange--50),
+      var(--color--orange--950)
+    );
+    border-color: light-dark(
+      var(--color--orange--400),
+      var(--color--orange--600)
+    );
+  }
+  &.popover--amber {
+    color: light-dark(var(--color--amber--800), var(--color--amber--200));
+    background-color: light-dark(
+      var(--color--amber--50),
+      var(--color--amber--950)
+    );
+    border-color: light-dark(
+      var(--color--amber--400),
+      var(--color--amber--600)
+    );
+  }
+  &.popover--yellow {
+    color: light-dark(var(--color--yellow--800), var(--color--yellow--200));
+    background-color: light-dark(
+      var(--color--yellow--50),
+      var(--color--yellow--950)
+    );
+    border-color: light-dark(
+      var(--color--yellow--400),
+      var(--color--yellow--600)
+    );
+  }
+  &.popover--lime {
+    color: light-dark(var(--color--lime--800), var(--color--lime--200));
+    background-color: light-dark(
+      var(--color--lime--50),
+      var(--color--lime--950)
+    );
+    border-color: light-dark(var(--color--lime--400), var(--color--lime--600));
+  }
+  &.popover--green {
+    color: light-dark(var(--color--green--800), var(--color--green--200));
+    background-color: light-dark(
+      var(--color--green--50),
+      var(--color--green--950)
+    );
+    border-color: light-dark(
+      var(--color--green--400),
+      var(--color--green--600)
+    );
+  }
+  &.popover--emerald {
+    color: light-dark(var(--color--emerald--800), var(--color--emerald--200));
+    background-color: light-dark(
+      var(--color--emerald--50),
+      var(--color--emerald--950)
+    );
+    border-color: light-dark(
+      var(--color--emerald--400),
+      var(--color--emerald--600)
+    );
+  }
+  &.popover--teal {
+    color: light-dark(var(--color--teal--800), var(--color--teal--200));
+    background-color: light-dark(
+      var(--color--teal--50),
+      var(--color--teal--950)
+    );
+    border-color: light-dark(var(--color--teal--400), var(--color--teal--600));
+  }
+  &.popover--cyan {
+    color: light-dark(var(--color--cyan--800), var(--color--cyan--200));
+    background-color: light-dark(
+      var(--color--cyan--50),
+      var(--color--cyan--950)
+    );
+    border-color: light-dark(var(--color--cyan--400), var(--color--cyan--600));
+  }
+  &.popover--sky {
+    color: light-dark(var(--color--sky--800), var(--color--sky--200));
+    background-color: light-dark(var(--color--sky--50), var(--color--sky--950));
+    border-color: light-dark(var(--color--sky--400), var(--color--sky--600));
+  }
+  &.popover--blue {
+    color: light-dark(var(--color--blue--800), var(--color--blue--200));
+    background-color: light-dark(
+      var(--color--blue--50),
+      var(--color--blue--950)
+    );
+    border-color: light-dark(var(--color--blue--400), var(--color--blue--600));
+  }
+  &.popover--indigo {
+    color: light-dark(var(--color--indigo--800), var(--color--indigo--200));
+    background-color: light-dark(
+      var(--color--indigo--50),
+      var(--color--indigo--950)
+    );
+    border-color: light-dark(
+      var(--color--indigo--400),
+      var(--color--indigo--600)
+    );
+  }
+  &.popover--violet {
+    color: light-dark(var(--color--violet--800), var(--color--violet--200));
+    background-color: light-dark(
+      var(--color--violet--50),
+      var(--color--violet--950)
+    );
+    border-color: light-dark(
+      var(--color--violet--400),
+      var(--color--violet--600)
+    );
+  }
+  &.popover--purple {
+    color: light-dark(var(--color--purple--800), var(--color--purple--200));
+    background-color: light-dark(
+      var(--color--purple--50),
+      var(--color--purple--950)
+    );
+    border-color: light-dark(
+      var(--color--purple--400),
+      var(--color--purple--600)
+    );
+  }
+  &.popover--fuchsia {
+    color: light-dark(var(--color--fuchsia--800), var(--color--fuchsia--200));
+    background-color: light-dark(
+      var(--color--fuchsia--50),
+      var(--color--fuchsia--950)
+    );
+    border-color: light-dark(
+      var(--color--fuchsia--400),
+      var(--color--fuchsia--600)
+    );
+  }
+  &.popover--pink {
+    color: light-dark(var(--color--pink--800), var(--color--pink--200));
+    background-color: light-dark(
+      var(--color--pink--50),
+      var(--color--pink--950)
+    );
+    border-color: light-dark(var(--color--pink--400), var(--color--pink--600));
+  }
+  &.popover--rose {
+    color: light-dark(var(--color--rose--800), var(--color--rose--200));
+    background-color: light-dark(
+      var(--color--rose--50),
+      var(--color--rose--950)
+    );
+    border-color: light-dark(var(--color--rose--400), var(--color--rose--600));
+  }
 }
 
 [key="global-error"] {
