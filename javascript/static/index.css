@@ -1,9 +1,22 @@
 @import "@radically-straightforward/css/static/index.css";
 
 .popover {
-  position: absolute;
+  font-size: var(--font-size--3-5);
+  line-height: var(--font-size--3-5--line-height);
+  font-weight: 400;
+  color: light-dark(var(--color--black), var(--color--white));
+  background-color: light-dark(
+    var(--color--slate--50),
+    var(--color--slate--950)
+  );
   width: max-content;
   max-width: min(calc(100% - var(--space--8)), var(--space--96));
+  padding: var(--space--1) var(--space--2);
+  border: var(--border-width--1) solid
+    light-dark(var(--color--slate--400), var(--color--slate--600));
+  border-radius: var(--border-radius--1);
+  box-shadow: var(--box-shadow--4);
+  position: absolute;
   top: 0;
   left: 0;
   z-index: 1000;
@@ -25,8 +38,8 @@
   border: var(--border-width--1) solid
     light-dark(var(--color--red--400), var(--color--red--600));
   border-radius: var(--border-radius--1);
-  box-shadow: var(--box-shadow--4);
   margin: var(--space--0) auto;
+  box-shadow: var(--box-shadow--4);
   position: fixed;
   top: var(--space--8);
   left: var(--space--2);
