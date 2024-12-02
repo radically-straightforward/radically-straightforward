@@ -1,5 +1,4 @@
 @import "@radically-straightforward/css/static/index.css";
-@import "tippy.js/dist/tippy.css";
 
 [key="global-error"] {
   text-align: center;
@@ -38,4 +37,20 @@
   transition-property: width;
   transition-duration: var(--transition-duration--300);
   transition-timing-function: var(--transition-timing-function--ease-in-out);
+}
+
+.popover {
+  position: absolute;
+  width: max-content;
+  max-width: calc(100% - var(--space--8));
+  top: 0;
+  left: 0;
+  z-index: 1000;
+  transition-property: var(--transition-property--opacity);
+  transition-duration: var(--transition-duration--150);
+  transition-timing-function: var(--transition-timing-function--ease-in-out);
+  &:not([state~="open"]) {
+    visibility: hidden;
+    opacity: var(--opacity--0);
+  }
 }

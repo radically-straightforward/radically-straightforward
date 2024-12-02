@@ -205,6 +205,14 @@ export function stateToggle(element, token);
 
 See `stateAdd()`.
 
+### `stateContains()`
+
+```typescript
+export function stateContains(element, token);
+```
+
+See `stateAdd()`.
+
 ### `execute()`
 
 ```typescript
@@ -214,6 +222,30 @@ export function execute(element, event = undefined);
 > **Note:** This is a low-level function—in most cases you want to call `mount()` instead.
 
 Execute the functions defined by the `javascript="___"` attribute, which is set by [`@radically-straightforward/build`](https://github.com/radically-straightforward/radically-straightforward/tree/main/build) when extracting browser JavaScript. You must call this when you insert new elements in the DOM, for example, when mounting content.
+
+### `popover()`
+
+```typescript
+export function popover(
+  element,
+  target = element.nextElementSibling,
+  {
+    trigger = "hover",
+    closeOnFirstSubsequentClick = true,
+    placement = trigger === "hover"
+      ? "top"
+      : trigger === "click"
+        ? "bottom-start"
+        : trigger === "none"
+          ? "top"
+          : (() => {
+              throw new Error();
+            })(),
+  },
+);
+```
+
+TODO
 
 ### `tippy()`
 

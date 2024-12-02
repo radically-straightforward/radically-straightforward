@@ -1,6 +1,6 @@
 import * as utilities from "@radically-straightforward/utilities";
 import fastMyersDiff from "fast-myers-diff";
-import * as Tippy from "tippy.js";
+import * as floatingUI from "@floating-ui/dom";
 
 async function liveNavigate(request, event = undefined) {
   if (event instanceof PopStateEvent) liveNavigate.abortController?.abort();
@@ -493,6 +493,63 @@ execute.functions = new Map();
 window.addEventListener("DOMContentLoaded", (event) => {
   execute(document, event);
 });
+
+/**
+ * TODO
+ */
+export function popover(
+  element,
+  target = element.nextElementSibling,
+  {
+    trigger = "hover",
+    closeOnFirstSubsequentClick = true,
+    placement = trigger === "hover"
+      ? "top"
+      : trigger === "click"
+        ? "bottom-start"
+        : trigger === "none"
+          ? "top"
+          : (() => {
+              throw new Error();
+            })(),
+  },
+) {
+  target.showPopover = async () => {
+    const targetCoordinate = await floatingUI.computePosition(element, target, {
+      placement,
+      middleware: [floatingUI.flip(), floatingUI.shift({ padding: 8 })],
+    });
+    target.style.top = `${targetCoordinate.y}px`;
+    target.style.left = `${targetCoordinate.x}px`;
+    stateAdd(target, "open");
+  };
+  target.hidePopover = () => {
+    stateRemove(target, "open");
+  };
+  if (trigger === "hover") {
+    element.onmouseenter = element.onfocusin = async () => {
+      await target.showPopover();
+    };
+    element.onmouseleave = element.onfocusout = () => {
+      target.hidePopover();
+    };
+  } else if (trigger === "click") {
+    element.onclick = async () => {
+      if (target.matches('[state~="open"]')) return;
+      await target.showPopover();
+      window.setTimeout(() => {
+        const originalDocumentOnclick = document.onclick;
+        document.onclick = (event) => {
+          if (closeOnFirstSubsequentClick || !target.contains(event.target)) {
+            target.hidePopover();
+            document.onclick = originalDocumentOnclick;
+          }
+          originalDocumentOnclick?.();
+        };
+      });
+    };
+  }
+}
 
 /**
  * Create a [Tippy.js](https://atomiks.github.io/tippyjs/) tippy. This is different from calling Tippy’s constructor for the following reasons:
@@ -1014,3 +1071,11 @@ export let shiftKey = false;
   window.addEventListener("keydown", eventListener);
   window.addEventListener("keyup", eventListener);
 }
+
+for (const eventType of ["focusin", "focusout"])
+  document.addEventListener(eventType, (event) => {
+    window.setTimeout(() => {
+      for (const element of javascript.parents(event.target))
+        element[`on${eventType}`]?.(event);
+    });
+  });
