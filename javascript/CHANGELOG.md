@@ -2,7 +2,9 @@
 
 ## Unreleased
 
+- **Breaking change:** Removed `tippy()` and added `popover()`.
 - Added `stateContains()`.
+- Added support for `element.onfocusin` and `element.onfocusout` event handler properties.
 
 ## 2.0.0 · 2024-11-19
 
