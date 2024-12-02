@@ -229,11 +229,9 @@ liveConnection.failedToConnectGlobalError = undefined;
  */
 export function mount(element, content, event = undefined) {
   if (typeof content === "string") content = stringToElements(content);
-  element.isAttached = true;
   delete element.liveConnectionUpdate;
   morph(element, content, event);
   execute(element, event);
-  delete element.isAttached;
   element.liveConnectionUpdate = false;
 }
 
@@ -680,7 +678,7 @@ export function validate(element) {
           `Minimum ${element.getAttribute("minlength")} characters.`,
         );
       if (
-        element.matches(`[type="email"]`) &&
+        element.matches('[type="email"]') &&
         element.value.match(utilities.emailRegExp) === null
       )
         throw new ValidationError("Invalid email.");
