@@ -520,7 +520,7 @@ export function popover(
       ? "top"
       : trigger === "click"
         ? "bottom-start"
-        : trigger === "showOnce"
+        : trigger === "show"
           ? "top"
           : trigger === "none"
             ? "top"
@@ -563,7 +563,7 @@ export function popover(
         };
       });
     };
-  } else if (trigger === "showOnce") {
+  } else if (trigger === "show") {
     target.liveConnectionUpdate = false;
     target.showPopover();
     const originalWindowEventProperties = {};
@@ -655,13 +655,8 @@ export function validate(element) {
       element.focus();
       popover(
         element,
-        element.insertAdjacentElement(
-          "afterend",
-          stringToElement(html`
-            <div class="popover popover--error">${error.message}</div>
-          `),
-        ),
-        { trigger: "showOnce" },
+        html`<div class="popover popover--error">${error.message}</div>`,
+        { trigger: "show" },
       );
       return false;
     }
