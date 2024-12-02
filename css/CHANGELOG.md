@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 2.0.0 · 2024-12-02
 
 - **Breaking Change:** Removed `.visually-hidden` and `.visually-hidden--interactive`.
 - Added `visibility` to `--transition-property--opacity`, so that you can transition the entry and the exit of elements.
