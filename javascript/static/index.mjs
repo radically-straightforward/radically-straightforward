@@ -54,7 +54,11 @@ async function liveNavigate(request, event = undefined) {
       .querySelector("body")
       .insertAdjacentHTML(
         "beforeend",
-        `<div key="global-error">Something went wrong. Please try reloading the page.</div>`,
+        html`
+          <div key="global-error">
+            Something went wrong. Please try reloading the page.
+          </div>
+        `,
       );
     throw error;
   } finally {
@@ -259,7 +263,11 @@ export function documentMount(content, event = new Event("DOMContentLoaded")) {
       .querySelector("body")
       .insertAdjacentHTML(
         "beforeend",
-        `<div key="global-error">There has been an update. Please reload the page.</div>`,
+        html`
+          <div key="global-error">
+            There has been an update. Please reload the page.
+          </div>
+        `,
       );
     return;
   }
