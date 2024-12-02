@@ -40,7 +40,6 @@ async function liveNavigate(request, event = undefined) {
       window.location.search !== responseURL.search
     )
       window.history.pushState(null, "", responseURL.href);
-    Tippy.hideAll();
     documentMount(responseText);
     if (responseURL.hash.trim() !== "")
       document.getElementById(responseURL.hash.slice(1))?.scrollIntoView();
