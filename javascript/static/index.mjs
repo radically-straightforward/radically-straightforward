@@ -304,7 +304,7 @@ export function documentMount(content, event = new Event("DOMContentLoaded")) {
  *
  * - `morph()` supports `key="___"` instead of `morphdom`’s `id="___"`s. `key`s don’t have to be unique across the document and don’t even have to be unique across the element siblings—they’re just a hint at the identity of the element that’s used in the diffing process.
  *
- * - `morph()` is aware of Live Connection updates, `tippy()`s, and so forth.
+ * - `morph()` is aware of Live Connection updates.
  */
 export function morph(from, to, event = undefined) {
   if (
@@ -371,8 +371,7 @@ export function morph(from, to, event = undefined) {
       const key = fromChildNodesKeys[nodeIndex];
       if (
         event?.detail?.liveConnectionUpdate &&
-        (node.liveConnectionUpdate === false ||
-          node.matches?.("[data-tippy-root]"))
+        node.liveConnectionUpdate === false
       )
         continue;
       toRemove.get(key)?.push(node) ?? toRemove.set(key, [node]);
@@ -493,10 +492,7 @@ export function execute(element, event = undefined) {
   for (const element of elements) {
     if (
       event?.detail?.liveConnectionUpdate &&
-      (element.closest("[data-tippy-root]") !== null ||
-        parents(element)
-          .slice(1)
-          .some((element) => element.liveConnectionUpdate === false))
+      parents(element).some((element) => element.liveConnectionUpdate === false)
     )
       continue;
     const javascript = JSON.parse(element.getAttribute("javascript"));
