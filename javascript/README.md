@@ -101,6 +101,10 @@ The default browser form validation is limited in many ways:
 
 If the user has filled a form but hasn’t submitted it and they try to leave the page, then `@radically-straightforward/javascript` warns that they will lose data. See `isModified()` for more information.
 
+### Add support for `element.onfocusin` and `element.onfocusout` event handler properties
+
+Unlike most events, browsers don’t support handling the [`focusin`](https://developer.mozilla.org/en-US/docs/Web/API/Element/focusin_event) and [`focusout`](https://developer.mozilla.org/en-US/docs/Web/API/Element/focusout_event) events with `element.onfocusin`/`element.onfocusout` properties (they require the use of [`addEventListener()`](https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener)). We add support for these properties, which are convenient because: 1. They bubble, unlike the related [`focus`](https://developer.mozilla.org/en-US/docs/Web/API/Element/focus_event) and [`blur`](https://developer.mozilla.org/en-US/docs/Web/API/Element/blur_event) events; and 2. Setting event handler properties is idempotent, which is required by `javascript="___"` snippets.
+
 <!-- DOCUMENTATION START: ./static/index.mjs -->
 
 ### `liveConnection()`
