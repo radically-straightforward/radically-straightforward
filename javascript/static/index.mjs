@@ -510,25 +510,27 @@ window.addEventListener("DOMContentLoaded", (event) => {
 /**
  * TODO
  */
-export function popover(
+export function popover({
   element,
   target = element.nextElementSibling,
-  {
-    trigger = "hover",
-    closeOnFirstSubsequentClick = true,
-    placement = trigger === "hover"
-      ? "top"
-      : trigger === "click"
-        ? "bottom-start"
-        : trigger === "show"
+  trigger = "hover",
+  closeOnFirstSubsequentClick = true,
+  placement = trigger === "hover"
+    ? "top"
+    : trigger === "click"
+      ? "bottom-start"
+      : trigger === "show"
+        ? "top"
+        : trigger === "none"
           ? "top"
-          : trigger === "none"
-            ? "top"
-            : (() => {
-                throw new Error();
-              })(),
-  },
-) {
+          : (() => {
+              throw new Error();
+            })(),
+}) {
+  if (typeof target === "string" && trigger === "show") {
+    target = element.insertAdjacentElement("afterend", stringToElement(target));
+    target.liveConnectionUpdate = false;
+  }
   target.showPopover = async () => {
     const targetCoordinate = await floatingUI.computePosition(element, target, {
       placement,
@@ -542,16 +544,16 @@ export function popover(
     stateRemove(target, "open");
   };
   if (trigger === "hover") {
-    element.onmouseenter = element.onfocusin = async () => {
-      await target.showPopover();
+    element.onmouseenter = element.onfocusin = () => {
+      target.showPopover();
     };
     element.onmouseleave = element.onfocusout = () => {
       target.hidePopover();
     };
   } else if (trigger === "click") {
-    element.onclick = async () => {
+    element.onclick = () => {
       if (target.matches('[state~="open"]')) return;
-      await target.showPopover();
+      target.showPopover();
       window.setTimeout(() => {
         const originalWindowOnclick = window.onclick;
         window.onclick = (event) => {
@@ -564,7 +566,6 @@ export function popover(
       });
     };
   } else if (trigger === "show") {
-    target.liveConnectionUpdate = false;
     target.showPopover();
     const originalWindowEventProperties = {};
     const eventProperties = ["onclick", "onkeydown"];
@@ -653,11 +654,13 @@ export function validate(element) {
     } catch (error) {
       if (!(error instanceof ValidationError)) throw error;
       element.focus();
-      popover(
+      popover({
         element,
-        html`<div class="popover popover--error">${error.message}</div>`,
-        { trigger: "show" },
-      );
+        target: html`
+          <div class="popover popover--error">${error.message}</div>
+        `,
+        trigger: "show",
+      });
       return false;
     }
   }
