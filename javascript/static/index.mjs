@@ -520,11 +520,13 @@ export function popover(
       ? "top"
       : trigger === "click"
         ? "bottom-start"
-        : trigger === "none"
+        : trigger === "showOnce"
           ? "top"
-          : (() => {
-              throw new Error();
-            })(),
+          : trigger === "none"
+            ? "top"
+            : (() => {
+                throw new Error();
+              })(),
   },
 ) {
   target.showPopover = async () => {
@@ -557,65 +559,34 @@ export function popover(
             target.hidePopover();
             window.onclick = originalWindowOnclick;
           }
-          originalWindowOnclick?.();
+          originalWindowOnclick?.(event);
         };
       });
     };
+  } else if (trigger === "showOnce") {
+    target.liveConnectionUpdate = false;
+    target.showPopover();
+    const originalWindowEventProperties = {};
+    const eventProperties = ["onclick", "onkeydown"];
+    for (const eventProperty of eventProperties) {
+      window[eventProperty] = (event) => {
+        target.hidePopover();
+        originalWindowEventProperties[eventProperty]?.(event);
+        for (const eventProperty of eventProperties)
+          window[eventProperty] = originalWindowEventProperties[eventProperty];
+        window.setTimeout(() => {
+          target.remove();
+        }, 500);
+      };
+    }
   }
-}
-
-/**
- * Create a [Tippy.js](https://atomiks.github.io/tippyjs/) tippy. This is different from calling Tippy’s constructor for the following reasons:
- *
- * 1. If `tippy()` is called multiple times on the same `element` with the same `elementProperty`, then it doesn’t create new tippys but `mount()`s the `content`.
- *
- * 2. The defaults are different:
- *
- *    - **`ignoreAttributes`:** Set to `true` because we active `tippy()` via JavaScript, not HTML `data` attributes.
- *
- *    - **`arrow`:** Set to `false`, because most user interface `tippy()`s don’t use an arrow.
- *
- *    - **`offset`:** Set to `[0, 0]`, because `arrow` has been set to `false` so it doesn’t make sense to distance the `tippy()` from the trigger.
- *
- *    - **`touch`:** Set is only set to `true` by default if:
- *
- *      - `interactive` is set to `true`, because most noninteractive `tippy()`s don’t work well on touch devices (see https://atomiks.github.io/tippyjs/v6/misc/#touch-devices), but most interactive `tippy()`s work well on touch devices (usually they’re menus).
- *
- *      - `trigger` is set to `"manual"`, because we understand it to mean that you want to control the showing of the `tippy()` programmatically.
- *
- *    - **`hideOnClick`:** Set to `false` if `trigger` is `"manual"`, because we understand it to mean that you want to control the showing of the `tippy()` programmatically.
- *
- *    - **`duration`:** Respect `prefers-reduced-motion: reduce` by default.
- */
-export function tippy({
-  event = undefined,
-  element,
-  elementProperty = "tippy",
-  content,
-  ...tippyProps
-}) {
-  element[elementProperty] ??= Tippy.default(element, {
-    content: document.createElement("div"),
-  });
-  element[elementProperty].setProps({
-    ignoreAttributes: true,
-    arrow: false,
-    offset: [0, 0],
-    touch: tippyProps.interactive === true || tippyProps.trigger === "manual",
-    hideOnClick: tippyProps.trigger !== "manual",
-    duration: window.matchMedia("(prefers-reduced-motion: reduce)").matches
-      ? 1
-      : 150,
-    ...tippyProps,
-  });
-  mount(element[elementProperty].props.content, content, event);
-  return element[elementProperty];
+  return target;
 }
 
 /**
  * Validate `element` (usually a `<form>`) and its `children()`.
  *
- * Validation errors are reported with `tippy()`s with the `error` theme.
+ * Validation errors are reported with `popover()`s with the `.popover--error` class, which you may style.
  *
  * Use `<form novalidate>` to disable the native browser validation, which is too permissive on email addresses, is more limited in custom validation, and so forth.
  *
@@ -681,16 +652,17 @@ export function validate(element) {
       element.onvalidate?.();
     } catch (error) {
       if (!(error instanceof ValidationError)) throw error;
-      const target = element.closest("[hidden]")?.parentElement ?? element; // TODO: This line may be unnecessary.
-      tippy({
-        element: target,
-        elementProperty: "validationErrorTooltip",
-        trigger: "manual",
-        hideOnClick: true,
-        theme: "error",
-        content: error.message,
-      }).show();
-      target.focus();
+      element.focus();
+      popover(
+        element,
+        element.insertAdjacentElement(
+          "afterend",
+          stringToElement(html`
+            <div class="popover popover--error">${error.message}</div>
+          `),
+        ),
+        { trigger: "showOnce" },
+      );
       return false;
     }
   }
