@@ -3,7 +3,7 @@
 .popover {
   position: absolute;
   width: max-content;
-  max-width: calc(100% - var(--space--8));
+  max-width: min(calc(100% - var(--space--8)), var(--space--96));
   top: 0;
   left: 0;
   z-index: 1000;
@@ -17,10 +17,10 @@
 }
 
 [key="global-error"] {
-  text-align: center;
   color: light-dark(var(--color--red--800), var(--color--red--200));
   background-color: light-dark(var(--color--red--50), var(--color--red--950));
-  max-width: var(--space--96);
+  width: max-content;
+  max-width: min(calc(100% - var(--space--8)), var(--space--96));
   padding: var(--space--1) var(--space--2);
   border: var(--border-width--1) solid
     light-dark(var(--color--red--400), var(--color--red--600));
