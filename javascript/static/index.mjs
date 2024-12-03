@@ -975,15 +975,13 @@ export function isAttached(element) {
 }
 
 /**
- * Returns an array of parents, including `element` itself. It knows how to navigate up `tippy()`s that aren’t showing.
+ * Returns an array of parents, including `element` itself.
  */
 export function parents(element) {
   const parents = [];
   while (element !== null) {
     if (element.nodeType === element.ELEMENT_NODE) parents.push(element);
-    element = element.matches?.("[data-tippy-root]")
-      ? element._tippy.reference
-      : element.parentElement;
+    element = element.parentElement;
   }
   return parents;
 }
