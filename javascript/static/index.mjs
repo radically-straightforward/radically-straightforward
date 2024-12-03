@@ -486,7 +486,7 @@ export function stateContains(element, token) {
  */
 export function execute(element, event = undefined) {
   const elements = [
-    ...(element.matches?.("[javascript]") ? [element] : []),
+    ...(element.matches("[javascript]") ? [element] : []),
     ...element.querySelectorAll("[javascript]"),
   ];
   for (const element of elements) {
@@ -504,7 +504,7 @@ export function execute(element, event = undefined) {
 }
 execute.functions = new Map();
 window.addEventListener("DOMContentLoaded", (event) => {
-  execute(document, event);
+  execute(document.querySelector("html"), event);
 });
 
 /**
