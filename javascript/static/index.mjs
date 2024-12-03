@@ -522,11 +522,11 @@ window.addEventListener("DOMContentLoaded", (event) => {
  *
  *   - **`"hover"`:** Show the popover on `mouseenter` or `focusin` and hide it on `onmouseleave` or `onfocusout`. The `target` must not contain elements that may have focus (for example, `<button>`, `<input>`, and so forth), otherwise keyboard navigation is broken.
  *
- *   - **`"click"`:** Show the popover on `click`. When to hide the popover depends on the `closeOnFirstSubsequentClick`. If `closeOnFirstSubsequentClick` is `true` (the default), then the next click anywhere will close the popover—this is useful for dropdown menus with `<button>`s. If `closeOnFirstSubsequentClick` is `false`, then only clicks outside of the popover will close it—this is useful for dropdown menus with `<input>`s.
+ *   - **`"click"`:** Show the popover on `click`. When to hide the popover depends on the `remainOpenWhileFocused`. If `remainOpenWhileFocused` is `false` (the default), then the next click anywhere will close the popover—this is useful for dropdown menus with `<button>`s. If `remainOpenWhileFocused` is `true`, then only clicks outside of the popover will close it—this is useful for dropdown menus with `<input>`s.
  *
  *   - **`"none"`:** Showing and hiding the popover is the responsibility of the caller, using the `target.showPopover()` and `target.hidePopover()` functions.
  *
- * - **`closeOnFirstSubsequentClick`:** See discussion on `trigger: "click"`. This parameter is ignored if `trigger` is something else.
+ * - **`remainOpenWhileFocused`:** See discussion on `trigger: "click"`. This parameter is ignored if `trigger` is something else.
  *
  * - **`placement`:** One of [Floating UI’s `placement`s](https://floating-ui.com/docs/computePosition#placement).
  *
@@ -555,7 +555,7 @@ export function popover({
   element,
   target = element.nextElementSibling,
   trigger = "hover",
-  closeOnFirstSubsequentClick = true,
+  remainOpenWhileFocused = false,
   placement = trigger === "hover"
     ? "top"
     : trigger === "click"
@@ -590,14 +590,16 @@ export function popover({
       if (target.matches('[state~="open"]')) return;
       target.showPopover();
       window.setTimeout(() => {
-        const originalWindowOnclick = window.onclick;
-        window.onclick = (event) => {
-          originalWindowOnclick?.(event);
-          if (closeOnFirstSubsequentClick || !target.contains(event.target)) {
+        const abortController = new AbortController();
+        window.addEventListener(
+          "click",
+          (event) => {
+            if (remainOpenWhileFocused && target.contains(event.target)) return;
             target.hidePopover();
-            window.onclick = originalWindowOnclick;
-          }
-        };
+            abortController.abort();
+          },
+          { signal: abortController.signal },
+        );
       });
     };
   }
@@ -818,19 +820,21 @@ export function isModified(element) {
       return true;
   return false;
 }
-const warnAboutUnsavedChangesBeforeLeavingThePage = (event) => {
-  if (isModified(document.querySelector("body"))) event.preventDefault();
-};
 window.addEventListener("DOMContentLoaded", () => {
+  const abortController = new AbortController();
   window.addEventListener(
     "beforeunload",
-    warnAboutUnsavedChangesBeforeLeavingThePage,
+    (event) => {
+      if (isModified(document.querySelector("body"))) event.preventDefault();
+    },
+    { signal: abortController.signal },
   );
-});
-window.addEventListener("submit", () => {
-  window.removeEventListener(
-    "beforeunload",
-    warnAboutUnsavedChangesBeforeLeavingThePage,
+  window.addEventListener(
+    "submit",
+    () => {
+      abortController.abort();
+    },
+    { once: true },
   );
 });
 
