@@ -8,7 +8,7 @@ async function liveNavigate(request, event = undefined) {
   else if (
     liveNavigate.abortController !== undefined ||
     (request.method === "GET" &&
-      isModified(document.querySelector("body")) &&
+      isModified(document.querySelector("html")) &&
       !confirm("Your changes will be lost if you continue."))
   )
     return;
@@ -168,7 +168,7 @@ export async function liveConnection(requestId, { reload = false }) {
         liveConnection.failedToConnectGlobalError?.remove();
         delete liveConnection.failedToConnectGlobalError;
         if (reloadOnConnect) {
-          document.querySelector("body").isModified = false;
+          document.querySelector("html").isModified = false;
           window.location.reload();
           return;
         }
@@ -255,7 +255,7 @@ export function documentMount(content, event = new Event("DOMContentLoaded")) {
     typeof contentVersion === "string" &&
     documentVersion !== contentVersion
   ) {
-    document.querySelector("body").isModified = false;
+    document.querySelector("html").isModified = false;
     document.querySelector('[key="global-error"]')?.remove();
     document
       .querySelector("body")
@@ -825,7 +825,7 @@ window.addEventListener("DOMContentLoaded", () => {
   window.addEventListener(
     "beforeunload",
     (event) => {
-      if (isModified(document.querySelector("body"))) event.preventDefault();
+      if (isModified(document.querySelector("html"))) event.preventDefault();
     },
     { signal: abortController.signal },
   );
