@@ -67,7 +67,7 @@ async function liveNavigate(request, event = undefined) {
   }
 }
 liveNavigate.abortController = undefined;
-window.onclick = async (event) => {
+window.addEventListener("click", (event) => {
   const link = event.target.closest(`a:not([target="_blank"])`);
   if (
     event.button !== 0 ||
@@ -85,8 +85,8 @@ window.onclick = async (event) => {
     return;
   event.preventDefault();
   liveNavigate(new Request(link.href));
-};
-window.onsubmit = async (event) => {
+});
+window.addEventListener("submit", (event) => {
   const method = (
     event.submitter?.getAttribute("formmethod") ??
     event.target.getAttribute("method") ??
@@ -125,10 +125,10 @@ window.onsubmit = async (event) => {
           body,
         }),
   );
-};
-window.onpopstate = async (event) => {
+});
+window.addEventListener("popstate", (event) => {
   liveNavigate(new Request(window.location), event);
-};
+});
 
 /**
  * Open a [Live Connection](https://github.com/radically-straightforward/radically-straightforward/tree/main/server#live-connection) to the server.
@@ -818,13 +818,20 @@ export function isModified(element) {
       return true;
   return false;
 }
+const warnAboutUnsavedChangesBeforeLeavingThePage = (event) => {
+  if (isModified(document.querySelector("body"))) event.preventDefault();
+};
 window.addEventListener("DOMContentLoaded", () => {
-  window.onbeforeunload = (event) => {
-    if (isModified(document.querySelector("body"))) event.preventDefault();
-  };
+  window.addEventListener(
+    "beforeunload",
+    warnAboutUnsavedChangesBeforeLeavingThePage,
+  );
 });
 window.addEventListener("submit", () => {
-  window.onbeforeunload = () => {};
+  window.removeEventListener(
+    "beforeunload",
+    warnAboutUnsavedChangesBeforeLeavingThePage,
+  );
 });
 
 /**
