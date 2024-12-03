@@ -4,6 +4,7 @@
 
 - **Breaking change:** Removed `tippy()`. Use `popover()`.
 - **Breaking change:** Removed `isAttached`. Use [`contains()`](https://developer.mozilla.org/en-US/docs/Web/API/Node/contains) or [`isConnected`](https://developer.mozilla.org/en-US/docs/Web/API/Node/isConnected).
+- **Breaking change:** Changed `relativizeDateTimeElement()`. It now has a new signature and it no longer sets up a popover with the original date—it’s the caller’s responsibility to do that.
 - Added `stateContains()`.
 - Added support for `element.onfocusin` and `element.onfocusout` event handler properties.
 

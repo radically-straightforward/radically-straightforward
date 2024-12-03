@@ -828,36 +828,16 @@ window.addEventListener("submit", () => {
 });
 
 /**
- * Given an `element` with the `datetime` attribute, `relativizeDateTimeElement()` keeps it updated with a relative datetime. See `relativizeDateTime()`, which provides the relative datetime, and `backgroundJob()`, which provides the background job management.
- *
- * **Example**
- *
- * ```javascript
- * html`
- *   <time
- *     datetime="2024-04-03T14:51:45.604Z"
- *     javascript="${javascript`
- *       javascript.relativizeDateTimeElement(this);
- *     `}"
- *   ></time>
- * `;
- * ```
+ * Keep an element updated with the relative datetime. See `relativizeDateTime()` (which provides the relative datetime) and `backgroundJob()` (which provides the background job management).
  */
 export function relativizeDateTimeElement(
   element,
-  { target = element, capitalize = false, ...relativizeDateTimeOptions } = {},
+  dateString,
+  { capitalize = false, ...relativizeDateTimeOptions } = {},
 ) {
-  const dateString = element.getAttribute("datetime");
-  tippy({
-    element: target,
-    elementProperty: "relativizeDateTimeElementTooltip",
-    content: `${localizeDateTime(dateString)} (${formatUTCDateTime(
-      dateString,
-    )})`,
-  });
   backgroundJob(
     element,
-    "relativizeDateTimeBackgroundJob",
+    "relativizeDateTimeElementBackgroundJob",
     { interval: 10 * 1000 },
     () => {
       element.textContent = relativizeDateTime(
@@ -929,7 +909,7 @@ export function localizeTime(dateString) {
 }
 
 /**
- * Format a datetime into a representation that is user friendly.
+ * Format a datetime into a representation that is user friendly, for example, `2024-04-03 15:20 UTC`.
  */
 export function formatUTCDateTime(dateString) {
   const date = new Date(dateString.trim());
@@ -970,7 +950,7 @@ export function documentStringToElement(string) {
  *
  * 1. If called multiple times, this version of `backgroundJob()` `stop()`s the previous background job so that at most one background job is active at any given time.
  *
- * 2. When the `element` is detached from the document, the background job is `stop()`ped. See `isAttached()`.
+ * 2. When the `element`’s [`isConnected`](https://developer.mozilla.org/en-US/docs/Web/API/Node/isConnected) is `false`, the background job is `stop()`ped.
  *
  * The background job object which offers the `run()` and `stop()` methods is available at `element[name]`.
  *
@@ -986,27 +966,9 @@ export function backgroundJob(
   element[elementProperty] = utilities.backgroundJob(
     utilitiesBackgroundJobOptions,
     async () => {
-      if (!isAttached(element)) {
-        element[elementProperty].stop();
-        return;
-      }
-      await job();
+      if (element.isConnected) await job();
+      else element[elementProperty].stop();
     },
-  );
-}
-
-/**
- * Check whether the `element` is attached to the document. This is different from the [`isConnected` property](https://developer.mozilla.org/en-US/docs/Web/API/Node/isConnected) in the following ways:
- *
- * 1. It uses `parents()`, so it supports `tippy()`s that aren’t showing but whose `target`s are attached.
- *
- * 2. You may force an element to be attached by setting `element.isAttached = true` on the `element` itself or on one of its parents.
- *
- * See, for example, `backgroundJob()`, which uses `isAttached()`.
- */
-export function isAttached(element) {
-  return parents(element).some(
-    (parent) => parent.isAttached === true || parent.matches("html"),
   );
 }
 
@@ -1016,7 +978,7 @@ export function isAttached(element) {
 export function parents(element) {
   const parents = [];
   while (element !== null) {
-    if (element.nodeType === element.ELEMENT_NODE) parents.push(element);
+    parents.push(element);
     element = element.parentElement;
   }
   return parents;
@@ -1026,7 +988,7 @@ export function parents(element) {
  * Returns an array of children, including `element` itself.
  */
 export function children(element) {
-  return element === null ? [] : [element, ...element.querySelectorAll("*")];
+  return [element, ...element.querySelectorAll("*")];
 }
 
 /**
@@ -1075,8 +1037,8 @@ export let isPhysicalKeyboard = false;
  */
 export let shiftKey = false;
 
-{
-  const eventListener = (event) => {
+for (const eventType of ["keydown", "keyup"])
+  window.addEventListener(eventType, (event) => {
     isPhysicalKeyboard =
       isPhysicalKeyboard ||
       event.shiftKey ||
@@ -1084,10 +1046,7 @@ export let shiftKey = false;
       event.altKey ||
       event.metaKey;
     shiftKey = event.shiftKey;
-  };
-  window.addEventListener("keydown", eventListener);
-  window.addEventListener("keyup", eventListener);
-}
+  });
 
 for (const eventType of ["focusin", "focusout"])
   window.addEventListener(eventType, (event) => {
