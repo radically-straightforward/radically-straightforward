@@ -2,7 +2,8 @@
 
 ## Unreleased
 
-- **Breaking change:** Removed `tippy()` and added `popover()`.
+- **Breaking change:** Removed `tippy()`. Use `popover()`.
+- **Breaking change:** Removed `isAttached`. Use [`contains()`](https://developer.mozilla.org/en-US/docs/Web/API/Node/contains) or [`isConnected`](https://developer.mozilla.org/en-US/docs/Web/API/Node/isConnected).
 - Added `stateContains()`.
 - Added support for `element.onfocusin` and `element.onfocusout` event handler properties.
 

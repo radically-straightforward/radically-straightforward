@@ -535,7 +535,6 @@ window.addEventListener("DOMContentLoaded", (event) => {
  * ```typescript
  * html`
  *   <button
- *     type="button"
  *     javascript="${javascript`
  *       javascript.popover(this);
  *     `}"
@@ -681,25 +680,23 @@ export function validate(element) {
         `),
       );
       target.liveConnectionUpdate = false;
-      popover({
-        element,
-        target,
-        trigger: "none",
-      });
+      popover({ element, target, trigger: "none" });
       target.showPopover();
-      const originalWindowEventProperties = {};
-      const eventProperties = ["onclick", "onkeydown"];
-      for (const eventProperty of eventProperties)
-        window[eventProperty] = (event) => {
-          originalWindowEventProperties[eventProperty]?.(event);
-          target.hidePopover();
-          for (const eventProperty of eventProperties)
-            window[eventProperty] =
-              originalWindowEventProperties[eventProperty];
-          window.setTimeout(() => {
-            target.remove();
-          }, 500);
-        };
+      window.setTimeout(() => {
+        const originalWindowEventProperties = {};
+        const eventProperties = ["onclick", "onkeydown"];
+        for (const eventProperty of eventProperties)
+          window[eventProperty] = (event) => {
+            originalWindowEventProperties[eventProperty]?.(event);
+            target.hidePopover();
+            for (const eventProperty of eventProperties)
+              window[eventProperty] =
+                originalWindowEventProperties[eventProperty];
+            window.setTimeout(() => {
+              target.remove();
+            }, 500);
+          };
+      });
       return false;
     }
   }
