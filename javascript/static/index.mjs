@@ -519,7 +519,7 @@ export function popover({
     ? "top"
     : trigger === "click"
       ? "bottom-start"
-      : trigger === "show"
+      : trigger === "showOnce"
         ? "top"
         : trigger === "none"
           ? "top"
@@ -527,7 +527,7 @@ export function popover({
               throw new Error();
             })(),
 }) {
-  if (typeof target === "string" && trigger === "show") {
+  if (typeof target === "string" && trigger === "showOnce") {
     target = element.insertAdjacentElement("afterend", stringToElement(target));
     target.liveConnectionUpdate = false;
   }
@@ -565,21 +565,20 @@ export function popover({
         };
       });
     };
-  } else if (trigger === "show") {
+  } else if (trigger === "showOnce") {
     target.showPopover();
     const originalWindowEventProperties = {};
     const eventProperties = ["onclick", "onkeydown"];
-    for (const eventProperty of eventProperties) {
+    for (const eventProperty of eventProperties)
       window[eventProperty] = (event) => {
         target.hidePopover();
-        originalWindowEventProperties[eventProperty]?.(event);
         for (const eventProperty of eventProperties)
           window[eventProperty] = originalWindowEventProperties[eventProperty];
+        originalWindowEventProperties[eventProperty]?.(event);
         window.setTimeout(() => {
           target.remove();
         }, 500);
       };
-    }
   }
   return target;
 }
@@ -659,7 +658,7 @@ export function validate(element) {
         target: html`
           <div class="popover popover--error">${error.message}</div>
         `,
-        trigger: "show",
+        trigger: "showOnce",
       });
       return false;
     }
