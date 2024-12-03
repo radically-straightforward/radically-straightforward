@@ -508,7 +508,49 @@ window.addEventListener("DOMContentLoaded", (event) => {
 });
 
 /**
- * TODO
+ * Create a popover (tooltip, dropdown menu, and so forth).
+ *
+ * The `target` is decorated with the `showPopover()` and `hidePopover()` functions. The `element` is decorated with event handler attributes to trigger the popover.
+ *
+ * **Parameters**
+ *
+ * - **`element`:** The element that is used a reference when positioning the popover and that triggers the popover open.
+ *
+ * - **`target`:** The element that contains the popover contents. It must have the `.popover` class, and it may have one of the `.popover--<color>` classes (see `@radically-straightforward/javascript/static/index.css`).
+ *
+ * - **`trigger`:** One of the following:
+ *
+ *   - **`"hover"`:** Show the popover on `mouseenter` or `focusin` and hide it on `onmouseleave` or `onfocusout`. The `target` must not contain elements that may have focus (for example, `<button>`, `<input>`, and so forth), otherwise keyboard navigation is broken.
+ *
+ *   - **`"click"`:** Show the popover on `click`. When to hide the popover depends on the `closeOnFirstSubsequentClick`. If `closeOnFirstSubsequentClick` is `true` (the default), then the next click anywhere will close the popover—this is useful for dropdown menus with `<button>`s. If `closeOnFirstSubsequentClick` is `false`, then only clicks outside of the popover will close it—this is useful for dropdown menus with `<input>`s.
+ *
+ *   - **`"none"`:** Showing and hiding the popover is the responsibility of the caller, using the `target.showPopover()` and `target.hidePopover()` functions.
+ *
+ * - **`closeOnFirstSubsequentClick`:** See discussion on `trigger: "click"`. This parameter is ignored if `trigger` is something else.
+ *
+ * - **`placement`:** One of [Floating UI’s `placement`s](https://floating-ui.com/docs/computePosition#placement).
+ *
+ * **Example**
+ *
+ * ```typescript
+ * html`
+ *   <button
+ *     type="button"
+ *     javascript="${javascript`
+ *       javascript.popover(this);
+ *     `}"
+ *   >
+ *     Example of an element
+ *   </button>
+ *   <div class="popover">Example of a popover.</div>
+ * `;
+ * ```
+ *
+ * **Implementation notes**
+ *
+ * This is inspired by the [Popover API](https://developer.mozilla.org/en-US/docs/Web/API/Popover_API) and [CSS anchor positioning](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_anchor_positioning), but it doesn’t follow the browser implementation exactly. First, because not all browsers support these APIs yet and the polyfills don’t work well enough (for example, they don’t support `position-try`). Second, because the APIs can be a bit awkward to use, for example, asking for you to come up with `anchor-name`s, and using HTML attributes instead of CSS & JavaScript.
+ *
+ * We use [Floating UI](https://floating-ui.com/) for positioning and provide an API reminiscent of the discontinued [Tippy.js](https://atomiks.github.io/tippyjs/). The major difference is that in Tippy.js the `content` is kept out of the DOM while the popover is hidden, while we keep the `target` in the DOM (just hidden). This allows, for example, the popover to contain form fields which are submitted on form submission, and it makes inspecting and debugging easier. We also support fewer features and less customization, for example, there isn’t the concept of `interactive` separate of `trigger`, so you can’t create an interactive `"hover"` popover.
  */
 export function popover({
   element,
@@ -519,18 +561,12 @@ export function popover({
     ? "top"
     : trigger === "click"
       ? "bottom-start"
-      : trigger === "showOnce"
+      : trigger === "none"
         ? "top"
-        : trigger === "none"
-          ? "top"
-          : (() => {
-              throw new Error();
-            })(),
+        : (() => {
+            throw new Error();
+          })(),
 }) {
-  if (typeof target === "string" && trigger === "showOnce") {
-    target = element.insertAdjacentElement("afterend", stringToElement(target));
-    target.liveConnectionUpdate = false;
-  }
   target.showPopover = async () => {
     const targetCoordinate = await floatingUI.computePosition(element, target, {
       placement,
@@ -557,30 +593,15 @@ export function popover({
       window.setTimeout(() => {
         const originalWindowOnclick = window.onclick;
         window.onclick = (event) => {
+          originalWindowOnclick?.(event);
           if (closeOnFirstSubsequentClick || !target.contains(event.target)) {
             target.hidePopover();
             window.onclick = originalWindowOnclick;
           }
-          originalWindowOnclick?.(event);
         };
       });
     };
-  } else if (trigger === "showOnce") {
-    target.showPopover();
-    const originalWindowEventProperties = {};
-    const eventProperties = ["onclick", "onkeydown"];
-    for (const eventProperty of eventProperties)
-      window[eventProperty] = (event) => {
-        target.hidePopover();
-        for (const eventProperty of eventProperties)
-          window[eventProperty] = originalWindowEventProperties[eventProperty];
-        originalWindowEventProperties[eventProperty]?.(event);
-        window.setTimeout(() => {
-          target.remove();
-        }, 500);
-      };
   }
-  return target;
 }
 
 /**
@@ -653,13 +674,32 @@ export function validate(element) {
     } catch (error) {
       if (!(error instanceof ValidationError)) throw error;
       element.focus();
+      const target = element.insertAdjacentElement(
+        "afterend",
+        stringToElement(html`
+          <div class="popover popover--error">${error.message}</div>
+        `),
+      );
+      target.liveConnectionUpdate = false;
       popover({
         element,
-        target: html`
-          <div class="popover popover--error">${error.message}</div>
-        `,
-        trigger: "showOnce",
+        target,
+        trigger: "none",
       });
+      target.showPopover();
+      const originalWindowEventProperties = {};
+      const eventProperties = ["onclick", "onkeydown"];
+      for (const eventProperty of eventProperties)
+        window[eventProperty] = (event) => {
+          originalWindowEventProperties[eventProperty]?.(event);
+          target.hidePopover();
+          for (const eventProperty of eventProperties)
+            window[eventProperty] =
+              originalWindowEventProperties[eventProperty];
+          window.setTimeout(() => {
+            target.remove();
+          }, 500);
+        };
       return false;
     }
   }
