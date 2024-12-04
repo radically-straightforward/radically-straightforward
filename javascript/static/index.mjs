@@ -15,7 +15,7 @@ async function liveNavigate(request, event = undefined) {
   const progressBar = document
     .querySelector("body")
     .insertAdjacentElement(
-      "beforeend",
+      "afterbegin",
       stringToElement(html`<div key="progress-bar"></div>`),
     );
   backgroundJob(progressBar, "progressBar", { interval: 1000 }, () => {
@@ -53,7 +53,7 @@ async function liveNavigate(request, event = undefined) {
     document
       .querySelector("body")
       .insertAdjacentHTML(
-        "beforeend",
+        "afterbegin",
         html`
           <div key="global-error">
             Something went wrong. Please try reloading the page.
@@ -203,7 +203,7 @@ export async function liveConnection(requestId, { reload = false }) {
         liveConnection.failedToConnectGlobalError = document
           .querySelector("body")
           .insertAdjacentElement(
-            "beforeend",
+            "afterbegin",
             stringToElement(html`
               <div key="global-error">
                 ${reload
@@ -260,7 +260,7 @@ export function documentMount(content, event = new Event("DOMContentLoaded")) {
     document
       .querySelector("body")
       .insertAdjacentHTML(
-        "beforeend",
+        "afterbegin",
         html`
           <div key="global-error">
             There has been an update. Please reload the page.
@@ -478,7 +478,7 @@ export function stateContains(element, token) {
  *   document
  *     .querySelector("body")
  *     .insertAdjacentElement(
- *       "beforeend",
+ *       "afterbegin",
  *       javascript.stringToElement(html`<div javascript="___"></div>`),
  *     ),
  * );
