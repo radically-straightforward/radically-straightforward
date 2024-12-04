@@ -830,14 +830,10 @@ export function isModified(element) {
       return true;
   return false;
 }
-window.addEventListener(
-  "beforeunload",
-  (event) => {
-    if (!liveNavigate.inSubmit && isModified(document.querySelector("html")))
-      event.preventDefault();
-  },
-  { signal: abortController.signal },
-);
+window.addEventListener("beforeunload", (event) => {
+  if (!liveNavigate.inSubmit && isModified(document.querySelector("html")))
+    event.preventDefault();
+});
 
 /**
  * Keep an element updated with the relative datetime. See `relativizeDateTime()` (which provides the relative datetime) and `backgroundJob()` (which provides the background job management).
