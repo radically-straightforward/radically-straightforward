@@ -536,7 +536,7 @@ window.addEventListener("DOMContentLoaded", (event) => {
  * html`
  *   <button
  *     javascript="${javascript`
- *       javascript.popover(this);
+ *       javascript.popover({ element: this });
  *     `}"
  *   >
  *     Example of an element
@@ -685,19 +685,23 @@ export function validate(element) {
       popover({ element, target, trigger: "none" });
       target.showPopover();
       window.setTimeout(() => {
-        const originalWindowEventProperties = {};
-        const eventProperties = ["onclick", "onkeydown"];
-        for (const eventProperty of eventProperties)
-          window[eventProperty] = (event) => {
-            originalWindowEventProperties[eventProperty]?.(event);
-            target.hidePopover();
-            for (const eventProperty of eventProperties)
-              window[eventProperty] =
-                originalWindowEventProperties[eventProperty];
-            window.setTimeout(() => {
-              target.remove();
-            }, 500);
-          };
+        const abortControllers = [];
+        for (const eventType of ["click", "keydown"]) {
+          const abortController = new AbortController();
+          abortControllers.push(abortController);
+          window.addEventListener(
+            eventType,
+            () => {
+              target.hidePopover();
+              for (const abortController of abortControllers)
+                abortController.abort();
+              window.setTimeout(() => {
+                target.remove();
+              }, 500);
+            },
+            { signal: abortController.signal },
+          );
+        }
       });
       return false;
     }
