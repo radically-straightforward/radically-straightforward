@@ -7,7 +7,7 @@ async function liveNavigate(request, event = undefined) {
   if (event instanceof PopStateEvent) liveNavigate.abortController?.abort();
   else if (
     liveNavigate.abortController !== undefined ||
-    (request.method === "GET" &&
+    (!liveNavigate.inSubmit &&
       isModified(document.querySelector("html")) &&
       !confirm("Your changes will be lost if you continue."))
   )
@@ -67,6 +67,9 @@ async function liveNavigate(request, event = undefined) {
   }
 }
 liveNavigate.abortController = undefined;
+window.addEventListener("DOMContentLoaded", () => {
+  liveNavigate.inSubmit = false;
+});
 window.addEventListener("click", (event) => {
   const link = event.target.closest(`a:not([target="_blank"])`);
   if (
@@ -711,9 +714,12 @@ export function validate(element) {
 window.addEventListener(
   "submit",
   (event) => {
-    if (validate(event.target)) return;
-    event.preventDefault();
-    event.stopImmediatePropagation();
+    if (!validate(event.target)) {
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      return;
+    }
+    liveNavigate.inSubmit = true;
   },
   { capture: true },
 );
@@ -824,23 +830,14 @@ export function isModified(element) {
       return true;
   return false;
 }
-window.addEventListener("DOMContentLoaded", () => {
-  const abortController = new AbortController();
-  window.addEventListener(
-    "beforeunload",
-    (event) => {
-      if (isModified(document.querySelector("html"))) event.preventDefault();
-    },
-    { signal: abortController.signal },
-  );
-  window.addEventListener(
-    "submit",
-    () => {
-      abortController.abort();
-    },
-    { once: true },
-  );
-});
+window.addEventListener(
+  "beforeunload",
+  (event) => {
+    if (!liveNavigate.inSubmit && isModified(document.querySelector("html")))
+      event.preventDefault();
+  },
+  { signal: abortController.signal },
+);
 
 /**
  * Keep an element updated with the relative datetime. See `relativizeDateTime()` (which provides the relative datetime) and `backgroundJob()` (which provides the background job management).
