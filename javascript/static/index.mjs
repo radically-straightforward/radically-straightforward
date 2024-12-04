@@ -142,7 +142,7 @@ window.addEventListener("popstate", (event) => {
  *
  * If `reload` is `true` then the page reloads when the connection is closed and reopened, because presumably the server has been restarted after a code modification during development.
  */
-export async function liveConnection(requestId, { reload = false }) {
+export async function liveConnection(requestId, { reload = false } = {}) {
   let abortController;
   let abortControllerTimeout;
   let reloadOnConnect = false;
