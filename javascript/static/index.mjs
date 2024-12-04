@@ -845,18 +845,14 @@ window.addEventListener("beforeunload", (event) => {
  * html`
  *   <span
  *     javascript="${javascript`
- *       javascript.relativizeDateTimeElement(this, ${new Date(
- *         Date.now() - 10 * 60 * 60 * 1000
- *       ).toISOString()});
+ *       javascript.relativizeDateTimeElement(this, ${date.toISOString()});
  *       javascript.popover({ element: this });
  *     `}"
  *   ></span>
  *   <span
  *     class="popover"
  *     javascript="${javascript`
- *       this.textContent = javascript.localizeDateTime(${new Date(
- *         Date.now() - 10 * 60 * 60 * 1000
- *       ).toISOString()});
+ *       this.textContent = javascript.localizeDateTime(${date.toISOString()});
  *     `}"
  *   ></span>
  * `;
