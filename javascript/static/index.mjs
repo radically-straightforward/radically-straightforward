@@ -837,6 +837,30 @@ window.addEventListener("beforeunload", (event) => {
 
 /**
  * Keep an element updated with the relative datetime. See `relativizeDateTime()` (which provides the relative datetime) and `backgroundJob()` (which provides the background job management).
+ *
+ * **Example**
+ *
+ * ```typescript
+ * const date = new Date(Date.now() - 10 * 60 * 60 * 1000);
+ * html`
+ *   <span
+ *     javascript="${javascript`
+ *       javascript.relativizeDateTimeElement(this, ${new Date(
+ *         Date.now() - 10 * 60 * 60 * 1000
+ *       ).toISOString()});
+ *       javascript.popover({ element: this });
+ *     `}"
+ *   ></span>
+ *   <span
+ *     class="popover"
+ *     javascript="${javascript`
+ *       this.textContent = javascript.localizeDateTime(${new Date(
+ *         Date.now() - 10 * 60 * 60 * 1000
+ *       ).toISOString()});
+ *     `}"
+ *   ></span>
+ * `;
+ * ```
  */
 export function relativizeDateTimeElement(
   element,
