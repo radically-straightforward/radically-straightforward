@@ -255,7 +255,6 @@ someUserInput.match(invalidXMLCharacters); // Detect whether there are invalid X
 - <https://github.com/felixrieseberg/sanitize-xml-string/blob/661bd881613c0f7555eb7d73b883b853b9826cc6/src/index.ts>: It was the inspiration for this code. The differences are:
   1. We export the regular expression, instead of encapsulating it in auxiliary functions, which arguably makes it more useful.
   2. We are more strict on what we consider to be valid characters (see description above).
-  3. We use the regular expression flag `v` instead of `u` (see <https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp/unicodeSets>).
 
 <!-- DOCUMENTATION END: ./source/index.mts -->
 
