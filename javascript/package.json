@@ -31,8 +31,8 @@
   },
   "types": "./build/index.d.mts",
   "scripts": {
-    "prepare": "tsc && documentation && postcss --use @csstools/postcss-light-dark-function --output \"./static/index.css\" \"./static/index.source.css\"",
-    "test": "npm run prepare && node --test && prettier --check \"./README.md\" --check \"./CHANGELOG.md\" --check \"./package.json\" --check \"./tsconfig.json\" --check \"./source/**/*.mts\" --check \"./static/**/*.{css,mjs}\" \"!./static/index.css\""
+    "prepare": "tsc && documentation && node ./static/index.css.mjs",
+    "test": "npm run prepare && node --test && prettier --check \"./README.md\" --check \"./CHANGELOG.md\" --check \"./package.json\" --check \"./tsconfig.json\" --check \"./source/**/*.mts\" --check \"./static/**/*.{css,mjs}\""
   },
   "dependencies": {
     "@floating-ui/dom": "^1.6.12",
@@ -47,7 +47,6 @@
     "@radically-straightforward/typescript": "^1.0.0",
     "@types/node": "^22.10.1",
     "postcss": "^8.4.49",
-    "postcss-cli": "^11.0.0",
     "prettier": "^3.4.1",
     "typescript": "^5.7.2"
   },
