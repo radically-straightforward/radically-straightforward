@@ -4,16 +4,16 @@
   font-size: var(--font-size--3-5);
   line-height: var(--font-size--3-5--line-height);
   font-weight: 400;
-  color: light-dark(var(--color--black), var(--color--white));
-  background-color: light-dark(
-    var(--color--slate--50),
-    var(--color--slate--950)
-  );
+  --csstools-light-dark-toggle--0: var(--csstools-color-scheme--light) var(--color--white);
+  color: var(--csstools-light-dark-toggle--0, var(--color--black));
+  --csstools-light-dark-toggle--1: var(--csstools-color-scheme--light) var(--color--slate--950);
+  background-color: var(--csstools-light-dark-toggle--1, var(--color--slate--50));
   width: max-content;
   max-width: min(calc(100% - var(--space--8)), var(--space--96));
   padding: var(--space--1) var(--space--2);
+  --csstools-light-dark-toggle--2: var(--csstools-color-scheme--light) var(--color--slate--600);
   border: var(--border-width--1) solid
-    light-dark(var(--color--slate--400), var(--color--slate--600));
+    var(--csstools-light-dark-toggle--2, var(--color--slate--400));
   border-radius: var(--border-radius--1);
   box-shadow: var(--box-shadow--4);
   position: absolute;
@@ -28,16 +28,48 @@
     opacity: var(--opacity--0);
   }
   &.popover--error {
+    --csstools-light-dark-toggle--3: var(--csstools-color-scheme--light) var(--color--red--200);
+    color: var(--csstools-light-dark-toggle--3, var(--color--red--800));
+    --csstools-light-dark-toggle--4: var(--csstools-color-scheme--light) var(--color--red--950);
+    background-color: var(--csstools-light-dark-toggle--4, var(--color--red--50));
+    --csstools-light-dark-toggle--5: var(--csstools-color-scheme--light) var(--color--red--600);
+    border-color: var(--csstools-light-dark-toggle--5, var(--color--red--400));
+  }
+
+@supports (color: light-dark(red, red)){
+&.popover--error {
     color: light-dark(var(--color--red--800), var(--color--red--200));
     background-color: light-dark(var(--color--red--50), var(--color--red--950));
     border-color: light-dark(var(--color--red--400), var(--color--red--600));
   }
+}
   &.popover--red {
+    --csstools-light-dark-toggle--6: var(--csstools-color-scheme--light) var(--color--red--200);
+    color: var(--csstools-light-dark-toggle--6, var(--color--red--800));
+    --csstools-light-dark-toggle--7: var(--csstools-color-scheme--light) var(--color--red--950);
+    background-color: var(--csstools-light-dark-toggle--7, var(--color--red--50));
+    --csstools-light-dark-toggle--8: var(--csstools-color-scheme--light) var(--color--red--600);
+    border-color: var(--csstools-light-dark-toggle--8, var(--color--red--400));
+  }
+
+@supports (color: light-dark(red, red)){
+&.popover--red {
     color: light-dark(var(--color--red--800), var(--color--red--200));
     background-color: light-dark(var(--color--red--50), var(--color--red--950));
     border-color: light-dark(var(--color--red--400), var(--color--red--600));
   }
+}
   &.popover--orange {
+    --csstools-light-dark-toggle--9: var(--csstools-color-scheme--light) var(--color--orange--200);
+    color: var(--csstools-light-dark-toggle--9, var(--color--orange--800));
+    --csstools-light-dark-toggle--10: var(--csstools-color-scheme--light) var(--color--orange--950);
+    background-color: var(--csstools-light-dark-toggle--10, var(--color--orange--50));
+    --csstools-light-dark-toggle--11: var(--csstools-color-scheme--light) var(--color--orange--600);
+    border-color: var(--csstools-light-dark-toggle--11, var(--color--orange--400));
+  }
+
+@supports (color: light-dark(red, red)){
+&.popover--orange {
     color: light-dark(var(--color--orange--800), var(--color--orange--200));
     background-color: light-dark(
       var(--color--orange--50),
@@ -48,7 +80,18 @@
       var(--color--orange--600)
     );
   }
+}
   &.popover--amber {
+    --csstools-light-dark-toggle--12: var(--csstools-color-scheme--light) var(--color--amber--200);
+    color: var(--csstools-light-dark-toggle--12, var(--color--amber--800));
+    --csstools-light-dark-toggle--13: var(--csstools-color-scheme--light) var(--color--amber--950);
+    background-color: var(--csstools-light-dark-toggle--13, var(--color--amber--50));
+    --csstools-light-dark-toggle--14: var(--csstools-color-scheme--light) var(--color--amber--600);
+    border-color: var(--csstools-light-dark-toggle--14, var(--color--amber--400));
+  }
+
+@supports (color: light-dark(red, red)){
+&.popover--amber {
     color: light-dark(var(--color--amber--800), var(--color--amber--200));
     background-color: light-dark(
       var(--color--amber--50),
@@ -59,7 +102,18 @@
       var(--color--amber--600)
     );
   }
+}
   &.popover--yellow {
+    --csstools-light-dark-toggle--15: var(--csstools-color-scheme--light) var(--color--yellow--200);
+    color: var(--csstools-light-dark-toggle--15, var(--color--yellow--800));
+    --csstools-light-dark-toggle--16: var(--csstools-color-scheme--light) var(--color--yellow--950);
+    background-color: var(--csstools-light-dark-toggle--16, var(--color--yellow--50));
+    --csstools-light-dark-toggle--17: var(--csstools-color-scheme--light) var(--color--yellow--600);
+    border-color: var(--csstools-light-dark-toggle--17, var(--color--yellow--400));
+  }
+
+@supports (color: light-dark(red, red)){
+&.popover--yellow {
     color: light-dark(var(--color--yellow--800), var(--color--yellow--200));
     background-color: light-dark(
       var(--color--yellow--50),
@@ -70,7 +124,18 @@
       var(--color--yellow--600)
     );
   }
+}
   &.popover--lime {
+    --csstools-light-dark-toggle--18: var(--csstools-color-scheme--light) var(--color--lime--200);
+    color: var(--csstools-light-dark-toggle--18, var(--color--lime--800));
+    --csstools-light-dark-toggle--19: var(--csstools-color-scheme--light) var(--color--lime--950);
+    background-color: var(--csstools-light-dark-toggle--19, var(--color--lime--50));
+    --csstools-light-dark-toggle--20: var(--csstools-color-scheme--light) var(--color--lime--600);
+    border-color: var(--csstools-light-dark-toggle--20, var(--color--lime--400));
+  }
+
+@supports (color: light-dark(red, red)){
+&.popover--lime {
     color: light-dark(var(--color--lime--800), var(--color--lime--200));
     background-color: light-dark(
       var(--color--lime--50),
@@ -78,7 +143,18 @@
     );
     border-color: light-dark(var(--color--lime--400), var(--color--lime--600));
   }
+}
   &.popover--green {
+    --csstools-light-dark-toggle--21: var(--csstools-color-scheme--light) var(--color--green--200);
+    color: var(--csstools-light-dark-toggle--21, var(--color--green--800));
+    --csstools-light-dark-toggle--22: var(--csstools-color-scheme--light) var(--color--green--950);
+    background-color: var(--csstools-light-dark-toggle--22, var(--color--green--50));
+    --csstools-light-dark-toggle--23: var(--csstools-color-scheme--light) var(--color--green--600);
+    border-color: var(--csstools-light-dark-toggle--23, var(--color--green--400));
+  }
+
+@supports (color: light-dark(red, red)){
+&.popover--green {
     color: light-dark(var(--color--green--800), var(--color--green--200));
     background-color: light-dark(
       var(--color--green--50),
@@ -89,7 +165,18 @@
       var(--color--green--600)
     );
   }
+}
   &.popover--emerald {
+    --csstools-light-dark-toggle--24: var(--csstools-color-scheme--light) var(--color--emerald--200);
+    color: var(--csstools-light-dark-toggle--24, var(--color--emerald--800));
+    --csstools-light-dark-toggle--25: var(--csstools-color-scheme--light) var(--color--emerald--950);
+    background-color: var(--csstools-light-dark-toggle--25, var(--color--emerald--50));
+    --csstools-light-dark-toggle--26: var(--csstools-color-scheme--light) var(--color--emerald--600);
+    border-color: var(--csstools-light-dark-toggle--26, var(--color--emerald--400));
+  }
+
+@supports (color: light-dark(red, red)){
+&.popover--emerald {
     color: light-dark(var(--color--emerald--800), var(--color--emerald--200));
     background-color: light-dark(
       var(--color--emerald--50),
@@ -100,7 +187,18 @@
       var(--color--emerald--600)
     );
   }
+}
   &.popover--teal {
+    --csstools-light-dark-toggle--27: var(--csstools-color-scheme--light) var(--color--teal--200);
+    color: var(--csstools-light-dark-toggle--27, var(--color--teal--800));
+    --csstools-light-dark-toggle--28: var(--csstools-color-scheme--light) var(--color--teal--950);
+    background-color: var(--csstools-light-dark-toggle--28, var(--color--teal--50));
+    --csstools-light-dark-toggle--29: var(--csstools-color-scheme--light) var(--color--teal--600);
+    border-color: var(--csstools-light-dark-toggle--29, var(--color--teal--400));
+  }
+
+@supports (color: light-dark(red, red)){
+&.popover--teal {
     color: light-dark(var(--color--teal--800), var(--color--teal--200));
     background-color: light-dark(
       var(--color--teal--50),
@@ -108,7 +206,18 @@
     );
     border-color: light-dark(var(--color--teal--400), var(--color--teal--600));
   }
+}
   &.popover--cyan {
+    --csstools-light-dark-toggle--30: var(--csstools-color-scheme--light) var(--color--cyan--200);
+    color: var(--csstools-light-dark-toggle--30, var(--color--cyan--800));
+    --csstools-light-dark-toggle--31: var(--csstools-color-scheme--light) var(--color--cyan--950);
+    background-color: var(--csstools-light-dark-toggle--31, var(--color--cyan--50));
+    --csstools-light-dark-toggle--32: var(--csstools-color-scheme--light) var(--color--cyan--600);
+    border-color: var(--csstools-light-dark-toggle--32, var(--color--cyan--400));
+  }
+
+@supports (color: light-dark(red, red)){
+&.popover--cyan {
     color: light-dark(var(--color--cyan--800), var(--color--cyan--200));
     background-color: light-dark(
       var(--color--cyan--50),
@@ -116,12 +225,34 @@
     );
     border-color: light-dark(var(--color--cyan--400), var(--color--cyan--600));
   }
+}
   &.popover--sky {
+    --csstools-light-dark-toggle--33: var(--csstools-color-scheme--light) var(--color--sky--200);
+    color: var(--csstools-light-dark-toggle--33, var(--color--sky--800));
+    --csstools-light-dark-toggle--34: var(--csstools-color-scheme--light) var(--color--sky--950);
+    background-color: var(--csstools-light-dark-toggle--34, var(--color--sky--50));
+    --csstools-light-dark-toggle--35: var(--csstools-color-scheme--light) var(--color--sky--600);
+    border-color: var(--csstools-light-dark-toggle--35, var(--color--sky--400));
+  }
+
+@supports (color: light-dark(red, red)){
+&.popover--sky {
     color: light-dark(var(--color--sky--800), var(--color--sky--200));
     background-color: light-dark(var(--color--sky--50), var(--color--sky--950));
     border-color: light-dark(var(--color--sky--400), var(--color--sky--600));
   }
+}
   &.popover--blue {
+    --csstools-light-dark-toggle--36: var(--csstools-color-scheme--light) var(--color--blue--200);
+    color: var(--csstools-light-dark-toggle--36, var(--color--blue--800));
+    --csstools-light-dark-toggle--37: var(--csstools-color-scheme--light) var(--color--blue--950);
+    background-color: var(--csstools-light-dark-toggle--37, var(--color--blue--50));
+    --csstools-light-dark-toggle--38: var(--csstools-color-scheme--light) var(--color--blue--600);
+    border-color: var(--csstools-light-dark-toggle--38, var(--color--blue--400));
+  }
+
+@supports (color: light-dark(red, red)){
+&.popover--blue {
     color: light-dark(var(--color--blue--800), var(--color--blue--200));
     background-color: light-dark(
       var(--color--blue--50),
@@ -129,7 +260,18 @@
     );
     border-color: light-dark(var(--color--blue--400), var(--color--blue--600));
   }
+}
   &.popover--indigo {
+    --csstools-light-dark-toggle--39: var(--csstools-color-scheme--light) var(--color--indigo--200);
+    color: var(--csstools-light-dark-toggle--39, var(--color--indigo--800));
+    --csstools-light-dark-toggle--40: var(--csstools-color-scheme--light) var(--color--indigo--950);
+    background-color: var(--csstools-light-dark-toggle--40, var(--color--indigo--50));
+    --csstools-light-dark-toggle--41: var(--csstools-color-scheme--light) var(--color--indigo--600);
+    border-color: var(--csstools-light-dark-toggle--41, var(--color--indigo--400));
+  }
+
+@supports (color: light-dark(red, red)){
+&.popover--indigo {
     color: light-dark(var(--color--indigo--800), var(--color--indigo--200));
     background-color: light-dark(
       var(--color--indigo--50),
@@ -140,7 +282,18 @@
       var(--color--indigo--600)
     );
   }
+}
   &.popover--violet {
+    --csstools-light-dark-toggle--42: var(--csstools-color-scheme--light) var(--color--violet--200);
+    color: var(--csstools-light-dark-toggle--42, var(--color--violet--800));
+    --csstools-light-dark-toggle--43: var(--csstools-color-scheme--light) var(--color--violet--950);
+    background-color: var(--csstools-light-dark-toggle--43, var(--color--violet--50));
+    --csstools-light-dark-toggle--44: var(--csstools-color-scheme--light) var(--color--violet--600);
+    border-color: var(--csstools-light-dark-toggle--44, var(--color--violet--400));
+  }
+
+@supports (color: light-dark(red, red)){
+&.popover--violet {
     color: light-dark(var(--color--violet--800), var(--color--violet--200));
     background-color: light-dark(
       var(--color--violet--50),
@@ -151,7 +304,18 @@
       var(--color--violet--600)
     );
   }
+}
   &.popover--purple {
+    --csstools-light-dark-toggle--45: var(--csstools-color-scheme--light) var(--color--purple--200);
+    color: var(--csstools-light-dark-toggle--45, var(--color--purple--800));
+    --csstools-light-dark-toggle--46: var(--csstools-color-scheme--light) var(--color--purple--950);
+    background-color: var(--csstools-light-dark-toggle--46, var(--color--purple--50));
+    --csstools-light-dark-toggle--47: var(--csstools-color-scheme--light) var(--color--purple--600);
+    border-color: var(--csstools-light-dark-toggle--47, var(--color--purple--400));
+  }
+
+@supports (color: light-dark(red, red)){
+&.popover--purple {
     color: light-dark(var(--color--purple--800), var(--color--purple--200));
     background-color: light-dark(
       var(--color--purple--50),
@@ -162,7 +326,18 @@
       var(--color--purple--600)
     );
   }
+}
   &.popover--fuchsia {
+    --csstools-light-dark-toggle--48: var(--csstools-color-scheme--light) var(--color--fuchsia--200);
+    color: var(--csstools-light-dark-toggle--48, var(--color--fuchsia--800));
+    --csstools-light-dark-toggle--49: var(--csstools-color-scheme--light) var(--color--fuchsia--950);
+    background-color: var(--csstools-light-dark-toggle--49, var(--color--fuchsia--50));
+    --csstools-light-dark-toggle--50: var(--csstools-color-scheme--light) var(--color--fuchsia--600);
+    border-color: var(--csstools-light-dark-toggle--50, var(--color--fuchsia--400));
+  }
+
+@supports (color: light-dark(red, red)){
+&.popover--fuchsia {
     color: light-dark(var(--color--fuchsia--800), var(--color--fuchsia--200));
     background-color: light-dark(
       var(--color--fuchsia--50),
@@ -173,7 +348,18 @@
       var(--color--fuchsia--600)
     );
   }
+}
   &.popover--pink {
+    --csstools-light-dark-toggle--51: var(--csstools-color-scheme--light) var(--color--pink--200);
+    color: var(--csstools-light-dark-toggle--51, var(--color--pink--800));
+    --csstools-light-dark-toggle--52: var(--csstools-color-scheme--light) var(--color--pink--950);
+    background-color: var(--csstools-light-dark-toggle--52, var(--color--pink--50));
+    --csstools-light-dark-toggle--53: var(--csstools-color-scheme--light) var(--color--pink--600);
+    border-color: var(--csstools-light-dark-toggle--53, var(--color--pink--400));
+  }
+
+@supports (color: light-dark(red, red)){
+&.popover--pink {
     color: light-dark(var(--color--pink--800), var(--color--pink--200));
     background-color: light-dark(
       var(--color--pink--50),
@@ -181,7 +367,18 @@
     );
     border-color: light-dark(var(--color--pink--400), var(--color--pink--600));
   }
+}
   &.popover--rose {
+    --csstools-light-dark-toggle--54: var(--csstools-color-scheme--light) var(--color--rose--200);
+    color: var(--csstools-light-dark-toggle--54, var(--color--rose--800));
+    --csstools-light-dark-toggle--55: var(--csstools-color-scheme--light) var(--color--rose--950);
+    background-color: var(--csstools-light-dark-toggle--55, var(--color--rose--50));
+    --csstools-light-dark-toggle--56: var(--csstools-color-scheme--light) var(--color--rose--600);
+    border-color: var(--csstools-light-dark-toggle--56, var(--color--rose--400));
+  }
+
+@supports (color: light-dark(red, red)){
+&.popover--rose {
     color: light-dark(var(--color--rose--800), var(--color--rose--200));
     background-color: light-dark(
       var(--color--rose--50),
@@ -190,15 +387,31 @@
     border-color: light-dark(var(--color--rose--400), var(--color--rose--600));
   }
 }
+}
+
+@supports (color: light-dark(red, red)){
+.popover {
+  color: light-dark(var(--color--black), var(--color--white));
+  background-color: light-dark(
+    var(--color--slate--50),
+    var(--color--slate--950)
+  );
+  border: var(--border-width--1) solid
+    light-dark(var(--color--slate--400), var(--color--slate--600))
+}
+}
 
 [key="global-error"] {
-  color: light-dark(var(--color--red--800), var(--color--red--200));
-  background-color: light-dark(var(--color--red--50), var(--color--red--950));
+  --csstools-light-dark-toggle--57: var(--csstools-color-scheme--light) var(--color--red--200);
+  color: var(--csstools-light-dark-toggle--57, var(--color--red--800));
+  --csstools-light-dark-toggle--58: var(--csstools-color-scheme--light) var(--color--red--950);
+  background-color: var(--csstools-light-dark-toggle--58, var(--color--red--50));
   width: max-content;
   max-width: min(calc(100% - var(--space--8)), var(--space--96));
   padding: var(--space--1) var(--space--2);
+  --csstools-light-dark-toggle--59: var(--csstools-color-scheme--light) var(--color--red--600);
   border: var(--border-width--1) solid
-    light-dark(var(--color--red--400), var(--color--red--600));
+    var(--csstools-light-dark-toggle--59, var(--color--red--400));
   border-radius: var(--border-radius--1);
   margin: var(--space--0) auto;
   box-shadow: var(--box-shadow--4);
@@ -209,16 +422,25 @@
   z-index: 2000;
 }
 
+@supports (color: light-dark(red, red)){
+[key="global-error"] {
+  color: light-dark(var(--color--red--800), var(--color--red--200));
+  background-color: light-dark(var(--color--red--50), var(--color--red--950));
+  border: var(--border-width--1) solid
+    light-dark(var(--color--red--400), var(--color--red--600));
+}
+}
+
 [key="progress-bar"] {
-  background-color: light-dark(
-    var(--color--blue--500),
-    var(--color--blue--500)
-  );
+  --csstools-light-dark-toggle--60: var(--csstools-color-scheme--light) var(--color--blue--500);
+  background-color: var(--csstools-light-dark-toggle--60, var(--color--blue--500));
   height: var(--space--1);
+  --csstools-light-dark-toggle--61: var(--csstools-color-scheme--light) var(--color--blue--700);
   border-bottom: var(--border-width--1) solid
-    light-dark(var(--color--blue--700), var(--color--blue--700));
+    var(--csstools-light-dark-toggle--61, var(--color--blue--700));
+  --csstools-light-dark-toggle--62: var(--csstools-color-scheme--light) var(--color--blue--700);
   border-right: var(--border-width--1) solid
-    light-dark(var(--color--blue--700), var(--color--blue--700));
+    var(--csstools-light-dark-toggle--62, var(--color--blue--700));
   box-shadow: var(--box-shadow--4);
   position: fixed;
   top: var(--space--0);
@@ -229,3 +451,18 @@
   transition-duration: var(--transition-duration--300);
   transition-timing-function: var(--transition-timing-function--ease-in-out);
 }
+
+@supports (color: light-dark(red, red)){
+[key="progress-bar"] {
+  background-color: light-dark(
+    var(--color--blue--500),
+    var(--color--blue--500)
+  );
+  border-bottom: var(--border-width--1) solid
+    light-dark(var(--color--blue--700), var(--color--blue--700));
+  border-right: var(--border-width--1) solid
+    light-dark(var(--color--blue--700), var(--color--blue--700));
+}
+}
+
+/*# sourceMappingURL=data:application/json;base64,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LXN0cmFpZ2h0Zm9yd2FyZC9jc3Mvc3RhdGljL2luZGV4LmNzc1wiO1xuXG4ucG9wb3ZlciB7XG4gIGZvbnQtc2l6ZTogdmFyKC0tZm9udC1zaXplLS0zLTUpO1xuICBsaW5lLWhlaWdodDogdmFyKC0tZm9udC1zaXplLS0zLTUtLWxpbmUtaGVpZ2h0KTtcbiAgZm9udC13ZWlnaHQ6IDQwMDtcbiAgY29sb3I6IGxpZ2h0LWRhcmsodmFyKC0tY29sb3ItLWJsYWNrKSwgdmFyKC0tY29sb3ItLXdoaXRlKSk7XG4gIGJhY2tncm91bmQtY29sb3I6IGxpZ2h0LWRhcmsoXG4gICAgdmFyKC0tY29sb3ItLXNsYXRlLS01MCksXG4gICAgdmFyKC0tY29sb3ItLXNsYXRlLS05NTApXG4gICk7XG4gIHdpZHRoOiBtYXgtY29udGVudDtcbiAgbWF4LXdpZHRoOiBtaW4oY2FsYygxMDAlIC0gdmFyKC0tc3BhY2UtLTgpKSwgdmFyKC0tc3BhY2UtLTk2KSk7XG4gIHBhZGRpbmc6IHZhcigtLXNwYWNlLS0xKSB2YXIoLS1zcGFjZS0tMik7XG4gIGJvcmRlcjogdmFyKC0tYm9yZGVyLXdpZHRoLS0xKSBzb2xpZFxuICAgIGxpZ2h0LWRhcmsodmFyKC0tY29sb3ItLXNsYXRlLS00MDApLCB2YXIoLS1jb2xvci0tc2xhdGUtLTYwMCkpO1xuICBib3JkZXItcmFkaXVzOiB2YXIoLS1ib3JkZXItcmFkaXVzLS0xKTtcbiAgYm94LXNoYWRvdzogdmFyKC0tYm94LXNoYWRvdy0tNCk7XG4gIHBvc2l0aW9uOiBhYnNvbHV0ZTtcbiAgdG9wOiAwO1xuICBsZWZ0OiAwO1xuICB6LWluZGV4OiAxMDAwO1xuICB0cmFuc2l0aW9uLXByb3BlcnR5OiB2YXIoLS10cmFuc2l0aW9uLXByb3BlcnR5LS1vcGFjaXR5KTtcbiAgdHJhbnNpdGlvbi1kdXJhdGlvbjogdmFyKC0tdHJhbnNpdGlvbi1kdXJhdGlvbi0tMTUwKTtcbiAgdHJhbnNpdGlvbi10aW1pbmctZnVuY3Rpb246IHZhcigtLXRyYW5zaXRpb24tdGltaW5nLWZ1bmN0aW9uLS1lYXNlLWluLW91dCk7XG4gICY6bm90KFtzdGF0ZX49XCJvcGVuXCJdKSB7XG4gICAgdmlzaWJpbGl0eTogaGlkZGVuO1xuICAgIG9wYWNpdHk6IHZhcigtLW9wYWNpdHktLTApO1xuICB9XG4gICYucG9wb3Zlci0tZXJyb3Ige1xuICAgIGNvbG9yOiBsaWdodC1kYXJrKHZhcigtLWNvbG9yLS1yZWQtLTgwMCksIHZhcigtLWNvbG9yLS1yZWQtLTIwMCkpO1xuICAgIGJhY2tncm91bmQtY29sb3I6IGxpZ2h0LWRhcmsodmFyKC0tY29sb3ItLXJlZC0tNTApLCB2YXIoLS1jb2xvci0tcmVkLS05NTApKTtcbiAgICBib3JkZXItY29sb3I6IGxpZ2h0LWRhcmsodmFyKC0tY29sb3ItLXJlZC0tNDAwKSwgdmFyKC0tY29sb3ItLXJlZC0tNjAwKSk7XG4gIH1cbiAgJi5wb3BvdmVyLS1yZWQge1xuICAgIGNvbG9yOiBsaWdodC1kYXJrKHZhcigtLWNvbG9yLS1yZWQtLTgwMCksIHZhcigtLWNvbG9yLS1yZWQtLTIwMCkpO1xuICAgIGJhY2tncm91bmQtY29sb3I6IGxpZ2h0LWRhcmsodmFyKC0tY29sb3ItLXJlZC0tNTApLCB2YXIoLS1jb2xvci0tcmVkLS05NTApKTtcbiAgICBib3JkZXItY29sb3I6IGxpZ2h0LWRhcmsodmFyKC0tY29sb3ItLXJlZC0tNDAwKSwgdmFyKC0tY29sb3ItLXJlZC0tNjAwKSk7XG4gIH1cbiAgJi5wb3BvdmVyLS1vcmFuZ2Uge1xuICAgIGNvbG9yOiBsaWdodC1kYXJrKHZhcigtLWNvbG9yLS1vcmFuZ2UtLTgwMCksIHZhcigtLWNvbG9yLS1vcmFuZ2UtLTIwMCkpO1xuICAgIGJhY2tncm91bmQtY29sb3I6IGxpZ2h0LWRhcmsoXG4gICAgICB2YXIoLS1jb2xvci0tb3JhbmdlLS01MCksXG4gICAgICB2YXIoLS1jb2xvci0tb3JhbmdlLS05NTApXG4gICAgKTtcbiAgICBib3JkZXItY29sb3I6IGxpZ2h0LWRhcmsoXG4gICAgICB2YXIoLS1jb2xvci0tb3JhbmdlLS00MDApLFxuICAgICAgdmFyKC0tY29sb3ItLW9yYW5nZS0tNjAwKVxuICAgICk7XG4gIH1cbiAgJi5wb3BvdmVyLS1hbWJlciB7XG4gICAgY29sb3I6IGxpZ2h0LWRhcmsodmFyKC0tY29sb3ItLWFtYmVyLS04MDApLCB2YXIoLS1jb2xvci0tYW1iZXItLTIwMCkpO1xuICAgIGJhY2tncm91bmQtY29sb3I6IGxpZ2h0LWRhcmsoXG4gICAgICB2YXIoLS1jb2xvci0tYW1iZXItLTUwKSxcbiAgICAgIHZhcigtLWNvbG9yLS1hbWJlci0tOTUwKVxuICAgICk7XG4gICAgYm9yZGVyLWNvbG9yOiBsaWdodC1kYXJrKFxuICAgICAgdmFyKC0tY29sb3ItLWFtYmVyLS00MDApLFxuICAgICAgdmFyKC0tY29sb3ItLWFtYmVyLS02MDApXG4gICAgKTtcbiAgfVxuICAmLnBvcG92ZXItLXllbGxvdyB7XG4gICAgY29sb3I6IGxpZ2h0LWRhcmsodmFyKC0tY29sb3ItLXllbGxvdy0tODAwKSwgdmFyKC0tY29sb3ItLXllbGxvdy0tMjAwKSk7XG4gICAgYmFja2dyb3VuZC1jb2xvcjogbGlnaHQtZGFyayhcbiAgICAgIHZhcigtLWNvbG9yLS15ZWxsb3ctLTUwKSxcbiAgICAgIHZhcigtLWNvbG9yLS15ZWxsb3ctLTk1MClcbiAgICApO1xuICAgIGJvcmRlci1jb2xvcjogbGlnaHQtZGFyayhcbiAgICAgIHZhcigtLWNvbG9yLS15ZWxsb3ctLTQwMCksXG4gICAgICB2YXIoLS1jb2xvci0teWVsbG93LS02MDApXG4gICAgKTtcbiAgfVxuICAmLnBvcG92ZXItLWxpbWUge1xuICAgIGNvbG9yOiBsaWdodC1kYXJrKHZhcigtLWNvbG9yLS1saW1lLS04MDApLCB2YXIoLS1jb2xvci0tbGltZS0tMjAwKSk7XG4gICAgYmFja2dyb3VuZC1jb2xvcjogbGlnaHQtZGFyayhcbiAgICAgIHZhcigtLWNvbG9yLS1saW1lLS01MCksXG4gICAgICB2YXIoLS1jb2xvci0tbGltZS0tOTUwKVxuICAgICk7XG4gICAgYm9yZGVyLWNvbG9yOiBsaWdodC1kYXJrKHZhcigtLWNvbG9yLS1saW1lLS00MDApLCB2YXIoLS1jb2xvci0tbGltZS0tNjAwKSk7XG4gIH1cbiAgJi5wb3BvdmVyLS1ncmVlbiB7XG4gICAgY29sb3I6IGxpZ2h0LWRhcmsodmFyKC0tY29sb3ItLWdyZWVuLS04MDApLCB2YXIoLS1jb2xvci0tZ3JlZW4tLTIwMCkpO1xuICAgIGJhY2tncm91bmQtY29sb3I6IGxpZ2h0LWRhcmsoXG4gICAgICB2YXIoLS1jb2xvci0tZ3JlZW4tLTUwKSxcbiAgICAgIHZhcigtLWNvbG9yLS1ncmVlbi0tOTUwKVxuICAgICk7XG4gICAgYm9yZGVyLWNvbG9yOiBsaWdodC1kYXJrKFxuICAgICAgdmFyKC0tY29sb3ItLWdyZWVuLS00MDApLFxuICAgICAgdmFyKC0tY29sb3ItLWdyZWVuLS02MDApXG4gICAgKTtcbiAgfVxuICAmLnBvcG92ZXItLWVtZXJhbGQge1xuICAgIGNvbG9yOiBsaWdodC1kYXJrKHZhcigtLWNvbG9yLS1lbWVyYWxkLS04MDApLCB2YXIoLS1jb2xvci0tZW1lcmFsZC0tMjAwKSk7XG4gICAgYmFja2dyb3VuZC1jb2xvcjogbGlnaHQtZGFyayhcbiAgICAgIHZhcigtLWNvbG9yLS1lbWVyYWxkLS01MCksXG4gICAgICB2YXIoLS1jb2xvci0tZW1lcmFsZC0tOTUwKVxuICAgICk7XG4gICAgYm9yZGVyLWNvbG9yOiBsaWdodC1kYXJrKFxuICAgICAgdmFyKC0tY29sb3ItLWVtZXJhbGQtLTQwMCksXG4gICAgICB2YXIoLS1jb2xvci0tZW1lcmFsZC0tNjAwKVxuICAgICk7XG4gIH1cbiAgJi5wb3BvdmVyLS10ZWFsIHtcbiAgICBjb2xvcjogbGlnaHQtZGFyayh2YXIoLS1jb2xvci0tdGVhbC0tODAwKSwgdmFyKC0tY29sb3ItLXRlYWwtLTIwMCkpO1xuICAgIGJhY2tncm91bmQtY29sb3I6IGxpZ2h0LWRhcmsoXG4gICAgICB2YXIoLS1jb2xvci0tdGVhbC0tNTApLFxuICAgICAgdmFyKC0tY29sb3ItLXRlYWwtLTk1MClcbiAgICApO1xuICAgIGJvcmRlci1jb2xvcjogbGlnaHQtZGFyayh2YXIoLS1jb2xvci0tdGVhbC0tNDAwKSwgdmFyKC0tY29sb3ItLXRlYWwtLTYwMCkpO1xuICB9XG4gICYucG9wb3Zlci0tY3lhbiB7XG4gICAgY29sb3I6IGxpZ2h0LWRhcmsodmFyKC0tY29sb3ItLWN5YW4tLTgwMCksIHZhcigtLWNvbG9yLS1jeWFuLS0yMDApKTtcbiAgICBiYWNrZ3JvdW5kLWNvbG9yOiBsaWdodC1kYXJrKFxuICAgICAgdmFyKC0tY29sb3ItLWN5YW4tLTUwKSxcbiAgICAgIHZhcigtLWNvbG9yLS1jeWFuLS05NTApXG4gICAgKTtcbiAgICBib3JkZXItY29sb3I6IGxpZ2h0LWRhcmsodmFyKC0tY29sb3ItLWN5YW4tLTQwMCksIHZhcigtLWNvbG9yLS1jeWFuLS02MDApKTtcbiAgfVxuICAmLnBvcG92ZXItLXNreSB7XG4gICAgY29sb3I6IGxpZ2h0LWRhcmsodmFyKC0tY29sb3ItLXNreS0tODAwKSwgdmFyKC0tY29sb3ItLXNreS0tMjAwKSk7XG4gICAgYmFja2dyb3VuZC1jb2xvcjogbGlnaHQtZGFyayh2YXIoLS1jb2xvci0tc2t5LS01MCksIHZhcigtLWNvbG9yLS1za3ktLTk1MCkpO1xuICAgIGJvcmRlci1jb2xvcjogbGlnaHQtZGFyayh2YXIoLS1jb2xvci0tc2t5LS00MDApLCB2YXIoLS1jb2xvci0tc2t5LS02MDApKTtcbiAgfVxuICAmLnBvcG92ZXItLWJsdWUge1xuICAgIGNvbG9yOiBsaWdodC1kYXJrKHZhcigtLWNvbG9yLS1ibHVlLS04MDApLCB2YXIoLS1jb2xvci0tYmx1ZS0tMjAwKSk7XG4gICAgYmFja2dyb3VuZC1jb2xvcjogbGlnaHQtZGFyayhcbiAgICAgIHZhcigtLWNvbG9yLS1ibHVlLS01MCksXG4gICAgICB2YXIoLS1jb2xvci0tYmx1ZS0tOTUwKVxuICAgICk7XG4gICAgYm9yZGVyLWNvbG9yOiBsaWdodC1kYXJrKHZhcigtLWNvbG9yLS1ibHVlLS00MDApLCB2YXIoLS1jb2xvci0tYmx1ZS0tNjAwKSk7XG4gIH1cbiAgJi5wb3BvdmVyLS1pbmRpZ28ge1xuICAgIGNvbG9yOiBsaWdodC1kYXJrKHZhcigtLWNvbG9yLS1pbmRpZ28tLTgwMCksIHZhcigtLWNvbG9yLS1pbmRpZ28tLTIwMCkpO1xuICAgIGJhY2tncm91bmQtY29sb3I6IGxpZ2h0LWRhcmsoXG4gICAgICB2YXIoLS1jb2xvci0taW5kaWdvLS01MCksXG4gICAgICB2YXIoLS1jb2xvci0taW5kaWdvLS05NTApXG4gICAgKTtcbiAgICBib3JkZXItY29sb3I6IGxpZ2h0LWRhcmsoXG4gICAgICB2YXIoLS1jb2xvci0taW5kaWdvLS00MDApLFxuICAgICAgdmFyKC0tY29sb3ItLWluZGlnby0tNjAwKVxuICAgICk7XG4gIH1cbiAgJi5wb3BvdmVyLS12aW9sZXQge1xuICAgIGNvbG9yOiBsaWdodC1kYXJrKHZhcigtLWNvbG9yLS12aW9sZXQtLTgwMCksIHZhcigtLWNvbG9yLS12aW9sZXQtLTIwMCkpO1xuICAgIGJhY2tncm91bmQtY29sb3I6IGxpZ2h0LWRhcmsoXG4gICAgICB2YXIoLS1jb2xvci0tdmlvbGV0LS01MCksXG4gICAgICB2YXIoLS1jb2xvci0tdmlvbGV0LS05NTApXG4gICAgKTtcbiAgICBib3JkZXItY29sb3I6IGxpZ2h0LWRhcmsoXG4gICAgICB2YXIoLS1jb2xvci0tdmlvbGV0LS00MDApLFxuICAgICAgdmFyKC0tY29sb3ItLXZpb2xldC0tNjAwKVxuICAgICk7XG4gIH1cbiAgJi5wb3BvdmVyLS1wdXJwbGUge1xuICAgIGNvbG9yOiBsaWdodC1kYXJrKHZhcigtLWNvbG9yLS1wdXJwbGUtLTgwMCksIHZhcigtLWNvbG9yLS1wdXJwbGUtLTIwMCkpO1xuICAgIGJhY2tncm91bmQtY29sb3I6IGxpZ2h0LWRhcmsoXG4gICAgICB2YXIoLS1jb2xvci0tcHVycGxlLS01MCksXG4gICAgICB2YXIoLS1jb2xvci0tcHVycGxlLS05NTApXG4gICAgKTtcbiAgICBib3JkZXItY29sb3I6IGxpZ2h0LWRhcmsoXG4gICAgICB2YXIoLS1jb2xvci0tcHVycGxlLS00MDApLFxuICAgICAgdmFyKC0tY29sb3ItLXB1cnBsZS0tNjAwKVxuICAgICk7XG4gIH1cbiAgJi5wb3BvdmVyLS1mdWNoc2lhIHtcbiAgICBjb2xvcjogbGlnaHQtZGFyayh2YXIoLS1jb2xvci0tZnVjaHNpYS0tODAwKSwgdmFyKC0tY29sb3ItLWZ1Y2hzaWEtLTIwMCkpO1xuICAgIGJhY2tncm91bmQtY29sb3I6IGxpZ2h0LWRhcmsoXG4gICAgICB2YXIoLS1jb2xvci0tZnVjaHNpYS0tNTApLFxuICAgICAgdmFyKC0tY29sb3ItLWZ1Y2hzaWEtLTk1MClcbiAgICApO1xuICAgIGJvcmRlci1jb2xvcjogbGlnaHQtZGFyayhcbiAgICAgIHZhcigtLWNvbG9yLS1mdWNoc2lhLS00MDApLFxuICAgICAgdmFyKC0tY29sb3ItLWZ1Y2hzaWEtLTYwMClcbiAgICApO1xuICB9XG4gICYucG9wb3Zlci0tcGluayB7XG4gICAgY29sb3I6IGxpZ2h0LWRhcmsodmFyKC0tY29sb3ItLXBpbmstLTgwMCksIHZhcigtLWNvbG9yLS1waW5rLS0yMDApKTtcbiAgICBiYWNrZ3JvdW5kLWNvbG9yOiBsaWdodC1kYXJrKFxuICAgICAgdmFyKC0tY29sb3ItLXBpbmstLTUwKSxcbiAgICAgIHZhcigtLWNvbG9yLS1waW5rLS05NTApXG4gICAgKTtcbiAgICBib3JkZXItY29sb3I6IGxpZ2h0LWRhcmsodmFyKC0tY29sb3ItLXBpbmstLTQwMCksIHZhcigtLWNvbG9yLS1waW5rLS02MDApKTtcbiAgfVxuICAmLnBvcG92ZXItLXJvc2Uge1xuICAgIGNvbG9yOiBsaWdodC1kYXJrKHZhcigtLWNvbG9yLS1yb3NlLS04MDApLCB2YXIoLS1jb2xvci0tcm9zZS0tMjAwKSk7XG4gICAgYmFja2dyb3VuZC1jb2xvcjogbGlnaHQtZGFyayhcbiAgICAgIHZhcigtLWNvbG9yLS1yb3NlLS01MCksXG4gICAgICB2YXIoLS1jb2xvci0tcm9zZS0tOTUwKVxuICAgICk7XG4gICAgYm9yZGVyLWNvbG9yOiBsaWdodC1kYXJrKHZhcigtLWNvbG9yLS1yb3NlLS00MDApLCB2YXIoLS1jb2xvci0tcm9zZS0tNjAwKSk7XG4gIH1cbn1cblxuW2tleT1cImdsb2JhbC1lcnJvclwiXSB7XG4gIGNvbG9yOiBsaWdodC1kYXJrKHZhcigtLWNvbG9yLS1yZWQtLTgwMCksIHZhcigtLWNvbG9yLS1yZWQtLTIwMCkpO1xuICBiYWNrZ3JvdW5kLWNvbG9yOiBsaWdodC1kYXJrKHZhcigtLWNvbG9yLS1yZWQtLTUwKSwgdmFyKC0tY29sb3ItLXJlZC0tOTUwKSk7XG4gIHdpZHRoOiBtYXgtY29udGVudDtcbiAgbWF4LXdpZHRoOiBtaW4oY2FsYygxMDAlIC0gdmFyKC0tc3BhY2UtLTgpKSwgdmFyKC0tc3BhY2UtLTk2KSk7XG4gIHBhZGRpbmc6IHZhcigtLXNwYWNlLS0xKSB2YXIoLS1zcGFjZS0tMik7XG4gIGJvcmRlcjogdmFyKC0tYm9yZGVyLXdpZHRoLS0xKSBzb2xpZFxuICAgIGxpZ2h0LWRhcmsodmFyKC0tY29sb3ItLXJlZC0tNDAwKSwgdmFyKC0tY29sb3ItLXJlZC0tNjAwKSk7XG4gIGJvcmRlci1yYWRpdXM6IHZhcigtLWJvcmRlci1yYWRpdXMtLTEpO1xuICBtYXJnaW46IHZhcigtLXNwYWNlLS0wKSBhdXRvO1xuICBib3gtc2hhZG93OiB2YXIoLS1ib3gtc2hhZG93LS00KTtcbiAgcG9zaXRpb246IGZpeGVkO1xuICB0b3A6IHZhcigtLXNwYWNlLS04KTtcbiAgbGVmdDogdmFyKC0tc3BhY2UtLTIpO1xuICByaWdodDogdmFyKC0tc3BhY2UtLTIpO1xuICB6LWluZGV4OiAyMDAwO1xufVxuXG5ba2V5PVwicHJvZ3Jlc3MtYmFyXCJdIHtcbiAgYmFja2dyb3VuZC1jb2xvcjogbGlnaHQtZGFyayhcbiAgICB2YXIoLS1jb2xvci0tYmx1ZS0tNTAwKSxcbiAgICB2YXIoLS1jb2xvci0tYmx1ZS0tNTAwKVxuICApO1xuICBoZWlnaHQ6IHZhcigtLXNwYWNlLS0xKTtcbiAgYm9yZGVyLWJvdHRvbTogdmFyKC0tYm9yZGVyLXdpZHRoLS0xKSBzb2xpZFxuICAgIGxpZ2h0LWRhcmsodmFyKC0tY29sb3ItLWJsdWUtLTcwMCksIHZhcigtLWNvbG9yLS1ibHVlLS03MDApKTtcbiAgYm9yZGVyLXJpZ2h0OiB2YXIoLS1ib3JkZXItd2lkdGgtLTEpIHNvbGlkXG4gICAgbGlnaHQtZGFyayh2YXIoLS1jb2xvci0tYmx1ZS0tNzAwKSwgdmFyKC0tY29sb3ItLWJsdWUtLTcwMCkpO1xuICBib3gtc2hhZG93OiB2YXIoLS1ib3gtc2hhZG93LS00KTtcbiAgcG9zaXRpb246IGZpeGVkO1xuICB0b3A6IHZhcigtLXNwYWNlLS0wKTtcbiAgcmlnaHQ6IHZhcigtLXNwYWNlLS0wKTtcbiAgbGVmdDogdmFyKC0tc3BhY2UtLTApO1xuICB6LWluZGV4OiAzMDAwO1xuICB0cmFuc2l0aW9uLXByb3BlcnR5OiB3aWR0aDtcbiAgdHJhbnNpdGlvbi1kdXJhdGlvbjogdmFyKC0tdHJhbnNpdGlvbi1kdXJhdGlvbi0tMzAwKTtcbiAgdHJhbnNpdGlvbi10aW1pbmctZnVuY3Rpb246IHZhcigtLXRyYW5zaXRpb24tdGltaW5nLWZ1bmN0aW9uLS1lYXNlLWluLW91dCk7XG59XG4iXX0= */

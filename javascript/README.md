@@ -110,7 +110,7 @@ Unlike most events, browsers don’t support handling the [`focusin`](https://de
 ### `liveConnection()`
 
 ```typescript
-export async function liveConnection(requestId, { reload = false });
+export async function liveConnection(requestId, { reload = false } = {});
 ```
 
 Open a [Live Connection](https://github.com/radically-straightforward/radically-straightforward/tree/main/server#live-connection) to the server.
@@ -177,7 +177,7 @@ When `morph()` is called to perform a Live Connection update (that is,`event?.de
 
 - `morph()` supports `key="___"` instead of `morphdom`’s `id="___"`s. `key`s don’t have to be unique across the document and don’t even have to be unique across the element siblings—they’re just a hint at the identity of the element that’s used in the diffing process.
 
-- `morph()` is aware of Live Connection updates, `tippy()`s, and so forth.
+- `morph()` is aware of Live Connection updates.
 
 ### `stateAdd()`
 
@@ -225,65 +225,81 @@ export function execute(element, event = undefined);
 
 > **Note:** This is a low-level function—in most cases you want to call `mount()` instead.
 
-Execute the functions defined by the `javascript="___"` attribute, which is set by [`@radically-straightforward/build`](https://github.com/radically-straightforward/radically-straightforward/tree/main/build) when extracting browser JavaScript. You must call this when you insert new elements in the DOM, for example, when mounting content.
+Execute the functions defined by the `javascript="___"` attribute, which is set by [`@radically-straightforward/build`](https://github.com/radically-straightforward/radically-straightforward/tree/main/build) when extracting browser JavaScript. You must call this when you insert new elements in the DOM, for example:
+
+```javascript
+javascript.execute(
+  document
+    .querySelector("body")
+    .insertAdjacentElement(
+      "afterbegin",
+      javascript.stringToElement(html`<div javascript="___"></div>`),
+    ),
+);
+```
 
 ### `popover()`
 
 ```typescript
-export function popover(
+export function popover({
   element,
   target = element.nextElementSibling,
-  {
-    trigger = "hover",
-    closeOnFirstSubsequentClick = true,
-    placement = trigger === "hover"
-      ? "top"
-      : trigger === "click"
-        ? "bottom-start"
-        : trigger === "none"
-          ? "top"
-          : (() => {
-              throw new Error();
-            })(),
-  },
-);
-```
-
-TODO
-
-### `tippy()`
-
-```typescript
-export function tippy({
-  event = undefined,
-  element,
-  elementProperty = "tippy",
-  content,
-  ...tippyProps
+  trigger = "hover",
+  remainOpenWhileFocused = false,
+  placement = trigger === "hover"
+    ? "top"
+    : trigger === "click"
+      ? "bottom-start"
+      : trigger === "none"
+        ? "top"
+        : (() => {
+            throw new Error();
+          })(),
 });
 ```
 
-Create a [Tippy.js](https://atomiks.github.io/tippyjs/) tippy. This is different from calling Tippy’s constructor for the following reasons:
+Create a popover (tooltip, dropdown menu, and so forth).
 
-1. If `tippy()` is called multiple times on the same `element` with the same `elementProperty`, then it doesn’t create new tippys but `mount()`s the `content`.
+The `target` is decorated with the `showPopover()` and `hidePopover()` functions. The `element` is decorated with event handler attributes to trigger the popover.
 
-2. The defaults are different:
+**Parameters**
 
-   - **`ignoreAttributes`:** Set to `true` because we active `tippy()` via JavaScript, not HTML `data` attributes.
+- **`element`:** The element that is used a reference when positioning the popover and that triggers the popover open.
 
-   - **`arrow`:** Set to `false`, because most user interface `tippy()`s don’t use an arrow.
+- **`target`:** The element that contains the popover contents. It must have the `.popover` class, and it may have one of the `.popover--<color>` classes (see `@radically-straightforward/javascript/static/index.css`).
 
-   - **`offset`:** Set to `[0, 0]`, because `arrow` has been set to `false` so it doesn’t make sense to distance the `tippy()` from the trigger.
+- **`trigger`:** One of the following:
 
-   - **`touch`:** Set is only set to `true` by default if:
+  - **`"hover"`:** Show the popover on the `mouseenter` or `focusin` events and hide the popover on `onmouseleave` or `onfocusout` events. The `target` must not contain elements that may have focus (for example, `<button>`, `<input>`, and so forth), otherwise keyboard navigation is broken. On `isTouch` devices, `"hover"` popovers don’t show up because they often conflict with `"click"` popovers.
 
-     - `interactive` is set to `true`, because most noninteractive `tippy()`s don’t work well on touch devices (see https://atomiks.github.io/tippyjs/v6/misc/#touch-devices), but most interactive `tippy()`s work well on touch devices (usually they’re menus).
+  - **`"click"`:** Show the popover on `click`. When to hide the popover depends on the `remainOpenWhileFocused`. If `remainOpenWhileFocused` is `false` (the default), then the next click anywhere will close the popover—this is useful for dropdown menus with `<button>`s. If `remainOpenWhileFocused` is `true`, then only clicks outside of the popover will close it—this is useful for dropdown menus with `<input>`s.
 
-     - `trigger` is set to `"manual"`, because we understand it to mean that you want to control the showing of the `tippy()` programmatically.
+  - **`"none"`:** Showing and hiding the popover is the responsibility of the caller, using the `target.showPopover()` and `target.hidePopover()` functions.
 
-   - **`hideOnClick`:** Set to `false` if `trigger` is `"manual"`, because we understand it to mean that you want to control the showing of the `tippy()` programmatically.
+- **`remainOpenWhileFocused`:** See discussion on `trigger: "click"`. This parameter is ignored if `trigger` is something else.
 
-   - **`duration`:** Respect `prefers-reduced-motion: reduce` by default.
+- **`placement`:** One of [Floating UI’s `placement`s](https://floating-ui.com/docs/computePosition#placement).
+
+**Example**
+
+```typescript
+html`
+  <button
+    javascript="${javascript`
+      javascript.popover({ element: this });
+    `}"
+  >
+    Example of an element
+  </button>
+  <div class="popover">Example of a popover.</div>
+`;
+```
+
+**Implementation notes**
+
+This is inspired by the [Popover API](https://developer.mozilla.org/en-US/docs/Web/API/Popover_API) and [CSS anchor positioning](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_anchor_positioning), but it doesn’t follow the browser implementation exactly. First, because not all browsers support these APIs yet and the polyfills don’t work well enough (for example, they don’t support `position-try`). Second, because the APIs can be a bit awkward to use, for example, asking for you to come up with `anchor-name`s, and using HTML attributes instead of CSS & JavaScript.
+
+We use [Floating UI](https://floating-ui.com/) for positioning and provide an API reminiscent of the discontinued [Tippy.js](https://atomiks.github.io/tippyjs/). The major difference is that in Tippy.js the `content` is kept out of the DOM while the popover is hidden, while we keep the `target` in the DOM (just hidden). This allows, for example, the popover to contain form fields which are submitted on form submission, and it makes inspecting and debugging easier. We also support fewer features and less customization, for example, there isn’t the concept of `interactive` separate of `trigger`, so you can’t create an interactive `"hover"` popover.
 
 ### `validate()`
 
@@ -293,7 +309,7 @@ export function validate(element);
 
 Validate `element` (usually a `<form>`) and its `children()`.
 
-Validation errors are reported with `tippy()`s with the `error` theme.
+Validation errors are reported with `popover()`s with the `.popover--error` class, which you may style.
 
 Use `<form novalidate>` to disable the native browser validation, which is too permissive on email addresses, is more limited in custom validation, and so forth.
 
@@ -394,22 +410,30 @@ You may set the `disabled` attribute on a parent element to disable an entire su
 ```typescript
 export function relativizeDateTimeElement(
   element,
-  { target = element, capitalize = false, ...relativizeDateTimeOptions } = {},
+  dateString,
+  { capitalize = false, ...relativizeDateTimeOptions } = {},
 );
 ```
 
-Given an `element` with the `datetime` attribute, `relativizeDateTimeElement()` keeps it updated with a relative datetime. See `relativizeDateTime()`, which provides the relative datetime, and `backgroundJob()`, which provides the background job management.
+Keep an element updated with the relative datetime. See `relativizeDateTime()` (which provides the relative datetime) and `backgroundJob()` (which provides the background job management).
 
 **Example**
 
-```javascript
+```typescript
+const date = new Date(Date.now() - 10 * 60 * 60 * 1000);
 html`
-  <time
-    datetime="2024-04-03T14:51:45.604Z"
+  <span
     javascript="${javascript`
-      javascript.relativizeDateTimeElement(this);
+      javascript.relativizeDateTimeElement(this, ${date.toISOString()});
+      javascript.popover({ element: this });
     `}"
-  ></time>
+  ></span>
+  <span
+    class="popover"
+    javascript="${javascript`
+      this.textContent = javascript.localizeDateTime(${date.toISOString()});
+    `}"
+  ></span>
 `;
 ```
 
@@ -453,7 +477,7 @@ Returns a localized time, for example, `15:20`.
 export function formatUTCDateTime(dateString);
 ```
 
-Format a datetime into a representation that is user friendly.
+Format a datetime into a representation that is user friendly, for example, `2024-04-03 15:20 UTC`.
 
 ### `stringToElements()`
 
@@ -494,25 +518,11 @@ This is an extension of [`@radically-straightforward/utilities`](https://github.
 
 1. If called multiple times, this version of `backgroundJob()` `stop()`s the previous background job so that at most one background job is active at any given time.
 
-2. When the `element` is detached from the document, the background job is `stop()`ped. See `isAttached()`.
+2. When the `element`’s [`isConnected`](https://developer.mozilla.org/en-US/docs/Web/API/Node/isConnected) is `false`, the background job is `stop()`ped.
 
 The background job object which offers the `run()` and `stop()` methods is available at `element[name]`.
 
 See, for example, `relativizeDateTimeElement()`, which uses `backgroundJob()` to periodically update a relative datetime, for example, “2 hours ago”.
-
-### `isAttached()`
-
-```typescript
-export function isAttached(element);
-```
-
-Check whether the `element` is attached to the document. This is different from the [`isConnected` property](https://developer.mozilla.org/en-US/docs/Web/API/Node/isConnected) in the following ways:
-
-1. It uses `parents()`, so it supports `tippy()`s that aren’t showing but whose `target`s are attached.
-
-2. You may force an element to be attached by setting `element.isAttached = true` on the `element` itself or on one of its parents.
-
-See, for example, `backgroundJob()`, which uses `isAttached()`.
 
 ### `parents()`
 
@@ -520,7 +530,7 @@ See, for example, `backgroundJob()`, which uses `isAttached()`.
 export function parents(element);
 ```
 
-Returns an array of parents, including `element` itself. It knows how to navigate up `tippy()`s that aren’t showing.
+Returns an array of parents, including `element` itself.
 
 ### `children()`
 
@@ -577,5 +587,13 @@ export let shiftKey;
 ```
 
 Whether the shift key is being held. Useful for events such as `paste`, which don’t include the state of modifier keys.
+
+### `isTouch`
+
+```typescript
+export let isTouch;
+```
+
+Whether the device has a touch screen, as opposed to a mouse. This is useful, for example, to disable `popover()`s triggered by `"hover"`. See <https://github.com/atomiks/tippyjs/blob/ad85f6feb79cf6c5853c43bf1b2a50c4fa98e7a1/src/bindGlobalEventListeners.ts#L7-L18>.
 
 <!-- DOCUMENTATION END: ./static/index.mjs -->
