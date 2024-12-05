@@ -1080,7 +1080,7 @@ for (const eventType of ["keydown", "keyup"])
   });
 
 /**
- * Whether the device has a touch screen, as opposed to a mouse. This is useful, for example, to disable `popover()`s triggered by `"hover"`.
+ * Whether the device has a touch screen, as opposed to a mouse. This is useful, for example, to disable `popover()`s triggered by `"hover"`. See <https://github.com/atomiks/tippyjs/blob/ad85f6feb79cf6c5853c43bf1b2a50c4fa98e7a1/src/bindGlobalEventListeners.ts#L7-L18>.
  */
 export let isTouch = false;
 window.addEventListener(
