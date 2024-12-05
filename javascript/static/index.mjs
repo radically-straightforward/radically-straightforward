@@ -696,19 +696,19 @@ export function validate(element) {
       target.showPopover();
       window.setTimeout(() => {
         const abortController = new AbortController();
-        for (const eventType of ["click", "keydown"])
+        for (const eventType of ["pointerdown", "keydown"])
           window.addEventListener(
             eventType,
             () => {
-              target.hidePopover();
               abortController.abort();
+              target.hidePopover();
               window.setTimeout(() => {
                 target.remove();
               }, 500);
             },
             { signal: abortController.signal },
           );
-      });
+      }, 50);
       return false;
     }
   }
