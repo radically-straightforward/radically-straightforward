@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 3.0.0 · 2024-12-05
 
 - **Breaking change:** Removed `tippy()`. Use `popover()`.
 - **Breaking change:** Removed `isAttached`. Use [`contains()`](https://developer.mozilla.org/en-US/docs/Web/API/Node/contains) or [`isConnected`](https://developer.mozilla.org/en-US/docs/Web/API/Node/isConnected).
