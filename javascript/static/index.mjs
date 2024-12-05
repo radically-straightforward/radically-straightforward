@@ -523,7 +523,7 @@ window.addEventListener("DOMContentLoaded", (event) => {
  *
  * - **`trigger`:** One of the following:
  *
- *   - **`"hover"`:** Show the popover on `mouseenter` or `focusin` and hide it on `onmouseleave` or `onfocusout`. The `target` must not contain elements that may have focus (for example, `<button>`, `<input>`, and so forth), otherwise keyboard navigation is broken.
+ *   - **`"hover"`:** Show the popover on the `mouseenter` or `focusin` events and hide the popover on `onmouseleave` or `onfocusout` events. The `target` must not contain elements that may have focus (for example, `<button>`, `<input>`, and so forth), otherwise keyboard navigation is broken. On `isTouch` devices, `"hover"` popovers don’t show up because they often conflict with `"click"` popovers.
  *
  *   - **`"click"`:** Show the popover on `click`. When to hide the popover depends on the `remainOpenWhileFocused`. If `remainOpenWhileFocused` is `false` (the default), then the next click anywhere will close the popover—this is useful for dropdown menus with `<button>`s. If `remainOpenWhileFocused` is `true`, then only clicks outside of the popover will close it—this is useful for dropdown menus with `<input>`s.
  *
