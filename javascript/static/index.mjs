@@ -598,14 +598,14 @@ export function popover({
           window.addEventListener(
             eventType,
             (event) => {
+              if (
+                event.button !== 0 ||
+                (remainOpenWhileFocused && target.contains(event.target))
+              )
+                return;
+              abortController.abort();
               window.setTimeout(() => {
-                if (
-                  event.button !== 0 ||
-                  (remainOpenWhileFocused && target.contains(event.target))
-                )
-                  return;
                 target.hidePopover();
-                abortController.abort();
               }, 50);
             },
             { signal: abortController.signal },
