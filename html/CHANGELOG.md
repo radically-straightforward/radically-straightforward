@@ -1,6 +1,6 @@
 # Changelog
 
-## 1.0.1 · 2024-12-05
+## Unreleased
 
 - Changed `invalidXMLCharacters` to use the `u` flag instead of the `v` flag, because:
   - We don’t use the extended features provided by the `v` flag.
