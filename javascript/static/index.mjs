@@ -594,16 +594,23 @@ export function popover({
       target.showPopover();
       window.setTimeout(() => {
         const abortController = new AbortController();
-        window.addEventListener(
-          "click",
-          (event) => {
-            if (remainOpenWhileFocused && target.contains(event.target)) return;
-            target.hidePopover();
-            abortController.abort();
-          },
-          { signal: abortController.signal },
-        );
-      });
+        for (const eventType of ["click", "pointerup"])
+          window.addEventListener(
+            eventType,
+            (event) => {
+              window.setTimeout(() => {
+                if (
+                  event.button !== 0 ||
+                  (remainOpenWhileFocused && target.contains(event.target))
+                )
+                  return;
+                target.hidePopover();
+                abortController.abort();
+              }, 50);
+            },
+            { signal: abortController.signal },
+          );
+      }, 50);
     };
   }
 }
@@ -688,23 +695,19 @@ export function validate(element) {
       popover({ element, target, trigger: "none" });
       target.showPopover();
       window.setTimeout(() => {
-        const abortControllers = [];
-        for (const eventType of ["click", "keydown"]) {
-          const abortController = new AbortController();
-          abortControllers.push(abortController);
+        const abortController = new AbortController();
+        for (const eventType of ["click", "keydown"])
           window.addEventListener(
             eventType,
             () => {
               target.hidePopover();
-              for (const abortController of abortControllers)
-                abortController.abort();
+              abortController.abort();
               window.setTimeout(() => {
                 target.remove();
               }, 500);
             },
             { signal: abortController.signal },
           );
-        }
       });
       return false;
     }
@@ -1078,8 +1081,6 @@ for (const eventType of ["keydown", "keyup"])
 
 for (const eventType of ["focusin", "focusout"])
   window.addEventListener(eventType, (event) => {
-    window.setTimeout(() => {
-      for (const element of parents(event.target))
-        element[`on${eventType}`]?.(event);
-    });
+    for (const element of parents(event.target))
+      element[`on${eventType}`]?.(event);
   });
