@@ -583,7 +583,7 @@ export function popover({
   };
   if (trigger === "hover") {
     element.onmouseenter = element.onfocusin = () => {
-      target.showPopover();
+      if (!isTouch) target.showPopover();
     };
     element.onmouseleave = element.onfocusout = () => {
       target.hidePopover();
@@ -1078,6 +1078,18 @@ for (const eventType of ["keydown", "keyup"])
       event.metaKey;
     shiftKey = event.shiftKey;
   });
+
+/**
+ * Whether the device has a touch screen, as opposed to a mouse. This is useful, for example, to disable `popover()`s triggered by `"hover"`.
+ */
+export let isTouch = false;
+window.addEventListener(
+  "touchstart",
+  () => {
+    isTouch = true;
+  },
+  { once: true },
+);
 
 for (const eventType of ["focusin", "focusout"])
   window.addEventListener(eventType, (event) => {
