@@ -613,6 +613,7 @@ export function popover({
       }, 50);
     };
   }
+  return target;
 }
 
 /**
@@ -685,14 +686,17 @@ export function validate(element) {
     } catch (error) {
       if (!(error instanceof ValidationError)) throw error;
       element.focus();
-      const target = element.insertAdjacentElement(
-        "afterend",
-        stringToElement(html`
-          <div class="popover popover--error">${error.message}</div>
-        `),
-      );
+      const target = popover({
+        element,
+        target: element.insertAdjacentElement(
+          "afterend",
+          stringToElement(html`
+            <div class="popover popover--error">${error.message}</div>
+          `),
+        ),
+        trigger: "none",
+      });
       target.liveConnectionUpdate = false;
-      popover({ element, target, trigger: "none" });
       target.showPopover();
       window.setTimeout(() => {
         const abortController = new AbortController();
