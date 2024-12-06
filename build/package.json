@@ -29,23 +29,23 @@
   },
   "dependencies": {
     "@babel/core": "^7.26.0",
-    "@babel/generator": "^7.26.2",
+    "@babel/generator": "^7.26.3",
     "@csstools/postcss-light-dark-function": "^2.0.7",
-    "@radically-straightforward/css": "^1.0.6",
-    "@radically-straightforward/javascript": "^2.0.0",
+    "@radically-straightforward/css": "^2.0.0",
+    "@radically-straightforward/javascript": "^3.0.2",
     "base-x": "^5.0.0",
     "esbuild": "^0.24.0",
     "globby": "^14.0.2",
     "postcss": "^8.4.49",
-    "prettier": "^3.3.3",
+    "prettier": "^3.4.2",
     "xxhash-addon": "^2.0.3"
   },
   "devDependencies": {
     "@radically-straightforward/typescript": "^1.0.0",
     "@types/babel__core": "^7.20.5",
     "@types/babel__generator": "^7.6.8",
-    "@types/node": "^22.9.0",
-    "typescript": "^5.6.3"
+    "@types/node": "^22.10.1",
+    "typescript": "^5.7.2"
   },
   "prettier": {}
 }
