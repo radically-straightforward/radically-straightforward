@@ -791,7 +791,7 @@ export function serialize(element) {
 }
 
 /**
- * Reset form fields from `element` and its `children()` using their `defaultValue` and `defaultChecked` properties, including calling `element.onchange()` when necessary.
+ * Reset form fields from `element` and its `children()` using their `defaultValue` and `defaultChecked` properties, including dispatching the `input` and `change` events.
  */
 export function reset(element) {
   const elements = children(element);
@@ -800,14 +800,30 @@ export function reset(element) {
     if (element.type === "checkbox" || element.type === "radio") {
       if (element.checked !== element.defaultChecked) {
         element.checked = element.defaultChecked;
-        element.onchange?.();
+        dispatchEvent(element);
       }
     } else {
       if (element.value !== element.defaultValue) {
         element.value = element.defaultValue;
-        element.onchange?.();
+        dispatchEvent(element);
       }
     }
+  }
+  function dispatchEvent(element) {
+    element.dispatchEvent(
+      new Event("input", {
+        bubbles: true,
+        cancelable: false,
+        composed: true,
+      }),
+    );
+    element.dispatchEvent(
+      new Event("change", {
+        bubbles: true,
+        cancelable: false,
+        composed: false,
+      }),
+    );
   }
 }
 
