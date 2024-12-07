@@ -389,7 +389,7 @@ Other than that, `serialize()` follows as best as possible the behavior of the `
 export function reset(element);
 ```
 
-Reset form fields from `element` and its `children()` using their `defaultValue` and `defaultChecked` properties, including calling `element.onchange()` when necessary.
+Reset form fields from `element` and its `children()` using their `defaultValue` and `defaultChecked` properties, including dispatching the `input` and `change` events.
 
 ### `isModified()`
 
