@@ -1,6 +1,6 @@
 # Changelog
 
-## 3.0.1 · 2024-12-07
+## 3.0.3 · 2024-12-07
 
 - Changed `reset()` so that it dispatches the `input` and `change` events appropriately (including bubbling).
 
