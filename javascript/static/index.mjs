@@ -4,7 +4,7 @@ import fastMyersDiff from "fast-myers-diff";
 import * as floatingUI from "@floating-ui/dom";
 
 window.addEventListener("DOMContentLoaded", () => {
-  liveNavigate.inSubmit = false;
+  liveNavigate.inFormSubmission = false;
 });
 window.addEventListener("DOMContentLoaded", (event) => {
   execute(document.querySelector("html"), event);
@@ -76,7 +76,7 @@ window.addEventListener(
       event.stopImmediatePropagation();
       return;
     }
-    liveNavigate.inSubmit = true;
+    liveNavigate.inFormSubmission = true;
   },
   { capture: true },
 );
@@ -84,7 +84,10 @@ window.addEventListener("popstate", (event) => {
   liveNavigate(new Request(window.location), event);
 });
 window.addEventListener("beforeunload", (event) => {
-  if (!liveNavigate.inSubmit && isModified(document.querySelector("html")))
+  if (
+    !liveNavigate.inFormSubmission &&
+    isModified(document.querySelector("html"))
+  )
     event.preventDefault();
 });
 
@@ -92,7 +95,7 @@ async function liveNavigate(request, event = undefined) {
   if (event instanceof PopStateEvent) liveNavigate.abortController?.abort();
   else if (
     liveNavigate.abortController !== undefined ||
-    (!liveNavigate.inSubmit &&
+    (!liveNavigate.inFormSubmission &&
       isModified(document.querySelector("html")) &&
       !confirm("Your changes will be lost if you continue."))
   )
