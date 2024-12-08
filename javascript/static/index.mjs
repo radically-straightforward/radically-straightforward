@@ -3,12 +3,11 @@ import * as utilities from "@radically-straightforward/utilities";
 import fastMyersDiff from "fast-myers-diff";
 import * as floatingUI from "@floating-ui/dom";
 
-window.addEventListener("DOMContentLoaded", () => {
-  liveNavigate.inFormSubmission = false;
-});
 window.addEventListener("DOMContentLoaded", (event) => {
+  liveNavigate.inFormSubmission = false;
   execute(document.querySelector("html"), event);
 });
+
 window.addEventListener("click", (event) => {
   const link = event.target.closest(`a:not([target="_blank"])`);
   if (
@@ -28,6 +27,7 @@ window.addEventListener("click", (event) => {
   event.preventDefault();
   liveNavigate(new Request(link.href));
 });
+
 window.addEventListener("submit", (event) => {
   const method = (
     event.submitter?.getAttribute("formmethod") ??
@@ -68,6 +68,7 @@ window.addEventListener("submit", (event) => {
         }),
   );
 });
+
 window.addEventListener(
   "submit",
   (event) => {
@@ -80,9 +81,11 @@ window.addEventListener(
   },
   { capture: true },
 );
+
 window.addEventListener("popstate", (event) => {
   liveNavigate(new Request(window.location), event);
 });
+
 window.addEventListener("beforeunload", (event) => {
   if (
     !liveNavigate.inFormSubmission &&
