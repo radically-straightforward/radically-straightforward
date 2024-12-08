@@ -70,6 +70,9 @@ liveNavigate.abortController = undefined;
 window.addEventListener("DOMContentLoaded", () => {
   liveNavigate.inSubmit = false;
 });
+window.addEventListener("DOMContentLoaded", (event) => {
+  execute(document.querySelector("html"), event);
+});
 window.addEventListener("click", (event) => {
   const link = event.target.closest(`a:not([target="_blank"])`);
   if (
@@ -129,8 +132,24 @@ window.addEventListener("submit", (event) => {
         }),
   );
 });
+window.addEventListener(
+  "submit",
+  (event) => {
+    if (!validate(event.target)) {
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      return;
+    }
+    liveNavigate.inSubmit = true;
+  },
+  { capture: true },
+);
 window.addEventListener("popstate", (event) => {
   liveNavigate(new Request(window.location), event);
+});
+window.addEventListener("beforeunload", (event) => {
+  if (!liveNavigate.inSubmit && isModified(document.querySelector("html")))
+    event.preventDefault();
 });
 
 /**
@@ -448,9 +467,6 @@ export function execute(element, event = undefined) {
   return element;
 }
 execute.functions = new Map();
-window.addEventListener("DOMContentLoaded", (event) => {
-  execute(document.querySelector("html"), event);
-});
 
 /**
  * Similar to `stringToElement()` but for a `string` which is a whole document, for example, starting with `<!DOCTYPE html>`. [`document.adoptNode()`](https://developer.mozilla.org/en-US/docs/Web/API/Document/adoptNode) is used so that the resulting element belongs to the current `document`.
@@ -503,10 +519,6 @@ export function isModified(element) {
       return true;
   return false;
 }
-window.addEventListener("beforeunload", (event) => {
-  if (!liveNavigate.inSubmit && isModified(document.querySelector("html")))
-    event.preventDefault();
-});
 
 /**
  * Reset form fields from `element` and its `children()` using their `defaultValue` and `defaultChecked` properties, including dispatching the `input` and `change` events.
@@ -647,18 +659,6 @@ export function validate(element) {
   }
   return true;
 }
-window.addEventListener(
-  "submit",
-  (event) => {
-    if (!validate(event.target)) {
-      event.preventDefault();
-      event.stopImmediatePropagation();
-      return;
-    }
-    liveNavigate.inSubmit = true;
-  },
-  { capture: true },
-);
 
 /**
  * Custom error class for `validate()`.
