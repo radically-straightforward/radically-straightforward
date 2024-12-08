@@ -29,7 +29,7 @@ window.addEventListener("click", (event) => {
     event.preventDefault();
     if (
       liveNavigate.abortController !== undefined ||
-      (isModified(document.querySelector("html")) &&
+      (isModified(document.querySelector("html"), { includeSubforms: true }) &&
         !confirm("Your changes will be lost if you continue."))
     )
       return;
@@ -89,7 +89,8 @@ window.addEventListener("popstate", (event) => {
 });
 
 window.addEventListener("beforeunload", (event) => {
-  if (isModified(document.querySelector("html"))) event.preventDefault();
+  if (isModified(document.querySelector("html"), { includeSubforms: true }))
+    event.preventDefault();
 });
 
 async function liveNavigate(request, event = undefined) {
@@ -498,10 +499,10 @@ export function stringToElement(string) {
  *
  * You may set the `disabled` attribute on a parent element to disable an entire subtree.
  *
- * `isModified()` powers the “your changes may be lost, do you wish to leave this page?” dialog that `@radically-straightforward/javascript` enables by default.
+ * `isModified()` powers the “Your changes will be lost if you continue.” dialog that `@radically-straightforward/javascript` enables by default.
  */
-export function isModified(element) {
-  const elements = children(element);
+export function isModified(element, { includeSubforms = false } = {}) {
+  const elements = children(element, { includeSubforms });
   for (const element of elements)
     if (
       parents(element).some((element) => element.isModified === true) ||
@@ -521,8 +522,8 @@ export function isModified(element) {
 /**
  * Reset form fields from `element` and its `children()` using their `defaultValue` and `defaultChecked` properties, including dispatching the `input` and `change` events.
  */
-export function reset(element) {
-  const elements = children(element);
+export function reset(element, { includeSubforms = false } = {}) {
+  const elements = children(element, { includeSubforms });
   for (const element of elements) {
     if (!element.matches("input, textarea")) continue;
     if (element.type === "checkbox" || element.type === "radio") {
@@ -588,8 +589,8 @@ export function reset(element) {
  *
  * `validate()` powers the custom validation that `@radically-straightforward/javascript` enables by default.
  */
-export function validate(element) {
-  const elements = children(element);
+export function validate(element, { includeSubforms = false } = {}) {
+  const elements = children(element, { includeSubforms });
   for (const element of elements) {
     if (
       !element.matches("input, textarea") ||
@@ -670,9 +671,9 @@ export class ValidationError extends Error {}
  *
  * Other than that, `serialize()` follows as best as possible the behavior of the `URLSearchParams` produced by a browser form submission.
  */
-export function serialize(element) {
+export function serialize(element, { includeSubforms = false } = {}) {
   const urlSearchParams = new URLSearchParams();
-  const elements = children(element);
+  const elements = children(element, { includeSubforms });
   for (const element of elements) {
     if (
       !element.matches("input, textarea") ||
@@ -1010,8 +1011,12 @@ export function parents(element) {
 /**
  * Returns an array of children, including `element` itself.
  */
-export function children(element) {
-  return [element, ...element.querySelectorAll("*")];
+export function children(element, { includeSubforms = true } = {}) {
+  const form = element.closest(`[type="form"]`);
+  const children = [element, ...element.querySelectorAll("*")];
+  return includeSubforms
+    ? children
+    : children.filter((child) => child.closest(`[type="form"]`) === form);
 }
 
 /**
