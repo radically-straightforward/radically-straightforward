@@ -557,11 +557,9 @@ export function reset(element, { includeSubforms = false } = {}) {
 }
 
 /**
- * Validate `element` (usually a `<form>`) and its `children()`.
+ * Validate `element` (usually a `<div type="form">`) and its `children()`.
  *
  * Validation errors are reported with `popover()`s with the `.popover--error` class, which you may style.
- *
- * Use `<form novalidate>` to disable the native browser validation, which is too permissive on email addresses, is more limited in custom validation, and so forth.
  *
  * You may set the `disabled` attribute on a parent element to disable an entire subtree.
  *

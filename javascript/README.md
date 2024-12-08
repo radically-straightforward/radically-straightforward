@@ -67,17 +67,31 @@ Importing this module enables the following features:
 
 Detect that the user is following a link, submitting a form, or navigating in browser history and overwrite the browser’s default behavior: instead of loading an entire new page, `morph()` the current page into the new one. This speeds up navigation because CSS and browser JavaScript are preserved. Also, it allows for preserving some browser state (for example, scroll position on a sidebar) through careful use of the same `key="___"` attribute across pages.
 
-Live Navigation enhances `<form>`s in the following ways:
+Forms in pages using Live Navigation must not use `<form>`. Instead, they must use `<div type="form">` (in block contexts) or `<span type="form">` (in inline contexts).
 
-- More `method`s are supported, including `PATCH`, `PUT`, `DELETE`, and so forth. This goes beyond the methods `GET` and `POST` that are supported by browsers by default.
+> **Reasons**
+>
+> - `<form>` triggers browser validation, which has some issues, including being too permissive with `<input type="email">` (allowing, for example, `localhost`), being too rigid in custom validation, and so forth. We implementing our own validation system in `validate()`.
+> - `<form>`’s `method="___"` must be either `"GET"` or `"POST"`, but `<div type="form">` supports any HTTP verb.
+> - `<div type="form">` sets the `CSRF-Protection` HTTP header is set, to satisfy [`@radically-straightforward/server`’s CSRF Protection mechanism](https://github.com/radically-straightforward/radically-straightforward/tree/main/server#csrf-protection).
+> - `<div type="form">`s may be nested.
 
-- The `CSRF-Protection` HTTP header is set, to satisfy [`@radically-straightforward/server`’s CSRF Protection mechanism](https://github.com/radically-straightforward/radically-straightforward/tree/main/server#csrf-protection).
+> **Example**
+>
+> ```html
+> <div type="form" method="PATCH" action="/">
+>   <input type="text" name="example" placeholder="Name…" />
+>   <button type="submit">Submit</button>
+> </div>
+> ```
+
+> **Note:** `<button>`s must have an explicit `type="submit"`.
 
 If the pages include the `<meta name="version" content="___" />` meta tag and the versions differ, then Live Navigation is disabled and the user is alerted to reload the page through an element with `key="global-error"` which you may style.
 
 When loading a new page, a progress bar is displayed on an element with `key="progress-bar"` that is the last child of `<body>`. This element may be styled via CSS.
 
-An `<a>` or `<form>` may opt out of Live Navigation by setting the property `element.liveNavigate = false`.
+An `<a>` or `<div type="form">` may opt out of Live Navigation by setting the property `element.liveNavigate = false`.
 
 ### Code Execution through the ``javascript="${javascript`___`}"`` Attribute
 
@@ -252,11 +266,9 @@ Reset form fields from `element` and its `children()` using their `defaultValue`
 export function validate(element, { includeSubforms = false } = {});
 ```
 
-Validate `element` (usually a `<form>`) and its `children()`.
+Validate `element` (usually a `<div type="form">`) and its `children()`.
 
 Validation errors are reported with `popover()`s with the `.popover--error` class, which you may style.
-
-Use `<form novalidate>` to disable the native browser validation, which is too permissive on email addresses, is more limited in custom validation, and so forth.
 
 You may set the `disabled` attribute on a parent element to disable an entire subtree.
 
