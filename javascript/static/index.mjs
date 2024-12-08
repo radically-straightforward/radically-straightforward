@@ -665,14 +665,14 @@ export function validate(element, { includeSubforms = false } = {}) {
 export class ValidationError extends Error {}
 
 /**
- * Produce a `URLSearchParams` from the `element` and its `children()`.
+ * Produce a [`FormData`](https://developer.mozilla.org/en-US/docs/Web/API/FormData) from the `element` and its `children()`.
  *
  * You may set the `disabled` attribute on a parent element to disable an entire subtree.
  *
- * Other than that, `serialize()` follows as best as possible the behavior of the `URLSearchParams` produced by a browser form submission.
+ * Other than that, `serialize()` follows the behavior of `new FormData(form)`.
  */
 export function serialize(element, { includeSubforms = false } = {}) {
-  const urlSearchParams = new URLSearchParams();
+  const formData = new FormData();
   const elements = children(element, { includeSubforms });
   for (const element of elements) {
     if (
@@ -686,9 +686,9 @@ export function serialize(element, { includeSubforms = false } = {}) {
       ((element.type === "radio" || element.type === "checkbox") &&
         element.checked)
     )
-      urlSearchParams.append(element.getAttribute("name"), element.value);
+      formData.append(element.getAttribute("name"), element.value);
   }
-  return urlSearchParams;
+  return formData;
 }
 
 /**
