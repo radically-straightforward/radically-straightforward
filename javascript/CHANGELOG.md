@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased
+
+- **Breaking change:** Added support for nested forms, which requires replacing `<form>` tags with `<div type="form">`, because HTML parsers don’t support nested `<form>` tags.
+- Improved the treatment of Live Navigation when the user tries to navigate while a Live Navigation is already underway.
+
 ## 3.0.3 · 2024-12-07
 
 - Changed `reset()` so that it dispatches the `input` and `change` events appropriately (including bubbling).
