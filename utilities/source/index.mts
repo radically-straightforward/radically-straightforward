@@ -614,36 +614,31 @@ export function backgroundJob(
   let timeout = setTimeout(() => {});
   const backgroundJob = {
     run: async () => {
-      switch (state) {
-        case "sleeping":
-          clearTimeout(timeout);
-          state = "running";
-          try {
-            await job();
-          } catch (error) {
-            log(
-              "BACKGROUND JOB ERROR",
-              String(error),
-              (error as Error)?.stack ?? "",
-            );
-          }
-          if (state === "running" || state === "runningAndMarkedForRerun") {
-            timeout = setTimeout(
-              () => {
-                backgroundJob.run();
-              },
-              (state as "running" | "runningAndMarkedForRerun") ===
-                "runningAndMarkedForRerun"
-                ? 0
-                : interval * (1 + 0.1 * Math.random()),
-            );
-            state = "sleeping";
-          }
-          break;
-        case "running":
-          state = "runningAndMarkedForRerun";
-          break;
-      }
+      if (state === "sleeping") {
+        clearTimeout(timeout);
+        state = "running";
+        try {
+          await job();
+        } catch (error) {
+          log(
+            "BACKGROUND JOB ERROR",
+            String(error),
+            (error as Error)?.stack ?? "",
+          );
+        }
+        if (state === "running" || state === "runningAndMarkedForRerun") {
+          timeout = setTimeout(
+            () => {
+              backgroundJob.run();
+            },
+            (state as "running" | "runningAndMarkedForRerun") ===
+              "runningAndMarkedForRerun"
+              ? 0
+              : interval * (1 + 0.1 * Math.random()),
+          );
+          state = "sleeping";
+        }
+      } else if (state === "running") state = "runningAndMarkedForRerun";
     },
     stop: async () => {
       clearTimeout(timeout);
@@ -691,31 +686,26 @@ export function foregroundJob(
 ): () => Promise<void> {
   let state: "available" | "running" | "runningAndMarkedForRerun" = "available";
   const run = async () => {
-    switch (state) {
-      case "available":
-        state = "running";
-        try {
-          await job();
-        } catch (error) {
-          log(
-            "FOREGROUND JOB ERROR",
-            String(error),
-            (error as Error)?.stack ?? "",
-          );
-        }
-        if (
-          (state as "running" | "runningAndMarkedForRerun") ===
-          "runningAndMarkedForRerun"
-        )
-          setTimeout(() => {
-            run();
-          });
-        state = "available";
-        break;
-      case "running":
-        state = "runningAndMarkedForRerun";
-        break;
-    }
+    if (state === "available") {
+      state = "running";
+      try {
+        await job();
+      } catch (error) {
+        log(
+          "FOREGROUND JOB ERROR",
+          String(error),
+          (error as Error)?.stack ?? "",
+        );
+      }
+      if (
+        (state as "running" | "runningAndMarkedForRerun") ===
+        "runningAndMarkedForRerun"
+      )
+        setTimeout(() => {
+          run();
+        });
+      state = "available";
+    } else if (state === "running") state = "runningAndMarkedForRerun";
   };
   return run;
 }

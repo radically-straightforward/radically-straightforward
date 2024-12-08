@@ -48,47 +48,44 @@ for (const source of await globby("./build/**/*.mjs")) {
           TaggedTemplateExpression: (path) => {
             if (path.node.tag.type !== "Identifier") return;
             const isGlobal = path.parent.type === "ExpressionStatement";
-            switch (path.node.tag.name) {
-              case "css":
-                path.skip();
-                const code = new Function(
-                  "css",
-                  `return (${babelGenerator.default(path.node).code});`,
-                )(css);
-                if (isGlobal) fileGlobalCSSs.push(code);
-                else
-                  fileInlineCSSs.push(
-                    `__RADICALLY__STRAIGHTFORWARD__PLACEHOLDER__ { ${code} }`,
+            if (path.node.tag.name === "css") {
+              path.skip();
+              const code = new Function(
+                "css",
+                `return (${babelGenerator.default(path.node).code});`,
+              )(css);
+              if (isGlobal) fileGlobalCSSs.push(code);
+              else
+                fileInlineCSSs.push(
+                  `__RADICALLY__STRAIGHTFORWARD__PLACEHOLDER__ { ${code} }`,
+                );
+            } else if (path.node.tag.name === "javascript") {
+              if (isGlobal) {
+                if (
+                  path.node.quasi.quasis.length !== 1 ||
+                  typeof path.node.quasi.quasis[0].value.cooked !== "string"
+                )
+                  throw new Error(
+                    "Global browser JavaScript doesn’t support interpolation.",
                   );
-                break;
-              case "javascript":
-                if (isGlobal) {
-                  if (
-                    path.node.quasi.quasis.length !== 1 ||
-                    typeof path.node.quasi.quasis[0].value.cooked !== "string"
-                  )
-                    throw new Error(
-                      "Global browser JavaScript doesn’t support interpolation.",
-                    );
-                  fileGlobalJavaScripts.push(
-                    path.node.quasi.quasis[0].value.cooked,
-                  );
-                } else
-                  fileInlineJavaScripts.push(
-                    `async function __RADICALLY__STRAIGHTFORWARD__PLACEHOLDER__(${[
-                      "event",
-                      ...path.node.quasi.expressions.map(
-                        (value, index) => `$$${index}`,
-                      ),
-                    ].join(", ")}) { ${path.node.quasi.quasis
-                      .map(
-                        (quasi, index) =>
-                          (index === 0 ? `` : `$$${index - 1}`) +
-                          quasi.value.cooked,
-                      )
-                      .join("")} }`,
-                  );
-                break;
+                fileGlobalJavaScripts.push(
+                  path.node.quasi.quasis[0].value.cooked,
+                );
+              } else
+                fileInlineJavaScripts.push(
+                  `async function __RADICALLY__STRAIGHTFORWARD__PLACEHOLDER__(${[
+                    "event",
+                    ...path.node.quasi.expressions.map(
+                      (value, index) => `$$${index}`,
+                    ),
+                  ].join(", ")}) { ${path.node.quasi.quasis
+                    .map(
+                      (quasi, index) =>
+                        (index === 0 ? `` : `$$${index - 1}`) +
+                        quasi.value.cooked,
+                    )
+                    .join("")} }`,
+                );
             }
           },
         },
@@ -156,31 +153,26 @@ for (const source of await globby("./build/**/*.mjs")) {
           TaggedTemplateExpression: (path) => {
             if (path.node.tag.type !== "Identifier") return;
             const isGlobal = path.parent.type === "ExpressionStatement";
-            switch (path.node.tag.name) {
-              case "css":
-                if (isGlobal) path.remove();
-                else
-                  path.replaceWith(
-                    babel.types.stringLiteral(
-                      fileInlineCSSIdentifiers.shift()!,
-                    ),
-                  );
-                break;
-              case "javascript":
-                if (isGlobal) path.remove();
-                else
-                  path.replaceWith(
-                    babel.template.ast`
-                      JSON.stringify({
-                        function: ${babel.types.stringLiteral(fileInlineJavaScriptIdentifiers.shift()!)},
-                        arguments: ${babel.types.arrayExpression(
-                          path.node.quasi
-                            .expressions as Array<babel.types.Expression>,
-                        )},
-                      })
-                    ` as babel.types.Node,
-                  );
-                break;
+            if (path.node.tag.name === "css") {
+              if (isGlobal) path.remove();
+              else
+                path.replaceWith(
+                  babel.types.stringLiteral(fileInlineCSSIdentifiers.shift()!),
+                );
+            } else if (path.node.tag.name === "javascript") {
+              if (isGlobal) path.remove();
+              else
+                path.replaceWith(
+                  babel.template.ast`
+                    JSON.stringify({
+                      function: ${babel.types.stringLiteral(fileInlineJavaScriptIdentifiers.shift()!)},
+                      arguments: ${babel.types.arrayExpression(
+                        path.node.quasi
+                          .expressions as Array<babel.types.Expression>,
+                      )},
+                    })
+                  ` as babel.types.Node,
+                );
             }
           },
         },
