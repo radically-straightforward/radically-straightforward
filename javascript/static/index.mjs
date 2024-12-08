@@ -3,70 +3,6 @@ import * as utilities from "@radically-straightforward/utilities";
 import fastMyersDiff from "fast-myers-diff";
 import * as floatingUI from "@floating-ui/dom";
 
-async function liveNavigate(request, event = undefined) {
-  if (event instanceof PopStateEvent) liveNavigate.abortController?.abort();
-  else if (
-    liveNavigate.abortController !== undefined ||
-    (!liveNavigate.inSubmit &&
-      isModified(document.querySelector("html")) &&
-      !confirm("Your changes will be lost if you continue."))
-  )
-    return;
-  const progressBar = document
-    .querySelector("body")
-    .insertAdjacentElement(
-      "afterbegin",
-      stringToElement(html`<div key="progress-bar"></div>`),
-    );
-  backgroundJob(progressBar, "progressBar", { interval: 1000 }, () => {
-    progressBar.style.width =
-      (progressBar.style.width.trim() === ""
-        ? "15"
-        : (() => {
-            const width = Number(progressBar.style.width.slice(0, -1));
-            return width + (90 - width) / (10 + Math.random() * 50);
-          })()) + "%";
-  });
-  try {
-    liveConnection.backgroundJob?.stop();
-    liveNavigate.abortController = new AbortController();
-    const response = await fetch(request, {
-      signal: liveNavigate.abortController.signal,
-    });
-    const responseURL = new URL(response.url);
-    responseURL.hash = new URL(request.url).hash;
-    const responseText = await response.text();
-    if (
-      window.location.pathname !== responseURL.pathname ||
-      window.location.search !== responseURL.search
-    )
-      window.history.pushState(null, "", responseURL.href);
-    documentMount(responseText);
-    if (responseURL.hash.trim() !== "")
-      document.getElementById(responseURL.hash.slice(1))?.scrollIntoView();
-    document.querySelector("[autofocus]")?.focus();
-  } catch (error) {
-    if (error.name === "AbortError") return;
-    if (!(event instanceof PopStateEvent) && request.method === "GET")
-      window.history.pushState(null, "", request.url);
-    document.querySelector('[key="global-error"]')?.remove();
-    document
-      .querySelector("body")
-      .insertAdjacentHTML(
-        "afterbegin",
-        html`
-          <div key="global-error">
-            Something went wrong. Please try reloading the page.
-          </div>
-        `,
-      );
-    throw error;
-  } finally {
-    progressBar.remove();
-    delete liveNavigate.abortController;
-  }
-}
-liveNavigate.abortController = undefined;
 window.addEventListener("DOMContentLoaded", () => {
   liveNavigate.inSubmit = false;
 });
@@ -151,6 +87,71 @@ window.addEventListener("beforeunload", (event) => {
   if (!liveNavigate.inSubmit && isModified(document.querySelector("html")))
     event.preventDefault();
 });
+
+async function liveNavigate(request, event = undefined) {
+  if (event instanceof PopStateEvent) liveNavigate.abortController?.abort();
+  else if (
+    liveNavigate.abortController !== undefined ||
+    (!liveNavigate.inSubmit &&
+      isModified(document.querySelector("html")) &&
+      !confirm("Your changes will be lost if you continue."))
+  )
+    return;
+  const progressBar = document
+    .querySelector("body")
+    .insertAdjacentElement(
+      "afterbegin",
+      stringToElement(html`<div key="progress-bar"></div>`),
+    );
+  backgroundJob(progressBar, "progressBar", { interval: 1000 }, () => {
+    progressBar.style.width =
+      (progressBar.style.width.trim() === ""
+        ? "15"
+        : (() => {
+            const width = Number(progressBar.style.width.slice(0, -1));
+            return width + (90 - width) / (10 + Math.random() * 50);
+          })()) + "%";
+  });
+  try {
+    liveConnection.backgroundJob?.stop();
+    liveNavigate.abortController = new AbortController();
+    const response = await fetch(request, {
+      signal: liveNavigate.abortController.signal,
+    });
+    const responseURL = new URL(response.url);
+    responseURL.hash = new URL(request.url).hash;
+    const responseText = await response.text();
+    if (
+      window.location.pathname !== responseURL.pathname ||
+      window.location.search !== responseURL.search
+    )
+      window.history.pushState(null, "", responseURL.href);
+    documentMount(responseText);
+    if (responseURL.hash.trim() !== "")
+      document.getElementById(responseURL.hash.slice(1))?.scrollIntoView();
+    document.querySelector("[autofocus]")?.focus();
+  } catch (error) {
+    if (error.name === "AbortError") return;
+    if (!(event instanceof PopStateEvent) && request.method === "GET")
+      window.history.pushState(null, "", request.url);
+    document.querySelector('[key="global-error"]')?.remove();
+    document
+      .querySelector("body")
+      .insertAdjacentHTML(
+        "afterbegin",
+        html`
+          <div key="global-error">
+            Something went wrong. Please try reloading the page.
+          </div>
+        `,
+      );
+    throw error;
+  } finally {
+    progressBar.remove();
+    delete liveNavigate.abortController;
+  }
+}
+liveNavigate.abortController = undefined;
 
 /**
  * Open a [Live Connection](https://github.com/radically-straightforward/radically-straightforward/tree/main/server#live-connection) to the server.
