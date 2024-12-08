@@ -93,7 +93,7 @@ window.addEventListener("beforeunload", (event) => {
 });
 
 async function liveNavigate(request, event = undefined) {
-  liveNavigate.abortController?.abort();
+  document.querySelector('[key="progress-bar"]')?.remove();
   const progressBar = document
     .querySelector("body")
     .insertAdjacentElement(
@@ -111,6 +111,7 @@ async function liveNavigate(request, event = undefined) {
   });
   try {
     liveConnection.backgroundJob?.stop();
+    liveNavigate.abortController?.abort();
     liveNavigate.abortController = new AbortController();
     const response = await fetch(request, {
       signal: liveNavigate.abortController.signal,
