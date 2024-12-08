@@ -22,7 +22,7 @@
   },
   "scripts": {
     "postinstall": "node ./postinstall.mjs",
-    "test": "prettier --check \"./README.md\" --check \"./CHANGELOG.md\" --check \"./package.json\" --check \"./tsconfig.json\""
+    "test": "prettier --check \"./README.md\" \"./CHANGELOG.md\" \"./package.json\" \"./tsconfig.json\""
   },
   "devDependencies": {
     "prettier": "^3.4.2"
