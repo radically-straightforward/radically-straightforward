@@ -649,7 +649,7 @@ export function validate(element, { includeSubforms = false } = {}) {
             },
             { signal: abortController.signal },
           );
-      }, 50);
+      }, 10);
       return false;
     }
   }
@@ -983,11 +983,11 @@ export function popover({
               abortController.abort();
               window.setTimeout(() => {
                 target.hidePopover();
-              }, 50);
+              }, 10);
             },
             { signal: abortController.signal },
           );
-      }, 50);
+      }, 10);
     };
   }
   return target;
