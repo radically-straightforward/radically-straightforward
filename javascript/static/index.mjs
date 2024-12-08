@@ -414,6 +414,45 @@ export function morph(from, to, event = undefined) {
 }
 
 /**
+ * > **Note:** This is a low-level function—in most cases you want to call `mount()` instead.
+ *
+ * Execute the functions defined by the `javascript="___"` attribute, which is set by [`@radically-straightforward/build`](https://github.com/radically-straightforward/radically-straightforward/tree/main/build) when extracting browser JavaScript. You must call this when you insert new elements in the DOM, for example:
+ *
+ * ```javascript
+ * javascript.execute(
+ *   document
+ *     .querySelector("body")
+ *     .insertAdjacentElement(
+ *       "afterbegin",
+ *       javascript.stringToElement(html`<div javascript="___"></div>`),
+ *     ),
+ * );
+ * ```
+ */
+export function execute(element, event = undefined) {
+  const elements = [
+    ...(element.matches("[javascript]") ? [element] : []),
+    ...element.querySelectorAll("[javascript]"),
+  ];
+  for (const element of elements) {
+    if (
+      event?.detail?.liveConnectionUpdate &&
+      parents(element).some((element) => element.liveConnectionUpdate === false)
+    )
+      continue;
+    const javascript = JSON.parse(element.getAttribute("javascript"));
+    execute.functions
+      .get(javascript.function)
+      .call(element, event, ...javascript.arguments);
+  }
+  return element;
+}
+execute.functions = new Map();
+window.addEventListener("DOMContentLoaded", (event) => {
+  execute(document.querySelector("html"), event);
+});
+
+/**
  * Add a `token` to the `state="___"` attribute
  *
  * The `state="___"` attribute is meant to be used to hold browser state, for example, whether a sidebar is open.
@@ -470,45 +509,6 @@ export function stateContains(element, token) {
   );
   return state.has(token);
 }
-
-/**
- * > **Note:** This is a low-level function—in most cases you want to call `mount()` instead.
- *
- * Execute the functions defined by the `javascript="___"` attribute, which is set by [`@radically-straightforward/build`](https://github.com/radically-straightforward/radically-straightforward/tree/main/build) when extracting browser JavaScript. You must call this when you insert new elements in the DOM, for example:
- *
- * ```javascript
- * javascript.execute(
- *   document
- *     .querySelector("body")
- *     .insertAdjacentElement(
- *       "afterbegin",
- *       javascript.stringToElement(html`<div javascript="___"></div>`),
- *     ),
- * );
- * ```
- */
-export function execute(element, event = undefined) {
-  const elements = [
-    ...(element.matches("[javascript]") ? [element] : []),
-    ...element.querySelectorAll("[javascript]"),
-  ];
-  for (const element of elements) {
-    if (
-      event?.detail?.liveConnectionUpdate &&
-      parents(element).some((element) => element.liveConnectionUpdate === false)
-    )
-      continue;
-    const javascript = JSON.parse(element.getAttribute("javascript"));
-    execute.functions
-      .get(javascript.function)
-      .call(element, event, ...javascript.arguments);
-  }
-  return element;
-}
-execute.functions = new Map();
-window.addEventListener("DOMContentLoaded", (event) => {
-  execute(document.querySelector("html"), event);
-});
 
 /**
  * Create a popover (tooltip, dropdown menu, and so forth).
@@ -615,6 +615,101 @@ export function popover({
     };
   }
   return target;
+}
+
+/**
+ * Detects whether there are form fields in `element` and its `children()` that are modified with respect to their `defaultValue` and `defaultChecked` properties.
+ *
+ * You may set `element.isModified = <true/false>` to force the result of `isModified()` for `element` and its `children()`.
+ *
+ * You may set the `disabled` attribute on a parent element to disable an entire subtree.
+ *
+ * `isModified()` powers the “your changes may be lost, do you wish to leave this page?” dialog that `@radically-straightforward/javascript` enables by default.
+ */
+export function isModified(element) {
+  const elements = children(element);
+  for (const element of elements)
+    if (
+      parents(element).some((element) => element.isModified === true) ||
+      (element.matches("input, textarea") &&
+        element.closest("[disabled]") === null &&
+        !parents(element).some((element) => element.isModified === false) &&
+        (((element.type === "checkbox" || element.type === "radio") &&
+          element.checked !== element.defaultChecked) ||
+          (element.type !== "checkbox" &&
+            element.type !== "radio" &&
+            element.value !== element.defaultValue)))
+    )
+      return true;
+  return false;
+}
+window.addEventListener("beforeunload", (event) => {
+  if (!liveNavigate.inSubmit && isModified(document.querySelector("html")))
+    event.preventDefault();
+});
+
+/**
+ * Produce a `URLSearchParams` from the `element` and its `children()`.
+ *
+ * You may set the `disabled` attribute on a parent element to disable an entire subtree.
+ *
+ * Other than that, `serialize()` follows as best as possible the behavior of the `URLSearchParams` produced by a browser form submission.
+ */
+export function serialize(element) {
+  const urlSearchParams = new URLSearchParams();
+  const elements = children(element);
+  for (const element of elements) {
+    if (
+      !element.matches("input, textarea") ||
+      element.closest("[disabled]") !== null ||
+      typeof element.getAttribute("name") !== "string"
+    )
+      continue;
+    if (
+      !(element.type === "radio" || element.type === "checkbox") ||
+      ((element.type === "radio" || element.type === "checkbox") &&
+        element.checked)
+    )
+      urlSearchParams.append(element.getAttribute("name"), element.value);
+  }
+  return urlSearchParams;
+}
+
+/**
+ * Reset form fields from `element` and its `children()` using their `defaultValue` and `defaultChecked` properties, including dispatching the `input` and `change` events.
+ */
+export function reset(element) {
+  const elements = children(element);
+  for (const element of elements) {
+    if (!element.matches("input, textarea")) continue;
+    if (element.type === "checkbox" || element.type === "radio") {
+      if (element.checked !== element.defaultChecked) {
+        element.checked = element.defaultChecked;
+        dispatchEvent(element);
+      }
+    } else {
+      if (element.value !== element.defaultValue) {
+        element.value = element.defaultValue;
+        dispatchEvent(element);
+      }
+    }
+  }
+  function dispatchEvent(element) {
+    element.dispatchEvent(
+      new Event("input", {
+        bubbles: true,
+        cancelable: false,
+        composed: true,
+      }),
+    );
+    element.dispatchEvent(
+      new Event("change", {
+        bubbles: true,
+        cancelable: false,
+        composed: false,
+      }),
+    );
+  }
 }
 
 /**
@@ -765,101 +860,6 @@ export function validateLocalizedDateTime(element) {
 }
 
 /**
- * Produce a `URLSearchParams` from the `element` and its `children()`.
- *
- * You may set the `disabled` attribute on a parent element to disable an entire subtree.
- *
- * Other than that, `serialize()` follows as best as possible the behavior of the `URLSearchParams` produced by a browser form submission.
- */
-export function serialize(element) {
-  const urlSearchParams = new URLSearchParams();
-  const elements = children(element);
-  for (const element of elements) {
-    if (
-      !element.matches("input, textarea") ||
-      element.closest("[disabled]") !== null ||
-      typeof element.getAttribute("name") !== "string"
-    )
-      continue;
-    if (
-      !(element.type === "radio" || element.type === "checkbox") ||
-      ((element.type === "radio" || element.type === "checkbox") &&
-        element.checked)
-    )
-      urlSearchParams.append(element.getAttribute("name"), element.value);
-  }
-  return urlSearchParams;
-}
-
-/**
- * Reset form fields from `element` and its `children()` using their `defaultValue` and `defaultChecked` properties, including dispatching the `input` and `change` events.
- */
-export function reset(element) {
-  const elements = children(element);
-  for (const element of elements) {
-    if (!element.matches("input, textarea")) continue;
-    if (element.type === "checkbox" || element.type === "radio") {
-      if (element.checked !== element.defaultChecked) {
-        element.checked = element.defaultChecked;
-        dispatchEvent(element);
-      }
-    } else {
-      if (element.value !== element.defaultValue) {
-        element.value = element.defaultValue;
-        dispatchEvent(element);
-      }
-    }
-  }
-  function dispatchEvent(element) {
-    element.dispatchEvent(
-      new Event("input", {
-        bubbles: true,
-        cancelable: false,
-        composed: true,
-      }),
-    );
-    element.dispatchEvent(
-      new Event("change", {
-        bubbles: true,
-        cancelable: false,
-        composed: false,
-      }),
-    );
-  }
-}
-
-/**
- * Detects whether there are form fields in `element` and its `children()` that are modified with respect to their `defaultValue` and `defaultChecked` properties.
- *
- * You may set `element.isModified = <true/false>` to force the result of `isModified()` for `element` and its `children()`.
- *
- * You may set the `disabled` attribute on a parent element to disable an entire subtree.
- *
- * `isModified()` powers the “your changes may be lost, do you wish to leave this page?” dialog that `@radically-straightforward/javascript` enables by default.
- */
-export function isModified(element) {
-  const elements = children(element);
-  for (const element of elements)
-    if (
-      parents(element).some((element) => element.isModified === true) ||
-      (element.matches("input, textarea") &&
-        element.closest("[disabled]") === null &&
-        !parents(element).some((element) => element.isModified === false) &&
-        (((element.type === "checkbox" || element.type === "radio") &&
-          element.checked !== element.defaultChecked) ||
-          (element.type !== "checkbox" &&
-            element.type !== "radio" &&
-            element.value !== element.defaultValue)))
-    )
-      return true;
-  return false;
-}
-window.addEventListener("beforeunload", (event) => {
-  if (!liveNavigate.inSubmit && isModified(document.querySelector("html")))
-    event.preventDefault();
-});
-
-/**
  * Keep an element updated with the relative datetime. See `relativizeDateTime()` (which provides the relative datetime) and `backgroundJob()` (which provides the background job management).
  *
  * **Example**
@@ -998,33 +998,6 @@ export function documentStringToElement(string) {
 }
 
 /**
- * This is an extension of [`@radically-straightforward/utilities`](https://github.com/radically-straightforward/radically-straightforward/tree/main/utilities)’s `backgroundJob()` with the following additions:
- *
- * 1. If called multiple times, this version of `backgroundJob()` `stop()`s the previous background job so that at most one background job is active at any given time.
- *
- * 2. When the `element`’s [`isConnected`](https://developer.mozilla.org/en-US/docs/Web/API/Node/isConnected) is `false`, the background job is `stop()`ped.
- *
- * The background job object which offers the `run()` and `stop()` methods is available at `element[name]`.
- *
- * See, for example, `relativizeDateTimeElement()`, which uses `backgroundJob()` to periodically update a relative datetime, for example, “2 hours ago”.
- */
-export function backgroundJob(
-  element,
-  elementProperty,
-  utilitiesBackgroundJobOptions,
-  job,
-) {
-  element[elementProperty]?.stop();
-  element[elementProperty] = utilities.backgroundJob(
-    utilitiesBackgroundJobOptions,
-    async () => {
-      if (element.isConnected) await job();
-      else element[elementProperty].stop();
-    },
-  );
-}
-
-/**
  * Returns an array of parents, including `element` itself.
  */
 export function parents(element) {
@@ -1065,6 +1038,33 @@ export function previousSiblings(element) {
     element = element.previousElementSibling;
   }
   return siblings;
+}
+
+/**
+ * This is an extension of [`@radically-straightforward/utilities`](https://github.com/radically-straightforward/radically-straightforward/tree/main/utilities)’s `backgroundJob()` with the following additions:
+ *
+ * 1. If called multiple times, this version of `backgroundJob()` `stop()`s the previous background job so that at most one background job is active at any given time.
+ *
+ * 2. When the `element`’s [`isConnected`](https://developer.mozilla.org/en-US/docs/Web/API/Node/isConnected) is `false`, the background job is `stop()`ped.
+ *
+ * The background job object which offers the `run()` and `stop()` methods is available at `element[name]`.
+ *
+ * See, for example, `relativizeDateTimeElement()`, which uses `backgroundJob()` to periodically update a relative datetime, for example, “2 hours ago”.
+ */
+export function backgroundJob(
+  element,
+  elementProperty,
+  utilitiesBackgroundJobOptions,
+  job,
+) {
+  element[elementProperty]?.stop();
+  element[elementProperty] = utilities.backgroundJob(
+    utilitiesBackgroundJobOptions,
+    async () => {
+      if (element.isConnected) await job();
+      else element[elementProperty].stop();
+    },
+  );
 }
 
 /**
