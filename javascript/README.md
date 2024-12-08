@@ -121,14 +121,6 @@ If the `content` of the meta tag `<meta name="version" content="___" />` has cha
 
 If `reload` is `true` then the page reloads when the connection is closed and reopened, because presumably the server has been restarted after a code modification during development.
 
-### `mount()`
-
-```typescript
-export function mount(element, content, event = undefined);
-```
-
-`morph()` the `element` container to include `content`. `execute()` the browser JavaScript in the `element`. Protect the `element` from changing in Live Connection updates.
-
 ### `documentMount()`
 
 ```typescript
@@ -140,6 +132,14 @@ export function documentMount(content, event = new Event("DOMContentLoaded"));
 Similar to `mount()`, but suited for morphing the entire `document`. For example, it dispatches the `event` to the `window`.
 
 If the `document` and the `content` have `<meta name="version" content="___" />` with different `content`s, then `documentMount()` displays an error message in an element with `key="global-error"` which you may style.
+
+### `mount()`
+
+```typescript
+export function mount(element, content, event = undefined);
+```
+
+`morph()` the `element` container to include `content`. `execute()` the browser JavaScript in the `element`. Protect the `element` from changing in Live Connection updates.
 
 ### `morph()`
 
@@ -179,6 +179,229 @@ When `morph()` is called to perform a Live Connection update (that is,`event?.de
 
 - `morph()` is aware of Live Connection updates.
 
+### `execute()`
+
+```typescript
+export function execute(element, event = undefined);
+```
+
+> **Note:** This is a low-level function—in most cases you want to call `mount()` instead.
+
+Execute the functions defined by the `javascript="___"` attribute, which is set by [`@radically-straightforward/build`](https://github.com/radically-straightforward/radically-straightforward/tree/main/build) when extracting browser JavaScript. You must call this when you insert new elements in the DOM, for example:
+
+```javascript
+javascript.execute(
+  document
+    .querySelector("body")
+    .insertAdjacentElement(
+      "afterbegin",
+      javascript.stringToElement(html`<div javascript="___"></div>`),
+    ),
+);
+```
+
+### `documentStringToElement()`
+
+```typescript
+export function documentStringToElement(string);
+```
+
+Similar to `stringToElement()` but for a `string` which is a whole document, for example, starting with `<!DOCTYPE html>`. [`document.adoptNode()`](https://developer.mozilla.org/en-US/docs/Web/API/Document/adoptNode) is used so that the resulting element belongs to the current `document`.
+
+### `stringToElements()`
+
+```typescript
+export function stringToElements(string);
+```
+
+Convert a string into a DOM element. The string may have multiple siblings without a common parent, so `stringToElements()` returns a `<div>` containing the elements.
+
+### `stringToElement()`
+
+```typescript
+export function stringToElement(string);
+```
+
+A specialized version of `stringToElements()` for when the `string` is a single element and the wrapper `<div>` is unnecessary.
+
+### `isModified()`
+
+```typescript
+export function isModified(element, { includeSubforms = false } = {});
+```
+
+Detects whether there are form fields in `element` and its `children()` that are modified with respect to their `defaultValue` and `defaultChecked` properties.
+
+You may set `element.isModified = <true/false>` to force the result of `isModified()` for `element` and its `children()`.
+
+You may set the `disabled` attribute on a parent element to disable an entire subtree.
+
+`isModified()` powers the “Your changes will be lost if you continue.” dialog that `@radically-straightforward/javascript` enables by default.
+
+### `reset()`
+
+```typescript
+export function reset(element, { includeSubforms = false } = {});
+```
+
+Reset form fields from `element` and its `children()` using their `defaultValue` and `defaultChecked` properties, including dispatching the `input` and `change` events.
+
+### `validate()`
+
+```typescript
+export function validate(element, { includeSubforms = false } = {});
+```
+
+Validate `element` (usually a `<form>`) and its `children()`.
+
+Validation errors are reported with `popover()`s with the `.popover--error` class, which you may style.
+
+Use `<form novalidate>` to disable the native browser validation, which is too permissive on email addresses, is more limited in custom validation, and so forth.
+
+You may set the `disabled` attribute on a parent element to disable an entire subtree.
+
+Use `element.isValid = true` to force a subtree to be valid.
+
+`validate()` supports the `required` and `minlength` attributes, the `type="email"` input type, and custom validation.
+
+For custom validation, use the `onvalidate` event and `throw new ValidationError()`, for example:
+
+```javascript
+html`
+  <input
+    type="text"
+    name="name"
+    required
+    javascript="${javascript`
+      this.onvalidate = () => {
+        if (this.value !== "Leandro")
+          throw new javascript.ValidationError("Invalid name.");
+      };
+    `}"
+  />
+`;
+```
+
+`validate()` powers the custom validation that `@radically-straightforward/javascript` enables by default.
+
+### `ValidationError`
+
+```typescript
+export class ValidationError extends Error;
+```
+
+Custom error class for `validate()`.
+
+### `serialize()`
+
+```typescript
+export function serialize(element, { includeSubforms = false } = {});
+```
+
+Produce a [`FormData`](https://developer.mozilla.org/en-US/docs/Web/API/FormData) from the `element` and its `children()`.
+
+You may set the `disabled` attribute on a parent element to disable an entire subtree.
+
+Other than that, `serialize()` follows the behavior of `new FormData(form)`.
+
+### `relativizeDateTimeElement()`
+
+```typescript
+export function relativizeDateTimeElement(
+  element,
+  dateString,
+  { capitalize = false, ...relativizeDateTimeOptions } = {},
+);
+```
+
+Keep an element updated with the relative datetime. See `relativizeDateTime()` (which provides the relative datetime) and `backgroundJob()` (which provides the background job management).
+
+**Example**
+
+```typescript
+const date = new Date(Date.now() - 10 * 60 * 60 * 1000);
+html`
+  <span
+    javascript="${javascript`
+      javascript.relativizeDateTimeElement(this, ${date.toISOString()});
+      javascript.popover({ element: this });
+    `}"
+  ></span>
+  <span
+    class="popover"
+    javascript="${javascript`
+      this.textContent = javascript.localizeDateTime(${date.toISOString()});
+    `}"
+  ></span>
+`;
+```
+
+### `relativizeDateTime()`
+
+```typescript
+export function relativizeDateTime(dateString, { preposition = false } = {});
+```
+
+Returns a relative datetime, for example, `just now`, `3 minutes ago`, `in 3 minutes`, `3 hours ago`, `in 3 hours`, `yesterday`, `tomorrow`, `3 days ago`, `in 3 days`, `on 2024-04-03`, and so forth.
+
+- **`preposition`:** Whether to return `2024-04-03` or `on 2024-04-03`.
+
+### `localizeDateTime()`
+
+```typescript
+export function localizeDateTime(dateString);
+```
+
+Returns a localized datetime, for example, `2024-04-03 15:20`.
+
+### `validateLocalizedDateTime()`
+
+```typescript
+export function validateLocalizedDateTime(element);
+```
+
+Validate a form field that used `localizeDateTime()`. The error is reported on the `element`, but the UTC datetime that must be sent to the server is returned as a string that must be assigned to another form field, for example:
+
+```javascript
+html`
+  <input type="hidden" name="datetime" value="${new Date().toISOString()}" />
+  <input
+    type="text"
+    required
+    javascript="${javascript`
+      this.value = javascript.localizeDateTime(this.previousElementSibling.value);
+      this.onvalidate = () => {
+        this.previousElementSibling.value = javascript.validateLocalizedDateTime(this);
+      };
+    `}"
+  />
+`;
+```
+
+### `localizeDate()`
+
+```typescript
+export function localizeDate(dateString);
+```
+
+Returns a localized date, for example, `2024-04-03`.
+
+### `localizeTime()`
+
+```typescript
+export function localizeTime(dateString);
+```
+
+Returns a localized time, for example, `15:20`.
+
+### `formatUTCDateTime()`
+
+```typescript
+export function formatUTCDateTime(dateString);
+```
+
+Format a datetime into a representation that is user friendly, for example, `2024-04-03 15:20 UTC`.
+
 ### `stateAdd()`
 
 ```typescript
@@ -216,27 +439,6 @@ export function stateContains(element, token);
 ```
 
 See `stateAdd()`.
-
-### `execute()`
-
-```typescript
-export function execute(element, event = undefined);
-```
-
-> **Note:** This is a low-level function—in most cases you want to call `mount()` instead.
-
-Execute the functions defined by the `javascript="___"` attribute, which is set by [`@radically-straightforward/build`](https://github.com/radically-straightforward/radically-straightforward/tree/main/build) when extracting browser JavaScript. You must call this when you insert new elements in the DOM, for example:
-
-```javascript
-javascript.execute(
-  document
-    .querySelector("body")
-    .insertAdjacentElement(
-      "afterbegin",
-      javascript.stringToElement(html`<div javascript="___"></div>`),
-    ),
-);
-```
 
 ### `popover()`
 
@@ -302,207 +504,37 @@ This is inspired by the [Popover API](https://developer.mozilla.org/en-US/docs/W
 
 We use [Floating UI](https://floating-ui.com/) for positioning and provide an API reminiscent of the discontinued [Tippy.js](https://atomiks.github.io/tippyjs/). The major difference is that in Tippy.js the `content` is kept out of the DOM while the popover is hidden, while we keep the `target` in the DOM (just hidden). This allows, for example, the popover to contain form fields which are submitted on form submission, and it makes inspecting and debugging easier. We also support fewer features and less customization, for example, there isn’t the concept of `interactive` separate of `trigger`, so you can’t create an interactive `"hover"` popover.
 
-### `validate()`
+### `parents()`
 
 ```typescript
-export function validate(element);
+export function parents(element);
 ```
 
-Validate `element` (usually a `<form>`) and its `children()`.
+Returns an array of parents, including `element` itself.
 
-Validation errors are reported with `popover()`s with the `.popover--error` class, which you may style.
-
-Use `<form novalidate>` to disable the native browser validation, which is too permissive on email addresses, is more limited in custom validation, and so forth.
-
-You may set the `disabled` attribute on a parent element to disable an entire subtree.
-
-Use `element.isValid = true` to force a subtree to be valid.
-
-`validate()` supports the `required` and `minlength` attributes, the `type="email"` input type, and custom validation.
-
-For custom validation, use the `onvalidate` event and `throw new ValidationError()`, for example:
-
-```javascript
-html`
-  <input
-    type="text"
-    name="name"
-    required
-    javascript="${javascript`
-      this.onvalidate = () => {
-        if (this.value !== "Leandro")
-          throw new javascript.ValidationError("Invalid name.");
-      };
-    `}"
-  />
-`;
-```
-
-`validate()` powers the custom validation that `@radically-straightforward/javascript` enables by default.
-
-### `ValidationError`
+### `children()`
 
 ```typescript
-export class ValidationError extends Error;
+export function children(element, { includeSubforms = true } = {});
 ```
 
-Custom error class for `validate()`.
+Returns an array of children, including `element` itself.
 
-### `validateLocalizedDateTime()`
+### `nextSiblings()`
 
 ```typescript
-export function validateLocalizedDateTime(element);
+export function nextSiblings(element);
 ```
 
-Validate a form field that used `localizeDateTime()`. The error is reported on the `element`, but the UTC datetime that must be sent to the server is returned as a string that must be assigned to another form field, for example:
+Returns an array of sibling elements, including `element` itself.
 
-```javascript
-html`
-  <input type="hidden" name="datetime" value="${new Date().toISOString()}" />
-  <input
-    type="text"
-    required
-    javascript="${javascript`
-      this.value = javascript.localizeDateTime(this.previousElementSibling.value);
-      this.onvalidate = () => {
-        this.previousElementSibling.value = javascript.validateLocalizedDateTime(this);
-      };
-    `}"
-  />
-`;
-```
-
-### `serialize()`
+### `previousSiblings()`
 
 ```typescript
-export function serialize(element);
+export function previousSiblings(element);
 ```
 
-Produce a `URLSearchParams` from the `element` and its `children()`.
-
-You may set the `disabled` attribute on a parent element to disable an entire subtree.
-
-Other than that, `serialize()` follows as best as possible the behavior of the `URLSearchParams` produced by a browser form submission.
-
-### `reset()`
-
-```typescript
-export function reset(element);
-```
-
-Reset form fields from `element` and its `children()` using their `defaultValue` and `defaultChecked` properties, including dispatching the `input` and `change` events.
-
-### `isModified()`
-
-```typescript
-export function isModified(element);
-```
-
-Detects whether there are form fields in `element` and its `children()` that are modified with respect to their `defaultValue` and `defaultChecked` properties.
-
-You may set `element.isModified = <true/false>` to force the result of `isModified()` for `element` and its `children()`.
-
-You may set the `disabled` attribute on a parent element to disable an entire subtree.
-
-`isModified()` powers the “your changes may be lost, do you wish to leave this page?” dialog that `@radically-straightforward/javascript` enables by default.
-
-### `relativizeDateTimeElement()`
-
-```typescript
-export function relativizeDateTimeElement(
-  element,
-  dateString,
-  { capitalize = false, ...relativizeDateTimeOptions } = {},
-);
-```
-
-Keep an element updated with the relative datetime. See `relativizeDateTime()` (which provides the relative datetime) and `backgroundJob()` (which provides the background job management).
-
-**Example**
-
-```typescript
-const date = new Date(Date.now() - 10 * 60 * 60 * 1000);
-html`
-  <span
-    javascript="${javascript`
-      javascript.relativizeDateTimeElement(this, ${date.toISOString()});
-      javascript.popover({ element: this });
-    `}"
-  ></span>
-  <span
-    class="popover"
-    javascript="${javascript`
-      this.textContent = javascript.localizeDateTime(${date.toISOString()});
-    `}"
-  ></span>
-`;
-```
-
-### `relativizeDateTime()`
-
-```typescript
-export function relativizeDateTime(dateString, { preposition = false } = {});
-```
-
-Returns a relative datetime, for example, `just now`, `3 minutes ago`, `in 3 minutes`, `3 hours ago`, `in 3 hours`, `yesterday`, `tomorrow`, `3 days ago`, `in 3 days`, `on 2024-04-03`, and so forth.
-
-- **`preposition`:** Whether to return `2024-04-03` or `on 2024-04-03`.
-
-### `localizeDateTime()`
-
-```typescript
-export function localizeDateTime(dateString);
-```
-
-Returns a localized datetime, for example, `2024-04-03 15:20`.
-
-### `localizeDate()`
-
-```typescript
-export function localizeDate(dateString);
-```
-
-Returns a localized date, for example, `2024-04-03`.
-
-### `localizeTime()`
-
-```typescript
-export function localizeTime(dateString);
-```
-
-Returns a localized time, for example, `15:20`.
-
-### `formatUTCDateTime()`
-
-```typescript
-export function formatUTCDateTime(dateString);
-```
-
-Format a datetime into a representation that is user friendly, for example, `2024-04-03 15:20 UTC`.
-
-### `stringToElements()`
-
-```typescript
-export function stringToElements(string);
-```
-
-Convert a string into a DOM element. The string may have multiple siblings without a common parent, so `stringToElements()` returns a `<div>` containing the elements.
-
-### `stringToElement()`
-
-```typescript
-export function stringToElement(string);
-```
-
-A specialized version of `stringToElements()` for when the `string` is a single element and the wrapper `<div>` is unnecessary.
-
-### `documentStringToElement()`
-
-```typescript
-export function documentStringToElement(string);
-```
-
-Similar to `stringToElement()` but for a `string` which is a whole document, for example, starting with `<!DOCTYPE html>`. [`document.adoptNode()`](https://developer.mozilla.org/en-US/docs/Web/API/Document/adoptNode) is used so that the resulting element belongs to the current `document`.
+Returns an array of sibling elements, including `element` itself.
 
 ### `backgroundJob()`
 
@@ -524,38 +556,6 @@ This is an extension of [`@radically-straightforward/utilities`](https://github.
 The background job object which offers the `run()` and `stop()` methods is available at `element[name]`.
 
 See, for example, `relativizeDateTimeElement()`, which uses `backgroundJob()` to periodically update a relative datetime, for example, “2 hours ago”.
-
-### `parents()`
-
-```typescript
-export function parents(element);
-```
-
-Returns an array of parents, including `element` itself.
-
-### `children()`
-
-```typescript
-export function children(element);
-```
-
-Returns an array of children, including `element` itself.
-
-### `nextSiblings()`
-
-```typescript
-export function nextSiblings(element);
-```
-
-Returns an array of sibling elements, including `element` itself.
-
-### `previousSiblings()`
-
-```typescript
-export function previousSiblings(element);
-```
-
-Returns an array of sibling elements, including `element` itself.
 
 ### `isAppleDevice`
 
