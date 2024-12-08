@@ -55,12 +55,9 @@ window.addEventListener("click", (event) => {
       "application/x-www-form-urlencoded";
     const body =
       enctype === "multipart/form-data"
-        ? new FormData(form)
-        : new URLSearchParams(new FormData(form));
-    if (
-      typeof button.getAttribute("name") === "string" &&
-      button.getAttribute("name").trim() !== ""
-    )
+        ? serialize(form)
+        : new URLSearchParams(serialize(form));
+    if (typeof button.getAttribute("name") === "string")
       body.append(button.getAttribute("name"), button.getAttribute("value"));
     event.preventDefault();
     liveNavigate(
