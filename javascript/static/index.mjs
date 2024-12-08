@@ -27,13 +27,18 @@ window.addEventListener("click", (event) => {
     )
       return;
     event.preventDefault();
+    if (
+      isModified(document.querySelector("html")) &&
+      !confirm("Your changes will be lost if you continue.")
+    )
+      return;
     liveNavigate(new Request(element.href));
   } else if (
     event.target.closest(`[type="form"]`) !== null &&
-    event.target.closest(`[type="submit"]`) !== null
+    event.target.closest(`button[type="submit"]`) !== null
   ) {
     const form = event.target.closest(`[type="form"]`);
-    const button = event.target.closest(`[type="submit"]`);
+    const button = event.target.closest(`button[type="submit"]`);
     if (button.liveNavigate === false || form.liveNavigate === false) return;
     if (!validate(form)) return;
     const method = (
@@ -55,7 +60,7 @@ window.addEventListener("click", (event) => {
         ? serialize(form)
         : new URLSearchParams(serialize(form));
     if (typeof button.getAttribute("name") === "string")
-      body.append(button.getAttribute("name"), button.getAttribute("value"));
+      body.append(button.getAttribute("name"), button.value);
     event.preventDefault();
     liveNavigate(
       method === "GET"
@@ -79,22 +84,12 @@ window.addEventListener("popstate", (event) => {
 });
 
 window.addEventListener("beforeunload", (event) => {
-  if (
-    !liveNavigate.inFormSubmission &&
-    isModified(document.querySelector("html"))
-  )
-    event.preventDefault();
+  if (isModified(document.querySelector("html"))) event.preventDefault();
 });
 
 async function liveNavigate(request, event = undefined) {
   if (event instanceof PopStateEvent) liveNavigate.abortController?.abort();
-  else if (
-    liveNavigate.abortController !== undefined ||
-    (!liveNavigate.inFormSubmission &&
-      isModified(document.querySelector("html")) &&
-      !confirm("Your changes will be lost if you continue."))
-  )
-    return;
+  else if (liveNavigate.abortController !== undefined) return;
   const progressBar = document
     .querySelector("body")
     .insertAdjacentElement(
