@@ -38,15 +38,21 @@ window.addEventListener("click", (event) => {
     const method = (
       button.getAttribute("formmethod") ??
       form.getAttribute("method") ??
-      form.method
+      "GET"
     ).toUpperCase();
-    const action = button.getAttribute("formaction") ?? form.action;
+    const action =
+      button.getAttribute("formaction") ??
+      form.getAttribute("action") ??
+      window.location.href;
     if (
       new URL(action).origin !== window.location.origin ||
       form.liveNavigate === false
     )
       return;
-    const enctype = button.getAttribute("formenctype") ?? form.enctype;
+    const enctype =
+      button.getAttribute("formenctype") ??
+      form.getAttribute("enctype") ??
+      "application/x-www-form-urlencoded";
     const body =
       enctype === "multipart/form-data"
         ? new FormData(form)
@@ -55,7 +61,7 @@ window.addEventListener("click", (event) => {
       typeof button.getAttribute("name") === "string" &&
       button.getAttribute("name").trim() !== ""
     )
-      body.append(button.getAttribute("name"), button.value);
+      body.append(button.getAttribute("name"), button.getAttribute("value"));
     event.preventDefault();
     liveNavigate(
       method === "GET"
