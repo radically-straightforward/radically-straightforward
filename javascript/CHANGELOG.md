@@ -4,6 +4,7 @@
 
 - **Breaking change:** Added support for nested forms, which requires replacing `<form>` tags with `<div type="form">`, because HTML parsers don’t support nested `<form>` tags.
 - Improved the treatment of Live Navigation when the user tries to navigate while a Live Navigation is already underway.
+- Improved the treatment of Live Connection updates on `<input>`s: Live Connection updates may always update the `value="___"` and `checked=""` attributes, which correspond to the `defaultValue` and `defaultChecked` properties.
 
 ## 3.0.3 · 2024-12-07
 

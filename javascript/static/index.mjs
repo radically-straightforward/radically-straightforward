@@ -337,6 +337,18 @@ export function morph(from, to, event = undefined) {
     ...from.getAttributeNames(),
     ...to.getAttributeNames(),
   ])) {
+    if (from.matches("input, textarea"))
+      for (const property of ["value", "checked"]) {
+        if (
+          event?.detail?.liveConnectionUpdate &&
+          isModified(from) &&
+          !parents(from).some((element) =>
+            element.liveConnectionUpdate?.has?.(property),
+          )
+        )
+          continue;
+        if (from[property] !== to[property]) from[property] = to[property];
+      }
     if (
       event?.detail?.liveConnectionUpdate &&
       (attribute === "state" ||
@@ -353,17 +365,6 @@ export function morph(from, to, event = undefined) {
     else if (from.getAttribute(attribute) !== to.getAttribute(attribute))
       from.setAttribute(attribute, to.getAttribute(attribute));
   }
-  if (from.matches("input, textarea"))
-    for (const property of ["value", "checked"]) {
-      if (
-        event?.detail?.liveConnectionUpdate &&
-        !parents(from).some((element) =>
-          element.liveConnectionUpdate?.has?.(property),
-        )
-      )
-        continue;
-      if (from[property] !== to[property]) from[property] = to[property];
-    }
   const key = (node) =>
     `${node.nodeType}--${
       node.nodeType === node.ELEMENT_NODE
