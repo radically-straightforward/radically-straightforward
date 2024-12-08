@@ -4,7 +4,6 @@ import fastMyersDiff from "fast-myers-diff";
 import * as floatingUI from "@floating-ui/dom";
 
 window.addEventListener("DOMContentLoaded", (event) => {
-  liveNavigate.inFormSubmission = false;
   execute(document.querySelector("html"), event);
 });
 
@@ -17,67 +16,62 @@ window.addEventListener("click", (event) => {
     event.metaKey
   )
     return;
-  link: {
-    const link = event.target.closest(`a:not([target="_blank"])`);
-    if (link === null) break link;
+  if (event.target.closest(`a:not([target="_blank"])`) !== null) {
+    const element = event.target.closest(`a:not([target="_blank"])`);
     if (
-      link.origin !== window.location.origin ||
-      (link.pathname === window.location.pathname &&
-        link.search === window.location.search &&
-        link.hash !== window.location.hash) ||
-      link.liveNavigate === false
+      element.origin !== window.location.origin ||
+      (element.pathname === window.location.pathname &&
+        element.search === window.location.search &&
+        element.hash !== window.location.hash) ||
+      element.liveNavigate === false
     )
       return;
     event.preventDefault();
-    liveNavigate(new Request(link.href));
-  }
-});
-
-window.addEventListener("submit", (event) => {
-  if (!validate(event.target)) {
+    liveNavigate(new Request(element.href));
+  } else if (
+    event.target.closest(`[type="form"]`) !== null &&
+    event.target.closest(`[type="submit"]`) !== null
+  ) {
+    const form = event.target.closest(`[type="form"]`);
+    const button = event.target.closest(`[type="submit"]`);
+    if (!validate(form)) return;
+    const method = (
+      button.getAttribute("formmethod") ??
+      form.getAttribute("method") ??
+      form.method
+    ).toUpperCase();
+    const action = button.getAttribute("formaction") ?? form.action;
+    if (
+      new URL(action).origin !== window.location.origin ||
+      form.liveNavigate === false
+    )
+      return;
+    const enctype = button.getAttribute("formenctype") ?? form.enctype;
+    const body =
+      enctype === "multipart/form-data"
+        ? new FormData(form)
+        : new URLSearchParams(new FormData(form));
+    if (
+      typeof button.getAttribute("name") === "string" &&
+      button.getAttribute("name").trim() !== ""
+    )
+      body.append(button.getAttribute("name"), button.value);
     event.preventDefault();
-    event.stopImmediatePropagation();
-    return;
+    liveNavigate(
+      method === "GET"
+        ? (() => {
+            const actionURL = new URL(action);
+            for (const [name, value] of body)
+              actionURL.searchParams.append(name, value);
+            return new Request(actionURL.href);
+          })()
+        : new Request(action, {
+            method,
+            headers: { "CSRF-Protection": "true" },
+            body,
+          }),
+    );
   }
-  liveNavigate.inFormSubmission = true;
-  const method = (
-    event.submitter?.getAttribute("formmethod") ??
-    event.target.getAttribute("method") ??
-    event.target.method
-  ).toUpperCase();
-  const action =
-    event.submitter?.getAttribute("formaction") ?? event.target.action;
-  if (
-    new URL(action).origin !== window.location.origin ||
-    event.target.liveNavigate === false
-  )
-    return;
-  const enctype =
-    event.submitter?.getAttribute("formenctype") ?? event.target.enctype;
-  const body =
-    enctype === "multipart/form-data"
-      ? new FormData(event.target)
-      : new URLSearchParams(new FormData(event.target));
-  if (
-    typeof event.submitter?.getAttribute("name") === "string" &&
-    event.submitter.getAttribute("name").trim() !== ""
-  )
-    body.append(event.submitter.getAttribute("name"), event.submitter.value);
-  event.preventDefault();
-  liveNavigate(
-    method === "GET"
-      ? (() => {
-          const actionURL = new URL(action);
-          for (const [name, value] of body)
-            actionURL.searchParams.append(name, value);
-          return new Request(actionURL.href);
-        })()
-      : new Request(action, {
-          method,
-          headers: { "CSRF-Protection": "true" },
-          body,
-        }),
-  );
 });
 
 window.addEventListener("popstate", (event) => {
