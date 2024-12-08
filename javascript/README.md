@@ -285,6 +285,7 @@ The `target` is decorated with the `showPopover()` and `hidePopover()` functions
 ```typescript
 html`
   <button
+    type="button"
     javascript="${javascript`
       javascript.popover({ element: this });
     `}"

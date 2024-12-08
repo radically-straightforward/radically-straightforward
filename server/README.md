@@ -57,7 +57,7 @@ application.push({
           </ul>
           <form method="POST">
             <input type="text" name="message" placeholder="Message…" required />
-            <button>Send</button>
+            <button type="submit">Send</button>
           </form>
         </body>
       </html>

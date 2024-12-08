@@ -538,6 +538,7 @@ window.addEventListener("DOMContentLoaded", (event) => {
  * ```typescript
  * html`
  *   <button
+ *     type="button"
  *     javascript="${javascript`
  *       javascript.popover({ element: this });
  *     `}"
