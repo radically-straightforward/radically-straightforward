@@ -28,8 +28,9 @@ window.addEventListener("click", (event) => {
       return;
     event.preventDefault();
     if (
-      isModified(document.querySelector("html")) &&
-      !confirm("Your changes will be lost if you continue.")
+      liveNavigate.abortController !== undefined ||
+      (isModified(document.querySelector("html")) &&
+        !confirm("Your changes will be lost if you continue."))
     )
       return;
     liveNavigate(new Request(element.href));
@@ -39,8 +40,6 @@ window.addEventListener("click", (event) => {
   ) {
     const form = event.target.closest(`[type="form"]`);
     const button = event.target.closest(`button[type="submit"]`);
-    if (button.liveNavigate === false || form.liveNavigate === false) return;
-    if (!validate(form)) return;
     const method = (
       button.getAttribute("formmethod") ??
       form.getAttribute("method") ??
@@ -50,7 +49,14 @@ window.addEventListener("click", (event) => {
       button.getAttribute("formaction") ??
       form.getAttribute("action") ??
       window.location.href;
-    if (new URL(action).origin !== window.location.origin) return;
+    if (
+      button.liveNavigate === false ||
+      form.liveNavigate === false ||
+      new URL(action).origin !== window.location.origin
+    )
+      return;
+    event.preventDefault();
+    if (liveNavigate.abortController !== undefined || !validate(form)) return;
     const enctype =
       button.getAttribute("formenctype") ??
       form.getAttribute("enctype") ??
@@ -61,7 +67,6 @@ window.addEventListener("click", (event) => {
         : new URLSearchParams(serialize(form));
     if (typeof button.getAttribute("name") === "string")
       body.append(button.getAttribute("name"), button.value);
-    event.preventDefault();
     liveNavigate(
       method === "GET"
         ? (() => {
@@ -88,8 +93,7 @@ window.addEventListener("beforeunload", (event) => {
 });
 
 async function liveNavigate(request, event = undefined) {
-  if (event instanceof PopStateEvent) liveNavigate.abortController?.abort();
-  else if (liveNavigate.abortController !== undefined) return;
+  liveNavigate.abortController?.abort();
   const progressBar = document
     .querySelector("body")
     .insertAdjacentElement(
