@@ -453,168 +453,28 @@ window.addEventListener("DOMContentLoaded", (event) => {
 });
 
 /**
- * Add a `token` to the `state="___"` attribute
- *
- * The `state="___"` attribute is meant to be used to hold browser state, for example, whether a sidebar is open.
- *
- * The `state="___"` attribute is similar to the `class="___"` attribute, and the `state___()` functions are similar to the [`classList` property](https://developer.mozilla.org/en-US/docs/Web/API/Element/classList). The main difference is that `morph()` preserves `state="___"` on Live Connection updates.
- *
- * The `state="___"` attribute is different from the `style="___"` attribute in that `state="___"` contains `token`s which may be addressed in CSS with the `[state~="___"]` selector and `style="___"` contains CSS directly.
+ * Convert a string into a DOM element. The string may have multiple siblings without a common parent, so `stringToElements()` returns a `<div>` containing the elements.
  */
-export function stateAdd(element, token) {
-  const state = new Set(
-    (element.getAttribute("state") ?? "")
-      .split(" ")
-      .filter((token) => token !== ""),
-  );
-  state.add(token);
-  element.setAttribute("state", [...state].join(" "));
+export function stringToElements(string) {
+  const element = document.createElement("div");
+  element.innerHTML = string;
+  return element;
 }
 
 /**
- * See `stateAdd()`.
+ * A specialized version of `stringToElements()` for when the `string` is a single element and the wrapper `<div>` is unnecessary.
  */
-export function stateRemove(element, token) {
-  const state = new Set(
-    (element.getAttribute("state") ?? "")
-      .split(" ")
-      .filter((token) => token !== ""),
-  );
-  state.delete(token);
-  element.setAttribute("state", [...state].join(" "));
+export function stringToElement(string) {
+  return stringToElements(string).firstElementChild;
 }
 
 /**
- * See `stateAdd()`.
+ * Similar to `stringToElement()` but for a `string` which is a whole document, for example, starting with `<!DOCTYPE html>`. [`document.adoptNode()`](https://developer.mozilla.org/en-US/docs/Web/API/Document/adoptNode) is used so that the resulting element belongs to the current `document`.
  */
-export function stateToggle(element, token) {
-  const state = new Set(
-    (element.getAttribute("state") ?? "")
-      .split(" ")
-      .filter((token) => token !== ""),
+export function documentStringToElement(string) {
+  return document.adoptNode(
+    new DOMParser().parseFromString(string, "text/html").querySelector("html"),
   );
-  if (state.has(token)) state.delete(token);
-  else state.add(token);
-  element.setAttribute("state", [...state].join(" "));
-}
-
-/**
- * See `stateAdd()`.
- */
-export function stateContains(element, token) {
-  const state = new Set(
-    (element.getAttribute("state") ?? "")
-      .split(" ")
-      .filter((token) => token !== ""),
-  );
-  return state.has(token);
-}
-
-/**
- * Create a popover (tooltip, dropdown menu, and so forth).
- *
- * The `target` is decorated with the `showPopover()` and `hidePopover()` functions. The `element` is decorated with event handler attributes to trigger the popover.
- *
- * **Parameters**
- *
- * - **`element`:** The element that is used a reference when positioning the popover and that triggers the popover open.
- *
- * - **`target`:** The element that contains the popover contents. It must have the `.popover` class, and it may have one of the `.popover--<color>` classes (see `@radically-straightforward/javascript/static/index.css`).
- *
- * - **`trigger`:** One of the following:
- *
- *   - **`"hover"`:** Show the popover on the `mouseenter` or `focusin` events and hide the popover on `onmouseleave` or `onfocusout` events. The `target` must not contain elements that may have focus (for example, `<button>`, `<input>`, and so forth), otherwise keyboard navigation is broken. On `isTouch` devices, `"hover"` popovers don’t show up because they often conflict with `"click"` popovers.
- *
- *   - **`"click"`:** Show the popover on `click`. When to hide the popover depends on the `remainOpenWhileFocused`. If `remainOpenWhileFocused` is `false` (the default), then the next click anywhere will close the popover—this is useful for dropdown menus with `<button>`s. If `remainOpenWhileFocused` is `true`, then only clicks outside of the popover will close it—this is useful for dropdown menus with `<input>`s.
- *
- *   - **`"none"`:** Showing and hiding the popover is the responsibility of the caller, using the `target.showPopover()` and `target.hidePopover()` functions.
- *
- * - **`remainOpenWhileFocused`:** See discussion on `trigger: "click"`. This parameter is ignored if `trigger` is something else.
- *
- * - **`placement`:** One of [Floating UI’s `placement`s](https://floating-ui.com/docs/computePosition#placement).
- *
- * **Example**
- *
- * ```typescript
- * html`
- *   <button
- *     type="button"
- *     javascript="${javascript`
- *       javascript.popover({ element: this });
- *     `}"
- *   >
- *     Example of an element
- *   </button>
- *   <div class="popover">Example of a popover.</div>
- * `;
- * ```
- *
- * **Implementation notes**
- *
- * This is inspired by the [Popover API](https://developer.mozilla.org/en-US/docs/Web/API/Popover_API) and [CSS anchor positioning](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_anchor_positioning), but it doesn’t follow the browser implementation exactly. First, because not all browsers support these APIs yet and the polyfills don’t work well enough (for example, they don’t support `position-try`). Second, because the APIs can be a bit awkward to use, for example, asking for you to come up with `anchor-name`s, and using HTML attributes instead of CSS & JavaScript.
- *
- * We use [Floating UI](https://floating-ui.com/) for positioning and provide an API reminiscent of the discontinued [Tippy.js](https://atomiks.github.io/tippyjs/). The major difference is that in Tippy.js the `content` is kept out of the DOM while the popover is hidden, while we keep the `target` in the DOM (just hidden). This allows, for example, the popover to contain form fields which are submitted on form submission, and it makes inspecting and debugging easier. We also support fewer features and less customization, for example, there isn’t the concept of `interactive` separate of `trigger`, so you can’t create an interactive `"hover"` popover.
- */
-export function popover({
-  element,
-  target = element.nextElementSibling,
-  trigger = "hover",
-  remainOpenWhileFocused = false,
-  placement = trigger === "hover"
-    ? "top"
-    : trigger === "click"
-      ? "bottom-start"
-      : trigger === "none"
-        ? "top"
-        : (() => {
-            throw new Error();
-          })(),
-}) {
-  target.showPopover = async () => {
-    const targetCoordinate = await floatingUI.computePosition(element, target, {
-      placement,
-      middleware: [floatingUI.flip(), floatingUI.shift({ padding: 8 })],
-    });
-    target.style.top = `${targetCoordinate.y}px`;
-    target.style.left = `${targetCoordinate.x}px`;
-    stateAdd(target, "open");
-  };
-  target.hidePopover = () => {
-    stateRemove(target, "open");
-  };
-  if (trigger === "hover") {
-    element.onmouseenter = element.onfocusin = () => {
-      if (!isTouch) target.showPopover();
-    };
-    element.onmouseleave = element.onfocusout = () => {
-      target.hidePopover();
-    };
-  } else if (trigger === "click") {
-    element.onclick = () => {
-      if (target.matches('[state~="open"]')) return;
-      target.showPopover();
-      window.setTimeout(() => {
-        const abortController = new AbortController();
-        for (const eventType of ["click", "pointerup"])
-          window.addEventListener(
-            eventType,
-            (event) => {
-              if (
-                event.button !== 0 ||
-                (remainOpenWhileFocused && target.contains(event.target))
-              )
-                return;
-              abortController.abort();
-              window.setTimeout(() => {
-                target.hidePopover();
-              }, 50);
-            },
-            { signal: abortController.signal },
-          );
-      }, 50);
-    };
-  }
-  return target;
 }
 
 /**
@@ -973,28 +833,168 @@ export function formatUTCDateTime(dateString) {
 }
 
 /**
- * Convert a string into a DOM element. The string may have multiple siblings without a common parent, so `stringToElements()` returns a `<div>` containing the elements.
+ * Add a `token` to the `state="___"` attribute
+ *
+ * The `state="___"` attribute is meant to be used to hold browser state, for example, whether a sidebar is open.
+ *
+ * The `state="___"` attribute is similar to the `class="___"` attribute, and the `state___()` functions are similar to the [`classList` property](https://developer.mozilla.org/en-US/docs/Web/API/Element/classList). The main difference is that `morph()` preserves `state="___"` on Live Connection updates.
+ *
+ * The `state="___"` attribute is different from the `style="___"` attribute in that `state="___"` contains `token`s which may be addressed in CSS with the `[state~="___"]` selector and `style="___"` contains CSS directly.
  */
-export function stringToElements(string) {
-  const element = document.createElement("div");
-  element.innerHTML = string;
-  return element;
-}
-
-/**
- * A specialized version of `stringToElements()` for when the `string` is a single element and the wrapper `<div>` is unnecessary.
- */
-export function stringToElement(string) {
-  return stringToElements(string).firstElementChild;
-}
-
-/**
- * Similar to `stringToElement()` but for a `string` which is a whole document, for example, starting with `<!DOCTYPE html>`. [`document.adoptNode()`](https://developer.mozilla.org/en-US/docs/Web/API/Document/adoptNode) is used so that the resulting element belongs to the current `document`.
- */
-export function documentStringToElement(string) {
-  return document.adoptNode(
-    new DOMParser().parseFromString(string, "text/html").querySelector("html"),
+export function stateAdd(element, token) {
+  const state = new Set(
+    (element.getAttribute("state") ?? "")
+      .split(" ")
+      .filter((token) => token !== ""),
   );
+  state.add(token);
+  element.setAttribute("state", [...state].join(" "));
+}
+
+/**
+ * See `stateAdd()`.
+ */
+export function stateRemove(element, token) {
+  const state = new Set(
+    (element.getAttribute("state") ?? "")
+      .split(" ")
+      .filter((token) => token !== ""),
+  );
+  state.delete(token);
+  element.setAttribute("state", [...state].join(" "));
+}
+
+/**
+ * See `stateAdd()`.
+ */
+export function stateToggle(element, token) {
+  const state = new Set(
+    (element.getAttribute("state") ?? "")
+      .split(" ")
+      .filter((token) => token !== ""),
+  );
+  if (state.has(token)) state.delete(token);
+  else state.add(token);
+  element.setAttribute("state", [...state].join(" "));
+}
+
+/**
+ * See `stateAdd()`.
+ */
+export function stateContains(element, token) {
+  const state = new Set(
+    (element.getAttribute("state") ?? "")
+      .split(" ")
+      .filter((token) => token !== ""),
+  );
+  return state.has(token);
+}
+
+/**
+ * Create a popover (tooltip, dropdown menu, and so forth).
+ *
+ * The `target` is decorated with the `showPopover()` and `hidePopover()` functions. The `element` is decorated with event handler attributes to trigger the popover.
+ *
+ * **Parameters**
+ *
+ * - **`element`:** The element that is used a reference when positioning the popover and that triggers the popover open.
+ *
+ * - **`target`:** The element that contains the popover contents. It must have the `.popover` class, and it may have one of the `.popover--<color>` classes (see `@radically-straightforward/javascript/static/index.css`).
+ *
+ * - **`trigger`:** One of the following:
+ *
+ *   - **`"hover"`:** Show the popover on the `mouseenter` or `focusin` events and hide the popover on `onmouseleave` or `onfocusout` events. The `target` must not contain elements that may have focus (for example, `<button>`, `<input>`, and so forth), otherwise keyboard navigation is broken. On `isTouch` devices, `"hover"` popovers don’t show up because they often conflict with `"click"` popovers.
+ *
+ *   - **`"click"`:** Show the popover on `click`. When to hide the popover depends on the `remainOpenWhileFocused`. If `remainOpenWhileFocused` is `false` (the default), then the next click anywhere will close the popover—this is useful for dropdown menus with `<button>`s. If `remainOpenWhileFocused` is `true`, then only clicks outside of the popover will close it—this is useful for dropdown menus with `<input>`s.
+ *
+ *   - **`"none"`:** Showing and hiding the popover is the responsibility of the caller, using the `target.showPopover()` and `target.hidePopover()` functions.
+ *
+ * - **`remainOpenWhileFocused`:** See discussion on `trigger: "click"`. This parameter is ignored if `trigger` is something else.
+ *
+ * - **`placement`:** One of [Floating UI’s `placement`s](https://floating-ui.com/docs/computePosition#placement).
+ *
+ * **Example**
+ *
+ * ```typescript
+ * html`
+ *   <button
+ *     type="button"
+ *     javascript="${javascript`
+ *       javascript.popover({ element: this });
+ *     `}"
+ *   >
+ *     Example of an element
+ *   </button>
+ *   <div class="popover">Example of a popover.</div>
+ * `;
+ * ```
+ *
+ * **Implementation notes**
+ *
+ * This is inspired by the [Popover API](https://developer.mozilla.org/en-US/docs/Web/API/Popover_API) and [CSS anchor positioning](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_anchor_positioning), but it doesn’t follow the browser implementation exactly. First, because not all browsers support these APIs yet and the polyfills don’t work well enough (for example, they don’t support `position-try`). Second, because the APIs can be a bit awkward to use, for example, asking for you to come up with `anchor-name`s, and using HTML attributes instead of CSS & JavaScript.
+ *
+ * We use [Floating UI](https://floating-ui.com/) for positioning and provide an API reminiscent of the discontinued [Tippy.js](https://atomiks.github.io/tippyjs/). The major difference is that in Tippy.js the `content` is kept out of the DOM while the popover is hidden, while we keep the `target` in the DOM (just hidden). This allows, for example, the popover to contain form fields which are submitted on form submission, and it makes inspecting and debugging easier. We also support fewer features and less customization, for example, there isn’t the concept of `interactive` separate of `trigger`, so you can’t create an interactive `"hover"` popover.
+ */
+export function popover({
+  element,
+  target = element.nextElementSibling,
+  trigger = "hover",
+  remainOpenWhileFocused = false,
+  placement = trigger === "hover"
+    ? "top"
+    : trigger === "click"
+      ? "bottom-start"
+      : trigger === "none"
+        ? "top"
+        : (() => {
+            throw new Error();
+          })(),
+}) {
+  target.showPopover = async () => {
+    const targetCoordinate = await floatingUI.computePosition(element, target, {
+      placement,
+      middleware: [floatingUI.flip(), floatingUI.shift({ padding: 8 })],
+    });
+    target.style.top = `${targetCoordinate.y}px`;
+    target.style.left = `${targetCoordinate.x}px`;
+    stateAdd(target, "open");
+  };
+  target.hidePopover = () => {
+    stateRemove(target, "open");
+  };
+  if (trigger === "hover") {
+    element.onmouseenter = element.onfocusin = () => {
+      if (!isTouch) target.showPopover();
+    };
+    element.onmouseleave = element.onfocusout = () => {
+      target.hidePopover();
+    };
+  } else if (trigger === "click") {
+    element.onclick = () => {
+      if (target.matches('[state~="open"]')) return;
+      target.showPopover();
+      window.setTimeout(() => {
+        const abortController = new AbortController();
+        for (const eventType of ["click", "pointerup"])
+          window.addEventListener(
+            eventType,
+            (event) => {
+              if (
+                event.button !== 0 ||
+                (remainOpenWhileFocused && target.contains(event.target))
+              )
+                return;
+              abortController.abort();
+              window.setTimeout(() => {
+                target.hidePopover();
+              }, 50);
+            },
+            { signal: abortController.signal },
+          );
+      }, 50);
+    };
+  }
+  return target;
 }
 
 /**
