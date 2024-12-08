@@ -19,11 +19,11 @@ window.addEventListener("click", (event) => {
   if (event.target.closest(`a:not([target="_blank"])`) !== null) {
     const element = event.target.closest(`a:not([target="_blank"])`);
     if (
+      element.liveNavigate === false ||
       element.origin !== window.location.origin ||
       (element.pathname === window.location.pathname &&
         element.search === window.location.search &&
-        element.hash !== window.location.hash) ||
-      element.liveNavigate === false
+        element.hash !== window.location.hash)
     )
       return;
     event.preventDefault();
@@ -34,6 +34,7 @@ window.addEventListener("click", (event) => {
   ) {
     const form = event.target.closest(`[type="form"]`);
     const button = event.target.closest(`[type="submit"]`);
+    if (button.liveNavigate === false || form.liveNavigate === false) return;
     if (!validate(form)) return;
     const method = (
       button.getAttribute("formmethod") ??
@@ -44,11 +45,7 @@ window.addEventListener("click", (event) => {
       button.getAttribute("formaction") ??
       form.getAttribute("action") ??
       window.location.href;
-    if (
-      new URL(action).origin !== window.location.origin ||
-      form.liveNavigate === false
-    )
-      return;
+    if (new URL(action).origin !== window.location.origin) return;
     const enctype =
       button.getAttribute("formenctype") ??
       form.getAttribute("enctype") ??
