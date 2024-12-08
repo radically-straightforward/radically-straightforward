@@ -343,9 +343,7 @@ export function morph(from, to, event = undefined) {
         attribute === "style" ||
         attribute === "hidden" ||
         attribute === "open" ||
-        attribute === "disabled" ||
-        attribute === "value" ||
-        attribute === "checked") &&
+        attribute === "disabled") &&
       !parents(from).some((element) =>
         element.liveConnectionUpdate?.has?.(attribute),
       )
