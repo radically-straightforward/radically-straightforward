@@ -9,23 +9,28 @@ window.addEventListener("DOMContentLoaded", (event) => {
 });
 
 window.addEventListener("click", (event) => {
-  const link = event.target.closest(`a:not([target="_blank"])`);
   if (
     event.button !== 0 ||
     event.shiftKey ||
     event.ctrlKey ||
     event.altKey ||
-    event.metaKey ||
-    link === null ||
-    link.origin !== window.location.origin ||
-    (link.pathname === window.location.pathname &&
-      link.search === window.location.search &&
-      link.hash !== window.location.hash) ||
-    link.liveNavigate === false
+    event.metaKey
   )
     return;
-  event.preventDefault();
-  liveNavigate(new Request(link.href));
+  link: {
+    const link = event.target.closest(`a:not([target="_blank"])`);
+    if (link === null) break link;
+    if (
+      link.origin !== window.location.origin ||
+      (link.pathname === window.location.pathname &&
+        link.search === window.location.search &&
+        link.hash !== window.location.hash) ||
+      link.liveNavigate === false
+    )
+      return;
+    event.preventDefault();
+    liveNavigate(new Request(link.href));
+  }
 });
 
 window.addEventListener("submit", (event) => {
