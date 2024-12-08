@@ -93,7 +93,6 @@ window.addEventListener("beforeunload", (event) => {
 });
 
 async function liveNavigate(request, event = undefined) {
-  document.querySelector('[key="progress-bar"]')?.remove();
   const progressBar = document
     .querySelector("body")
     .insertAdjacentElement(
