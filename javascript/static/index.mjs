@@ -151,6 +151,7 @@ async function liveNavigate(request, event = undefined) {
   }
 }
 liveNavigate.abortController = undefined;
+liveNavigate.inFormSubmission = undefined;
 
 /**
  * Open a [Live Connection](https://github.com/radically-straightforward/radically-straightforward/tree/main/server#live-connection) to the server.
