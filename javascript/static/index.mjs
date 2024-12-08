@@ -509,33 +509,6 @@ window.addEventListener("beforeunload", (event) => {
 });
 
 /**
- * Produce a `URLSearchParams` from the `element` and its `children()`.
- *
- * You may set the `disabled` attribute on a parent element to disable an entire subtree.
- *
- * Other than that, `serialize()` follows as best as possible the behavior of the `URLSearchParams` produced by a browser form submission.
- */
-export function serialize(element) {
-  const urlSearchParams = new URLSearchParams();
-  const elements = children(element);
-  for (const element of elements) {
-    if (
-      !element.matches("input, textarea") ||
-      element.closest("[disabled]") !== null ||
-      typeof element.getAttribute("name") !== "string"
-    )
-      continue;
-    if (
-      !(element.type === "radio" || element.type === "checkbox") ||
-      ((element.type === "radio" || element.type === "checkbox") &&
-        element.checked)
-    )
-      urlSearchParams.append(element.getAttribute("name"), element.value);
-  }
-  return urlSearchParams;
-}
-
-/**
  * Reset form fields from `element` and its `children()` using their `defaultValue` and `defaultChecked` properties, including dispatching the `input` and `change` events.
  */
 export function reset(element) {
@@ -693,30 +666,30 @@ window.addEventListener(
 export class ValidationError extends Error {}
 
 /**
- * Validate a form field that used `localizeDateTime()`. The error is reported on the `element`, but the UTC datetime that must be sent to the server is returned as a string that must be assigned to another form field, for example:
+ * Produce a `URLSearchParams` from the `element` and its `children()`.
  *
- * ```javascript
- * html`
- *   <input type="hidden" name="datetime" value="${new Date().toISOString()}" />
- *   <input
- *     type="text"
- *     required
- *     javascript="${javascript`
- *       this.value = javascript.localizeDateTime(this.previousElementSibling.value);
- *       this.onvalidate = () => {
- *         this.previousElementSibling.value = javascript.validateLocalizedDateTime(this);
- *       };
- *     `}"
- *   />
- * `;
- * ```
+ * You may set the `disabled` attribute on a parent element to disable an entire subtree.
+ *
+ * Other than that, `serialize()` follows as best as possible the behavior of the `URLSearchParams` produced by a browser form submission.
  */
-export function validateLocalizedDateTime(element) {
-  if (element.value.match(/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}$/) === null)
-    throw new ValidationError("Match the pattern YYYY-MM-DD HH:MM.");
-  const date = new Date(element.value.trim().replace(" ", "T"));
-  if (isNaN(date.getTime())) throw new ValidationError("Invalid datetime.");
-  return date.toISOString();
+export function serialize(element) {
+  const urlSearchParams = new URLSearchParams();
+  const elements = children(element);
+  for (const element of elements) {
+    if (
+      !element.matches("input, textarea") ||
+      element.closest("[disabled]") !== null ||
+      typeof element.getAttribute("name") !== "string"
+    )
+      continue;
+    if (
+      !(element.type === "radio" || element.type === "checkbox") ||
+      ((element.type === "radio" || element.type === "checkbox") &&
+        element.checked)
+    )
+      urlSearchParams.append(element.getAttribute("name"), element.value);
+  }
+  return urlSearchParams;
 }
 
 /**
@@ -797,6 +770,33 @@ export function relativizeDateTime(dateString, { preposition = false } = {}) {
  */
 export function localizeDateTime(dateString) {
   return `${localizeDate(dateString)} ${localizeTime(dateString)}`;
+}
+
+/**
+ * Validate a form field that used `localizeDateTime()`. The error is reported on the `element`, but the UTC datetime that must be sent to the server is returned as a string that must be assigned to another form field, for example:
+ *
+ * ```javascript
+ * html`
+ *   <input type="hidden" name="datetime" value="${new Date().toISOString()}" />
+ *   <input
+ *     type="text"
+ *     required
+ *     javascript="${javascript`
+ *       this.value = javascript.localizeDateTime(this.previousElementSibling.value);
+ *       this.onvalidate = () => {
+ *         this.previousElementSibling.value = javascript.validateLocalizedDateTime(this);
+ *       };
+ *     `}"
+ *   />
+ * `;
+ * ```
+ */
+export function validateLocalizedDateTime(element) {
+  if (element.value.match(/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}$/) === null)
+    throw new ValidationError("Match the pattern YYYY-MM-DD HH:MM.");
+  const date = new Date(element.value.trim().replace(" ", "T"));
+  if (isNaN(date.getTime())) throw new ValidationError("Invalid datetime.");
+  return date.toISOString();
 }
 
 /**
