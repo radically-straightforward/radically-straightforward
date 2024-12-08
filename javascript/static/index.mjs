@@ -29,6 +29,12 @@ window.addEventListener("click", (event) => {
 });
 
 window.addEventListener("submit", (event) => {
+  if (!validate(event.target)) {
+    event.preventDefault();
+    event.stopImmediatePropagation();
+    return;
+  }
+  liveNavigate.inFormSubmission = true;
   const method = (
     event.submitter?.getAttribute("formmethod") ??
     event.target.getAttribute("method") ??
@@ -68,19 +74,6 @@ window.addEventListener("submit", (event) => {
         }),
   );
 });
-
-window.addEventListener(
-  "submit",
-  (event) => {
-    if (!validate(event.target)) {
-      event.preventDefault();
-      event.stopImmediatePropagation();
-      return;
-    }
-    liveNavigate.inFormSubmission = true;
-  },
-  { capture: true },
-);
 
 window.addEventListener("popstate", (event) => {
   liveNavigate(new Request(window.location), event);
