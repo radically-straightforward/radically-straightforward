@@ -45,10 +45,10 @@ window.addEventListener("click", (event) => {
       form.getAttribute("method") ??
       "GET"
     ).toUpperCase();
-    const action =
-      button.getAttribute("formaction") ??
-      form.getAttribute("action") ??
-      window.location.href;
+    const action = new URL(
+      button.getAttribute("formaction") ?? form.getAttribute("action") ?? "/",
+      window.location,
+    );
     if (
       button.liveNavigate === false ||
       form.liveNavigate === false ||
