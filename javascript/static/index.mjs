@@ -228,17 +228,6 @@ liveConnection.backgroundJob = undefined;
 liveConnection.failedToConnectGlobalError = undefined;
 
 /**
- * `morph()` the `element` container to include `content`. `execute()` the browser JavaScript in the `element`. Protect the `element` from changing in Live Connection updates.
- */
-export function mount(element, content, event = undefined) {
-  if (typeof content === "string") content = stringToElements(content);
-  delete element.liveConnectionUpdate;
-  morph(element, content, event);
-  execute(element, event);
-  element.liveConnectionUpdate = false;
-}
-
-/**
  * > **Note:** This is a low-level function used by Live Navigation and Live Connection.
  *
  * Similar to `mount()`, but suited for morphing the entire `document`. For example, it dispatches the `event` to the `window`.
@@ -274,6 +263,17 @@ export function documentMount(content, event = new Event("DOMContentLoaded")) {
   }
   morph(document.querySelector("html"), content, event);
   window.dispatchEvent(event);
+}
+
+/**
+ * `morph()` the `element` container to include `content`. `execute()` the browser JavaScript in the `element`. Protect the `element` from changing in Live Connection updates.
+ */
+export function mount(element, content, event = undefined) {
+  if (typeof content === "string") content = stringToElements(content);
+  delete element.liveConnectionUpdate;
+  morph(element, content, event);
+  execute(element, event);
+  element.liveConnectionUpdate = false;
 }
 
 /**
@@ -453,6 +453,15 @@ window.addEventListener("DOMContentLoaded", (event) => {
 });
 
 /**
+ * Similar to `stringToElement()` but for a `string` which is a whole document, for example, starting with `<!DOCTYPE html>`. [`document.adoptNode()`](https://developer.mozilla.org/en-US/docs/Web/API/Document/adoptNode) is used so that the resulting element belongs to the current `document`.
+ */
+export function documentStringToElement(string) {
+  return document.adoptNode(
+    new DOMParser().parseFromString(string, "text/html").querySelector("html"),
+  );
+}
+
+/**
  * Convert a string into a DOM element. The string may have multiple siblings without a common parent, so `stringToElements()` returns a `<div>` containing the elements.
  */
 export function stringToElements(string) {
@@ -466,15 +475,6 @@ export function stringToElements(string) {
  */
 export function stringToElement(string) {
   return stringToElements(string).firstElementChild;
-}
-
-/**
- * Similar to `stringToElement()` but for a `string` which is a whole document, for example, starting with `<!DOCTYPE html>`. [`document.adoptNode()`](https://developer.mozilla.org/en-US/docs/Web/API/Document/adoptNode) is used so that the resulting element belongs to the current `document`.
- */
-export function documentStringToElement(string) {
-  return document.adoptNode(
-    new DOMParser().parseFromString(string, "text/html").querySelector("html"),
-  );
 }
 
 /**
