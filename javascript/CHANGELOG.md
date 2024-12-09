@@ -1,5 +1,9 @@
 # Changelog
 
+## 4.0.1 · 2024-12-09
+
+- **Breaking change:** `class="popover"` is now `type="popover"`, for consistency with `type="form"`. This breaking change is small enough and the release of `popover()` has been recent enough that we aren’t doing a major release.
+
 ## 4.0.0 · 2024-12-08
 
 - **Breaking change:** Added support for nested forms, which requires replacing `<form>` tags with `<div type="form">`, because HTML parsers don’t support nested `<form>` tags.
