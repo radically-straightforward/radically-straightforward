@@ -35,10 +35,10 @@ window.addEventListener("click", (event) => {
       return;
     liveNavigate(new Request(element.href));
   } else if (
-    event.target.closest(`[type="form"]`) !== null &&
+    event.target.closest(`[type~="form"]`) !== null &&
     event.target.closest(`button[type="submit"]`) !== null
   ) {
-    const form = event.target.closest(`[type="form"]`);
+    const form = event.target.closest(`[type~="form"]`);
     const button = event.target.closest(`button[type="submit"]`);
     const method = (
       button.getAttribute("formmethod") ??
@@ -600,9 +600,10 @@ export function validate(element, { includeSubforms = false } = {}) {
         if (
           element.value.trim() === "" ||
           ((element.type === "radio" || element.type === "checkbox") &&
-            element
-              .closest("form")
-              .querySelector(`[name="${element.name}"]:checked`) === null)
+            (element.matches(":checked") ||
+              elements.some((otherElement) =>
+                otherElement.matches(`[name="${element.name}"]:checked`),
+              )))
         )
           throw new ValidationError("Required.");
       }
@@ -1009,11 +1010,11 @@ export function parents(element) {
  * Returns an array of children, including `element` itself.
  */
 export function children(element, { includeSubforms = true } = {}) {
-  const form = element.closest(`[type="form"]`);
+  const form = element.closest(`[type~="form"]`);
   const children = [element, ...element.querySelectorAll("*")];
   return includeSubforms
     ? children
-    : children.filter((child) => child.closest(`[type="form"]`) === form);
+    : children.filter((child) => child.closest(`[type~="form"]`) === form);
 }
 
 /**
