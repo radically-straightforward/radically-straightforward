@@ -13,7 +13,7 @@ await fs.writeFile(
         css`
           @import "@radically-straightforward/css/static/index.css";
 
-          .popover {
+          [type~="popover"] {
             font-size: var(--font-size--3-5);
             line-height: var(--font-size--3-5--line-height);
             font-weight: 400;
