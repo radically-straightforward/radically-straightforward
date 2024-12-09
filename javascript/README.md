@@ -340,7 +340,7 @@ html`
     `}"
   ></span>
   <span
-    class="popover"
+    type="popover"
     javascript="${javascript`
       this.textContent = javascript.localizeDateTime(${date.toISOString()});
     `}"
@@ -480,7 +480,7 @@ The `target` is decorated with the `showPopover()` and `hidePopover()` functions
 
 - **`element`:** The element that is used a reference when positioning the popover and that triggers the popover open.
 
-- **`target`:** The element that contains the popover contents. It must have the `.popover` class, and it may have one of the `.popover--<color>` classes (see `@radically-straightforward/javascript/static/index.css`).
+- **`target`:** The element that contains the popover contents. It must have the `type="popover"` type, and it may have one of the `.popover--<color>` classes (see `@radically-straightforward/javascript/static/index.css`).
 
 - **`trigger`:** One of the following:
 
@@ -506,7 +506,7 @@ html`
   >
     Example of an element
   </button>
-  <div class="popover">Example of a popover.</div>
+  <div type="popover">Example of a popover.</div>
 `;
 ```
 

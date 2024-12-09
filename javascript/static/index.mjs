@@ -628,7 +628,7 @@ export function validate(element, { includeSubforms = false } = {}) {
         target: element.insertAdjacentElement(
           "afterend",
           stringToElement(html`
-            <div class="popover popover--error">${error.message}</div>
+            <div type="popover" class="popover--error">${error.message}</div>
           `),
         ),
         trigger: "none",
@@ -703,7 +703,7 @@ export function serialize(element, { includeSubforms = false } = {}) {
  *     `}"
  *   ></span>
  *   <span
- *     class="popover"
+ *     type="popover"
  *     javascript="${javascript`
  *       this.textContent = javascript.localizeDateTime(${date.toISOString()});
  *     `}"
@@ -895,7 +895,7 @@ export function stateContains(element, token) {
  *
  * - **`element`:** The element that is used a reference when positioning the popover and that triggers the popover open.
  *
- * - **`target`:** The element that contains the popover contents. It must have the `.popover` class, and it may have one of the `.popover--<color>` classes (see `@radically-straightforward/javascript/static/index.css`).
+ * - **`target`:** The element that contains the popover contents. It must have the `type="popover"` type, and it may have one of the `.popover--<color>` classes (see `@radically-straightforward/javascript/static/index.css`).
  *
  * - **`trigger`:** One of the following:
  *
@@ -921,7 +921,7 @@ export function stateContains(element, token) {
  *   >
  *     Example of an element
  *   </button>
- *   <div class="popover">Example of a popover.</div>
+ *   <div type="popover">Example of a popover.</div>
  * `;
  * ```
  *
