@@ -1,6 +1,6 @@
 {
   "name": "@radically-straightforward/development",
-  "version": "1.0.35",
+  "version": "1.0.36",
   "description": "🧰 Radically Straightforward packages for development",
   "keywords": [
     "radically straightforward",
@@ -27,7 +27,7 @@
     "@radically-straightforward/build": "^2.0.6",
     "@radically-straightforward/css": "^2.0.0",
     "@radically-straightforward/documentation": "^1.0.4",
-    "@radically-straightforward/javascript": "^4.0.0",
+    "@radically-straightforward/javascript": "^4.0.1",
     "@radically-straightforward/package": "^2.0.1",
     "@radically-straightforward/typescript": "^1.0.0"
   }
