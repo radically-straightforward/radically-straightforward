@@ -166,7 +166,7 @@ export async function liveConnection(requestId, { reload = false } = {}) {
   let reloadOnConnect = false;
   liveConnection.backgroundJob ??= utilities.backgroundJob(
     {
-      interval: 5 * 1000,
+      interval: reload ? 1000 : 5 * 1000,
       onStop: () => {
         abortController.abort();
         window.clearTimeout(abortControllerTimeout);
@@ -189,6 +189,7 @@ export async function liveConnection(requestId, { reload = false } = {}) {
         liveConnection.failedToConnectGlobalError?.remove();
         delete liveConnection.failedToConnectGlobalError;
         if (reloadOnConnect) {
+          liveConnection.backgroundJob.stop();
           document.querySelector("html").isModified = false;
           window.location.reload();
           return;
