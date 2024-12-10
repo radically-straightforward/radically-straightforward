@@ -624,10 +624,22 @@ export function validate(element, { includeSubforms = false } = {}) {
       element.onvalidate?.();
     } catch (error) {
       if (!(error instanceof ValidationError)) throw error;
-      element.focus();
+      let popoverTriggerElement;
+      for (const parentElement of parents(element).reverse()) {
+        if (parentElement.matches("[hidden]")) {
+          popoverTriggerElement = parentElement.parentElement;
+          break;
+        }
+        if (parentElement.matches('[type="popover"]:not([state="open"])')) {
+          popoverTriggerElement = parentElement.popoverTriggerElement;
+          break;
+        }
+      }
+      popoverTriggerElement ??= element;
+      popoverTriggerElement.focus();
       const target = popover({
-        element,
-        target: element.insertAdjacentElement(
+        element: popoverTriggerElement,
+        target: popoverTriggerElement.insertAdjacentElement(
           "afterend",
           stringToElement(html`
             <div type="popover" class="popover--error">${error.message}</div>
@@ -891,7 +903,7 @@ export function stateContains(element, token) {
 /**
  * Create a popover (tooltip, dropdown menu, and so forth).
  *
- * The `target` is decorated with the `showPopover()` and `hidePopover()` functions. The `element` is decorated with event handler attributes to trigger the popover.
+ * The `target` is decorated with the `showPopover()` and `hidePopover()` functions. The `target` is decorated with the `popoverTriggerElement` attribute, which refers to `element`. The `element` is decorated with event handler attributes to trigger the popover.
  *
  * **Parameters**
  *
@@ -949,6 +961,7 @@ export function popover({
           })(),
 }) {
   let abortController;
+  target.popoverTriggerElement = element;
   target.showPopover = async () => {
     const targetCoordinate = await floatingUI.computePosition(element, target, {
       placement,

@@ -474,7 +474,7 @@ export function popover({
 
 Create a popover (tooltip, dropdown menu, and so forth).
 
-The `target` is decorated with the `showPopover()` and `hidePopover()` functions. The `element` is decorated with event handler attributes to trigger the popover.
+The `target` is decorated with the `showPopover()` and `hidePopover()` functions. The `target` is decorated with the `popoverTriggerElement` attribute, which refers to `element`. The `element` is decorated with event handler attributes to trigger the popover.
 
 **Parameters**
 
