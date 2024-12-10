@@ -166,7 +166,7 @@ export async function liveConnection(requestId, { reload = false } = {}) {
   let reloadOnConnect = false;
   liveConnection.backgroundJob ??= utilities.backgroundJob(
     {
-      interval: reload ? 1000 : 5 * 1000,
+      interval: 5 * 1000,
       onStop: () => {
         abortController.abort();
         window.clearTimeout(abortControllerTimeout);
