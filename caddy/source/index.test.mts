@@ -44,7 +44,7 @@ test(
       "./data/files/example.html",
       `
         <!DOCTYPE html>
-        <html lang="en">
+        <html>
         <head>
           <meta charset="UTF-8">
         </head>
@@ -58,7 +58,7 @@ test(
       "./data/files/example--html.txt",
       `
         <!DOCTYPE html>
-        <html lang="en">
+        <html>
         <head>
           <meta charset="UTF-8">
         </head>

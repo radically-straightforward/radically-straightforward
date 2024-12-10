@@ -205,7 +205,7 @@ application.push({
   handler: (request, response) => {
     response.end(
       `<!DOCTYPE html>
-        <html lang="en">
+        <html>
           <head>
             <script>
               (async () => {

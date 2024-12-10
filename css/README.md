@@ -79,7 +79,7 @@ To use this framework:
 
    ```html
    <!doctype html>
-   <html lang="en">
+   <html>
      <head>
        <meta
          name="viewport"

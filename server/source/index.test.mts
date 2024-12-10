@@ -901,7 +901,7 @@ test(async () => {
             request.liveConnection?.skipUpdateOnEstablish
             ? "SKIP UPDATE ON ESTABLISH"
             : `<!DOCTYPE html>
-                <html lang="en">
+                <html>
                   <head>
                     <script>
                       (async () => {
