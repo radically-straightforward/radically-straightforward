@@ -132,7 +132,7 @@ async function liveNavigate(request, event = undefined) {
     if (error.name === "AbortError") return;
     if (!(event instanceof PopStateEvent) && request.method === "GET")
       window.history.pushState(null, "", request.url);
-    document.querySelector('[key="global-error"]')?.remove();
+    document.querySelector('[key~="global-error"]')?.remove();
     document
       .querySelector("body")
       .insertAdjacentHTML(
@@ -221,7 +221,7 @@ export async function liveConnection(requestId, { reload = false } = {}) {
         }
       } catch (error) {
         if (connected) return;
-        document.querySelector('[key="global-error"]')?.remove();
+        document.querySelector('[key~="global-error"]')?.remove();
         liveConnection.failedToConnectGlobalError = document
           .querySelector("body")
           .insertAdjacentElement(
@@ -267,7 +267,7 @@ export function documentMount(content, event = new Event("DOMContentLoaded")) {
     documentVersion !== contentVersion
   ) {
     document.querySelector("html").isModified = false;
-    document.querySelector('[key="global-error"]')?.remove();
+    document.querySelector('[key~="global-error"]')?.remove();
     document
       .querySelector("body")
       .insertAdjacentHTML(
@@ -630,7 +630,7 @@ export function validate(element, { includeSubforms = false } = {}) {
           popoverTriggerElement = parentElement.parentElement;
           break;
         }
-        if (parentElement.matches('[type="popover"]:not([state="open"])')) {
+        if (parentElement.matches('[type~="popover"]:not([state~="open"])')) {
           popoverTriggerElement = parentElement.popoverTriggerElement;
           break;
         }
