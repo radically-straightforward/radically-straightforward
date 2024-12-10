@@ -601,10 +601,10 @@ export function validate(element, { includeSubforms = false } = {}) {
         if (
           element.value.trim() === "" ||
           ((element.type === "radio" || element.type === "checkbox") &&
-            (element.matches(":checked") ||
-              elements.some((otherElement) =>
-                otherElement.matches(`[name="${element.name}"]:checked`),
-              )))
+            !element.matches(":checked") &&
+            !elements.some((otherElement) =>
+              otherElement.matches(`[name="${element.name}"]:checked`),
+            ))
         )
           throw new ValidationError("Required.");
       }
