@@ -425,7 +425,11 @@ export function morph(from, to, event = undefined) {
     }
   }
   for (const nodes of toRemove.values())
-    for (const node of nodes) from.removeChild(node);
+    for (const node of nodes) {
+      from.removeChild(node);
+      if (node.nodeType === node.ELEMENT_NODE)
+        for (const element of children(node).reverse()) element.onremove?.();
+    }
   for (const { node, nodeAfter } of toAdd) from.insertBefore(node, nodeAfter);
   for (const { from, to } of toMorph)
     if (from.nodeType === from.ELEMENT_NODE) morph(from, to, event);
