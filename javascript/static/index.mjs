@@ -903,7 +903,7 @@ export function stateContains(element, token) {
 /**
  * Create a popover (tooltip, dropdown menu, and so forth).
  *
- * The `target` is decorated with the `showPopover()` and `hidePopover()` functions. The `target` is decorated with the `popoverTriggerElement` attribute, which refers to `element`. The `element` is decorated with event handler attributes to trigger the popover.
+ * The `target` is decorated with the `showPopover()`, `hidePopover()`, and `positionPopover()` functions. The `target` is decorated with the `popoverTriggerElement` attribute, which refers to `element`. The `element` is decorated with event handler attributes to trigger the popover.
  *
  * **Parameters**
  *
@@ -962,13 +962,17 @@ export function popover({
 }) {
   let abortController;
   target.popoverTriggerElement = element;
-  target.showPopover = async () => {
+  target.positionPopover = async () => {
     const targetCoordinate = await floatingUI.computePosition(element, target, {
       placement,
       middleware: [floatingUI.flip(), floatingUI.shift({ padding: 8 })],
     });
     target.style.top = `${targetCoordinate.y}px`;
     target.style.left = `${targetCoordinate.x}px`;
+  };
+  target.positionPopover();
+  target.showPopover = () => {
+    target.positionPopover();
     stateAdd(target, "open");
   };
   target.hidePopover = () => {
