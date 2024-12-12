@@ -1081,8 +1081,11 @@ export function backgroundJob(
   element[elementProperty] = utilities.backgroundJob(
     utilitiesBackgroundJobOptions,
     async () => {
-      if (element.isConnected) await job();
-      else element[elementProperty].stop();
+      if (!element.isConnected) {
+        element[elementProperty].stop();
+        return;
+      }
+      await job();
     },
   );
 }
