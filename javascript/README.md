@@ -181,6 +181,8 @@ When `morph()` is called to perform a Live Connection update (that is,`event?.de
 
 > **Note:** `to` is mutated destructively in the process of morphing. Create a clone of `to` before passing it into `morph()` if you wish to continue using it.
 
+> **Note:** Elements may define an `onremove()` function, which is called before the element is removed during morphing. This is useful, for example, to prevent leaks of attached `IntersectionObserver`s and `MutationObserver`s by calling [`IntersectionObserver.disconnect()`](https://developer.mozilla.org/en-US/docs/Web/API/IntersectionObserver/disconnect) and [`MutationObserver.disconnect()`](https://developer.mozilla.org/en-US/docs/Web/API/MutationObserver/disconnect).
+
 **Related Work**
 
 `morph()` is different from `from.innerHTML = to.innerHTML` because setting `innerHTML` loses browser state, for example, form inputs, scrolling position, and so forth.
@@ -474,7 +476,7 @@ export function popover({
 
 Create a popover (tooltip, dropdown menu, and so forth).
 
-The `target` is decorated with the `showPopover()` and `hidePopover()` functions. The `target` is decorated with the `popoverTriggerElement` attribute, which refers to `element`. The `element` is decorated with event handler attributes to trigger the popover.
+The `target` is decorated with the `showPopover()`, `hidePopover()`, and `positionPopover()` functions. The `target` is decorated with the `popoverTriggerElement` attribute, which refers to `element`. The `element` is decorated with event handler attributes to trigger the popover.
 
 **Parameters**
 
