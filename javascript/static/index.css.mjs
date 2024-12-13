@@ -23,7 +23,7 @@ await fs.writeFile(
               var(--color--slate--950)
             );
             width: max-content;
-            max-width: min(calc(100% - var(--space--8)), var(--space--96));
+            max-width: min(calc(100cqw - var(--space--8)), var(--space--96));
             padding: var(--space--1) var(--space--2);
             border: var(--border-width--1) solid
               light-dark(var(--color--slate--400), var(--color--slate--600));
@@ -98,7 +98,7 @@ await fs.writeFile(
               var(--color--red--950)
             );
             width: max-content;
-            max-width: min(calc(100% - var(--space--8)), var(--space--96));
+            max-width: min(calc(100cqw - var(--space--8)), var(--space--96));
             padding: var(--space--1) var(--space--2);
             border: var(--border-width--1) solid
               light-dark(var(--color--red--400), var(--color--red--600));

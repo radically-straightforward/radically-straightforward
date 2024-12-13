@@ -740,3 +740,17 @@ The `[state~="noninteractive"]` state makes **the children** of an element not i
   pointer-events: none;
   touch-action: none;
 }
+
+/*
+The `.scroll` class creates a scrolling container.
+
+- `overflow: auto;` is used to enable scrollbars if necessary.
+- `position: relative;` is used so that `[type~="popover"]`’s position is computed with respect to the scrolling container.
+- `container-type: inline-size;` is used so that `[type~="popover"]`’s `max-width` is computed with respect to the scrolling container.
+*/
+
+.scroll {
+  position: relative;
+  overflow: auto;
+  container-type: inline-size;
+}
