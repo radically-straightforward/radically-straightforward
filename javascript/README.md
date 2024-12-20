@@ -446,14 +446,6 @@ export function stateToggle(element, token);
 
 See `stateAdd()`.
 
-### `stateContains()`
-
-```typescript
-export function stateContains(element, token);
-```
-
-See `stateAdd()`.
-
 ### `popover()`
 
 ```typescript

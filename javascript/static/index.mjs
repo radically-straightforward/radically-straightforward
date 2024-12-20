@@ -895,18 +895,6 @@ export function stateToggle(element, token) {
 }
 
 /**
- * See `stateAdd()`.
- */
-export function stateContains(element, token) {
-  const state = new Set(
-    (element.getAttribute("state") ?? "")
-      .split(" ")
-      .filter((token) => token !== ""),
-  );
-  return state.has(token);
-}
-
-/**
  * Create a popover (tooltip, dropdown menu, and so forth).
  *
  * The `target` is decorated with the `showPopover()`, `hidePopover()`, and `positionPopover()` functions. The `target` is decorated with the `popoverTriggerElement` attribute, which refers to `element`. The `element` is decorated with event handler attributes to trigger the popover.

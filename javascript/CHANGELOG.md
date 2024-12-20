@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- Removed `stateContains()`. Use `element.matches('[state~="___"]')` instead.
+
 ## 4.0.1 · 2024-12-09
 
 - **Breaking change:** `class="popover"` is now `type="popover"`, for consistency with `type="form"`. This breaking change is small enough and the release of `popover()` has been recent enough that we aren’t doing a major release.
