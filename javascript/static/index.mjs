@@ -370,7 +370,7 @@ export function morph(from, to, event = undefined) {
   }
   const key = (node) =>
     `${node.nodeType}--${
-      node.nodeType === node.ELEMENT_NODE
+      node.nodeType === Node.ELEMENT_NODE
         ? `${node.tagName}--${node.getAttribute("key")}`
         : node.nodeValue
     }`;
@@ -411,14 +411,18 @@ export function morph(from, to, event = undefined) {
       nodeIndexOffset < fromStart - previousFromEnd;
       nodeIndexOffset++
     )
-      toMorph.add({
-        from: from.childNodes[previousFromEnd + nodeIndexOffset],
-        to: to.childNodes[previousToEnd + nodeIndexOffset],
-      });
+      if (
+        from.childNodes[previousFromEnd + nodeIndexOffset].nodeType ===
+        Node.ELEMENT_NODE
+      )
+        toMorph.add({
+          from: from.childNodes[previousFromEnd + nodeIndexOffset],
+          to: to.childNodes[previousToEnd + nodeIndexOffset],
+        });
     for (let nodeIndex = toStart; nodeIndex < toEnd; nodeIndex++) {
       const fromChildNode = toRemove.get(toChildNodesKeys[nodeIndex])?.shift();
       const toChildNode = to.childNodes[nodeIndex];
-      if (fromChildNode !== undefined)
+      if (fromChildNode?.nodeType === Node.ELEMENT_NODE)
         toMorph.add({ from: fromChildNode, to: toChildNode });
       toAdd.push({
         node: fromChildNode ?? toChildNode,
@@ -429,12 +433,11 @@ export function morph(from, to, event = undefined) {
   for (const nodes of toRemove.values())
     for (const node of nodes) {
       from.removeChild(node);
-      if (node.nodeType === node.ELEMENT_NODE)
+      if (node.nodeType === Node.ELEMENT_NODE)
         for (const element of children(node).reverse()) element.onremove?.();
     }
   for (const { node, nodeAfter } of toAdd) from.insertBefore(node, nodeAfter);
-  for (const { from, to } of toMorph)
-    if (from.nodeType === from.ELEMENT_NODE) morph(from, to, event);
+  for (const { from, to } of toMorph) morph(from, to, event);
 }
 
 /**
