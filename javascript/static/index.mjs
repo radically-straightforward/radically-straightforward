@@ -302,7 +302,7 @@ export function mount(element, content, event = undefined) {
  *
  * Elements may provide a `key="___"` attribute to help identify them with respect to the diffing algorithm. This is similar to [React’s `key`s](https://react.dev/learn/rendering-lists#keeping-list-items-in-order-with-key), but sibling elements may have the same `key` (at the risk of potentially getting them mixed up if they’re reordered).
  *
- * Elements may define a `state="___"` attribute, typically through the `state___()` methods below, which is not morphed on Live Connection updates, and is meant to include browser state, for example, whether a sidebar is open.
+ * Elements may define a `state="___"` attribute, typically through the `state___()` functions below, which is not morphed on Live Connection updates, and is meant to include browser state, for example, whether a sidebar is open.
  *
  * When `morph()` is called to perform a Live Connection update (that is,`event?.detail?.liveConnectionUpdate` is `true`), elements may set a `liveConnectionUpdate` attribute, which controls the behavior of `morph()` in the following ways:
  *
