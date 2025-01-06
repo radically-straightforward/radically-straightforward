@@ -215,12 +215,7 @@ export async function liveConnection(requestId, { reload = false } = {}) {
         while (true) {
           const responseText = (await responseBodyReader.read()).value;
           if (responseText === undefined) break;
-          documentMount(
-            responseText,
-            new CustomEvent("DOMContentLoaded", {
-              detail: { liveConnectionUpdate: true },
-            }),
-          );
+          documentMount(responseText);
         }
       } catch (error) {
         if (connected) return;
@@ -292,10 +287,10 @@ export function documentMount(content, event = new Event("DOMContentLoaded")) {
  */
 export function mount(element, content, event = undefined) {
   if (typeof content === "string") content = stringToElements(content);
-  delete element.liveConnectionUpdate;
+  delete element.morph;
   morph(element, content, event);
   execute(element, event);
-  element.liveConnectionUpdate = false;
+  element.morph = false;
 }
 
 /**
@@ -305,15 +300,11 @@ export function mount(element, content, event = undefined) {
  *
  * Elements may provide a `key="___"` attribute to help identify them with respect to the diffing algorithm. This is similar to [React’s `key`s](https://react.dev/learn/rendering-lists#keeping-list-items-in-order-with-key), but sibling elements may have the same `key` (at the risk of potentially getting them mixed up if they’re reordered).
  *
- * Elements may define a `state="___"` attribute, typically through the `state___()` functions below, which is not morphed on Live Connection updates, and is meant to include browser state, for example, whether a sidebar is open.
+ * Elements may define a `state="___"` attribute, typically through the `state___()` functions below, which is not morphed and is meant to include browser state, for example, whether a sidebar is open.
  *
- * When `morph()` is called to perform a Live Connection update (that is,`event?.detail?.liveConnectionUpdate` is `true`), elements may set a `liveConnectionUpdate` attribute, which controls the behavior of `morph()` in the following ways:
+ * In general, the following attributes aren’t morphed: `state`, `style`, `hidden`, `open`, and `disabled`.
  *
- * - When `from.liveConnectionUpdate` is `false`, `morph()` doesn’t do anything. This is useful for elements which contain browser state that must be preserved on Live Connection updates, for example, the container of dynamically-loaded content (see `mount()`).
- *
- * - When `from.liveConnectionUpdate` or any of `from`’s parents is `new Set(["state", "style", "hidden", "open", "disabled", "value", "checked"])` or any subset thereof, the mentioned attributes and properties are updated even in a Live Connection update (normally these attributes and properties represent browser state and are skipped in Live Connection updates). This is useful, for example, for forms with hidden fields which must be updated by the server.
- *
- * - When `fromChildNode.liveConnectionUpdate` is `false`, `morph()` doesn’t remove that `fromChildNode` even if it’s missing among `to`’s child nodes. This is useful for elements that should remain on the page but wouldn’t be sent by the server again in a Live Connection update, for example, an indicator of unread messages.
+ * Elements may set a `morph` attribute, which when `false` prevents the element from being morphed. This is useful, for example, for elements that have been `mount()`ed and shouldn’t be removed.
  *
  * > **Note:** `to` is expected to already belong to the `document`. You may need to call [`importNode()`](https://developer.mozilla.org/en-US/docs/Web/API/Document/importNode) or [`adoptNode()`](https://developer.mozilla.org/en-US/docs/Web/API/Document/adoptNode) on a node before passing it to `morph()`. `documentStringToElement()` does that for you.
  *
@@ -331,40 +322,23 @@ export function mount(element, content, event = undefined) {
  *
  * - `morph()` supports `key="___"` instead of `morphdom`’s `id="___"`s. `key`s don’t have to be unique across the document and don’t even have to be unique across the element siblings—they’re just a hint at the identity of the element that’s used in the diffing process.
  *
- * - `morph()` is aware of Live Connection updates.
+ * `morph()` is different from [React](https://react.dev/) in that it works with the DOM, not a Virtual DOM.
  */
 export function morph(from, to, event = undefined) {
-  if (
-    event?.detail?.liveConnectionUpdate &&
-    from.liveConnectionUpdate === false
-  )
-    return;
+  if (from.morph === false) return;
+  if (from.matches("input, textarea") && !isModified(from))
+    for (const property of ["value", "checked"])
+      if (from[property] !== to[property]) from[property] = to[property];
   for (const attribute of new Set([
     ...from.getAttributeNames(),
     ...to.getAttributeNames(),
   ])) {
-    if (from.matches("input, textarea"))
-      for (const property of ["value", "checked"]) {
-        if (
-          event?.detail?.liveConnectionUpdate &&
-          isModified(from) &&
-          !parents(from).some((element) =>
-            element.liveConnectionUpdate?.has?.(property),
-          )
-        )
-          continue;
-        if (from[property] !== to[property]) from[property] = to[property];
-      }
     if (
-      event?.detail?.liveConnectionUpdate &&
-      (attribute === "state" ||
-        attribute === "style" ||
-        attribute === "hidden" ||
-        attribute === "open" ||
-        attribute === "disabled") &&
-      !parents(from).some((element) =>
-        element.liveConnectionUpdate?.has?.(attribute),
-      )
+      attribute === "state" ||
+      attribute === "style" ||
+      attribute === "hidden" ||
+      attribute === "open" ||
+      attribute === "disabled"
     )
       continue;
     if (to.getAttribute(attribute) === null) from.removeAttribute(attribute);
@@ -395,12 +369,8 @@ export function morph(from, to, event = undefined) {
     for (let nodeIndex = fromStart; nodeIndex < fromEnd; nodeIndex++) {
       const node = from.childNodes[nodeIndex];
       const key = fromChildNodesKeys[nodeIndex];
-      if (
-        event?.detail?.liveConnectionUpdate &&
-        node.liveConnectionUpdate === false
-      )
-        continue;
-      toRemove.get(key)?.push(node) ?? toRemove.set(key, [node]);
+      if (node.morph !== false)
+        toRemove.get(key)?.push(node) ?? toRemove.set(key, [node]);
     }
   }
   const toAdd = [];
