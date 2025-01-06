@@ -84,8 +84,8 @@ window.addEventListener("click", (event) => {
   }
 });
 
-window.addEventListener("popstate", (event) => {
-  liveNavigate(new Request(window.location), event);
+window.addEventListener("popstate", () => {
+  liveNavigate(new Request(window.location), { mayPushState: false });
 });
 
 window.addEventListener("beforeunload", (event) => {
@@ -93,7 +93,7 @@ window.addEventListener("beforeunload", (event) => {
     event.preventDefault();
 });
 
-async function liveNavigate(request, event = undefined) {
+async function liveNavigate(request, { mayPushState = true } = {}) {
   const progressBar = document
     .querySelector("body")
     .insertAdjacentElement(
@@ -120,17 +120,20 @@ async function liveNavigate(request, event = undefined) {
     responseURL.hash = new URL(request.url).hash;
     const responseText = await response.text();
     if (
-      window.location.pathname !== responseURL.pathname ||
-      window.location.search !== responseURL.search
-    )
+      mayPushState &&
+      (window.location.pathname !== responseURL.pathname ||
+        window.location.search !== responseURL.search)
+    ) {
       window.history.pushState(null, "", responseURL.href);
+      mayPushState = false;
+    }
     documentMount(responseText);
     if (responseURL.hash.trim() !== "")
       document.getElementById(responseURL.hash.slice(1))?.scrollIntoView();
     document.querySelector("[autofocus]")?.focus();
   } catch (error) {
     if (error.name === "AbortError") return;
-    if (!(event instanceof PopStateEvent) && request.method === "GET")
+    if (mayPushState && request.method === "GET")
       window.history.pushState(null, "", request.url);
     document.querySelector('[key~="global-error"]')?.remove();
     document
