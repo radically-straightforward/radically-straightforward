@@ -535,33 +535,34 @@ export function reset(element, { includeSubforms = false } = {}) {
   const elements = children(element, { includeSubforms });
   for (const element of elements) {
     if (!element.matches("input, textarea")) continue;
+    let dispatchEvent = false;
     if (element.type === "checkbox" || element.type === "radio") {
       if (element.checked !== element.defaultChecked) {
         element.checked = element.defaultChecked;
-        dispatchEvent(element);
+        dispatchEvent = true;
       }
     } else {
       if (element.value !== element.defaultValue) {
         element.value = element.defaultValue;
-        dispatchEvent(element);
+        dispatchEvent = true;
       }
     }
-  }
-  function dispatchEvent(element) {
-    element.dispatchEvent(
-      new Event("input", {
-        bubbles: true,
-        cancelable: false,
-        composed: true,
-      }),
-    );
-    element.dispatchEvent(
-      new Event("change", {
-        bubbles: true,
-        cancelable: false,
-        composed: false,
-      }),
-    );
+    if (dispatchEvent) {
+      element.dispatchEvent(
+        new Event("input", {
+          bubbles: true,
+          cancelable: false,
+          composed: true,
+        }),
+      );
+      element.dispatchEvent(
+        new Event("change", {
+          bubbles: true,
+          cancelable: false,
+          composed: false,
+        }),
+      );
+    }
   }
 }
 
