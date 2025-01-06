@@ -435,11 +435,6 @@ export function execute(element, event = undefined) {
     ...element.querySelectorAll("[javascript]"),
   ];
   for (const element of elements) {
-    if (
-      event?.detail?.liveConnectionUpdate &&
-      parents(element).some((element) => element.liveConnectionUpdate === false)
-    )
-      continue;
     const javascript = JSON.parse(element.getAttribute("javascript"));
     execute.functions
       .get(javascript.function)
@@ -630,7 +625,7 @@ export function validate(element, { includeSubforms = false } = {}) {
         ),
         trigger: "none",
       });
-      target.liveConnectionUpdate = false;
+      target.morph = false;
       target.showPopover();
       window.setTimeout(() => {
         const abortController = new AbortController();
