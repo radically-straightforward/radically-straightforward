@@ -3,8 +3,8 @@ import * as utilities from "@radically-straightforward/utilities";
 import fastMyersDiff from "fast-myers-diff";
 import * as floatingUI from "@floating-ui/dom";
 
-window.addEventListener("DOMContentLoaded", (event) => {
-  execute(document.querySelector("html"), event);
+window.addEventListener("DOMContentLoaded", () => {
+  execute(document.querySelector("html"));
 });
 
 window.addEventListener("click", (event) => {
@@ -245,13 +245,13 @@ liveConnection.backgroundJob = undefined;
 liveConnection.failedToConnectGlobalError = undefined;
 
 /**
- * > **Note:** This is a low-level function used by Live Navigation and Live Connection.
+ * > **Note:** This is a low-level function used by Live Navigation and Live Connection updates.
  *
- * Similar to `mount()`, but suited for morphing the entire `document`. For example, it dispatches the `event` to the `window`.
+ * Similar to `mount()`, but suited for morphing the entire `document`, for example, `documentMount()` dispatches the `DOMContentLoaded` event to the `window`.
  *
  * If the `document` and the `content` have `<meta name="version" content="___" />` with different `content`s, then `documentMount()` displays an error message in an element with `key="global-error"` which you may style.
  */
-export function documentMount(content, event = new Event("DOMContentLoaded")) {
+export function documentMount(content) {
   if (typeof content === "string") content = documentStringToElement(content);
   const documentVersion = document
     .querySelector('meta[name="version"]')
@@ -278,18 +278,18 @@ export function documentMount(content, event = new Event("DOMContentLoaded")) {
       );
     return;
   }
-  morph(document.querySelector("html"), content, event);
-  window.dispatchEvent(event);
+  morph(document.querySelector("html"), content);
+  window.dispatchEvent(new Event("DOMContentLoaded"));
 }
 
 /**
  * `morph()` the `element` container to include `content`. `execute()` the browser JavaScript in the `element`. Protect the `element` from changing in Live Connection updates.
  */
-export function mount(element, content, event = undefined) {
+export function mount(element, content) {
   if (typeof content === "string") content = stringToElements(content);
   delete element.morph;
-  morph(element, content, event);
-  execute(element, event);
+  morph(element, content);
+  execute(element);
   element.morph = false;
 }
 
@@ -324,7 +324,7 @@ export function mount(element, content, event = undefined) {
  *
  * `morph()` is different from [React](https://react.dev/) in that it works with the DOM, not a Virtual DOM.
  */
-export function morph(from, to, event = undefined) {
+export function morph(from, to) {
   if (from.morph === false) return;
   if (from.matches("input, textarea") && !isModified(from))
     for (const property of ["value", "checked"])
@@ -410,7 +410,7 @@ export function morph(from, to, event = undefined) {
         for (const element of children(node).reverse()) element.onremove?.();
     }
   for (const { node, nodeAfter } of toAdd) from.insertBefore(node, nodeAfter);
-  for (const { from, to } of toMorph) morph(from, to, event);
+  for (const { from, to } of toMorph) morph(from, to);
 }
 
 /**
@@ -429,7 +429,7 @@ export function morph(from, to, event = undefined) {
  * );
  * ```
  */
-export function execute(element, event = undefined) {
+export function execute(element) {
   const elements = [
     ...(element.matches("[javascript]") ? [element] : []),
     ...element.querySelectorAll("[javascript]"),
@@ -438,7 +438,7 @@ export function execute(element, event = undefined) {
     const javascript = JSON.parse(element.getAttribute("javascript"));
     execute.functions
       .get(javascript.function)
-      .call(element, event, ...javascript.arguments);
+      .call(element, ...javascript.arguments);
   }
   return element;
 }

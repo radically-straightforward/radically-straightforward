@@ -73,12 +73,9 @@ for (const source of await globby("./build/**/*.mjs")) {
                 );
               } else
                 fileInlineJavaScripts.push(
-                  `async function __RADICALLY__STRAIGHTFORWARD__PLACEHOLDER__(${[
-                    "event",
-                    ...path.node.quasi.expressions.map(
-                      (value, index) => `$$${index}`,
-                    ),
-                  ].join(", ")}) { ${path.node.quasi.quasis
+                  `async function __RADICALLY__STRAIGHTFORWARD__PLACEHOLDER__(${path.node.quasi.expressions
+                    .map((value, index) => `$$${index}`)
+                    .join(", ")}) { ${path.node.quasi.quasis
                     .map(
                       (quasi, index) =>
                         (index === 0 ? `` : `$$${index - 1}`) +
