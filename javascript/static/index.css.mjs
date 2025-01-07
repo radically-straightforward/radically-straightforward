@@ -92,7 +92,7 @@ await fs.writeFile(
             )}
           }
 
-          [key="global-error"] {
+          [key~="global-error"] {
             color: light-dark(var(--color--red--800), var(--color--red--200));
             background-color: light-dark(
               var(--color--red--50),
@@ -114,7 +114,7 @@ await fs.writeFile(
             z-index: 2000;
           }
 
-          [key="progress-bar"] {
+          [key~="progress-bar"] {
             background-color: light-dark(
               var(--color--blue--500),
               var(--color--blue--500)
