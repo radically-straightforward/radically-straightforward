@@ -1,11 +1,11 @@
 # Changelog
 
-## 4.0.2 · 2025-01-07
+## 4.0.8 · 2025-01-07
 
 - **Breaking change:** Removed `stateContains()`. Use `element.matches('[state~="___"]')` instead.
 - **Breaking change:** `morph()` now doesn’t include special cases for Live Connection updates. Instead, there’s a new `morph` attribute which, when set to `false`, prevents morphing.
 - **Breaking change:** Removed the `event` parameter from many functions, for example, `execute()`, `morph()` and so forth.
-- **Breaking change:** Removed the `event` parameter from JavaScript extracted from `javascript="___"` attributes. Compatible with `@radically-straightforward/build@2.0.2`.
+- **Breaking change:** Removed the `event` parameter from JavaScript extracted from `javascript="___"` attributes. Compatible with `@radically-straightforward/build@2.0.7`.
 
 ## 4.0.1 · 2024-12-09
 
