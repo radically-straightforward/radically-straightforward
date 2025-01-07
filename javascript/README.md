@@ -138,19 +138,19 @@ If `reload` is `true` then the page reloads when the connection is closed and re
 ### `documentMount()`
 
 ```typescript
-export function documentMount(content, event = new Event("DOMContentLoaded"));
+export function documentMount(content);
 ```
 
-> **Note:** This is a low-level function used by Live Navigation and Live Connection.
+> **Note:** This is a low-level function used by Live Navigation and Live Connection updates.
 
-Similar to `mount()`, but suited for morphing the entire `document`. For example, it dispatches the `event` to the `window`.
+Similar to `mount()`, but suited for morphing the entire `document`, for example, `documentMount()` dispatches the `DOMContentLoaded` event to the `window`.
 
 If the `document` and the `content` have `<meta name="version" content="___" />` with different `content`s, then `documentMount()` displays an error message in an element with `key="global-error"` which you may style.
 
 ### `mount()`
 
 ```typescript
-export function mount(element, content, event = undefined);
+export function mount(element, content);
 ```
 
 `morph()` the `element` container to include `content`. `execute()` the browser JavaScript in the `element`. Protect the `element` from changing in Live Connection updates.
@@ -158,7 +158,7 @@ export function mount(element, content, event = undefined);
 ### `morph()`
 
 ```typescript
-export function morph(from, to, event = undefined);
+export function morph(from, to);
 ```
 
 > **Note:** This is a low-level function—in most cases you want to call `mount()` instead.
@@ -167,15 +167,11 @@ Morph the contents of the `from` element into the contents of the `to` element w
 
 Elements may provide a `key="___"` attribute to help identify them with respect to the diffing algorithm. This is similar to [React’s `key`s](https://react.dev/learn/rendering-lists#keeping-list-items-in-order-with-key), but sibling elements may have the same `key` (at the risk of potentially getting them mixed up if they’re reordered).
 
-Elements may define a `state="___"` attribute, typically through the `state___()` methods below, which is not morphed on Live Connection updates, and is meant to include browser state, for example, whether a sidebar is open.
+Elements may define a `state="___"` attribute, typically through the `state___()` functions below, which is not morphed and is meant to include browser state, for example, whether a sidebar is open.
 
-When `morph()` is called to perform a Live Connection update (that is,`event?.detail?.liveConnectionUpdate` is `true`), elements may set a `liveConnectionUpdate` attribute, which controls the behavior of `morph()` in the following ways:
+In general, the following attributes aren’t morphed: `state`, `style`, `hidden`, `open`, and `disabled`.
 
-- When `from.liveConnectionUpdate` is `false`, `morph()` doesn’t do anything. This is useful for elements which contain browser state that must be preserved on Live Connection updates, for example, the container of dynamically-loaded content (see `mount()`).
-
-- When `from.liveConnectionUpdate` or any of `from`’s parents is `new Set(["state", "style", "hidden", "open", "disabled", "value", "checked"])` or any subset thereof, the mentioned attributes and properties are updated even in a Live Connection update (normally these attributes and properties represent browser state and are skipped in Live Connection updates). This is useful, for example, for forms with hidden fields which must be updated by the server.
-
-- When `fromChildNode.liveConnectionUpdate` is `false`, `morph()` doesn’t remove that `fromChildNode` even if it’s missing among `to`’s child nodes. This is useful for elements that should remain on the page but wouldn’t be sent by the server again in a Live Connection update, for example, an indicator of unread messages.
+Elements may set a `morph` attribute, which when `false` prevents the element from being morphed. This is useful, for example, for elements that have been `mount()`ed and shouldn’t be removed.
 
 > **Note:** `to` is expected to already belong to the `document`. You may need to call [`importNode()`](https://developer.mozilla.org/en-US/docs/Web/API/Document/importNode) or [`adoptNode()`](https://developer.mozilla.org/en-US/docs/Web/API/Document/adoptNode) on a node before passing it to `morph()`. `documentStringToElement()` does that for you.
 
@@ -193,12 +189,12 @@ When `morph()` is called to perform a Live Connection update (that is,`event?.de
 
 - `morph()` supports `key="___"` instead of `morphdom`’s `id="___"`s. `key`s don’t have to be unique across the document and don’t even have to be unique across the element siblings—they’re just a hint at the identity of the element that’s used in the diffing process.
 
-- `morph()` is aware of Live Connection updates.
+`morph()` is different from [React](https://react.dev/) in that it works with the DOM, not a Virtual DOM.
 
 ### `execute()`
 
 ```typescript
-export function execute(element, event = undefined);
+export function execute(element);
 ```
 
 > **Note:** This is a low-level function—in most cases you want to call `mount()` instead.
