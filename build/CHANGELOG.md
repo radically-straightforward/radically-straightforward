@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.0.2 · 2025-01-07
+
+- **Breaking change:** Removed the `event` parameter from JavaScript extracted from `javascript="___"` attributes. Compatible with `@radically-straightforward/javascript@4.0.2`.
+
 ## 2.0.1 · 2024-06-12
 
 - Fixed an issue in which nested CSS expressions weren’t extracted correctly.
