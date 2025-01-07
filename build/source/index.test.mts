@@ -111,11 +111,11 @@ test(async () => {
 
   assert.equal(
     await fs.readFile("./build/index.mjs", "utf-8"),
-    'import html from "@radically-straightforward/html";\nconst template = html`<div css="${"idnnykdflodmu"}" javascript="${JSON.stringify({\n  function: "funyrgvdgmnyff",\n  arguments: ["Hello", "World"]\n})}"></div>`;\n//# sourceMappingURL=index.mjs.map',
+    'import html from "@radically-straightforward/html";\nconst template = html`<div css="${"idnnykdflodmu"}" javascript="${JSON.stringify({\n  function: "cmbvnmdmzvywyz",\n  arguments: ["Hello", "World"]\n})}"></div>`;\n//# sourceMappingURL=index.mjs.map',
   );
   assert.equal(
     await fs.readFile("./build/users.mjs", "utf-8"),
-    'import html from "@radically-straightforward/html";\n() => {};\nconst users = html`<div css="${"idnnykdflodmu"}" javascript="${JSON.stringify({\n  function: "funyrgvdgmnyff",\n  arguments: ["Bye", "World"]\n})}"></div><div css="${"xbjbuzxiqpcpj"}" javascript="${JSON.stringify({\n  function: "ywdosramhnhmk",\n  arguments: []\n})}"></div>`;\n//# sourceMappingURL=users.mjs.map',
+    'import html from "@radically-straightforward/html";\n() => {};\nconst users = html`<div css="${"idnnykdflodmu"}" javascript="${JSON.stringify({\n  function: "cmbvnmdmzvywyz",\n  arguments: ["Bye", "World"]\n})}"></div><div css="${"xbjbuzxiqpcpj"}" javascript="${JSON.stringify({\n  function: "dmkitzfcccjwfv",\n  arguments: []\n})}"></div>`;\n//# sourceMappingURL=users.mjs.map',
   );
   assert.equal(
     await fs.readFile(
@@ -129,7 +129,7 @@ test(async () => {
       path.join("./build/static/", paths["index.mjs"]),
       "utf-8",
     ),
-    '(()=>{var o=hi="Hi";console.log(o);console.log("Global users");javascript?.execute?.functions?.set?.("funyrgvdgmnyff",async function(e,n,s){console.log(n,s)});javascript?.execute?.functions?.set?.("ywdosramhnhmk",async function(e){console.log("Users")});})();\n//# sourceMappingURL=index--OA5S3TJX.js.map\n',
+    '(()=>{var o=hi="Hi";console.log(o);console.log("Global users");javascript?.execute?.functions?.set?.("cmbvnmdmzvywyz",async function(c,e){console.log(c,e)});javascript?.execute?.functions?.set?.("dmkitzfcccjwfv",async function(){console.log("Users")});})();\n//# sourceMappingURL=index--HA65PULG.js.map\n',
   );
   assert.equal(
     await fs.readFile("./build/static/favicon.ico", "utf-8"),
