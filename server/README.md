@@ -383,7 +383,7 @@ An extension of [Node.js’s `http.IncomingMessage`](https://nodejs.org/api/http
 
 - **`pathname`:** The variable parts of the [`pathname` part of the `URL`](https://nodejs.org/api/url.html#url-strings-and-url-objects), as defined in the named capturing groups of the regular expression from the `route`’s `pathname`. Note that this depends on user input, so it’s important to validate explicitly (the generic `Pathname` in TypeScript is `Partial<>` to encourage you to perform these validations).
 
-- **`search`:** The [`search` part of the `URL`](https://nodejs.org/api/url.html#url-strings-and-url-objects) parsed into an object. Note that this depends on user input, so it’s important to validate explicitly (the generic `Search` in TypeScript is `Partial<>` to encourage you to perform these validations).
+- **`search`:** The [`search` part of the `URL`](https://nodejs.org/api/url.html#url-strings-and-url-objects) parsed into an object. If a field name ends in `[]`, for example, `colors[]`, then multiple occurrences of the same field are captured into an array—this is useful for `<input type="checkbox" />`s with the same `name`. Note that this depends on user input, so it’s important to validate explicitly (the generic `Search` in TypeScript is `Partial<>` to encourage you to perform these validations).
 
 - **`cookies`:** The cookies sent via the `Cookie` header parsed into an object. Note that this depends on user input, so it’s important to validate explicitly (the generic `Cookies` in TypeScript is `Partial<>` to encourage you to perform these validations).
 

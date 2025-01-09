@@ -74,7 +74,7 @@ test(async () => {
 
   {
     const response = await fetch(
-      "http://localhost:18000/request-parsing/10?searchParameter=20",
+      "http://localhost:18000/request-parsing/10?searchParameter=20&searchParameterArray[]=10&searchParameterArray[]=15",
       {
         method: "PATCH",
         headers: {
@@ -82,7 +82,11 @@ test(async () => {
           "Custom-Header": "Hello",
           Cookie: "__Host-example=abc; __Host-anotherExample=def",
         },
-        body: new URLSearchParams({ bodyField: "33" }),
+        body: new URLSearchParams([
+          ["bodyField", "33"],
+          ["bodyFieldArray[]", "34"],
+          ["bodyFieldArray[]", "35"],
+        ]),
       },
     );
     assert.equal(
@@ -90,12 +94,12 @@ test(async () => {
       "application/json; charset=utf-8",
     );
     assert.deepEqual(await response.json(), {
-      href: "http://localhost:18000/request-parsing/10?searchParameter=20",
+      href: "http://localhost:18000/request-parsing/10?searchParameter=20&searchParameterArray[]=10&searchParameterArray[]=15",
       pathname: { pathnameParameter: "10" },
-      search: { searchParameter: "20" },
+      search: { searchParameter: "20", searchParameterArray: ["10", "15"] },
       headers: { "custom-header": "Hello" },
       cookies: { example: "abc", anotherExample: "def" },
-      body: { bodyField: "33" },
+      body: { bodyField: "33", bodyFieldArray: ["34", "35"] },
     });
   }
 
