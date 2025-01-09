@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.9 · 2025-01-09
+
+- Added support for `array[]` parameters in `request.search`, similar to `request.body`.
+
 ## 1.0.8 · 2024-06-21
 
 - Added support for flash via `response.setFlash()` and `request.getFlash()`.
