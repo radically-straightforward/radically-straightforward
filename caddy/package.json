@@ -28,7 +28,7 @@
     "postinstall": "node ./scripts.mjs postinstall",
     "preuninstall": "node ./scripts.mjs preuninstall",
     "prepare": "tsc && documentation",
-    "test": "npm run prepare && node --test && prettier --check \"./README.md\" \"./CHANGELOG.md\" \"./package.json\" \"./scripts.mjs\" \"./scripts.test.mjs\" \"./tsconfig.json\" \"./source/**/*.mts\""
+    "test": "npm run prepare && node --test \"./scripts.test.mjs\" \"./build/**/*.test.mjs\" && prettier --check \"./README.md\" \"./CHANGELOG.md\" \"./package.json\" \"./scripts.mjs\" \"./scripts.test.mjs\" \"./tsconfig.json\" \"./source/**/*.mts\""
   },
   "dependencies": {
     "@radically-straightforward/node": "^3.1.7"

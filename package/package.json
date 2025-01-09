@@ -24,7 +24,7 @@
   "bin": "./build/index.mjs",
   "scripts": {
     "prepare": "tsc",
-    "test": "npm run prepare && node --test && prettier --check \"./README.md\" \"./CHANGELOG.md\" \"./package.json\" \"./tsconfig.json\" \"./source/**/*.mts\""
+    "test": "npm run prepare && node --test \"./build/**/*.test.mjs\" && prettier --check \"./README.md\" \"./CHANGELOG.md\" \"./package.json\" \"./tsconfig.json\" \"./source/**/*.mts\""
   },
   "dependencies": {
     "@radically-straightforward/utilities": "^2.0.7",
