@@ -67,6 +67,7 @@ window.addEventListener("click", (event) => {
         : new URLSearchParams(serialize(form));
     if (typeof button.getAttribute("name") === "string")
       body.append(button.getAttribute("name"), button.value);
+    form.onsubmit?.();
     liveNavigate(
       method === "GET"
         ? (() => {
