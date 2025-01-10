@@ -1,5 +1,9 @@
 # Changelog
 
+## 4.0.9 · 2025-01-10
+
+- Added `onsubmit()` event to form submission via Live Navigation.
+
 ## 4.0.8 · 2025-01-07
 
 - **Breaking change:** Removed `stateContains()`. Use `element.matches('[state~="___"]')` instead.
