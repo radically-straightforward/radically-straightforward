@@ -942,6 +942,16 @@ export function popover({
     abortController?.abort();
     stateRemove(target, "open");
   };
+  target.ontransitionend = (event) => {
+    if (
+      event.target === target &&
+      event.propertyName === "opacity" &&
+      !target.matches('[state~="open"]')
+    ) {
+      target.style.top = "";
+      target.style.left = "";
+    }
+  };
   if (trigger === "hover") {
     element.onmouseenter = element.onfocusin = () => {
       if (!isTouch) target.showPopover();
