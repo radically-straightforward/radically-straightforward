@@ -937,10 +937,6 @@ export function popover({
     target.style.top = `${targetCoordinate.y}px`;
     target.style.left = `${targetCoordinate.x}px`;
   };
-  target.positionPopover();
-  window.setTimeout(() => {
-    target.positionPopover();
-  });
   target.showPopover = () => {
     target.positionPopover();
     stateAdd(target, "open");
