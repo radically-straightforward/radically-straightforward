@@ -927,7 +927,7 @@ export function popover({
             throw new Error();
           })(),
 }) {
-  let abortController;
+  let triggerClickAbortController;
   target.popoverTriggerElement = element;
   target.showPopover = async () => {
     const targetCoordinate = await floatingUI.computePosition(element, target, {
@@ -939,7 +939,7 @@ export function popover({
     stateAdd(target, "open");
   };
   target.hidePopover = () => {
-    abortController?.abort();
+    triggerClickAbortController?.abort();
     stateRemove(target, "open");
     const transitionEndAbortController = new AbortController();
     target.addEventListener(
@@ -971,7 +971,7 @@ export function popover({
       if (target.matches('[state~="open"]')) return;
       target.showPopover();
       window.setTimeout(() => {
-        abortController = new AbortController();
+        triggerClickAbortController = new AbortController();
         for (const eventType of ["pointerup", "click"])
           window.addEventListener(
             eventType,
@@ -985,7 +985,7 @@ export function popover({
                 target.hidePopover();
               }, 10);
             },
-            { signal: abortController.signal },
+            { signal: triggerClickAbortController.signal },
           );
       }, 10);
     };
