@@ -941,16 +941,23 @@ export function popover({
   target.hidePopover = () => {
     abortController?.abort();
     stateRemove(target, "open");
-  };
-  target.ontransitionend = (event) => {
-    if (
-      event.target === target &&
-      event.propertyName === "opacity" &&
-      !target.matches('[state~="open"]')
-    ) {
-      target.style.top = "";
-      target.style.left = "";
-    }
+    const transitionEndAbortController = new AbortController();
+    target.addEventListener(
+      "transitionend",
+      (event) => {
+        if (
+          event.target !== target ||
+          event.propertyName !== "visibility" ||
+          window.getComputedStyle(target).visibility !== "hidden" ||
+          target.matches('[state~="open"]')
+        )
+          return;
+        transitionEndAbortController.abort();
+        target.style.top = "";
+        target.style.left = "";
+      },
+      { signal: transitionEndAbortController.signal },
+    );
   };
   if (trigger === "hover") {
     element.onmouseenter = element.onfocusin = () => {
