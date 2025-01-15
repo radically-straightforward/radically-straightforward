@@ -929,12 +929,12 @@ export function popover({
 }) {
   target.popoverTriggerElement = element;
   target.showPopover = async () => {
-    const targetCoordinate = await floatingUI.computePosition(element, target, {
+    const position = await floatingUI.computePosition(element, target, {
       placement,
       middleware: [floatingUI.flip(), floatingUI.shift({ padding: 8 })],
     });
-    target.style.top = `${targetCoordinate.y}px`;
-    target.style.left = `${targetCoordinate.x}px`;
+    target.style.top = `${position.y}px`;
+    target.style.left = `${position.x}px`;
     stateAdd(target, "open");
   };
   target.hidePopover = () => {
