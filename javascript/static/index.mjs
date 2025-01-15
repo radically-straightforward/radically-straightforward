@@ -939,7 +939,7 @@ export function popover({
   };
   target.hidePopover = () => {
     stateRemove(target, "open");
-    const transitionEndAbortController = new AbortController();
+    const abortController = new AbortController();
     target.addEventListener(
       "transitionend",
       (event) => {
@@ -950,11 +950,11 @@ export function popover({
           target.matches('[state~="open"]')
         )
           return;
-        transitionEndAbortController.abort();
+        abortController.abort();
         target.style.top = "";
         target.style.left = "";
       },
-      { signal: transitionEndAbortController.signal },
+      { signal: abortController.signal },
     );
   };
   if (trigger === "hover") {
