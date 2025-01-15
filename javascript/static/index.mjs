@@ -870,19 +870,19 @@ export function stateToggle(element, token) {
 /**
  * Create a popover (tooltip, dropdown menu, and so forth).
  *
- * The `target` is decorated with the `showPopover()` and `hidePopover()` functions, and the `popoverTriggerElement` attribute which refers to `element`. The `element` is decorated with event handler attributes to trigger the popover.
+ * > **Note:** The `target.popoverTriggerElement` property is set to refer to `element`.
  *
  * **Parameters**
  *
- * - **`element`:** The element that is used a reference when positioning the popover and that triggers the popover open.
+ * - **`element`:** The element that is used as reference when positioning the popover and that triggers the popover open.
  *
  * - **`target`:** The element that contains the popover contents. It must have the `type="popover"` type, and it may have one of the `.popover--<color>` classes (see `@radically-straightforward/javascript/static/index.css`).
  *
  * - **`trigger`:** One of the following:
  *
- *   - **`"hover"`:** Show the popover on the `mouseenter` or `focusin` events and hide the popover on `onmouseleave` or `onfocusout` events. The `target` must not contain elements that may have focus (for example, `<button>`, `<input>`, and so forth), otherwise keyboard navigation is broken. On `isTouch` devices, `"hover"` popovers don’t show up because they often conflict with `"click"` popovers.
+ *   - **`"hover"`:** Show the popover on the `element.onmouseenter` or `element.onfocusin` events and hide the popover on `element.onmouseleave` or `element.onfocusout` events. The `target` must not contain elements that may have focus (for example, `<button>`, `<input>`, and so forth), otherwise keyboard navigation is broken. On `isTouch` devices, `"hover"` popovers don’t show up because they often conflict with `"click"` popovers.
  *
- *   - **`"click"`:** Show the popover on `click`. When to hide the popover depends on the `remainOpenWhileFocused`. If `remainOpenWhileFocused` is `false` (the default), then the next click anywhere will close the popover—this is useful for dropdown menus with `<button>`s. If `remainOpenWhileFocused` is `true`, then only clicks outside of the popover will close it—this is useful for dropdown menus with `<input>`s.
+ *   - **`"click"`:** Show the popover on `element.click`. When to hide the popover depends on the `remainOpenWhileFocused`. If `remainOpenWhileFocused` is `false` (the default), then the next click anywhere will close the popover—this is useful for dropdown menus with `<button>`s. If `remainOpenWhileFocused` is `true`, then only clicks outside of the popover will close it—this is useful for dropdown menus with `<input>`s. If `remainOpenWhileFocused` is `true` and you need to close the popover programmatically, you may send a `click` event to an element out of the popover, for example, `document.querySelector("body").click()`.
  *
  *   - **`"none"`:** Showing and hiding the popover is the responsibility of the caller, using the `target.showPopover()` and `target.hidePopover()` functions.
  *
