@@ -964,12 +964,12 @@ export function popover({
     element.onmouseleave = element.onfocusout = () => {
       target.hidePopover();
     };
-  } else if (trigger === "click") {
+  } else if (trigger === "click")
     element.onclick = () => {
       if (target.matches('[state~="open"]')) return;
       target.showPopover();
       window.setTimeout(() => {
-        const triggerClickAbortController = new AbortController();
+        const abortController = new AbortController();
         for (const eventType of ["pointerup", "click"])
           window.addEventListener(
             eventType,
@@ -980,15 +980,14 @@ export function popover({
               )
                 return;
               window.setTimeout(() => {
-                triggerClickAbortController?.abort();
+                abortController?.abort();
                 target.hidePopover();
               }, 10);
             },
-            { signal: triggerClickAbortController.signal },
+            { signal: abortController.signal },
           );
       }, 10);
     };
-  }
   return target;
 }
 
