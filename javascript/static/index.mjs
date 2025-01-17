@@ -965,27 +965,24 @@ export function popover({
       target.hidePopover();
     };
   } else if (trigger === "click")
-    element.onclick = () => {
+    element.onclick = (elementEvent) => {
       if (target.matches('[state~="open"]')) return;
       target.showPopover();
-      window.setTimeout(() => {
-        const abortController = new AbortController();
-        document.addEventListener(
-          "click",
-          (event) => {
-            if (
-              event.button !== 0 ||
-              (remainOpenWhileFocused && target.contains(event.target))
-            )
-              return;
-            window.setTimeout(() => {
-              abortController?.abort();
-              target.hidePopover();
-            }, 10);
-          },
-          { signal: abortController.signal },
-        );
-      }, 10);
+      const abortController = new AbortController();
+      document.addEventListener(
+        "click",
+        (event) => {
+          if (
+            elementEvent === event ||
+            event.button !== 0 ||
+            (remainOpenWhileFocused && target.contains(event.target))
+          )
+            return;
+          abortController?.abort();
+          target.hidePopover();
+        },
+        { signal: abortController.signal },
+      );
     };
   return target;
 }
