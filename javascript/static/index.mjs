@@ -8,14 +8,7 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 document.addEventListener("click", (event) => {
-  if (
-    event.button !== 0 ||
-    event.shiftKey ||
-    event.ctrlKey ||
-    event.altKey ||
-    event.metaKey
-  )
-    return;
+  if (event.shiftKey || event.ctrlKey || event.altKey || event.metaKey) return;
   if (event.target.closest(`a:not([target="_blank"])`) !== null) {
     const element = event.target.closest(`a:not([target="_blank"])`);
     if (
@@ -974,7 +967,6 @@ export function popover({
         (event) => {
           if (
             elementEvent === event ||
-            event.button !== 0 ||
             (remainOpenWhileFocused && target.contains(event.target))
           )
             return;
