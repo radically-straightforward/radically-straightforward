@@ -621,21 +621,34 @@ export function validate(element, { includeSubforms = false } = {}) {
       });
       target.morph = false;
       target.showPopover();
-      window.setTimeout(() => {
-        const abortController = new AbortController();
-        for (const eventType of ["pointerdown", "keydown"])
-          document.addEventListener(
-            eventType,
-            () => {
-              abortController.abort();
-              target.hidePopover();
-              window.setTimeout(() => {
-                target.remove();
-              }, 500);
-            },
-            { signal: abortController.signal },
-          );
-      }, 10);
+      const abortController = new AbortController();
+      for (const eventType of ["pointerdown", "keydown"])
+        document.addEventListener(
+          eventType,
+          () => {
+            abortController.abort();
+            target.hidePopover();
+            {
+              const abortController = new AbortController();
+              target.addEventListener(
+                "transitionend",
+                (event) => {
+                  if (
+                    event.target !== target ||
+                    event.propertyName !== "visibility" ||
+                    window.getComputedStyle(target).visibility !== "hidden" ||
+                    target.matches('[state~="open"]')
+                  )
+                    return;
+                  abortController.abort();
+                  target.remove();
+                },
+                { signal: abortController.signal },
+              );
+            }
+          },
+          { signal: abortController.signal },
+        );
       return false;
     }
   }
