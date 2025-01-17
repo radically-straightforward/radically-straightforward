@@ -3,11 +3,11 @@ import * as utilities from "@radically-straightforward/utilities";
 import fastMyersDiff from "fast-myers-diff";
 import * as floatingUI from "@floating-ui/dom";
 
-window.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", () => {
   execute(document.querySelector("html"));
 });
 
-window.addEventListener("click", (event) => {
+document.addEventListener("click", (event) => {
   if (
     event.button !== 0 ||
     event.shiftKey ||
@@ -248,7 +248,7 @@ liveConnection.failedToConnectGlobalError = undefined;
 /**
  * > **Note:** This is a low-level function used by Live Navigation and Live Connection updates.
  *
- * Similar to `mount()`, but suited for morphing the entire `document`, for example, `documentMount()` dispatches the `DOMContentLoaded` event to the `window`.
+ * Similar to `mount()`, but suited for morphing the entire `document`, for example, `documentMount()` dispatches the `DOMContentLoaded` event.
  *
  * If the `document` and the `content` have `<meta name="version" content="___" />` with different `content`s, then `documentMount()` displays an error message in an element with `key="global-error"` which you may style.
  */
@@ -280,7 +280,7 @@ export function documentMount(content) {
     return;
   }
   morph(document.querySelector("html"), content);
-  window.dispatchEvent(new Event("DOMContentLoaded"));
+  document.dispatchEvent(new Event("DOMContentLoaded"));
 }
 
 /**
@@ -631,7 +631,7 @@ export function validate(element, { includeSubforms = false } = {}) {
       window.setTimeout(() => {
         const abortController = new AbortController();
         for (const eventType of ["pointerdown", "keydown"])
-          window.addEventListener(
+          document.addEventListener(
             eventType,
             () => {
               abortController.abort();
@@ -971,7 +971,7 @@ export function popover({
       window.setTimeout(() => {
         const abortController = new AbortController();
         for (const eventType of ["pointerup", "click"])
-          window.addEventListener(
+          document.addEventListener(
             eventType,
             (event) => {
               if (
@@ -1091,7 +1091,7 @@ export let isPhysicalKeyboard = false;
 export let shiftKey = false;
 
 for (const eventType of ["keydown", "keyup"])
-  window.addEventListener(eventType, (event) => {
+  document.addEventListener(eventType, (event) => {
     isPhysicalKeyboard =
       isPhysicalKeyboard ||
       event.shiftKey ||
@@ -1105,7 +1105,7 @@ for (const eventType of ["keydown", "keyup"])
  * Whether the device has a touch screen, as opposed to a mouse. This is useful, for example, to disable `popover()`s triggered by `"hover"`. See <https://github.com/atomiks/tippyjs/blob/ad85f6feb79cf6c5853c43bf1b2a50c4fa98e7a1/src/bindGlobalEventListeners.ts#L7-L18>.
  */
 export let isTouch = false;
-window.addEventListener(
+document.addEventListener(
   "touchstart",
   () => {
     isTouch = true;
@@ -1114,7 +1114,7 @@ window.addEventListener(
 );
 
 for (const eventType of ["focusin", "focusout"])
-  window.addEventListener(eventType, (event) => {
+  document.addEventListener(eventType, (event) => {
     for (const element of parents(event.target))
       element[`on${eventType}`]?.(event);
   });
