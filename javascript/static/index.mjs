@@ -970,22 +970,21 @@ export function popover({
       target.showPopover();
       window.setTimeout(() => {
         const abortController = new AbortController();
-        for (const eventType of ["pointerup", "click"])
-          document.addEventListener(
-            eventType,
-            (event) => {
-              if (
-                event.button !== 0 ||
-                (remainOpenWhileFocused && target.contains(event.target))
-              )
-                return;
-              window.setTimeout(() => {
-                abortController?.abort();
-                target.hidePopover();
-              }, 10);
-            },
-            { signal: abortController.signal },
-          );
+        document.addEventListener(
+          "click",
+          (event) => {
+            if (
+              event.button !== 0 ||
+              (remainOpenWhileFocused && target.contains(event.target))
+            )
+              return;
+            window.setTimeout(() => {
+              abortController?.abort();
+              target.hidePopover();
+            }, 10);
+          },
+          { signal: abortController.signal },
+        );
       }, 10);
     };
   return target;
