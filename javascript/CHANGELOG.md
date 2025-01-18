@@ -1,5 +1,11 @@
 # Changelog
 
+## 4.0.10 · 2025-01-18
+
+- Fixed issues in `popover()`:
+  - A popover that had been left behind would contribute to the size of the scrolling container.
+  - A popover could reach an unopenable state if activated and deactivated in fast succession, particularly when Live Navigating across pages.
+
 ## 4.0.9 · 2025-01-10
 
 - Added `onsubmit()` event to form submission via Live Navigation.
