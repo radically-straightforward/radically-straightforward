@@ -1,5 +1,10 @@
 # Changelog
 
+## 4.0.11 · 2025-01-20
+
+- Fixed `isModified()` such that an outer element with a `.isModified` property takes priority.
+- On `morph()` added the `name="___"` attribute as part of the `key`, which prevents `<input>`s and `<textarea>` from getting mixed up in Live Navigation.
+
 ## 4.0.10 · 2025-01-18
 
 - Fixed issues in `popover()`:

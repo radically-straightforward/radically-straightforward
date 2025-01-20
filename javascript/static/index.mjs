@@ -342,7 +342,7 @@ export function morph(from, to) {
   const key = (node) =>
     `${node.nodeType}--${
       node.nodeType === Node.ELEMENT_NODE
-        ? `${node.tagName}--${node.getAttribute("key")}`
+        ? `${node.tagName}--${node.getAttribute("key")}--${node.getAttribute("name")}`
         : node.nodeValue
     }`;
   const fromChildNodesKeys = [...from.childNodes].map(key);
