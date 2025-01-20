@@ -474,19 +474,20 @@ export function stringToElement(string) {
  */
 export function isModified(element, { includeSubforms = false } = {}) {
   const elements = children(element, { includeSubforms });
-  for (const element of elements)
+  for (const element of elements) {
+    for (const parent of parents(element).reverse())
+      if (parent.isModified === true || parent.isModified === false)
+        return parent.isModified;
     if (
-      parents(element).some((element) => element.isModified === true) ||
-      (element.matches("input, textarea") &&
-        element.closest("[disabled]") === null &&
-        !parents(element).some((element) => element.isModified === false) &&
-        (((element.type === "checkbox" || element.type === "radio") &&
-          element.checked !== element.defaultChecked) ||
-          (element.type !== "checkbox" &&
-            element.type !== "radio" &&
-            element.value !== element.defaultValue)))
+      element.matches("input, textarea") &&
+      element.closest("[disabled]") === null &&
+      (((element.type === "checkbox" || element.type === "radio") &&
+        element.checked !== element.defaultChecked) ||
+        (!(element.type === "checkbox" || element.type === "radio") &&
+          element.value !== element.defaultValue))
     )
       return true;
+  }
   return false;
 }
 
