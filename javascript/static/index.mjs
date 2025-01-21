@@ -597,7 +597,7 @@ export function validate(element, { includeSubforms = false } = {}) {
       element.onvalidate?.();
     } catch (error) {
       if (!(error instanceof ValidationError)) throw error;
-      let popoverTriggerElement;
+      let popoverTriggerElement = element;
       for (const parentElement of parents(element).reverse()) {
         if (parentElement.matches("[hidden]")) {
           popoverTriggerElement = parentElement.parentElement;
@@ -608,7 +608,6 @@ export function validate(element, { includeSubforms = false } = {}) {
           break;
         }
       }
-      popoverTriggerElement ??= element;
       popoverTriggerElement.focus();
       const target = popover({
         element: popoverTriggerElement,
