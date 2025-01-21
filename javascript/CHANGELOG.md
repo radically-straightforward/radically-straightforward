@@ -1,5 +1,9 @@
 # Changelog
 
+## 4.0.12 · 2025-01-21
+
+- On `popover()`, added the `trigger: "showOnce"` option.
+
 ## 4.0.11 · 2025-01-20
 
 - Fixed `isModified()` such that an outer element with a `.isModified` property takes priority.
