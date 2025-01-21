@@ -609,46 +609,13 @@ export function validate(element, { includeSubforms = false } = {}) {
         }
       }
       popoverTriggerElement.focus();
-      const target = popover({
+      popover({
         element: popoverTriggerElement,
-        target: popoverTriggerElement.insertAdjacentElement(
-          "afterend",
-          stringToElement(html`
-            <div type="popover" class="popover--error">${error.message}</div>
-          `),
-        ),
-        trigger: "none",
+        target: html`
+          <div type="popover" class="popover--error">${error.message}</div>
+        `,
+        trigger: "showOnce",
       });
-      target.morph = false;
-      target.showPopover();
-      const abortController = new AbortController();
-      for (const eventType of ["pointerdown", "keydown"])
-        document.addEventListener(
-          eventType,
-          () => {
-            abortController.abort();
-            target.hidePopover();
-            {
-              const abortController = new AbortController();
-              target.addEventListener(
-                "transitionend",
-                (event) => {
-                  if (
-                    event.target !== target ||
-                    event.propertyName !== "visibility" ||
-                    window.getComputedStyle(target).visibility !== "hidden" ||
-                    target.matches('[state~="open"]')
-                  )
-                    return;
-                  abortController.abort();
-                  target.remove();
-                },
-                { signal: abortController.signal },
-              );
-            }
-          },
-          { signal: abortController.signal },
-        );
       return false;
     }
   }
@@ -882,13 +849,15 @@ export function stateToggle(element, token) {
  *
  * - **`element`:** The element that is used as reference when positioning the popover and that triggers the popover open.
  *
- * - **`target`:** The element that contains the popover contents. It must have the `type="popover"` type, and it may have one of the `.popover--<color>` classes (see `@radically-straightforward/javascript/static/index.css`).
+ * - **`target`:** The element that contains the popover contents. It must have the `type="popover"` type, and it may have one of the `.popover--<color>` classes (see `@radically-straightforward/javascript/static/index.css`). As a special case, if `trigger` is set to `"showOnce"`, then `target` may be a string which is turned into a DOM element by `popover()`.
  *
  * - **`trigger`:** One of the following:
  *
  *   - **`"hover"`:** Show the popover on the `element.onmouseenter` or `element.onfocusin` events and hide the popover on the `element.onmouseleave` or `element.onfocusout` events. The `target` must not contain elements that may be focused (for example, `<button>`, `<input>`, and so forth), otherwise keyboard navigation is broken. On `isTouch` devices, `"hover"` popovers don’t show up because they often conflict with `"click"` popovers.
  *
  *   - **`"click"`:** Show the popover on the `element.onclick` event. When to hide the popover depends on the `remainOpenWhileFocused`. If `remainOpenWhileFocused` is `false` (the default), then the next click anywhere will close the popover—this is useful for dropdown menus with `<button>`s. If `remainOpenWhileFocused` is `true`, then only clicks outside of the popover will close it—this is useful for dropdown menus with `<input>`s. If `remainOpenWhileFocused` is `true` and you need to close the popover programmatically, you may send a `click` event to an element out of the popover, for example, `document.querySelector("body").click()`.
+ *
+ *   - **`"showOnce"`:** Show the popover right away, and hide it (and remove it from the DOM) on the next `pointerdown` or `keydown` event.
  *
  *   - **`"none"`:** Showing and hiding the popover is the responsibility of the caller using the `target.showPopover()` and `target.hidePopover()` functions.
  *
@@ -927,12 +896,20 @@ export function popover({
     ? "top"
     : trigger === "click"
       ? "bottom-start"
-      : trigger === "none"
+      : trigger === "showOnce"
         ? "top"
-        : (() => {
-            throw new Error();
-          })(),
+        : trigger === "none"
+          ? "top"
+          : (() => {
+              throw new Error();
+            })(),
 }) {
+  if (typeof target === "string") {
+    target = execute(
+      element.insertAdjacentElement("afterend", stringToElement(target)),
+    );
+    target.morph = false;
+  }
   target.popoverTriggerElement = element;
   target.showPopover = async () => {
     const position = await floatingUI.computePosition(element, target, {
@@ -989,6 +966,38 @@ export function popover({
         { signal: abortController.signal },
       );
     };
+  else if (trigger === "showOnce") {
+    target.showPopover();
+    const abortController = new AbortController();
+    for (const eventType of ["pointerdown", "keydown"])
+      document.addEventListener(
+        eventType,
+        () => {
+          abortController.abort();
+          target.hidePopover();
+          {
+            const abortController = new AbortController();
+            target.addEventListener(
+              "transitionend",
+              (event) => {
+                if (
+                  event.target !== target ||
+                  event.propertyName !== "visibility" ||
+                  window.getComputedStyle(target).visibility !== "hidden" ||
+                  target.matches('[state~="open"]')
+                )
+                  return;
+                abortController.abort();
+                target.remove();
+              },
+              { signal: abortController.signal },
+            );
+          }
+        },
+        { signal: abortController.signal },
+      );
+  } else if (trigger === "none") "NOOP";
+  else throw new Error();
   return target;
 }
 
