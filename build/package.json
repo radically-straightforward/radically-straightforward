@@ -1,6 +1,6 @@
 {
   "name": "@radically-straightforward/build",
-  "version": "2.0.7",
+  "version": "2.0.8",
   "description": "🏗️ Build static assets",
   "keywords": [
     "build",
@@ -31,8 +31,8 @@
     "@babel/core": "^7.26.0",
     "@babel/generator": "^7.26.5",
     "@csstools/postcss-light-dark-function": "^2.0.7",
-    "@radically-straightforward/css": "^2.0.1",
-    "@radically-straightforward/javascript": "^4.0.12",
+    "@radically-straightforward/css": "^3.0.0",
+    "@radically-straightforward/javascript": "^4.0.13",
     "base-x": "^5.0.0",
     "esbuild": "^0.24.2",
     "globby": "^14.0.2",
