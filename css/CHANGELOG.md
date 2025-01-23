@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.0.0 · 2025-01-23
+
+- **Breaking change:** Changed the `--space--___` CSS variables to `--size--___`.
+
 ## 2.0.0 · 2024-12-02
 
 - **Breaking Change:** Removed `.visually-hidden` and `.visually-hidden--interactive`.

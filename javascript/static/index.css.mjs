@@ -23,9 +23,9 @@ await fs.writeFile(
               var(--color--slate--950)
             );
             width: max-content;
-            max-width: min(calc(100% - var(--space--8)), var(--space--96));
-            max-width: min(calc(100cqw - var(--space--8)), var(--space--96));
-            padding: var(--space--1) var(--space--2);
+            max-width: min(calc(100% - var(--size--8)), var(--size--96));
+            max-width: min(calc(100cqw - var(--size--8)), var(--size--96));
+            padding: var(--size--1) var(--size--2);
             border: var(--border-width--1) solid
               light-dark(var(--color--slate--400), var(--color--slate--600));
             border-radius: var(--border-radius--1);
@@ -99,18 +99,18 @@ await fs.writeFile(
               var(--color--red--950)
             );
             width: max-content;
-            max-width: min(calc(100% - var(--space--8)), var(--space--96));
-            max-width: min(calc(100cqw - var(--space--8)), var(--space--96));
-            padding: var(--space--1) var(--space--2);
+            max-width: min(calc(100% - var(--size--8)), var(--size--96));
+            max-width: min(calc(100cqw - var(--size--8)), var(--size--96));
+            padding: var(--size--1) var(--size--2);
             border: var(--border-width--1) solid
               light-dark(var(--color--red--400), var(--color--red--600));
             border-radius: var(--border-radius--1);
-            margin: var(--space--0) auto;
+            margin: var(--size--0) auto;
             box-shadow: var(--box-shadow--4);
             position: fixed;
-            top: var(--space--8);
-            left: var(--space--2);
-            right: var(--space--2);
+            top: var(--size--8);
+            left: var(--size--2);
+            right: var(--size--2);
             z-index: 2000;
           }
 
@@ -119,16 +119,16 @@ await fs.writeFile(
               var(--color--blue--500),
               var(--color--blue--500)
             );
-            height: var(--space--1);
+            height: var(--size--1);
             border-bottom: var(--border-width--1) solid
               light-dark(var(--color--blue--700), var(--color--blue--700));
             border-right: var(--border-width--1) solid
               light-dark(var(--color--blue--700), var(--color--blue--700));
             box-shadow: var(--box-shadow--4);
             position: fixed;
-            top: var(--space--0);
-            right: var(--space--0);
-            left: var(--space--0);
+            top: var(--size--0);
+            right: var(--size--0);
+            left: var(--size--0);
             z-index: 3000;
             transition-property: width;
             transition-duration: var(--transition-duration--300);
