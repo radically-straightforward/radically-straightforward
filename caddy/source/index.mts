@@ -147,7 +147,7 @@ export function application({
       header ?X-XSS-Protection 0
       header ?Permissions-Policy "interest-cohort=()"
       header ?Origin-Agent-Cluster "?1"
-      header ?Content-Security-Policy "default-src 'self'; style-src 'self' 'unsafe-inline'; frame-src 'none'; object-src 'none'; form-action 'self'; frame-ancestors 'none'"
+      header ?Content-Security-Policy "default-src 'none'; manifest-src 'self'; style-src-elem 'self'; style-src-attr 'unsafe-inline'; script-src-elem 'self'; worker-src 'self'; connect-src 'self'; img-src 'self' data: blob:; media-src 'self' data: blob:; font-src 'self'; base-uri 'none'; form-action 'self'; frame-ancestors 'none'"
       header ?Cross-Origin-Resource-Policy same-origin
       header ?Cross-Origin-Embedder-Policy require-corp
       header ?Cross-Origin-Opener-Policy same-origin
