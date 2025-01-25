@@ -644,7 +644,10 @@ export function serialize(element, { includeSubforms = false } = {}) {
       typeof element.getAttribute("name") !== "string"
     )
       continue;
-    if (
+    if (element.type === "file")
+      for (const file of element.files)
+        formData.append(element.getAttribute("name"), file);
+    else if (
       !(element.type === "radio" || element.type === "checkbox") ||
       ((element.type === "radio" || element.type === "checkbox") &&
         element.checked)
