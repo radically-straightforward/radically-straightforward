@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.0.5 · 2025-01-26
+
+- Updated `Content-Security-Policy` to be more an allowlist instead of a blocklist.
+
 ## 2.0.4 · 2024-11-12
 
 - Removed the `tunnel` parameter, which became unnecessary because Visual Studio Code Port Forwarding feature supports HTTPS.
