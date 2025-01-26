@@ -1,5 +1,9 @@
 # Changelog
 
+## 4.0.13 · 2025-01-26
+
+- In `serialize()`, added support for `<input type="file">`.
+
 ## 4.0.12 · 2025-01-21
 
 - On `popover()`, added the `trigger: "showOnce"` option.
