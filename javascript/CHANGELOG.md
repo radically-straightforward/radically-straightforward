@@ -1,8 +1,9 @@
 # Changelog
 
-## 4.0.13 · 2025-01-26
+## 4.0.14 · 2025-01-26
 
 - In `serialize()`, added support for `<input type="file">`.
+- **Breaking change:** In `validate()`, removed `.isValid` property.
 
 ## 4.0.12 · 2025-01-21
 

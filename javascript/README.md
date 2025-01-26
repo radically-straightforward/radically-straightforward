@@ -270,8 +270,6 @@ Validation errors are reported with `popover()`s with the `.popover--error` clas
 
 You may set the `disabled` attribute on a parent element to disable an entire subtree.
 
-Use `element.isValid = true` to force a subtree to be valid.
-
 `validate()` supports the `required` and `minlength` attributes, the `type="email"` input type, and custom validation.
 
 For custom validation, use the `onvalidate` event and `throw new ValidationError()`, for example:
