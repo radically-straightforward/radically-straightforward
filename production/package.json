@@ -1,6 +1,6 @@
 {
   "name": "@radically-straightforward/production",
-  "version": "1.0.32",
+  "version": "1.0.33",
   "description": "🧰 Radically Straightforward packages for production",
   "keywords": [
     "radically straightforward",
@@ -24,7 +24,7 @@
     "test": ""
   },
   "dependencies": {
-    "@radically-straightforward/caddy": "^2.0.4",
+    "@radically-straightforward/caddy": "^2.0.5",
     "@radically-straightforward/examples": "^1.0.0",
     "@radically-straightforward/html": "^1.0.1",
     "@radically-straightforward/node": "^3.1.7",
