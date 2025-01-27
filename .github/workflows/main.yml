@@ -1,6 +1,6 @@
 on: push
 jobs:
-  packages:
+  main:
     strategy:
       fail-fast: false
       matrix:
