@@ -111,18 +111,18 @@ test(async () => {
 
   assert.equal(
     await fs.readFile("./build/index.mjs", "utf-8"),
-    'import html from "@radically-straightforward/html";\nconst template = html`<div css="${"idnnykdflodmu"}" javascript="${JSON.stringify({\n  function: "cmbvnmdmzvywyz",\n  arguments: ["Hello", "World"]\n})}"></div>`;\n//# sourceMappingURL=index.mjs.map',
+    'import html from "@radically-straightforward/html";\nconst template = html`<div css="${"ezwcjopkwtcbnn"}" javascript="${JSON.stringify({\n  function: "cmbvnmdmzvywyz",\n  arguments: ["Hello", "World"]\n})}"></div>`;\n//# sourceMappingURL=index.mjs.map',
   );
   assert.equal(
     await fs.readFile("./build/users.mjs", "utf-8"),
-    'import html from "@radically-straightforward/html";\n() => {};\nconst users = html`<div css="${"idnnykdflodmu"}" javascript="${JSON.stringify({\n  function: "cmbvnmdmzvywyz",\n  arguments: ["Bye", "World"]\n})}"></div><div css="${"xbjbuzxiqpcpj"}" javascript="${JSON.stringify({\n  function: "dmkitzfcccjwfv",\n  arguments: []\n})}"></div>`;\n//# sourceMappingURL=users.mjs.map',
+    'import html from "@radically-straightforward/html";\n() => {};\nconst users = html`<div css="${"ezwcjopkwtcbnn"}" javascript="${JSON.stringify({\n  function: "cmbvnmdmzvywyz",\n  arguments: ["Bye", "World"]\n})}"></div><div css="${"cppvvoknyrtbnr"}" javascript="${JSON.stringify({\n  function: "dmkitzfcccjwfv",\n  arguments: []\n})}"></div>`;\n//# sourceMappingURL=users.mjs.map',
   );
   assert.equal(
     await fs.readFile(
       path.join("./build/static/", paths["index.css"]),
       "utf-8",
     ),
-    "@layer __RADICALLY_STRAIGHTFORWARD__GLOBAL__{p{background-color:#00f}body{background-color:red}@media (min-width: 400px){.a .b{--csstools-light-dark-toggle--0: var(--csstools-color-scheme--light) black;background-color:var(--csstools-light-dark-toggle--0, white);background-color:light-dark(white,black)}}.text--red{color:red}.text--green{color:green}.text--blue{color:#00f}.user{background-color:green}}@layer __RADICALLY_STRAIGHTFORWARD__INLINE__{@layer idnnykdflodmu{[css~=idnnykdflodmu]{background-color:pink}}@layer xbjbuzxiqpcpj{[css~=xbjbuzxiqpcpj]{background-color:purple}[css~=xbjbuzxiqpcpj]:hover{-webkit-appearance:none;appearance:none}}}\n/*# sourceMappingURL=index--LP7E4JK2.css.map */\n",
+    "@layer __RADICALLY_STRAIGHTFORWARD__GLOBAL__{p{background-color:#00f}body{background-color:red}@media (min-width: 400px){.a .b{--csstools-light-dark-toggle--0: var(--csstools-color-scheme--light) black;background-color:var(--csstools-light-dark-toggle--0, white);background-color:light-dark(white,black)}}.text--red{color:red}.text--green{color:green}.text--blue{color:#00f}.user{background-color:green}}@layer __RADICALLY_STRAIGHTFORWARD__INLINE__{@layer ezwcjopkwtcbnn{[css~=ezwcjopkwtcbnn]{background-color:pink}}@layer cppvvoknyrtbnr{[css~=cppvvoknyrtbnr]{background-color:purple}[css~=cppvvoknyrtbnr]:hover{-webkit-appearance:none;appearance:none}}}\n/*# sourceMappingURL=index--3EQP3BTO.css.map */\n",
   );
   assert.equal(
     await fs.readFile(
