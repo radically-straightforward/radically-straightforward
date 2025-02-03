@@ -33,8 +33,8 @@ const commandLineArguments = util.parseArgs({
 });
 
 const globalCSSs = new Array<CSS>();
-const globalJavaScripts = new Array<JavaScript>();
 const inlineCSSs = new Set<CSS>();
+const globalJavaScripts = new Array<JavaScript>();
 const inlineJavaScripts = new Set<JavaScript>();
 const baseIdentifier = baseX("abcdefghijklmnopqrstuvwxyz");
 for (const source of await globby("./build/**/*.mjs")) {
