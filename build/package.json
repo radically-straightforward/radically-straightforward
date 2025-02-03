@@ -1,6 +1,6 @@
 {
   "name": "@radically-straightforward/build",
-  "version": "2.0.8",
+  "version": "2.0.9",
   "description": "🏗️ Build static assets",
   "keywords": [
     "build",
