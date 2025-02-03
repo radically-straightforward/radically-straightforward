@@ -6,7 +6,9 @@ import util from "node:util";
 import { globby } from "globby";
 import babel from "@babel/core";
 import babelGenerator from "@babel/generator";
-import prettier from "prettier";
+// @ts-ignore
+import makeSynchronized from "make-synchronized";
+const prettierSync = makeSynchronized(import.meta.resolve("prettier"));
 import postcss from "postcss";
 import postcssLightDarkFunction from "@csstools/postcss-light-dark-function";
 import esbuild from "esbuild";
@@ -90,20 +92,20 @@ for (const source of await globby("./build/**/*.mjs")) {
     ],
   });
   for (let code of fileGlobalCSSs) {
-    code = await prettier.format(code, { parser: "css" });
+    code = prettierSync.format(code, { parser: "css" });
     globalCSSs.push(
       `/********************************************************************************/\n\n${code}\n\n`,
     );
   }
   for (let code of fileGlobalJavaScripts) {
-    code = await prettier.format(code, { parser: "babel" });
+    code = prettierSync.format(code, { parser: "babel" });
     globalJavaScripts.push(
       `/********************************************************************************/\n\n${code}\n\n`,
     );
   }
   const fileInlineCSSIdentifiers = new Array<string>();
   for (let code of fileInlineCSSs) {
-    code = await prettier.format(code, { parser: "css" });
+    code = prettierSync.format(code, { parser: "css" });
     const identifier = baseIdentifier.encode(
       xxhash.XXHash3.hash(Buffer.from(code)),
     );
@@ -118,7 +120,7 @@ for (const source of await globby("./build/**/*.mjs")) {
   }
   const fileInlineJavaScriptIdentifiers = new Array<string>();
   for (let code of fileInlineJavaScripts) {
-    code = await prettier.format(code, { parser: "babel" });
+    code = prettierSync.format(code, { parser: "babel" });
     const identifier = baseIdentifier.encode(
       xxhash.XXHash3.hash(Buffer.from(code)),
     );

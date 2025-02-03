@@ -36,6 +36,7 @@
     "base-x": "^5.0.0",
     "esbuild": "^0.24.2",
     "globby": "^14.0.2",
+    "make-synchronized": "^0.2.9",
     "postcss": "^8.5.1",
     "prettier": "^3.4.2",
     "xxhash-addon": "^2.0.3"
