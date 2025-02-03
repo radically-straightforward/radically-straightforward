@@ -160,7 +160,7 @@ await fs.writeFile(
   (
     await postcss([postcssLightDarkFunction()]).process(
       css`
-        ${[...globalCSSs].join("")}
+        ${globalCSSs.join("")}
 
         @layer __RADICALLY_STRAIGHTFORWARD__INLINE__ {
           ${[...inlineCSSs].join("")}
