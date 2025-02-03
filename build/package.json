@@ -28,11 +28,11 @@
     "test": "npm run prepare && node --test \"./build/**/*.test.mjs\" && prettier --check \"./README.md\" \"./CHANGELOG.md\" \"./package.json\" \"./tsconfig.json\" \"./source/**/*.mts\""
   },
   "dependencies": {
-    "@babel/core": "^7.26.0",
+    "@babel/core": "^7.26.7",
     "@babel/generator": "^7.26.5",
     "@csstools/postcss-light-dark-function": "^2.0.7",
     "@radically-straightforward/css": "^3.0.0",
-    "@radically-straightforward/javascript": "^4.0.13",
+    "@radically-straightforward/javascript": "^4.0.14",
     "base-x": "^5.0.0",
     "esbuild": "^0.24.2",
     "globby": "^14.0.2",
@@ -45,7 +45,7 @@
     "@radically-straightforward/typescript": "^1.0.0",
     "@types/babel__core": "^7.20.5",
     "@types/babel__generator": "^7.6.8",
-    "@types/node": "^22.10.9",
+    "@types/node": "^22.13.0",
     "typescript": "^5.7.3"
   },
   "prettier": {}

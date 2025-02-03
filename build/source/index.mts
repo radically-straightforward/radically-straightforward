@@ -38,101 +38,6 @@ const inlineCSSs = new Set<CSS>();
 const inlineJavaScripts = new Set<JavaScript>();
 const baseIdentifier = baseX("abcdefghijklmnopqrstuvwxyz");
 for (const source of await globby("./build/**/*.mjs")) {
-  const fileGlobalCSSs = new Array<CSS>();
-  const fileGlobalJavaScripts = new Array<JavaScript>();
-  const fileInlineCSSs = new Array<CSS>();
-  const fileInlineJavaScripts = new Array<JavaScript>();
-  await babel.transformFileAsync(source, {
-    code: false,
-    plugins: [
-      {
-        visitor: {
-          TaggedTemplateExpression: (path) => {
-            if (path.node.tag.type !== "Identifier") return;
-            const isGlobal = path.parent.type === "ExpressionStatement";
-            if (path.node.tag.name === "css") {
-              path.skip();
-              const code = new Function(
-                "css",
-                `return (${babelGenerator.default(path.node).code});`,
-              )(css);
-              if (isGlobal) fileGlobalCSSs.push(code);
-              else
-                fileInlineCSSs.push(
-                  `__RADICALLY__STRAIGHTFORWARD__PLACEHOLDER__ { ${code} }`,
-                );
-            } else if (path.node.tag.name === "javascript") {
-              if (isGlobal) {
-                if (
-                  path.node.quasi.quasis.length !== 1 ||
-                  typeof path.node.quasi.quasis[0].value.cooked !== "string"
-                )
-                  throw new Error(
-                    "Global browser JavaScript doesn’t support interpolation.",
-                  );
-                fileGlobalJavaScripts.push(
-                  path.node.quasi.quasis[0].value.cooked,
-                );
-              } else
-                fileInlineJavaScripts.push(
-                  `async function __RADICALLY__STRAIGHTFORWARD__PLACEHOLDER__(${path.node.quasi.expressions
-                    .map((value, index) => `$$${index}`)
-                    .join(", ")}) { ${path.node.quasi.quasis
-                    .map(
-                      (quasi, index) =>
-                        (index === 0 ? `` : `$$${index - 1}`) +
-                        quasi.value.cooked,
-                    )
-                    .join("")} }`,
-                );
-            }
-          },
-        },
-      },
-    ],
-  });
-  for (let code of fileGlobalCSSs) {
-    code = prettierSync.format(code, { parser: "css" });
-    globalCSSs.push(
-      `/********************************************************************************/\n\n${code}\n\n`,
-    );
-  }
-  for (let code of fileGlobalJavaScripts) {
-    code = prettierSync.format(code, { parser: "babel" });
-    globalJavaScripts.push(
-      `/********************************************************************************/\n\n${code}\n\n`,
-    );
-  }
-  const fileInlineCSSIdentifiers = new Array<string>();
-  for (let code of fileInlineCSSs) {
-    code = prettierSync.format(code, { parser: "css" });
-    const identifier = baseIdentifier.encode(
-      xxhash.XXHash3.hash(Buffer.from(code)),
-    );
-    code = code.replace(
-      /^__RADICALLY__STRAIGHTFORWARD__PLACEHOLDER__/,
-      `[css~="${identifier}"]`,
-    );
-    fileInlineCSSIdentifiers.push(identifier);
-    inlineCSSs.add(
-      `/********************************************************************************/\n\n@layer ${identifier} {\n${code}\n}\n\n`,
-    );
-  }
-  const fileInlineJavaScriptIdentifiers = new Array<string>();
-  for (let code of fileInlineJavaScripts) {
-    code = prettierSync.format(code, { parser: "babel" });
-    const identifier = baseIdentifier.encode(
-      xxhash.XXHash3.hash(Buffer.from(code)),
-    );
-    code = `javascript?.execute?.functions?.set?.("${identifier}", ${code.replace(
-      /^async function __RADICALLY__STRAIGHTFORWARD__PLACEHOLDER__/,
-      "async function",
-    )});`;
-    fileInlineJavaScriptIdentifiers.push(identifier);
-    inlineJavaScripts.add(
-      `/********************************************************************************/\n\n${code}\n\n`,
-    );
-  }
   const babelResult = await babel.transformFileAsync(source, {
     compact: false,
     sourceMaps: true,
@@ -153,18 +58,71 @@ for (const source of await globby("./build/**/*.mjs")) {
             if (path.node.tag.type !== "Identifier") return;
             const isGlobal = path.parent.type === "ExpressionStatement";
             if (path.node.tag.name === "css") {
-              if (isGlobal) path.remove();
-              else
-                path.replaceWith(
-                  babel.types.stringLiteral(fileInlineCSSIdentifiers.shift()!),
+              let code = prettierSync.format(
+                new Function(
+                  "css",
+                  `return (${babelGenerator.default(path.node).code});`,
+                )(css),
+                { parser: "css" },
+              );
+              if (isGlobal) {
+                globalCSSs.push(
+                  `/********************************************************************************/\n\n${code}\n\n`,
                 );
+                path.remove();
+              } else {
+                code = `__RADICALLY__STRAIGHTFORWARD__PLACEHOLDER__ { ${code} }`;
+                const identifier = baseIdentifier.encode(
+                  xxhash.XXHash3.hash(Buffer.from(code)),
+                );
+                code = code.replace(
+                  /^__RADICALLY__STRAIGHTFORWARD__PLACEHOLDER__/,
+                  `[css~="${identifier}"]`,
+                );
+                inlineCSSs.add(
+                  `/********************************************************************************/\n\n@layer ${identifier} {\n${code}\n}\n\n`,
+                );
+                path.replaceWith(babel.types.stringLiteral(identifier));
+              }
             } else if (path.node.tag.name === "javascript") {
-              if (isGlobal) path.remove();
-              else
+              if (isGlobal) {
+                if (
+                  path.node.quasi.quasis.length !== 1 ||
+                  typeof path.node.quasi.quasis[0].value.cooked !== "string"
+                )
+                  throw new Error(
+                    "Global browser JavaScript doesn’t support interpolation.",
+                  );
+                globalJavaScripts.push(
+                  `/********************************************************************************/\n\n${prettierSync.format(path.node.quasi.quasis[0].value.cooked, { parser: "babel" })}\n\n`,
+                );
+                path.remove();
+              } else {
+                let code = prettierSync.format(
+                  `async function __RADICALLY__STRAIGHTFORWARD__PLACEHOLDER__(${path.node.quasi.expressions
+                    .map((value, index) => `$$${index}`)
+                    .join(", ")}) { ${path.node.quasi.quasis
+                    .map(
+                      (quasi, index) =>
+                        (index === 0 ? `` : `$$${index - 1}`) +
+                        quasi.value.cooked,
+                    )
+                    .join("")} }`,
+                  { parser: "babel" },
+                );
+                const identifier = baseIdentifier.encode(
+                  xxhash.XXHash3.hash(Buffer.from(code)),
+                );
+                inlineJavaScripts.add(
+                  `/********************************************************************************/\n\njavascript?.execute?.functions?.set?.("${identifier}", ${code.replace(
+                    /^async function __RADICALLY__STRAIGHTFORWARD__PLACEHOLDER__/,
+                    "async function",
+                  )});\n\n`,
+                );
                 path.replaceWith(
                   babel.template.ast`
                     JSON.stringify({
-                      function: ${babel.types.stringLiteral(fileInlineJavaScriptIdentifiers.shift()!)},
+                      function: ${babel.types.stringLiteral(identifier)},
                       arguments: ${babel.types.arrayExpression(
                         path.node.quasi
                           .expressions as Array<babel.types.Expression>,
@@ -172,6 +130,7 @@ for (const source of await globby("./build/**/*.mjs")) {
                     })
                   ` as babel.types.Node,
                 );
+              }
             }
           },
         },
