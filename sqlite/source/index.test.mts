@@ -203,22 +203,59 @@ test("Database", async () => {
   );
 
   database.cacheSize = 3;
-  assert.equal(await database.cache("1", () => "1"), "1");
-  await utilities.sleep(10);
-  assert.equal(await database.cache("2", () => "2"), "2");
-  await utilities.sleep(10);
-  assert.equal(await database.cache("3", () => "3"), "3");
+  assert.equal(
+    database.cache("1", () => "1"),
+    "1",
+  );
   await utilities.sleep(10);
   assert.equal(
-    await database.cache("1", () => {
+    database.cache("2", () => "2"),
+    "2",
+  );
+  await utilities.sleep(10);
+  assert.equal(
+    database.cache("3", () => "3"),
+    "3",
+  );
+  await utilities.sleep(10);
+  assert.equal(
+    database.cache("1", () => {
       throw new Error();
     }),
     "1",
   );
   await utilities.sleep(10);
-  assert.equal(await database.cache("4", () => "4"), "4");
+  assert.equal(
+    database.cache("4", () => "4"),
+    "4",
+  );
   await utilities.sleep(10);
-  assert.equal(await database.cache("2", () => "a new 2"), "a new 2");
+  assert.equal(
+    database.cache("2", () => "a new 2"),
+    "a new 2",
+  );
+
+  database.run(
+    sql`
+      delete from "_cache";
+    `,
+  );
+  assert.equal(await database.cacheAsync("1", () => "1"), "1");
+  await utilities.sleep(10);
+  assert.equal(await database.cacheAsync("2", () => "2"), "2");
+  await utilities.sleep(10);
+  assert.equal(await database.cacheAsync("3", () => "3"), "3");
+  await utilities.sleep(10);
+  assert.equal(
+    await database.cacheAsync("1", () => {
+      throw new Error();
+    }),
+    "1",
+  );
+  await utilities.sleep(10);
+  assert.equal(await database.cacheAsync("4", () => "4"), "4");
+  await utilities.sleep(10);
+  assert.equal(await database.cacheAsync("2", () => "a new 2"), "a new 2");
 
   assert.deepEqual(
     sql`create table "users" ("id" integer primary key autoincrement, "name" text);`,

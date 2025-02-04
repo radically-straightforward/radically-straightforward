@@ -565,9 +565,51 @@ export class Database extends BetterSQLite3Database {
    *
    * **Implementation Notes**
    *
-   * - We don’t use a transaction between consulting the cache and updating the cache so that things are as fast as possible: a transaction would lock writes to the database for longer—not to mention that `valueGenerator()` may be asynchronous, and it runs between these two steps. As a consequence, in case of a race condition, the `key` may appear multiple times in the cache. But that isn’t an issue, because the `key` isn’t `unique` in the schema, so no uniqueness constraint violation happens, and if the cache is being used correctly and `valueGenerator()` returns the same value every time, then both `key`s will have the same `value`, and one of them will not be used and naturally fall out of the cache at some point.
+   * We don’t use a transaction between consulting the cache and updating the cache so that things are as fast as possible: a transaction would lock writes to the database for longer—not to mention that `valueGenerator()` may be asynchronous in `cacheAsync()`, and it runs between these two steps. As a consequence, in case of a race condition, the `key` may appear multiple times in the cache. But that isn’t an issue, because the `key` isn’t `unique` in the schema, so no uniqueness constraint violation happens, and if the cache is being used correctly and `valueGenerator()` returns the same value every time, then both `key`s will have the same `value`, and one of them will not be used and naturally fall out of the cache at some point.
    */
-  async cache(
+  cache(key: string, valueGenerator: () => string): string {
+    let value: string;
+    const valueRow = this.get<{ id: number; value: string }>(
+      sql`
+        select "id", "value" from "_cache" where "key" = ${key};
+      `,
+    );
+    if (valueRow === undefined) {
+      value = valueGenerator();
+      this.run(
+        sql`
+          insert into "_cache" ("key", "value", "usedAt")
+          values (
+            ${key},
+            ${value},
+            ${new Date().toISOString()}
+          );
+        `,
+      );
+      this.run(
+        sql`
+          delete from "_cache"
+          order by "usedAt" desc
+          limit -1 offset ${this.cacheSize};
+        `,
+      );
+    } else {
+      value = valueRow.value;
+      this.run(
+        sql`
+          update "_cache"
+          set "usedAt" = ${new Date().toISOString()}
+          where "id" = ${valueRow.id};
+        `,
+      );
+    }
+    return value;
+  }
+
+  /**
+   * An asynchronous version of `cache()` for when the `valueGenerator()` is asynchronous.
+   */
+  async cacheAsync(
     key: string,
     valueGenerator: () => string | Promise<string>,
   ): Promise<string> {

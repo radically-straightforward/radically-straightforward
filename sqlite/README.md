@@ -327,10 +327,7 @@ database.run(
 #### `Database.cache()`
 
 ```typescript
-async cache(
-    key: string,
-    valueGenerator: () => string | Promise<string>,
-  ): Promise<string>;
+cache(key: string, valueGenerator: () => string): string;
 ```
 
 A simple cache mechanism backed by the SQLite database.
@@ -356,7 +353,18 @@ You may want to have the cache in the same database as the application, because 
 
 **Implementation Notes**
 
-- We don’t use a transaction between consulting the cache and updating the cache so that things are as fast as possible: a transaction would lock writes to the database for longer—not to mention that `valueGenerator()` may be asynchronous, and it runs between these two steps. As a consequence, in case of a race condition, the `key` may appear multiple times in the cache. But that isn’t an issue, because the `key` isn’t `unique` in the schema, so no uniqueness constraint violation happens, and if the cache is being used correctly and `valueGenerator()` returns the same value every time, then both `key`s will have the same `value`, and one of them will not be used and naturally fall out of the cache at some point.
+We don’t use a transaction between consulting the cache and updating the cache so that things are as fast as possible: a transaction would lock writes to the database for longer—not to mention that `valueGenerator()` may be asynchronous in `cacheAsync()`, and it runs between these two steps. As a consequence, in case of a race condition, the `key` may appear multiple times in the cache. But that isn’t an issue, because the `key` isn’t `unique` in the schema, so no uniqueness constraint violation happens, and if the cache is being used correctly and `valueGenerator()` returns the same value every time, then both `key`s will have the same `value`, and one of them will not be used and naturally fall out of the cache at some point.
+
+#### `Database.cacheAsync()`
+
+```typescript
+async cacheAsync(
+    key: string,
+    valueGenerator: () => string | Promise<string>,
+  ): Promise<string>;
+```
+
+An asynchronous version of `cache()` for when the `valueGenerator()` is asynchronous.
 
 #### `Database.getStatement()`
 

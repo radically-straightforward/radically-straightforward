@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.1.7 · 2025-02-04
+
+- **Breaking change:** Changed `cache()` to be synchronous, similar to other database operations, and added `cacheAsync()`.
+
 ## 1.1.6 · 2024-10-09
 
 - Added `cache()`.
