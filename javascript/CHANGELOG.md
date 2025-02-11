@@ -1,5 +1,9 @@
 # Changelog
 
+## 4.0.15 · 2025-02-11
+
+- Added support for SVG elements in `stringToElements()`/`stringToElement()`.
+
 ## 4.0.14 · 2025-01-26
 
 - In `serialize()`, added support for `<input type="file">`.

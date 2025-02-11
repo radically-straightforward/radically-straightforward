@@ -448,10 +448,12 @@ export function documentStringToElement(string) {
 }
 
 /**
- * Convert a string into a DOM element. The string may have multiple siblings without a common parent, so `stringToElements()` returns a `<div>` containing the elements.
+ * Convert a string into a DOM element. The string may have multiple siblings without a common parent, so `stringToElements()` returns a `<div>` containing the elements. If `svg` is `true`, then the element is created in the SVG namespace, which is necessary for SVG elements to be drawn by the browser, and the container is an `<svg>` tag instead of a `<div>`.
  */
-export function stringToElements(string) {
-  const element = document.createElement("div");
+export function stringToElements(string, { svg = false }) {
+  const element = svg
+    ? document.createElementNS("http://www.w3.org/2000/svg", "svg")
+    : document.createElement("div");
   element.innerHTML = string;
   return element;
 }
@@ -459,8 +461,8 @@ export function stringToElements(string) {
 /**
  * A specialized version of `stringToElements()` for when the `string` is a single element and the wrapper `<div>` is unnecessary.
  */
-export function stringToElement(string) {
-  return stringToElements(string).firstElementChild;
+export function stringToElement(string, options = {}) {
+  return stringToElements(string, options).firstElementChild;
 }
 
 /**
