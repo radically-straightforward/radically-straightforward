@@ -24,7 +24,7 @@
   "types": "./build/index.d.mts",
   "scripts": {
     "prepare": "tsc && documentation",
-    "test": "npm run prepare && node --test \"./build/**/*.test.mjs\" && prettier --check \"./README.md\" \"./CHANGELOG.md\" \"./package.json\" \"./tsconfig.json\" \"./source/**/*.mts\""
+    "test": "npm run prepare && node --test \"./build/**/*.test.mjs\" && prettier --check ./README.md ./CHANGELOG.md ./package.json ./tsconfig.json ./source/"
   },
   "dependencies": {
     "@radically-straightforward/node": "^3.1.7",

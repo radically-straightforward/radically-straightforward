@@ -25,7 +25,7 @@
   "bin": "./build/index.mjs",
   "scripts": {
     "prepare": "tsc",
-    "test": "npm run prepare && node --test \"./build/**/*.test.mjs\" && prettier --check \"./README.md\" \"./CHANGELOG.md\" \"./package.json\" \"./tsconfig.json\" \"./source/**/*.mts\""
+    "test": "npm run prepare && node --test \"./build/**/*.test.mjs\" && prettier --check ./README.md ./CHANGELOG.md ./package.json ./tsconfig.json ./source/"
   },
   "dependencies": {
     "@babel/core": "^7.26.0",
