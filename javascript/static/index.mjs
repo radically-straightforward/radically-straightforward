@@ -323,21 +323,24 @@ export function morph(from, to) {
   if (from.matches("input, textarea") && !isModified(from))
     for (const property of ["value", "checked"])
       if (from[property] !== to[property]) from[property] = to[property];
-  for (const attribute of new Set([
+  for (const attributeName of new Set([
     ...from.getAttributeNames(),
     ...to.getAttributeNames(),
   ])) {
     if (
-      attribute === "state" ||
-      attribute === "style" ||
-      attribute === "hidden" ||
-      attribute === "open" ||
-      attribute === "disabled"
+      attributeName === "state" ||
+      attributeName === "style" ||
+      attributeName === "hidden" ||
+      attributeName === "open" ||
+      attributeName === "disabled"
     )
       continue;
-    if (to.getAttribute(attribute) === null) from.removeAttribute(attribute);
-    else if (from.getAttribute(attribute) !== to.getAttribute(attribute))
-      from.setAttribute(attribute, to.getAttribute(attribute));
+    if (to.getAttribute(attributeName) === null)
+      from.removeAttribute(attributeName);
+    else if (
+      from.getAttribute(attributeName) !== to.getAttribute(attributeName)
+    )
+      from.setAttribute(attributeName, to.getAttribute(attributeName));
   }
   const key = (node) =>
     `${node.nodeType}--${
