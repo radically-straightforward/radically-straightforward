@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+- **Breaking changes:**
+  - `--transform--scale--___` → `--scale--___`
+  - `--transform--rotate--___` → `--rotate--___`
+
 ## 3.0.0 · 2025-01-23
 
 - **Breaking change:** Changed the `--space--___` CSS variables to `--size--___`.
