@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 3.0.1 · 2025-02-16
 
 - **Breaking changes:**
   - `--transform--scale--___` → `--scale--___`
