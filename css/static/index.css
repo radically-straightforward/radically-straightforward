@@ -547,17 +547,6 @@ font-family: var(--font-family--sans-serif);
   --box-shadow--25: 0 25px 50px -12px rgb(0 0 0 / 0.25);
   --box-shadow--inset: inset 0 2px 4px 0 rgb(0 0 0 / 0.05);
 
-  --scale--0: 0;
-  --scale--50: 0.5;
-  --scale--75: 0.75;
-  --scale--90: 0.9;
-  --scale--95: 0.95;
-  --scale--100: 1;
-  --scale--105: 1.05;
-  --scale--110: 1.1;
-  --scale--125: 1.25;
-  --scale--150: 1.5;
-
   --rotate--0: 0deg;
   --rotate--1: 1deg;
   --rotate---1: -1deg;
@@ -575,6 +564,17 @@ font-family: var(--font-family--sans-serif);
   --rotate---90: -90deg;
   --rotate--180: 180deg;
   --rotate---180: -180deg;
+
+  --scale--0: 0;
+  --scale--50: 0.5;
+  --scale--75: 0.75;
+  --scale--90: 0.9;
+  --scale--95: 0.95;
+  --scale--100: 1;
+  --scale--105: 1.05;
+  --scale--110: 1.1;
+  --scale--125: 1.25;
+  --scale--150: 1.5;
 
   --transform--skew--0: 0deg;
   --transform--skew--1: 1deg;
@@ -656,11 +656,11 @@ font-family: var(--font-family--sans-serif);
   --transition-property--colors: color, background-color, border-color,
     text-decoration-color, fill, stroke;
   --transition-property--base: color, background-color, border-color,
-    text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter,
-    backdrop-filter;
+    text-decoration-color, fill, stroke, opacity, box-shadow, transform,
+    translate, rotate, scale, filter, backdrop-filter;
   --transition-property--opacity: opacity, visibility;
   --transition-property--box-shadow: box-shadow;
-  --transition-property--transform: transform;
+  --transition-property--transform: transform, translate, rotate, scale;
 
   --transition-duration--0: 0ms;
   --transition-duration--75: 75ms;
