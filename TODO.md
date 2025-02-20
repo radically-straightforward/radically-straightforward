@@ -77,6 +77,7 @@
 - Router
   - Use Node.js `http.createServer()`’s options `IncomingMessage` and `ServerResponse` instead of ad-hoc extending the `request` and `response` objects? (https://stackoverflow.com/questions/70034891/extending-http-incomingmessage-and-http-serverresponse-providing-it-to-the-htt)
   - Route based on other aspects of request, for example, `search`?
+  - Instead of regular expressions, use the URL Pattern API?
 - Request Parsing
   - In the case of a request with a file that is too big, the server may not stop writing the file to the filesystem early enough, abusing the server resources (for example, disk).
   - Pass `pathname` parameters through `decodeURIComponent`?
