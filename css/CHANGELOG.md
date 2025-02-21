@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.0.2 · 2025-02-21
+
+- Added `vertical-align: 0;` to reset.
+
 ## 3.0.1 · 2025-02-16
 
 - **Breaking changes:**

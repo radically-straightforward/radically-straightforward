@@ -25,6 +25,7 @@ This CSS reset covers more than other CSS resets and normalizers, for example, i
   font-synthesis: none;
   /* Reset `<button>` text alignment. */
   text-align: left;
+  vertical-align: 0;
   text-decoration: inherit;
   /* Prevent iOS from making text bigger in landscape orientation. */
   text-size-adjust: 100%;
