@@ -15,8 +15,6 @@ test(
       : "Run local test with ‘node ./build/index.test.mjs’.",
   },
   async () => {
-    process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
-
     process.chdir(
       await fs.mkdtemp(
         path.join(os.tmpdir(), "radically-straightforward--caddy--test--"),
