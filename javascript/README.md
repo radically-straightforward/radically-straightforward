@@ -223,15 +223,15 @@ Similar to `stringToElement()` but for a `string` which is a whole document, for
 ### `stringToElements()`
 
 ```typescript
-export function stringToElements(string);
+export function stringToElements(string, { svg = false });
 ```
 
-Convert a string into a DOM element. The string may have multiple siblings without a common parent, so `stringToElements()` returns a `<div>` containing the elements.
+Convert a string into a DOM element. The string may have multiple siblings without a common parent, so `stringToElements()` returns a `<div>` containing the elements. If `svg` is `true`, then the element is created in the SVG namespace, which is necessary for SVG elements to be drawn by the browser, and the container is an `<svg>` tag instead of a `<div>`.
 
 ### `stringToElement()`
 
 ```typescript
-export function stringToElement(string);
+export function stringToElement(string, options = {});
 ```
 
 A specialized version of `stringToElements()` for when the `string` is a single element and the wrapper `<div>` is unnecessary.
@@ -459,6 +459,8 @@ export function popover({
           : (() => {
               throw new Error();
             })(),
+  onshow,
+  onhide,
 });
 ```
 
