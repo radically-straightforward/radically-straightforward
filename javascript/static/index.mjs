@@ -908,6 +908,8 @@ export function popover({
           : (() => {
               throw new Error();
             })(),
+  onshow,
+  onhide,
 }) {
   if (typeof target === "string") {
     target = execute(
@@ -924,6 +926,22 @@ export function popover({
     target.style.top = `${position.y}px`;
     target.style.left = `${position.x}px`;
     stateAdd(target, "open");
+    const abortController = new AbortController();
+    target.addEventListener(
+      "transitionend",
+      (event) => {
+        if (
+          event.target !== target ||
+          event.propertyName !== "visibility" ||
+          window.getComputedStyle(target).visibility === "hidden" ||
+          !target.matches('[state~="open"]')
+        )
+          return;
+        abortController.abort();
+        onshow?.();
+      },
+      { signal: abortController.signal },
+    );
   };
   target.hidePopover = () => {
     stateRemove(target, "open");
@@ -941,6 +959,7 @@ export function popover({
         abortController.abort();
         target.style.top = "";
         target.style.left = "";
+        onhide?.();
       },
       { signal: abortController.signal },
     );
