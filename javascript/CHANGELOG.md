@@ -1,5 +1,9 @@
 # Changelog
 
+## 4.0.16 · 2025-03-12
+
+- On `popover()`, added `onshow` and `onhide` parameters.
+
 ## 4.0.15 · 2025-02-11
 
 - Added support for SVG elements in `stringToElements()`/`stringToElement()`.
