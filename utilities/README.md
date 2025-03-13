@@ -198,10 +198,12 @@ export function highlight(
   text: string,
   search: Set<string>,
   {
+    prefix = false,
     start = `<span class="highlight">`,
     end = `</span>`,
     ...tokenizeOptions
   }: {
+    prefix?: boolean;
     start?: string;
     end?: string;
   } & Parameters<typeof tokenize>[1] = {},

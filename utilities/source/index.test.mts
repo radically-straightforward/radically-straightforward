@@ -112,6 +112,18 @@ test("highlight()", () => {
     ),
     `For my <span class="highlight">peanuts</span> allergy <span class="highlight">peanut</span> butter is sometimes used.`,
   );
+  assert.equal(
+    utilities.highlight(
+      "Leandro Facchinetti",
+      new Set(
+        utilities
+          .tokenize("lean")
+          .map((tokenWithPosition) => tokenWithPosition.token),
+      ),
+      { prefix: true },
+    ),
+    `<span class="highlight">Leandro</span> Facchinetti`,
+  );
 });
 
 test("snippet()", () => {

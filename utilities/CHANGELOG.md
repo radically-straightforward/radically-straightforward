@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.0.8 · 2025-03-13
+
+- On `highlight()`, add the `prefix` parameter.
+
 ## 2.0.7 · 2024-10-18
 
 - Added `tokenize()`, `normalizeToken()`, `highlight()`, and `snippet()`.

@@ -250,14 +250,24 @@ export function highlight(
   text: string,
   search: Set<string>,
   {
+    prefix = false,
     start = `<span class="highlight">`,
     end = `</span>`,
     ...tokenizeOptions
-  }: { start?: string; end?: string } & Parameters<typeof tokenize>[1] = {},
+  }: {
+    prefix?: boolean;
+    start?: string;
+    end?: string;
+  } & Parameters<typeof tokenize>[1] = {},
 ): string {
   let highlightedText = "";
   const highlightedTokens = tokenize(text, tokenizeOptions).filter(
-    (tokenWithPosition) => search.has(tokenWithPosition.token),
+    (tokenWithPosition) =>
+      prefix
+        ? [...search].some((searchTerm) =>
+            tokenWithPosition.token.startsWith(searchTerm),
+          )
+        : search.has(tokenWithPosition.token),
   );
   highlightedText += text.slice(0, highlightedTokens[0]?.start ?? text.length);
   for (const highlightedTokensIndex of highlightedTokens.keys())
