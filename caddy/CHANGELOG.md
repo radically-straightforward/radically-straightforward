@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.0.6 · 2025-03-15
+
+- Changed `Content-Security-Policy` header to work around a bug in Safari.
+
 ## 2.0.5 · 2025-01-26
 
 - Updated `Content-Security-Policy` to be more an allowlist instead of a blocklist.
