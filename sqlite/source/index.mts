@@ -181,7 +181,7 @@ export class Database extends BetterSQLite3Database {
             create table if not exists "_backgroundJobs" (
               "id" integer primary key autoincrement,
               "type" text not null,
-              "startAt" Text not null,
+              "startAt" text not null,
               "parameters" text not null,
               "startedAt" text null,
               "retries" integer null
