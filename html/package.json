@@ -30,9 +30,9 @@
   "devDependencies": {
     "@radically-straightforward/documentation": "^1.0.4",
     "@radically-straightforward/typescript": "^1.0.0",
-    "@types/node": "^22.10.9",
-    "prettier": "^3.4.2",
-    "typescript": "^5.7.3"
+    "@types/node": "^22.13.11",
+    "prettier": "^3.5.3",
+    "typescript": "^5.8.2"
   },
   "prettier": {}
 }

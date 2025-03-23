@@ -33,13 +33,13 @@
     "test": "npm run prepare && node --test \"./build/**/*.test.mjs\" && prettier --check ./README.md ./CHANGELOG.md ./package.json ./tsconfig.json ./source/"
   },
   "dependencies": {
-    "linkedom": "^0.18.7"
+    "linkedom": "^0.18.9"
   },
   "devDependencies": {
     "@radically-straightforward/documentation": "^1.0.4",
     "@radically-straightforward/typescript": "^1.0.0",
-    "@types/node": "^22.10.9",
-    "typescript": "^5.7.3"
+    "@types/node": "^22.13.11",
+    "typescript": "^5.8.2"
   },
   "prettier": {}
 }

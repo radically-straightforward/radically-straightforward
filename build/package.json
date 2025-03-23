@@ -28,25 +28,25 @@
     "test": "npm run prepare && node --test \"./build/**/*.test.mjs\" && prettier --check ./README.md ./CHANGELOG.md ./package.json ./tsconfig.json ./source/"
   },
   "dependencies": {
-    "@babel/core": "^7.26.7",
-    "@babel/generator": "^7.26.5",
+    "@babel/core": "^7.26.10",
+    "@babel/generator": "^7.26.10",
     "@csstools/postcss-light-dark-function": "^2.0.7",
-    "@radically-straightforward/css": "^3.0.0",
-    "@radically-straightforward/javascript": "^4.0.14",
-    "base-x": "^5.0.0",
-    "esbuild": "^0.24.2",
-    "globby": "^14.0.2",
-    "make-synchronized": "^0.2.9",
-    "postcss": "^8.5.1",
-    "prettier": "^3.4.2",
+    "@radically-straightforward/css": "^3.0.2",
+    "@radically-straightforward/javascript": "^4.0.16",
+    "base-x": "^5.0.1",
+    "esbuild": "^0.25.1",
+    "globby": "^14.1.0",
+    "make-synchronized": "^0.3.1",
+    "postcss": "^8.5.3",
+    "prettier": "^3.5.3",
     "xxhash-addon": "^2.0.3"
   },
   "devDependencies": {
     "@radically-straightforward/typescript": "^1.0.0",
     "@types/babel__core": "^7.20.5",
     "@types/babel__generator": "^7.6.8",
-    "@types/node": "^22.13.0",
-    "typescript": "^5.7.3"
+    "@types/node": "^22.13.11",
+    "typescript": "^5.8.2"
   },
   "prettier": {}
 }
