@@ -29,12 +29,12 @@
   "dependencies": {
     "@radically-straightforward/node": "^3.1.7",
     "@radically-straightforward/utilities": "^2.0.8",
+    "@types/busboy": "^1.5.4",
     "busboy": "^1.6.0"
   },
   "devDependencies": {
     "@radically-straightforward/documentation": "^1.0.4",
     "@radically-straightforward/typescript": "^1.0.0",
-    "@types/busboy": "^1.5.4",
     "@types/node": "^22.13.11",
     "prettier": "^3.5.3",
     "typescript": "^5.8.2"
