@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.11 · 2025-04-18
+
+- Fixed type `RequestBodyFile` by declaring `@types/busboy` as a `dependency` instead of `devDependency`.
+
 ## 1.0.9 · 2025-01-09
 
 - Added support for `array[]` parameters in `request.search`, similar to `request.body`.
