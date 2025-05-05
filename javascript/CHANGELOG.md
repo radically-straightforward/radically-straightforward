@@ -1,5 +1,9 @@
 # Changelog
 
+## 4.0.17 · 2025-05-05
+
+- Improved the treatment of forms that needs to submit to an external page, for example, for a SAML sign-out workflow.
+
 ## 4.0.16 · 2025-03-12
 
 - On `popover()`, added `onshow` and `onhide` parameters.
