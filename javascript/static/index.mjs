@@ -42,13 +42,6 @@ document.addEventListener("click", (event) => {
       button.getAttribute("formaction") ?? form.getAttribute("action") ?? "/",
       window.location,
     );
-    if (
-      button.liveNavigate === false ||
-      form.liveNavigate === false ||
-      new URL(action).origin !== window.location.origin
-    )
-      return;
-    event.preventDefault();
     if (liveNavigate.abortController !== undefined || !validate(form)) return;
     const enctype =
       button.getAttribute("formenctype") ??
@@ -76,6 +69,15 @@ document.addEventListener("click", (event) => {
           }),
     );
   }
+});
+
+document.addEventListener("submit", (event) => {
+  if (!event.target.matches("[novalidate]")) return;
+  if (!validate(event.target)) {
+    event.preventDefault();
+    return;
+  }
+  document.querySelector("html").isModified = false;
 });
 
 window.addEventListener("popstate", () => {

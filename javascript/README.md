@@ -71,7 +71,7 @@ Forms in pages using Live Navigation must not use `<form>`. Instead, they must u
 
 > **Reasons**
 >
-> - `<form>` triggers browser validation, which has some issues, including being too permissive with `<input type="email">` (allowing, for example, `localhost`), being too rigid in custom validation, and so forth. We implementing our own validation system in `validate()`.
+> - `<form>` triggers browser validation, which has some issues, including being too permissive with `<input type="email">` (allowing, for example, `localhost`), being too rigid in custom validation, and so forth. We implement our own validation system in `validate()`.
 > - `<form>`’s `method="___"` must be either `"GET"` or `"POST"`, but `<div type="form">` supports any HTTP verb.
 > - `<div type="form">` sets the `CSRF-Protection` HTTP header is set, to satisfy [`@radically-straightforward/server`’s CSRF Protection mechanism](https://github.com/radically-straightforward/radically-straightforward/tree/main/server#csrf-protection).
 > - `<div type="form">`s may be nested.
@@ -91,7 +91,9 @@ If the pages include the `<meta name="version" content="___" />` meta tag and th
 
 When loading a new page, a progress bar is displayed on an element with `key="progress-bar"` that is the last child of `<body>`. This element may be styled via CSS.
 
-An `<a>` or `<div type="form">` may opt out of Live Navigation by setting the property `element.liveNavigate = false`.
+An `<a>` may opt out of Live Navigation by setting the property `element.liveNavigate = false`. This is useful for links that point to internal pages (thus triggering Live Navigation) which end up redirecting to external pages (which don’t support Live Navigation), for example, a link to initiate a SAML sign-in workflow.
+
+A form may opt out of Live Navigation by using the `<form novalidate>` tag instead of `<div type="form">`. This opts out of all of the advantages above, except for our custom form validation (the `novalidate` opts out of the default browser validation and into our custom validation). It’s useful for forms that need to target an external page, for example, a form that initiates a SAML sign-out workflow.
 
 ### Code Execution through the ``javascript="${javascript`___`}"`` Attribute
 
