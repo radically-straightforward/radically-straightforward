@@ -71,15 +71,6 @@ document.addEventListener("click", (event) => {
   }
 });
 
-document.addEventListener("submit", (event) => {
-  if (!event.target.matches("[novalidate]")) return;
-  if (!validate(event.target)) {
-    event.preventDefault();
-    return;
-  }
-  document.querySelector("html").isModified = false;
-});
-
 window.addEventListener("popstate", () => {
   liveNavigate(new Request(window.location), { mayPushState: false });
 });
