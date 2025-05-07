@@ -12,11 +12,8 @@ document.addEventListener("click", (event) => {
   if (event.target.closest(`a:not([target="_blank"])`) !== null) {
     const element = event.target.closest(`a:not([target="_blank"])`);
     if (
-      element.liveNavigate === false ||
-      element.origin !== window.location.origin ||
-      (element.pathname === window.location.pathname &&
-        element.search === window.location.search &&
-        element.hash !== window.location.hash)
+      typeof element.getAttribute("href") !== "string" ||
+      !element.getAttribute("href").startsWith("/")
     )
       return;
     event.preventDefault();
@@ -38,11 +35,14 @@ document.addEventListener("click", (event) => {
       form.getAttribute("method") ??
       "GET"
     ).toUpperCase();
-    const action = new URL(
-      button.getAttribute("formaction") ?? form.getAttribute("action") ?? "/",
-      window.location,
-    );
-    if (liveNavigate.abortController !== undefined || !validate(form)) return;
+    const action =
+      button.getAttribute("formaction") ?? form.getAttribute("action") ?? "/";
+    if (
+      !action.startsWith("/") ||
+      liveNavigate.abortController !== undefined ||
+      !validate(form)
+    )
+      return;
     const enctype =
       button.getAttribute("formenctype") ??
       form.getAttribute("enctype") ??
