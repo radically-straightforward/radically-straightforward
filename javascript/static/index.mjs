@@ -100,9 +100,14 @@ async function liveNavigate(request, { mayPushState = true } = {}) {
     liveConnection.backgroundJob?.stop();
     liveNavigate.abortController?.abort();
     liveNavigate.abortController = new AbortController();
+    request.headers.set("Live-Navigation", "true");
     const response = await fetch(request, {
       signal: liveNavigate.abortController.signal,
     });
+    if (typeof response.headers.get("Location") === "string") {
+      window.location.href = response.headers.get("Location");
+      return;
+    }
     const responseURL = new URL(response.url);
     responseURL.hash = new URL(request.url).hash;
     const responseText = await response.text();
