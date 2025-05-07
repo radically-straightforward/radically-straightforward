@@ -109,22 +109,9 @@ async function liveNavigate(request, { mayPushState = true } = {}) {
     liveConnection.backgroundJob?.stop();
     liveNavigate.abortController?.abort();
     liveNavigate.abortController = new AbortController();
-    let response = await fetch(request, {
+    const response = await fetch(request, {
       signal: liveNavigate.abortController.signal,
-      redirect: "manual",
     });
-    if (response.status === 303) {
-      const location = response.headers.get("Location");
-      if (typeof location !== "string") throw new Error();
-      else if (new URL(location).origin !== window.location.origin) {
-        window.location.href = location;
-        return;
-      } else
-        response = await fetch(location, {
-          signal: liveNavigate.abortController.signal,
-        });
-    } else if (300 <= response.status && response.status < 300)
-      throw new Error();
     const responseURL = new URL(response.url);
     responseURL.hash = new URL(request.url).hash;
     const responseText = await response.text();
