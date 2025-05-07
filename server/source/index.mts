@@ -566,15 +566,15 @@ export default function server({
               destination: string = "",
               type: "see-other" | "temporary" | "permanent" = "see-other",
             ): typeof response => {
-              if (
-                request.headers["live-navigation"] !== "true" ||
-                destination.startsWith("/")
-              )
-                response.statusCode = {
-                  "see-other": 303,
-                  temporary: 307,
-                  permanent: 308,
-                }[type];
+              response.statusCode =
+                request.headers["live-navigation"] === "true" &&
+                !destination.startsWith("/")
+                  ? 200
+                  : {
+                      "see-other": 303,
+                      temporary: 307,
+                      permanent: 308,
+                    }[type];
               response.setHeader(
                 "Location",
                 new URL(destination, request.URL).href,
