@@ -535,6 +535,34 @@ test(async () => {
   }
 
   {
+    const response = await fetch("http://localhost:18000/response-helpers", {
+      redirect: "manual",
+      headers: { "Live-Navigation": "true" },
+    });
+    assert.equal(response.status, 303);
+    assert.equal(
+      response.headers.get("Location"),
+      "http://localhost:18000/redirect",
+    );
+  }
+
+  application.push({
+    method: "GET",
+    pathname: "/external-redirect",
+    handler: (request: serverTypes.Request<{}, {}, {}, {}, {}>, response) => {
+      response.redirect("https://leafac.com");
+    },
+  });
+
+  {
+    const response = await fetch("http://localhost:18000/external-redirect", {
+      headers: { "Live-Navigation": "true" },
+    });
+    assert.equal(response.status, 200);
+    assert.equal(response.headers.get("Location"), "https://leafac.com/");
+  }
+
+  {
     const trace = new Array<string>();
 
     application.push({
