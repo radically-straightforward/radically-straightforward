@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.12 · 2025-05-08
+
+- Added support for external redirects in Live Navigation by returning HTTP status 200.
+
 ## 1.0.11 · 2025-04-18
 
 - Fixed type `RequestBodyFile` by declaring `@types/busboy` as a `dependency` instead of `devDependency`.
