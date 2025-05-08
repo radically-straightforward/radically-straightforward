@@ -1,5 +1,9 @@
 # Changelog
 
+## 4.0.18 · 2025-05-08
+
+- Added support for external redirects in Live Navigation.
+
 ## 4.0.17 · 2025-05-05
 
 - Improved the treatment of forms that needs to submit to an external page, for example, for a SAML sign-out workflow.
