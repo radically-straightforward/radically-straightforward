@@ -1,5 +1,9 @@
 # Changelog
 
+## 4.0.19 · 2025-06-02
+
+- Fixed Live Navigation with `#anchor`s.
+
 ## 4.0.18 · 2025-05-08
 
 - Added support for external redirects in Live Navigation.
