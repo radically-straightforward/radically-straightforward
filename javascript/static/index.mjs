@@ -154,7 +154,8 @@ async function liveNavigate(request, { mayPushState = true } = {}) {
     }
   } else {
     if (mayPushState) window.history.pushState(null, "", requestURL.href);
-    document.getElementById(requestURL.hash.slice(1))?.scrollIntoView();
+    if (requestURL.hash.trim() !== "")
+      document.getElementById(requestURL.hash.slice(1))?.scrollIntoView();
     liveNavigate.previousLocation = { ...window.location };
   }
 }
