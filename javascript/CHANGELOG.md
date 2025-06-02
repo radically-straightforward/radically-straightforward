@@ -1,6 +1,6 @@
 # Changelog
 
-## 4.0.19 · 2025-06-02
+## 4.0.20 · 2025-06-02
 
 - Fixed Live Navigation with `#anchor`s.
 
