@@ -13,13 +13,16 @@ document.addEventListener("click", (event) => {
     const element = event.target.closest(`a:not([target="_blank"])`);
     if (
       typeof element.getAttribute("href") !== "string" ||
-      !element.getAttribute("href").startsWith("/")
+      !element.getAttribute("href").match(/^[/#]/)
     )
       return;
     event.preventDefault();
     if (
       liveNavigate.abortController !== undefined ||
-      (isModified(document.querySelector("html"), { includeSubforms: true }) &&
+      (element.getAttribute("href").startsWith("/") &&
+        isModified(document.querySelector("html"), {
+          includeSubforms: true,
+        }) &&
         !confirm("Your changes will be lost if you continue."))
     )
       return;
@@ -81,69 +84,81 @@ window.addEventListener("beforeunload", (event) => {
 });
 
 async function liveNavigate(request, { mayPushState = true } = {}) {
-  const progressBar = document
-    .querySelector("body")
-    .insertAdjacentElement(
-      "afterbegin",
-      stringToElement(html`<div key="progress-bar"></div>`),
-    );
-  backgroundJob(progressBar, "progressBar", { interval: 1000 }, () => {
-    progressBar.style.width =
-      (progressBar.style.width.trim() === ""
-        ? "15"
-        : (() => {
-            const width = Number(progressBar.style.width.slice(0, -1));
-            return width + (90 - width) / (10 + Math.random() * 50);
-          })()) + "%";
-  });
-  try {
-    liveConnection.backgroundJob?.stop();
-    liveNavigate.abortController?.abort();
-    liveNavigate.abortController = new AbortController();
-    request.headers.set("Live-Navigation", "true");
-    const response = await fetch(request, {
-      signal: liveNavigate.abortController.signal,
-    });
-    if (typeof response.headers.get("Location") === "string") {
-      window.location.href = response.headers.get("Location");
-      return;
-    }
-    const responseURL = new URL(response.url);
-    responseURL.hash = new URL(request.url).hash;
-    const responseText = await response.text();
-    if (
-      mayPushState &&
-      (window.location.pathname !== responseURL.pathname ||
-        window.location.search !== responseURL.search)
-    ) {
-      window.history.pushState(null, "", responseURL.href);
-      mayPushState = false;
-    }
-    documentMount(responseText);
-    if (responseURL.hash.trim() !== "")
-      document.getElementById(responseURL.hash.slice(1))?.scrollIntoView();
-    document.querySelector("[autofocus]")?.focus();
-  } catch (error) {
-    if (error.name === "AbortError") return;
-    if (mayPushState && request.method === "GET")
-      window.history.pushState(null, "", request.url);
-    document.querySelector('[key~="global-error"]')?.remove();
-    document
+  const requestURL = new URL(request.url);
+  if (
+    liveNavigate.previousLocation.pathname !== requestURL.pathname ||
+    liveNavigate.previousLocation.search !== requestURL.search
+  ) {
+    const progressBar = document
       .querySelector("body")
-      .insertAdjacentHTML(
+      .insertAdjacentElement(
         "afterbegin",
-        html`
-          <div key="global-error">
-            Something went wrong. Please try reloading the page.
-          </div>
-        `,
+        stringToElement(html`<div key="progress-bar"></div>`),
       );
-    throw error;
-  } finally {
-    progressBar.remove();
-    delete liveNavigate.abortController;
+    backgroundJob(progressBar, "progressBar", { interval: 1000 }, () => {
+      progressBar.style.width =
+        (progressBar.style.width.trim() === ""
+          ? "15"
+          : (() => {
+              const width = Number(progressBar.style.width.slice(0, -1));
+              return width + (90 - width) / (10 + Math.random() * 50);
+            })()) + "%";
+    });
+    try {
+      liveConnection.backgroundJob?.stop();
+      liveNavigate.abortController?.abort();
+      liveNavigate.abortController = new AbortController();
+      request.headers.set("Live-Navigation", "true");
+      const response = await fetch(request, {
+        signal: liveNavigate.abortController.signal,
+      });
+      if (typeof response.headers.get("Location") === "string") {
+        window.location.href = response.headers.get("Location");
+        return;
+      }
+      const responseURL = new URL(response.url);
+      responseURL.hash = requestURL.hash;
+      const responseText = await response.text();
+      if (
+        mayPushState &&
+        (liveNavigate.previousLocation.pathname !== responseURL.pathname ||
+          liveNavigate.previousLocation.search !== responseURL.search)
+      ) {
+        window.history.pushState(null, "", responseURL.href);
+        mayPushState = false;
+      }
+      documentMount(responseText);
+      if (responseURL.hash.trim() !== "")
+        document.getElementById(responseURL.hash.slice(1))?.scrollIntoView();
+      document.querySelector("[autofocus]")?.focus();
+    } catch (error) {
+      if (error.name === "AbortError") return;
+      if (mayPushState && request.method === "GET")
+        window.history.pushState(null, "", requestURL.href);
+      document.querySelector('[key~="global-error"]')?.remove();
+      document
+        .querySelector("body")
+        .insertAdjacentHTML(
+          "afterbegin",
+          html`
+            <div key="global-error">
+              Something went wrong. Please try reloading the page.
+            </div>
+          `,
+        );
+      throw error;
+    } finally {
+      progressBar.remove();
+      liveNavigate.previousLocation = { ...window.location };
+      delete liveNavigate.abortController;
+    }
+  } else {
+    if (mayPushState) window.history.pushState(null, "", requestURL.href);
+    document.getElementById(requestURL.hash.slice(1))?.scrollIntoView();
+    liveNavigate.previousLocation = { ...window.location };
   }
 }
+liveNavigate.previousLocation = { ...window.location };
 liveNavigate.abortController = undefined;
 
 /**
