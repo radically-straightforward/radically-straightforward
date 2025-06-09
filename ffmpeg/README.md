@@ -1,0 +1,8 @@
+- https://github.com/BtbN/FFmpeg-Builds/releases/tag/autobuild-2025-06-08-14-00
+  - https://github.com/BtbN/FFmpeg-Builds/releases/download/autobuild-2025-06-08-14-00/ffmpeg-n7.1.1-22-g0f1fe3d153-linux64-gpl-7.1.tar.xz
+  - https://github.com/BtbN/FFmpeg-Builds/releases/download/autobuild-2025-06-08-14-00/ffmpeg-n7.1.1-22-g0f1fe3d153-linuxarm64-gpl-7.1.tar.xz
+  - https://github.com/BtbN/FFmpeg-Builds/releases/download/autobuild-2025-06-08-14-00/ffmpeg-n7.1.1-22-g0f1fe3d153-win64-gpl-7.1.zip
+  - https://github.com/BtbN/FFmpeg-Builds/releases/download/autobuild-2025-06-08-14-00/ffmpeg-n7.1.1-22-g0f1fe3d153-winarm64-gpl-7.1.zip
+- https://osxexperts.net/
+  - https://www.osxexperts.net/ffmpeg71intel.zip
+  - https://www.osxexperts.net/ffmpeg711arm.zip
