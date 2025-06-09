@@ -7,9 +7,9 @@ test(async () => {
   assert(
     (
       await util.promisify(childProcess.execFile)("./node_modules/.bin/ffmpeg", [
-        "version",
+        "-version",
       ])
-    ).stdout.startsWith("v"),
+    ).stdout.startsWith("ffmpeg"),
   );
   await util.promisify(childProcess.execFile)("node", [
     "scripts.mjs",
@@ -17,7 +17,7 @@ test(async () => {
   ]);
   await assert.rejects(async () => {
     await util.promisify(childProcess.execFile)("./node_modules/.bin/ffmpeg", [
-      "version",
+      "-version",
     ]);
   });
   await util.promisify(childProcess.execFile)("node", [
@@ -27,8 +27,8 @@ test(async () => {
   assert(
     (
       await util.promisify(childProcess.execFile)("./node_modules/.bin/ffmpeg", [
-        "version",
+        "-version",
       ])
-    ).stdout.startsWith("v"),
+    ).stdout.startsWith("ffmpeg"),
   );
 });
