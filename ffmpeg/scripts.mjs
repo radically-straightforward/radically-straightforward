@@ -14,40 +14,34 @@ if (process.argv[2] === "postinstall") {
         path.join(installationDirectory, "package.json"),
         "utf-8",
       ),
-    ).caddy;
+    ).ffmpeg;
   } catch {}
   if (version === undefined)
     version = (
       await (
         await fetch(
-          "https://api.github.com/repos/caddyserver/caddy/releases/latest",
+          "https://github.com/radically-straightforward/radically-straightforward/raw/refs/heads/main/ffmpeg/package.json",
         )
       ).json()
-    ).tag_name.slice(1);
+    ).ffmpeg;
 
   const downloadDirectory = await fs.mkdtemp(
-    path.join(os.tmpdir(), "radically-straightforward--caddy--"),
+    path.join(os.tmpdir(), "radically-straightforward--ffmpeg--"),
   );
   await fs.writeFile(
     path.join(
       downloadDirectory,
-      `caddy.${process.platform === "win32" ? "zip" : "tar.gz"}`,
+      `ffmpeg.${process.platform === "win32" ? "zip" : "tar.gz"}`,
     ),
     (
       await fetch(
-        `https://github.com/caddyserver/caddy/releases/download/v${version}/caddy_${version}_${
-          { win32: "windows", darwin: "mac", linux: "linux" }[process.platform]
-        }_${{ x64: "amd64", arm64: "arm64", arm: "arm" }[process.arch]}${
-          process.arch === "arm"
-            ? `v${process.config.variables.arm_version}`
-            : ""
-        }.${process.platform === "win32" ? "zip" : "tar.gz"}`,
+        `https://github.com/radically-straightforward/radically-straightforward/releases/download/ffmpeg-binaries--v${version}/ffmpeg--${process.platform}--${process.arch}--v${version}.${process.platform === "win32" ? "zip" : "tar.gz"}`,
       )
     ).body,
   );
   await util.promisify(childProcess.execFile)(
     "tar",
-    ["-xzf", `caddy.${process.platform === "win32" ? "zip" : "tar.gz"}`],
+    ["-xzf", `ffmpeg.${process.platform === "win32" ? "zip" : "tar.gz"}`],
     { cwd: downloadDirectory },
   );
   await fs.mkdir(path.join(installationDirectory, "node_modules/.bin/"), {
@@ -56,11 +50,11 @@ if (process.argv[2] === "postinstall") {
   await fs.copyFile(
     path.join(
       downloadDirectory,
-      `caddy${process.platform === "win32" ? ".exe" : ""}`,
+      `ffmpeg${process.platform === "win32" ? ".exe" : ""}`,
     ),
     path.join(
       installationDirectory,
-      `node_modules/.bin/caddy${process.platform === "win32" ? ".exe" : ""}`,
+      `node_modules/.bin/ffmpeg${process.platform === "win32" ? ".exe" : ""}`,
     ),
   );
   await fs.rm(downloadDirectory, { recursive: true, force: true });
@@ -68,7 +62,7 @@ if (process.argv[2] === "postinstall") {
   await fs.rm(
     path.join(
       installationDirectory,
-      `node_modules/.bin/caddy${process.platform === "win32" ? ".exe" : ""}`,
+      `node_modules/.bin/ffmpeg${process.platform === "win32" ? ".exe" : ""}`,
     ),
     { force: true },
   );
