@@ -16,6 +16,7 @@ jobs:
           - examples
           - documentation
           - caddy
+          - ffmpeg
           - build
           - package
           - production
