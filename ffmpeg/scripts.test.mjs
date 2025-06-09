@@ -6,9 +6,10 @@ import util from "node:util";
 test(async () => {
   assert(
     (
-      await util.promisify(childProcess.execFile)("./node_modules/.bin/ffmpeg", [
-        "-version",
-      ])
+      await util.promisify(childProcess.execFile)(
+        "./node_modules/.bin/ffmpeg",
+        ["-version"],
+      )
     ).stdout.startsWith("ffmpeg"),
   );
   await util.promisify(childProcess.execFile)("node", [
@@ -26,9 +27,10 @@ test(async () => {
   ]);
   assert(
     (
-      await util.promisify(childProcess.execFile)("./node_modules/.bin/ffmpeg", [
-        "-version",
-      ])
+      await util.promisify(childProcess.execFile)(
+        "./node_modules/.bin/ffmpeg",
+        ["-version"],
+      )
     ).stdout.startsWith("ffmpeg"),
   );
 });
