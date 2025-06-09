@@ -1,0 +1,34 @@
+{
+  "name": "@radically-straightforward/ffmpeg",
+  "version": "1.0.0",
+  "description": "🎞️ Install FFmpeg as an npm package",
+  "keywords": [
+    "ffmpeg",
+    "convert video"
+  ],
+  "homepage": "https://github.com/leafac/radically-straightforward",
+  "repository": "https://github.com/leafac/radically-straightforward",
+  "bugs": "https://github.com/leafac/radically-straightforward/issues",
+  "funding": [
+    "https://patreon.com/leafac",
+    "https://github.com/sponsors/leafac",
+    "https://paypal.me/LeandroFacchinettiEU",
+    "https://btc.com/34KJBgtaFYMtDqpSgMayw9qiKWg2GQXA9M"
+  ],
+  "author": "Leandro Facchinetti <radically-straightforward@leafac.com> (https://leafac.com)",
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  },
+  "bin": "ffmpeg",
+  "scripts": {
+    "postinstall": "node ./scripts.mjs postinstall",
+    "preuninstall": "node ./scripts.mjs preuninstall",
+    "test": "node --test ./scripts.test.mjs && prettier --check ./README.md ./CHANGELOG.md ./package.json ./scripts.mjs ./scripts.test.mjs"
+  },
+  "devDependencies": {
+    "prettier": "^3.5.3"
+  },
+  "prettier": {},
+  "ffmpeg": "7.1.1"
+}
