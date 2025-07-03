@@ -116,6 +116,7 @@ async function liveNavigate(request, { mayPushState = true } = {}) {
         window.location.href = response.headers.get("Location");
         return;
       }
+      if (500 <= response.status) throw new Error();
       const responseURL = new URL(response.url);
       responseURL.hash = requestURL.hash;
       const responseText = await response.text();
