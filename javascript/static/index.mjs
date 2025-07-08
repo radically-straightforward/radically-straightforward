@@ -998,7 +998,7 @@ export function popover({
             (remainOpenWhileFocused && target.contains(event.target))
           )
             return;
-          abortController?.abort();
+          abortController.abort();
           target.hidePopover();
         },
         { signal: abortController.signal },
