@@ -132,13 +132,6 @@
   ```
 
 - Live Navigation
-  - Cache server responses to show a preview while fetching a page.
-    - Advantages:
-      - It’ll potentially be a bit faster.
-    - Disadvantages:
-      - It complicates the implementation.
-      - It uses more memory on the client side.
-    - Make sure to clear cache on sign-out or the back button will reveal private information.
   - Pre-fetching
     - There are some links that have side-effects, for example, changing the most recently visited course and conversation
     - Potential workaround: Have some flag that the request is a pre-fetching (say, an HTTP header) and don’t perform these side-effects
