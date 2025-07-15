@@ -3,6 +3,17 @@ import * as utilities from "@radically-straightforward/utilities";
 import fastMyersDiff from "fast-myers-diff";
 import * as floatingUI from "@floating-ui/dom";
 
+document.addEventListener(
+  "DOMContentLoaded",
+  () => {
+    liveNavigate.cache.set(
+      liveNavigate.previousLocation.href,
+      new XMLSerializer().serializeToString(document),
+    );
+  },
+  { once: true },
+);
+
 document.addEventListener("DOMContentLoaded", () => {
   execute(document.querySelector("html"));
 });
@@ -107,18 +118,26 @@ async function liveNavigate(request, { mayPushState = true } = {}) {
     try {
       liveConnection.backgroundJob?.stop();
       liveNavigate.abortController?.abort();
-      liveNavigate.abortController = new AbortController();
-      request.headers.set("Live-Navigation", "true");
-      const response = await fetch(request, {
-        signal: liveNavigate.abortController.signal,
-      });
-      if (typeof response.headers.get("Location") === "string") {
-        window.location.href = response.headers.get("Location");
-        return;
+      let responseURL = new URL(request.url);
+      let responseText = liveNavigate.cache.get(request.url);
+      if (typeof responseText !== "string") {
+        liveNavigate.abortController = new AbortController();
+        request.headers.set("Live-Navigation", "true");
+        const response = await fetch(request, {
+          signal: liveNavigate.abortController.signal,
+        });
+        if (typeof response.headers.get("Location") === "string") {
+          window.location.href = response.headers.get("Location");
+          return;
+        }
+        responseURL = new URL(response.url);
+        responseURL.hash = requestURL.hash;
+        responseText = await response.text();
+        liveNavigate.cache.delete(response.url);
+        liveNavigate.cache.set(response.url, responseText);
+        for (const key of [...liveNavigate.cache.keys()].slice(0, -15))
+          liveNavigate.cache.delete(key);
       }
-      const responseURL = new URL(response.url);
-      responseURL.hash = requestURL.hash;
-      const responseText = await response.text();
       if (
         mayPushState &&
         (liveNavigate.previousLocation.pathname !== responseURL.pathname ||
@@ -161,6 +180,7 @@ async function liveNavigate(request, { mayPushState = true } = {}) {
 }
 liveNavigate.previousLocation = { ...window.location };
 liveNavigate.abortController = undefined;
+liveNavigate.cache = new Map();
 
 /**
  * Open a [Live Connection](https://github.com/radically-straightforward/radically-straightforward/tree/main/server#live-connection) to the server.
@@ -223,6 +243,10 @@ export async function liveConnection(requestId, { reload = false } = {}) {
         while (true) {
           const responseText = (await responseBodyReader.read()).value;
           if (responseText === undefined) break;
+          liveNavigate.cache.delete(response.url);
+          liveNavigate.cache.set(response.url, responseText);
+          for (const key of [...liveNavigate.cache.keys()].slice(0, -15))
+            liveNavigate.cache.delete(key);
           documentMount(responseText);
         }
       } catch (error) {
