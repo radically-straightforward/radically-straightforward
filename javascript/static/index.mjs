@@ -127,6 +127,7 @@ async function liveNavigate(request, { mayPushState = true } = {}) {
           signal: liveNavigate.abortController.signal,
         });
         if (typeof response.headers.get("Location") === "string") {
+          document.querySelector("html").isModified = false;
           window.location.href = response.headers.get("Location");
           return;
         }
