@@ -97,6 +97,7 @@ window.addEventListener("beforeunload", (event) => {
 async function liveNavigate(request, { mayPushState = true } = {}) {
   const requestURL = new URL(request.url);
   if (
+    request.method !== "GET" ||
     liveNavigate.previousLocation.pathname !== requestURL.pathname ||
     liveNavigate.previousLocation.search !== requestURL.search
   ) {
@@ -119,7 +120,10 @@ async function liveNavigate(request, { mayPushState = true } = {}) {
       liveConnection.backgroundJob?.stop();
       liveNavigate.abortController?.abort();
       let responseURL = new URL(request.url);
-      let responseText = liveNavigate.cache.get(request.url);
+      let responseText =
+        request.method === "GET"
+          ? liveNavigate.cache.get(request.url)
+          : undefined;
       if (typeof responseText !== "string") {
         liveNavigate.abortController = new AbortController();
         request.headers.set("Live-Navigation", "true");
@@ -134,10 +138,12 @@ async function liveNavigate(request, { mayPushState = true } = {}) {
         responseURL = new URL(response.url);
         responseURL.hash = requestURL.hash;
         responseText = await response.text();
-        liveNavigate.cache.delete(response.url);
-        liveNavigate.cache.set(response.url, responseText);
-        for (const key of [...liveNavigate.cache.keys()].slice(0, -15))
-          liveNavigate.cache.delete(key);
+        if (request.method === "GET") {
+          liveNavigate.cache.delete(response.url);
+          liveNavigate.cache.set(response.url, responseText);
+          for (const key of [...liveNavigate.cache.keys()].slice(0, -15))
+            liveNavigate.cache.delete(key);
+        }
       }
       if (
         mayPushState &&
