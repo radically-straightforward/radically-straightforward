@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.13 · 2025-07-24
+
+- Added a way for `redirect()` to say that it’s special for Live Connections, sending an HTTP status of 200.
+
 ## 1.0.12 · 2025-05-08
 
 - Added support for external redirects in Live Navigation by returning HTTP status 200.

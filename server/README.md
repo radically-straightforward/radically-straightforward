@@ -433,7 +433,7 @@ export type Response = http.ServerResponse & {
   setFlash: (message: string) => Response;
   redirect: (
     destination?: string,
-    type?: "see-other" | "temporary" | "permanent",
+    type?: "see-other" | "temporary" | "permanent" | "live-navigation",
   ) => Response;
 };
 ```

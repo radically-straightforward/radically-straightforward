@@ -124,7 +124,7 @@ export type Response = http.ServerResponse & {
   setFlash: (message: string) => Response;
   redirect: (
     destination?: string,
-    type?: "see-other" | "temporary" | "permanent",
+    type?: "see-other" | "temporary" | "permanent" | "live-navigation",
   ) => Response;
 };
 
@@ -564,7 +564,11 @@ export default function server({
 
             response.redirect = (
               destination: string = "",
-              type: "see-other" | "temporary" | "permanent" = "see-other",
+              type:
+                | "see-other"
+                | "temporary"
+                | "permanent"
+                | "live-navigation" = "see-other",
             ): typeof response => {
               response.statusCode =
                 request.headers["live-navigation"] === "true" &&
@@ -574,6 +578,7 @@ export default function server({
                       "see-other": 303,
                       temporary: 307,
                       permanent: 308,
+                      "live-navigation": 200,
                     }[type];
               response.setHeader(
                 "Location",
