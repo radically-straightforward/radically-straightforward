@@ -33,6 +33,7 @@
   },
   "devDependencies": {
     "@radically-straightforward/documentation": "^1.0.4",
+    "@radically-straightforward/html": "^1.0.1",
     "@radically-straightforward/typescript": "^1.0.0",
     "@types/node": "^22.13.11",
     "prettier": "^3.5.3",
