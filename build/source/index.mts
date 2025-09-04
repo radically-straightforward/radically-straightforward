@@ -14,6 +14,7 @@ import postcssLightDarkFunction from "@csstools/postcss-light-dark-function";
 import esbuild from "esbuild";
 import xxhash from "xxhash-addon";
 import baseX from "base-x";
+import html from "@radically-straightforward/html";
 import css, { CSS } from "@radically-straightforward/css";
 import { JavaScript } from "@radically-straightforward/javascript";
 
@@ -60,9 +61,10 @@ for (const source of await globby("./build/**/*.mjs")) {
             if (path.node.tag.name === "css") {
               let code = prettierSync.format(
                 new Function(
+                  "html",
                   "css",
                   `return (${babelGenerator.default(path.node).code});`,
-                )(css),
+                )(html, css),
                 { parser: "css" },
               );
               if (isGlobal) {

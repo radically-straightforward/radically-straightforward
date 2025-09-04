@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.0.12 · 2025-09-04
+
+- Added support for `` html`___` `` in `` css`___` ``.
+
 ## 2.0.9 · 2025-02-03
 
 - Simplify implementation. The problem is that Prettier only provides an asynchronous API, and Babel plugins must be synchronous. The previous solution was to do two passes on the code: the first pass identified the uses of `` css`___` ``/`` javascript`___` ``, then Prettier was called asynchronously, and the second pass would transform the uses of `` css`___` ``/`` javascript`___` ``. The new solution uses `make-synchronized` to call Prettier synchronously from within the plugin. Benchmarks suggest that the new solution is slightly slower, because `make-synchronized` works by creating a worker thread and there’s an overhead of communicating data back and forth, but the overhead seems to be small and it’s worth for the simplicity of the implementation.

@@ -5,6 +5,7 @@ import path from "node:path";
 import fs from "node:fs/promises";
 import childProcess from "node:child_process";
 import util from "node:util";
+import html from "@radically-straightforward/html";
 import css from "@radically-straightforward/css";
 import javascript from "@radically-straightforward/javascript";
 
@@ -26,16 +27,19 @@ test(async () => {
 
       css\`
         @import "example-library/index.css";
+
         body {
-          background-color: red;
+          background-color: \${"red"};
         }
-        .a {
-          .b {
-            @media (min-width: 400px) {
-              background-color: light-dark(white, black);
-            }
-          }
+
+        p {
+          background-image: url("data:image/svg+xml,\${encodeURIComponent(html\`
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16">
+              <rect fill="#f00" x="8" y="8" width="1" height="1" />
+            </svg>
+          \`)}");
         }
+
         \${["red", "green", "blue"].map(
           (color) => css\`
             .text--\${color} {
@@ -43,6 +47,14 @@ test(async () => {
             }
           \`,
         )}
+
+        .a {
+          .b {
+            @media (min-width: 400px) {
+              background-color: light-dark(white, black);
+            }
+          }
+        }
       \`;
 
       javascript\`
@@ -122,7 +134,7 @@ test(async () => {
       path.join("./build/static/", paths["index.css"]),
       "utf-8",
     ),
-    "@layer __RADICALLY_STRAIGHTFORWARD__GLOBAL__{p{background-color:#00f}body{background-color:red}@media (min-width: 400px){.a .b{--csstools-light-dark-toggle--0: var(--csstools-color-scheme--light) black;background-color:var(--csstools-light-dark-toggle--0, white);background-color:light-dark(white,black)}}.text--red{color:red}.text--green{color:green}.text--blue{color:#00f}.user{background-color:green}}@layer __RADICALLY_STRAIGHTFORWARD__INLINE__{@layer ezwcjopkwtcbnn{[css~=ezwcjopkwtcbnn]{background-color:pink}}@layer cppvvoknyrtbnr{[css~=cppvvoknyrtbnr]{background-color:purple}[css~=cppvvoknyrtbnr]:hover{-webkit-appearance:none;appearance:none}}}\n/*# sourceMappingURL=index--3EQP3BTO.css.map */\n",
+    "@layer __RADICALLY_STRAIGHTFORWARD__GLOBAL__{p{background-color:#00f}body{background-color:red}p{background-image:url(data:image/svg+xml,%0A%20%20%20%20%20%20%20%20%20%20%20%20%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2216%22%20height%3D%2216%22%3E%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%3Crect%20fill%3D%22%23f00%22%20x%3D%228%22%20y%3D%228%22%20width%3D%221%22%20height%3D%221%22%20%2F%3E%0A%20%20%20%20%20%20%20%20%20%20%20%20%3C%2Fsvg%3E%0A%20%20%20%20%20%20%20%20%20%20)}.text--red{color:red}.text--green{color:green}.text--blue{color:#00f}@media (min-width: 400px){.a .b{--csstools-light-dark-toggle--0: var(--csstools-color-scheme--light) black;background-color:var(--csstools-light-dark-toggle--0, white);background-color:light-dark(white,black)}}.user{background-color:green}}@layer __RADICALLY_STRAIGHTFORWARD__INLINE__{@layer ezwcjopkwtcbnn{[css~=ezwcjopkwtcbnn]{background-color:pink}}@layer cppvvoknyrtbnr{[css~=cppvvoknyrtbnr]{background-color:purple}[css~=cppvvoknyrtbnr]:hover{-webkit-appearance:none;appearance:none}}}\n/*# sourceMappingURL=index--NWMTJGH2.css.map */\n",
   );
   assert.equal(
     await fs.readFile(
