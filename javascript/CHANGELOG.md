@@ -1,5 +1,9 @@
 # Changelog
 
+## 4.0.24 · 2025-09-11
+
+- Fixed issue in which `___.isModified = false` caused `morph()` to overwrite `value`s on Live Connection updates.
+
 ## 4.0.21 · 2025-07-24
 
 - Added cache to Live Navigation.

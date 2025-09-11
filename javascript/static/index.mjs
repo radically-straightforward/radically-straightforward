@@ -365,7 +365,10 @@ export function mount(element, content) {
  */
 export function morph(from, to) {
   if (from.morph === false) return;
-  if (from.matches("input, textarea") && !isModified(from))
+  if (
+    from.matches("input, textarea") &&
+    !isModified(from, { ignoreIsModifiedProperty: true })
+  )
     for (const property of ["value", "checked"])
       if (from[property] !== to[property]) from[property] = to[property];
   for (const attributeName of new Set([
@@ -522,12 +525,16 @@ export function stringToElement(string, options = {}) {
  *
  * `isModified()` powers the “Your changes will be lost if you continue.” dialog that `@radically-straightforward/javascript` enables by default.
  */
-export function isModified(element, { includeSubforms = false } = {}) {
+export function isModified(
+  element,
+  { includeSubforms = false, ignoreIsModifiedProperty = false } = {},
+) {
   const elements = children(element, { includeSubforms });
   for (const element of elements) {
-    for (const parent of parents(element).reverse())
-      if (parent.isModified === true || parent.isModified === false)
-        return parent.isModified;
+    if (!ignoreIsModifiedProperty)
+      for (const parent of parents(element).reverse())
+        if (parent.isModified === true || parent.isModified === false)
+          return parent.isModified;
     if (
       element.matches("input, textarea") &&
       element.closest("[disabled]") === null &&
