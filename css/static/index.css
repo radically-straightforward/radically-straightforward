@@ -747,7 +747,7 @@ The `[state~="noninteractive"]` state makes **the children** of an element not i
 }
 
 /*
-The `.scroll` class creates a scrolling container.
+The `.scroll` class creates a scrolling container. Must not be used inside a `[type~="popover"]`—in that case use only `overflow: auto;`.
 */
 
 .scroll {
