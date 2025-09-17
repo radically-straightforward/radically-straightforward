@@ -531,17 +531,22 @@ export function isModified(
 ) {
   const elements = children(element, { includeSubforms });
   for (const element of elements) {
+    let isModifiedProperty;
     if (!ignoreIsModifiedProperty)
-      for (const parent of parents(element).reverse())
-        if (parent.isModified === true || parent.isModified === false)
-          return parent.isModified;
+      for (const parent of parents(element))
+        if (parent.isModified === true || parent.isModified === false) {
+          isModifiedProperty = parent.isModified;
+          break;
+        }
     if (
-      element.matches("input, textarea") &&
-      element.closest("[disabled]") === null &&
-      (((element.type === "checkbox" || element.type === "radio") &&
-        element.checked !== element.defaultChecked) ||
-        (!(element.type === "checkbox" || element.type === "radio") &&
-          element.value !== element.defaultValue))
+      isModifiedProperty === true ||
+      (isModifiedProperty !== false &&
+        element.matches("input, textarea") &&
+        element.closest("[disabled]") === null &&
+        (((element.type === "checkbox" || element.type === "radio") &&
+          element.checked !== element.defaultChecked) ||
+          (!(element.type === "checkbox" || element.type === "radio") &&
+            element.value !== element.defaultValue)))
     )
       return true;
   }
