@@ -237,7 +237,10 @@ A specialized version of `stringToElements()` for when the `string` is a single 
 ### `isModified()`
 
 ```typescript
-export function isModified(element, { includeSubforms = false } = {});
+export function isModified(
+  element,
+  { includeSubforms = false, ignoreIsModifiedProperty = false } = {},
+);
 ```
 
 Detects whether there are form fields in `element` and its `children()` that are modified with respect to their `defaultValue` and `defaultChecked` properties.
