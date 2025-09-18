@@ -1,5 +1,9 @@
 # Changelog
 
+## 4.0.25 · 2025-09-18
+
+- Fixed the behavior of `isModified()` such that using the property `___.isModified = false` doesn’t override the output of parent elements.
+
 ## 4.0.24 · 2025-09-11
 
 - Fixed issue in which `___.isModified = false` caused `morph()` to overwrite `value`s on Live Connection updates.
