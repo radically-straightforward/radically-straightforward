@@ -523,7 +523,7 @@ export function stringToElement(string, options = {}) {
  *
  * You may set the `disabled` attribute on a parent element to disable an entire subtree.
  *
- * `isModified()` powers the “Your changes will be lost if you continue.” dialog that `@radically-straightforward/javascript` enables by default.
+ * `isModified()` powers the “Your changes will be lost if you continue.” dialog that `@radically-straightforward/javascript` enables by default and the part of `morph()` that updates `<input>`s and `<textarea>`s. You may use `isModified()` in features such as only showing an “Update” button in case there is a form input that has been modified.
  */
 export function isModified(
   element,
