@@ -1,5 +1,9 @@
 # Changelog
 
+## 4.0.26 · 2025-09-23
+
+- Fixed the behavior of “Your changes will be lost if you continue.”
+
 ## 4.0.25 · 2025-09-18
 
 - Fixed the behavior of `isModified()` such that using the property `___.isModified = false` doesn’t override the output of parent elements.
