@@ -349,7 +349,11 @@ export function snippet(
   const textTokenMatchIndex = textTokens.findIndex(
     (tokenWithPosition) =>
       tokenWithPosition.tokenIsStopWord === false &&
-      search.has(tokenWithPosition.token),
+      (highlightOptions.prefix
+        ? [...search].some((searchTerm) =>
+            tokenWithPosition.token.startsWith(searchTerm),
+          )
+        : search.has(tokenWithPosition.token)),
   );
   if (textTokenMatchIndex === -1)
     throw new Error(`‘snippet()’ called with no matching token.`);

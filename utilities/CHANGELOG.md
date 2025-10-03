@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.0.9 · 2025-10-03
+
+- On `snippet()`, fix the `prefix` parameter.
+
 ## 2.0.8 · 2025-03-13
 
 - On `highlight()`, add the `prefix` parameter.
