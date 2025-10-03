@@ -105,10 +105,13 @@ test("highlight()", () => {
       "For my peanuts allergy peanut butter is sometimes used.",
       new Set(
         utilities
-          .tokenize("peanuts", { stopWords, stem: natural.PorterStemmer.stem })
+          .tokenize("peanuts", {
+            stopWords,
+            stem: (token) => natural.PorterStemmer.stem(token),
+          })
           .map((tokenWithPosition) => tokenWithPosition.token),
       ),
-      { stopWords, stem: natural.PorterStemmer.stem },
+      { stopWords, stem: (token) => natural.PorterStemmer.stem(token) },
     ),
     `For my <span class="highlight">peanuts</span> allergy <span class="highlight">peanut</span> butter is sometimes used.`,
   );
@@ -157,10 +160,13 @@ test("snippet()", () => {
       `,
       new Set(
         utilities
-          .tokenize("peanuts", { stopWords, stem: natural.PorterStemmer.stem })
+          .tokenize("peanuts", {
+            stopWords,
+            stem: (token) => natural.PorterStemmer.stem(token),
+          })
           .map((tokenWithPosition) => tokenWithPosition.token),
       ),
-      { stopWords, stem: natural.PorterStemmer.stem },
+      { stopWords, stem: (token) => natural.PorterStemmer.stem(token) },
     ),
     `… work in restaurants?\n\nFor my <span class="highlight">peanuts</span> allergy <span class="highlight">peanut</span> butter is sometimes …`,
   );
@@ -191,10 +197,17 @@ test("snippet()", () => {
       `,
       new Set(
         utilities
-          .tokenize("pea", { stopWords, stem: natural.PorterStemmer.stem })
+          .tokenize("pea", {
+            stopWords,
+            stem: (token) => natural.PorterStemmer.stem(token),
+          })
           .map((tokenWithPosition) => tokenWithPosition.token),
       ),
-      { prefix: true, stopWords, stem: natural.PorterStemmer.stem },
+      {
+        prefix: true,
+        stopWords,
+        stem: (token) => natural.PorterStemmer.stem(token),
+      },
     ),
     `… work in restaurants?\n\nFor my <span class="highlight">peanuts</span> allergy <span class="highlight">peanut</span> butter is sometimes …`,
   );
