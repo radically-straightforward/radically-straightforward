@@ -237,7 +237,10 @@ export function normalizeToken(token: string): string {
  *     "For my peanuts allergy peanut butter is sometimes used.",
  *     new Set(
  *       utilities
- *         .tokenize("peanuts", { stopWords, stem: (token) => natural.PorterStemmer.stem(token) })
+ *         .tokenize("peanuts", {
+ *           stopWords,
+ *           stem: (token) => natural.PorterStemmer.stem(token),
+ *         })
  *         .map((tokenWithPosition) => tokenWithPosition.token),
  *     ),
  *     { stopWords, stem: (token) => natural.PorterStemmer.stem(token) },
@@ -325,7 +328,10 @@ export function highlight(
  *     `,
  *     new Set(
  *       utilities
- *         .tokenize("peanuts", { stopWords, stem: (token) => natural.PorterStemmer.stem(token) })
+ *         .tokenize("peanuts", {
+ *           stopWords,
+ *           stem: (token) => natural.PorterStemmer.stem(token),
+ *         })
  *         .map((tokenWithPosition) => tokenWithPosition.token),
  *     ),
  *     { stopWords, stem: (token) => natural.PorterStemmer.stem(token) },

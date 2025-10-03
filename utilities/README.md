@@ -229,7 +229,10 @@ console.log(
     "For my peanuts allergy peanut butter is sometimes used.",
     new Set(
       utilities
-        .tokenize("peanuts", { stopWords, stem: (token) => natural.PorterStemmer.stem(token) })
+        .tokenize("peanuts", {
+          stopWords,
+          stem: (token) => natural.PorterStemmer.stem(token),
+        })
         .map((tokenWithPosition) => tokenWithPosition.token),
     ),
     { stopWords, stem: (token) => natural.PorterStemmer.stem(token) },
@@ -292,7 +295,10 @@ console.log(
     `,
     new Set(
       utilities
-        .tokenize("peanuts", { stopWords, stem: (token) => natural.PorterStemmer.stem(token) })
+        .tokenize("peanuts", {
+          stopWords,
+          stem: (token) => natural.PorterStemmer.stem(token),
+        })
         .map((tokenWithPosition) => tokenWithPosition.token),
     ),
     { stopWords, stem: (token) => natural.PorterStemmer.stem(token) },
