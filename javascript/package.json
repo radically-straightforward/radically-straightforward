@@ -35,20 +35,20 @@
     "test": "npm run prepare && node --test \"./build/**/*.test.mjs\" && prettier --check ./README.md ./CHANGELOG.md ./package.json ./tsconfig.json ./source/ ./static/"
   },
   "dependencies": {
-    "@floating-ui/dom": "^1.6.13",
+    "@floating-ui/dom": "^1.7.4",
     "@radically-straightforward/css": "^3.0.2",
     "@radically-straightforward/html": "^1.0.1",
-    "@radically-straightforward/utilities": "^2.0.8",
+    "@radically-straightforward/utilities": "^2.0.9",
     "fast-myers-diff": "^3.2.0"
   },
   "devDependencies": {
-    "@csstools/postcss-light-dark-function": "^2.0.7",
+    "@csstools/postcss-light-dark-function": "^2.0.11",
     "@radically-straightforward/documentation": "^1.0.4",
     "@radically-straightforward/typescript": "^1.0.0",
-    "@types/node": "^22.13.11",
-    "postcss": "^8.5.3",
-    "prettier": "^3.5.3",
-    "typescript": "^5.8.2"
+    "@types/node": "^24.6.2",
+    "postcss": "^8.5.6",
+    "prettier": "^3.6.2",
+    "typescript": "^5.9.3"
   },
   "prettier": {}
 }
