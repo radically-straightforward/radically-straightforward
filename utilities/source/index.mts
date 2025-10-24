@@ -6,6 +6,23 @@ export function sleep(duration: number): Promise<void> {
 }
 
 /**
+ * A polyfill for [`Promise.withResolvers()`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/withResolvers) to be used until browser support gets better.
+ */
+export function PromiseWithResolvers<T>(): {
+  promise: Promise<T>;
+  resolve: (value: T | PromiseLike<T>) => void;
+  reject: (reason?: any) => void;
+} {
+  let resolve: any;
+  let reject: any;
+  const promise = new Promise<T>((promiseResolve, promiseReject) => {
+    resolve = promiseResolve;
+    reject = promiseReject;
+  });
+  return { promise, resolve, reject };
+}
+
+/**
  * A fast random string generator. The generated strings vary in length, but are generally around 10 characters. The generated strings include the characters `[a-z0-9]`. The generated strings are **not** cryptographically secure—if you need that, then use [`crypto-random-string`](https://www.npmjs.com/package/crypto-random-string).
  */
 export function randomString(): string {
@@ -705,6 +722,7 @@ export function foregroundJob(
   job: () => void | Promise<void>,
 ): () => Promise<void> {
   let state: "available" | "running" | "runningAndMarkedForRerun" = "available";
+  let promiseWithResolvers = PromiseWithResolvers();
   return async function run() {
     if (state === "available") {
       state = "running";
@@ -722,6 +740,11 @@ export function foregroundJob(
         "runningAndMarkedForRerun";
       state = "available";
       if (shouldRerun) await run();
-    } else if (state === "running") state = "runningAndMarkedForRerun";
+      promiseWithResolvers.resolve(undefined);
+      promiseWithResolvers = PromiseWithResolvers();
+    } else if (state === "running") {
+      state = "runningAndMarkedForRerun";
+      await promiseWithResolvers.promise;
+    }
   };
 }

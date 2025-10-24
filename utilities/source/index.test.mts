@@ -10,6 +10,12 @@ test("sleep()", async () => {
   assert(Date.now() - before >= 1000);
 });
 
+test("PromiseWithResolvers()", async () => {
+  const promiseWithResolvers = utilities.PromiseWithResolvers();
+  promiseWithResolvers.resolve(undefined);
+  await promiseWithResolvers.promise;
+});
+
 test("randomString()", () => {
   assert.match(utilities.randomString(), /^[a-z0-9]+$/);
 });

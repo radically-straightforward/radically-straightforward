@@ -24,6 +24,18 @@ export function sleep(duration: number): Promise<void>;
 
 A promisified version of `setTimeout()`. Bare-bones: It doesn’t even offer a way to `clearTimeout()`. Useful in JavaScript that may run in the browser—if you’re only targeting Node.js then you’re better served by [`timersPromises.setTimeout()`](https://nodejs.org/api/timers.html#timerspromisessettimeoutdelay-value-options).
 
+### `PromiseWithResolvers()`
+
+```typescript
+export function PromiseWithResolvers<T>(): {
+  promise: Promise<T>;
+  resolve: (value: T | PromiseLike<T>) => void;
+  reject: (reason?: any) => void;
+};
+```
+
+A polyfill for [`Promise.withResolvers()`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/withResolvers) to be used until browser support gets better.
+
 ### `randomString()`
 
 ```typescript
