@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.0.10 · 2025-10-24
+
+- On `foregroundJob()`, make it so that you can `await` for the job to stop running/rerunning.
+
 ## 2.0.9 · 2025-10-03
 
 - On `snippet()`, fix the `prefix` parameter.

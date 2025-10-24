@@ -705,7 +705,7 @@ export function foregroundJob(
   job: () => void | Promise<void>,
 ): () => Promise<void> {
   let state: "available" | "running" | "runningAndMarkedForRerun" = "available";
-  const run = async () => {
+  return async function run() {
     if (state === "available") {
       state = "running";
       try {
@@ -717,15 +717,11 @@ export function foregroundJob(
           (error as Error)?.stack ?? "",
         );
       }
-      if (
+      const shouldRerun =
         (state as "running" | "runningAndMarkedForRerun") ===
-        "runningAndMarkedForRerun"
-      )
-        setTimeout(() => {
-          run();
-        });
+        "runningAndMarkedForRerun";
       state = "available";
+      if (shouldRerun) await run();
     } else if (state === "running") state = "runningAndMarkedForRerun";
   };
-  return run;
 }
