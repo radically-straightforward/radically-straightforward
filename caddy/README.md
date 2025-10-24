@@ -131,7 +131,6 @@ A Caddyfile template for an application.
 - Set the following security headers:
 
   > **Note:** These headers may be overwritten by the underlying application. This is useful if the application needs to tweak some security settings, for example, Content Security Policy (CSP).
-
   - **`Strict-Transport-Security`:** Tells the browser that moving forward it should only attempt to load this origin with HTTPS (not HTTP). The `hstsPreload` parameter controls whether to set the [`preload` directive](https://hstspreload.org/)—by default it’s `false`, but it’s recommended that you opt into preloading by setting `hstsPreload: true`.
 
   - **`Cache-Control`:** Turns off HTTP caching. This is the best setting for the dynamic parts of the application: in the best case the cache may be stale, and in the worst case the cache may include private information that could leak even after signing out. For static files, we recommend that you overwrite this header to enable caching, for example, `header Cache-Control "public, max-age=31536000, immutable"`.

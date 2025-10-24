@@ -476,7 +476,6 @@ Create a popover (tooltip, dropdown menu, and so forth).
 - **`target`:** The element that contains the popover contents. It must have the `type="popover"` type, and it may have one of the `.popover--<color>` classes (see `@radically-straightforward/javascript/static/index.css`). As a special case, if `trigger` is set to `"showOnce"`, then `target` may be a string which is turned into a DOM element by `popover()`.
 
 - **`trigger`:** One of the following:
-
   - **`"hover"`:** Show the popover on the `element.onmouseenter` or `element.onfocusin` events and hide the popover on the `element.onmouseleave` or `element.onfocusout` events. The `target` must not contain elements that may be focused (for example, `<button>`, `<input>`, and so forth), otherwise keyboard navigation is broken. On `isTouch` devices, `"hover"` popovers don’t show up because they often conflict with `"click"` popovers.
 
   - **`"click"`:** Show the popover on the `element.onclick` event. When to hide the popover depends on the `remainOpenWhileFocused`. If `remainOpenWhileFocused` is `false` (the default), then the next click anywhere will close the popover—this is useful for dropdown menus with `<button>`s. If `remainOpenWhileFocused` is `true`, then only clicks outside of the popover will close it—this is useful for dropdown menus with `<input>`s. If `remainOpenWhileFocused` is `true` and you need to close the popover programmatically, you may send a `click` event to an element out of the popover, for example, `document.querySelector("body").click()`.

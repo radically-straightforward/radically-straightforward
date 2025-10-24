@@ -176,7 +176,6 @@ sanitize.replacement = "";
  *   The performance of the `escape()` function matters because it’s used frequently to escape user input when rendering HTML with the `` html`___` `` tagged template.
  *
  *   The following are some details on how this implementation is made faster:
- *
  *   - The relatively new string function `replaceAll()` when used with a string parameter is faster than `replace()` with a regular expression.
  *
  *   - Perhaps surprisingly, calling `replaceAll()` multiple times is faster than using a single regular expression of the kind `/[&<>"']/g`.

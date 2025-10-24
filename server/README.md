@@ -291,7 +291,6 @@ In your application:
 - **Automatic Management of Uploaded Files:** When parsing the request, the uploaded files are put in a temporary directory, and if the application doesn’t move them to a permanent location, they’re automatically deleted after the response is sent.
 
 - **Designed to Be Used with a Reverse Proxy ([Caddy](https://github.com/radically-straightforward/radically-straightforward/tree/main/caddy)):** A reverse proxy is essential in deploying a Node.js application. It provides HTTPS, HTTP/2 (and newer versions), load balancing between multiple server processes, static file serving, and so forth. Node.js could provide these features, but it’d be slower and clunkier at them. `@radically-straightforward/server` is designed to be used with [`@radically-straightforward/caddy`](https://github.com/radically-straightforward/radically-straightforward/tree/main/caddy), which entails the following:
-
   - The server binds to `localhost` (because Caddy runs on the same machine) and doesn’t respond to requests coming from other machines.
 
   - The server trusts the `X-Forwarded-For`, `X-Forwarded-Proto`, and `X-Forwarded-Host` request headers, which normally could be spoofed but can be trusted because they’re set by Caddy.
