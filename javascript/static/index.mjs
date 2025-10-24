@@ -18,7 +18,7 @@ document.addEventListener("DOMContentLoaded", () => {
   execute(document.querySelector("html"));
 });
 
-document.addEventListener("click", (event) => {
+document.addEventListener("click", async (event) => {
   if (event.shiftKey || event.ctrlKey || event.altKey || event.metaKey) return;
   if (event.target.closest(`a:not([target="_blank"])`) !== null) {
     const element = event.target.closest(`a:not([target="_blank"])`);
@@ -67,7 +67,7 @@ document.addEventListener("click", (event) => {
         : new URLSearchParams(serialize(form));
     if (typeof button.getAttribute("name") === "string")
       body.append(button.getAttribute("name"), button.value);
-    form.onsubmit?.();
+    await form.onsubmit?.();
     liveNavigate(
       method === "GET"
         ? (() => {

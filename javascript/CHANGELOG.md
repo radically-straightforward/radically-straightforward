@@ -1,5 +1,9 @@
 # Changelog
 
+## 4.0.27 · 2025-10-24
+
+- Make `onsubmit()` `async`.
+
 ## 4.0.26 · 2025-09-23
 
 - Fixed the behavior of “Your changes will be lost if you continue.”
