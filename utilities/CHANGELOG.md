@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.0.11 · 2025-10-26
+
+- On `foregroundJob()`, make it so that you can `await` for the job to stop running/rerunning even when this is a subsequent call that will set the state to `"runningAndMarkedForRerun"`.
+
 ## 2.0.10 · 2025-10-24
 
 - On `foregroundJob()`, make it so that you can `await` for the job to stop running/rerunning.
