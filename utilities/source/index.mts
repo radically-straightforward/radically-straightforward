@@ -742,7 +742,7 @@ export function foregroundJob(
       if (shouldRerun) await run();
       promiseWithResolvers.resolve(undefined);
       promiseWithResolvers = PromiseWithResolvers();
-    } else if (state === "running") {
+    } else {
       state = "runningAndMarkedForRerun";
       await promiseWithResolvers.promise;
     }
