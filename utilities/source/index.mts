@@ -720,13 +720,17 @@ export async function timeout<Type>(
  */
 export function foregroundJob(
   job: () => void | Promise<void>,
-): (() => Promise<void>) & { promise: Promise<void> } {
-  let state: "available" | "running" | "runningAndMarkedForRerun" = "available";
-  let promiseWithResolvers = PromiseWithResolvers<void>();
-  run.promise = promiseWithResolvers.promise;
+): (() => Promise<void>) & { promise?: Promise<void> } {
+  let state: "available" | "running" | "runningAndMarkedForRerun" | "rerun" =
+    "available";
+  let promiseWithResolvers: ReturnType<typeof PromiseWithResolvers>;
   return run;
   async function run() {
-    if (state === "available") {
+    if (state === "available" || state === "rerun") {
+      if (state === "available") {
+        promiseWithResolvers = PromiseWithResolvers();
+        run.promise = promiseWithResolvers.promise;
+      }
       state = "running";
       try {
         await job();
@@ -740,11 +744,10 @@ export function foregroundJob(
       const shouldRerun =
         (state as "running" | "runningAndMarkedForRerun") ===
         "runningAndMarkedForRerun";
-      state = "available";
+      state = "rerun";
       if (shouldRerun) await run();
+      state = "available";
       promiseWithResolvers.resolve(undefined);
-      promiseWithResolvers = PromiseWithResolvers();
-      run.promise = promiseWithResolvers.promise;
     } else {
       state = "runningAndMarkedForRerun";
       await promiseWithResolvers.promise;
