@@ -716,14 +716,16 @@ export async function timeout<Type>(
  *
  * This is different from `backgroundJob()` because it doesn’t run periodically—it only runs when it’s called.
  *
- * This is different from Lodash’s [`debounce()`](https://lodash.com/docs/4.17.15#debounce) and [`throttle()`](https://lodash.com/docs/4.17.15#throttle) because it doesn’t `wait`.
+ * This is different from Lodash’s [`debounce()`](https://lodash.com/docs/4.17.15#debounce) and [`throttle()`](https://lodash.com/docs/4.17.15#throttle) because it doesn’t `wait`. Instead, it depends on the timing of the `job` itself to pace the execution, so it works best when the `job` is slow.
  */
 export function foregroundJob(
   job: () => void | Promise<void>,
-): () => Promise<void> {
+): (() => Promise<void>) & { promise: Promise<void> } {
   let state: "available" | "running" | "runningAndMarkedForRerun" = "available";
-  let promiseWithResolvers = PromiseWithResolvers();
-  return async function run() {
+  let promiseWithResolvers = PromiseWithResolvers<void>();
+  run.promise = promiseWithResolvers.promise;
+  return run;
+  async function run() {
     if (state === "available") {
       state = "running";
       try {
@@ -742,9 +744,10 @@ export function foregroundJob(
       if (shouldRerun) await run();
       promiseWithResolvers.resolve(undefined);
       promiseWithResolvers = PromiseWithResolvers();
+      run.promise = promiseWithResolvers.promise;
     } else {
       state = "runningAndMarkedForRerun";
       await promiseWithResolvers.promise;
     }
-  };
+  }
 }
