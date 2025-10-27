@@ -741,11 +741,13 @@ export function foregroundJob(
           (error as Error)?.stack ?? "",
         );
       }
-      const shouldRerun =
+      if (
         (state as "running" | "runningAndMarkedForRerun") ===
-        "runningAndMarkedForRerun";
-      state = "rerun";
-      if (shouldRerun) await run();
+        "runningAndMarkedForRerun"
+      ) {
+        state = "rerun";
+        await run();
+      }
       state = "available";
       promiseWithResolvers.resolve(undefined);
     } else {
