@@ -720,16 +720,16 @@ export async function timeout<Type>(
  */
 export function foregroundJob(
   job: () => void | Promise<void>,
-): (() => Promise<void>) & { promise?: Promise<void> } {
+): (() => Promise<void>) & { promise: Promise<void> } {
   let state: "available" | "running" | "runningAndMarkedForRerun" | "rerun" =
     "available";
   let promiseWithResolvers: ReturnType<typeof PromiseWithResolvers>;
-  return run;
+  return run as any;
   async function run() {
     if (state === "available" || state === "rerun") {
       if (state === "available") {
         promiseWithResolvers = PromiseWithResolvers();
-        run.promise = promiseWithResolvers.promise;
+        (run as any).promise = promiseWithResolvers.promise;
       }
       state = "running";
       try {
