@@ -717,7 +717,7 @@ export async function timeout<Type>(
  * This is different from `backgroundJob()` because it doesn’t run periodically—it only runs when it’s called.
  *
  * This is different from Lodash’s [`debounce()`](https://lodash.com/docs/4.17.15#debounce) and [`throttle()`](https://lodash.com/docs/4.17.15#throttle) because it doesn’t `wait`. Instead, it depends on the timing of the `job` itself to pace the execution, so it works best when the `job` is slow.
- * 
+ *
  * There’s a promise available under the `.promise` property of the returned value that resolves when there’s no job running. It’s useful to synchronize actions that must wait on the job to be over.
  */
 export function foregroundJob(
