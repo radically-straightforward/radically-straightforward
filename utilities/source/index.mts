@@ -712,11 +712,13 @@ export async function timeout<Type>(
 /**
  * Controls the execution of the given `job` such that it can’t execute until the previous execution finished.
  *
- * This is useful, for example, for an autocomplete feature in which an event listener of the `keydown` event `fetch()`es from the server. If the function is called while it’s running, then it schedules itself to be rerun as soon as it completes.
+ * This is useful, for example, for an autocomplete feature in which an event listener of the `input` event `fetch()`es from the server. If the `job` is called again while it’s running, then it schedules itself to be rerun as soon as it completes.
  *
  * This is different from `backgroundJob()` because it doesn’t run periodically—it only runs when it’s called.
  *
  * This is different from Lodash’s [`debounce()`](https://lodash.com/docs/4.17.15#debounce) and [`throttle()`](https://lodash.com/docs/4.17.15#throttle) because it doesn’t `wait`. Instead, it depends on the timing of the `job` itself to pace the execution, so it works best when the `job` is slow.
+ * 
+ * There’s a promise available under the `.promise` property of the returned value that resolves when there’s no job running. It’s useful to synchronize actions that must wait on the job to be over.
  */
 export function foregroundJob(
   job: () => void | Promise<void>,
