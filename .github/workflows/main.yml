@@ -1,4 +1,6 @@
 on: push
+permissions:
+  id-token: write
 jobs:
   main:
     strategy:
