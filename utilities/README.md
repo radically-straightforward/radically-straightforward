@@ -27,9 +27,9 @@ A promisified version of `setTimeout()`. Bare-bones: It doesn’t even offer a w
 ### `PromiseWithResolvers()`
 
 ```typescript
-export function PromiseWithResolvers<T>(): {
-  promise: Promise<T>;
-  resolve: (value: T | PromiseLike<T>) => void;
+export function PromiseWithResolvers<Type>(): {
+  promise: Promise<Type>;
+  resolve: (value: Type | PromiseLike<Type>) => void;
   reject: (reason?: any) => void;
 };
 ```
@@ -558,5 +558,19 @@ This is different from `backgroundJob()` because it doesn’t run periodically�
 This is different from Lodash’s [`debounce()`](https://lodash.com/docs/4.17.15#debounce) and [`throttle()`](https://lodash.com/docs/4.17.15#throttle) because it doesn’t `wait`. Instead, it depends on the timing of the `job` itself to pace the execution, so it works best when the `job` is slow.
 
 There’s a promise available under the `.promise` property of the returned value that resolves when there’s no job running. It’s useful to synchronize actions that must wait on the job to be over.
+
+### `Cache`
+
+```typescript
+export class Cache<Type>;
+```
+
+An in-memory caching mechanism with the Least Recently Used (LRU) policy.
+
+Designed for simple tasks, for example, caching visited pages in Live Navigation.
+
+Designed for values that take a long time to produce, for example, a page in Live Navigation.
+
+Not designed for frequent access.
 
 <!-- DOCUMENTATION END: ./source/index.mts -->

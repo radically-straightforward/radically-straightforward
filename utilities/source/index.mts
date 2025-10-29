@@ -8,14 +8,14 @@ export function sleep(duration: number): Promise<void> {
 /**
  * A polyfill for [`Promise.withResolvers()`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/withResolvers) to be used until browser support gets better.
  */
-export function PromiseWithResolvers<T>(): {
-  promise: Promise<T>;
-  resolve: (value: T | PromiseLike<T>) => void;
+export function PromiseWithResolvers<Type>(): {
+  promise: Promise<Type>;
+  resolve: (value: Type | PromiseLike<Type>) => void;
   reject: (reason?: any) => void;
 } {
   let resolve: any;
   let reject: any;
-  const promise = new Promise<T>((promiseResolve, promiseReject) => {
+  const promise = new Promise<Type>((promiseResolve, promiseReject) => {
     resolve = promiseResolve;
     reject = promiseReject;
   });
@@ -756,5 +756,36 @@ export function foregroundJob(
       state = "runningAndMarkedForRerun";
       await promiseWithResolvers.promise;
     }
+  }
+}
+
+/**
+ * An in-memory caching mechanism with the Least Recently Used (LRU) policy.
+ *
+ * Designed for simple tasks, for example, caching visited pages in Live Navigation.
+ *
+ * Designed for values that take a long time to produce, for example, a page in Live Navigation.
+ *
+ * Not designed for frequent access.
+ */
+export class Cache<Type> {
+  #storage = new Map<string, Type>();
+
+  constructor(public size: number = 15) {}
+
+  set(key: string, value: Type): void {
+    this.#storage.delete(key);
+    this.#storage.set(key, value);
+    for (const key of [...this.#storage.keys()].slice(0, -this.size))
+      this.#storage.delete(key);
+  }
+
+  get(key: string): Type | undefined {
+    const value = this.#storage.get(key);
+    if (value !== undefined) {
+      this.#storage.delete(key);
+      this.#storage.set(key, value);
+    }
+    return value;
   }
 }

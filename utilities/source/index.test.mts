@@ -366,3 +366,16 @@ test(
     setInterval(() => {});
   },
 );
+
+test("Cache", () => {
+  const cache = new utilities.Cache();
+  for (let keyNumber = 0; keyNumber < cache.size + 1; keyNumber++)
+    cache.set(String(keyNumber), keyNumber);
+  assert.equal(cache.get("0"), undefined);
+  for (let keyNumber = 1; keyNumber < cache.size + 1; keyNumber++)
+    assert.equal(cache.get(String(keyNumber)), keyNumber);
+  assert.equal(cache.get("1"), 1);
+  cache.set("-1", -1);
+  assert.equal(cache.get("1"), 1);
+  assert.equal(cache.get("2"), undefined);
+});
