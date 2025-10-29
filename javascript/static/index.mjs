@@ -124,27 +124,27 @@ async function liveNavigate(request, { mayPushState = true } = {}) {
       liveConnection.backgroundJob?.stop();
       liveNavigate.abortController?.abort();
       let responseURL = new URL(request.url);
-      let responseText =
+      const cachedResponseText =
         request.method === "GET"
           ? liveNavigate.cache.get(request.url)
           : undefined;
-      if (typeof responseText !== "string") {
-        liveNavigate.abortController = new AbortController();
-        request.headers.set("Live-Navigation", "true");
-        const response = await fetch(request, {
-          signal: liveNavigate.abortController.signal,
-        });
-        if (typeof response.headers.get("Location") === "string") {
-          beforeunload = false;
-          window.location.href = response.headers.get("Location");
-          return;
-        }
-        responseURL = new URL(response.url);
-        responseURL.hash = requestURL.hash;
-        responseText = await response.text();
-        if (request.method === "GET")
-          liveNavigate.cache.set(response.url, responseText);
+      if (typeof cachedResponseText === "string")
+        documentMount(cachedResponseText);
+      liveNavigate.abortController = new AbortController();
+      request.headers.set("Live-Navigation", "true");
+      const response = await fetch(request, {
+        signal: liveNavigate.abortController.signal,
+      });
+      if (typeof response.headers.get("Location") === "string") {
+        beforeunload = false;
+        window.location.href = response.headers.get("Location");
+        return;
       }
+      responseURL = new URL(response.url);
+      responseURL.hash = requestURL.hash;
+      const responseText = await response.text();
+      if (request.method === "GET")
+        liveNavigate.cache.set(response.url, responseText);
       if (
         mayPushState &&
         (liveNavigate.previousLocation.pathname !== responseURL.pathname ||
