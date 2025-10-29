@@ -10,9 +10,9 @@
     "live update",
     "live reload"
   ],
-  "homepage": "https://github.com/leafac/radically-straightforward",
-  "repository": "https://github.com/leafac/radically-straightforward",
-  "bugs": "https://github.com/leafac/radically-straightforward/issues",
+  "homepage": "https://github.com/radically-straightforward/radically-straightforward",
+  "repository": "https://github.com/radically-straightforward/radically-straightforward",
+  "bugs": "https://github.com/radically-straightforward/radically-straightforward/issues",
   "funding": [
     "https://patreon.com/leafac",
     "https://github.com/sponsors/leafac",
