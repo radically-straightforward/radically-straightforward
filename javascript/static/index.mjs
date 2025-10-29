@@ -3,19 +3,16 @@ import * as utilities from "@radically-straightforward/utilities";
 import fastMyersDiff from "fast-myers-diff";
 import * as floatingUI from "@floating-ui/dom";
 
-document.addEventListener(
-  "DOMContentLoaded",
-  () => {
-    liveNavigate.cache.set(
-      liveNavigate.previousLocation.href,
-      new XMLSerializer().serializeToString(document),
-    );
-  },
-  { once: true },
-);
+let documentState = "initial";
 
 document.addEventListener("DOMContentLoaded", () => {
+  if (documentState === "initial")
+    liveNavigate.cache.set(
+      window.location.href,
+      new XMLSerializer().serializeToString(document),
+    );
   execute(document.querySelector("html"));
+  documentState = "loaded";
 });
 
 document.addEventListener("click", async (event) => {
@@ -29,7 +26,7 @@ document.addEventListener("click", async (event) => {
       return;
     event.preventDefault();
     if (
-      liveNavigate.abortController !== undefined ||
+      documentState === "liveNavigating" ||
       (element.getAttribute("href").startsWith("/") &&
         isModified(document.querySelector("html"), {
           includeSubforms: true,
@@ -53,7 +50,7 @@ document.addEventListener("click", async (event) => {
       button.getAttribute("formaction") ?? form.getAttribute("action") ?? "/";
     if (
       !action.startsWith("/") ||
-      liveNavigate.abortController !== undefined ||
+      documentState === "liveNavigating" ||
       !validate(form)
     )
       return;
@@ -89,16 +86,16 @@ window.addEventListener("popstate", () => {
   liveNavigate(new Request(window.location), { mayPushState: false });
 });
 
-let beforeunload = true;
 window.addEventListener("beforeunload", (event) => {
   if (
-    beforeunload &&
+    documentState !== "navigatingOut" &&
     isModified(document.querySelector("html"), { includeSubforms: true })
   )
     event.preventDefault();
 });
 
 async function liveNavigate(request, { mayPushState = true } = {}) {
+  documentState = "liveNavigating";
   const requestURL = new URL(request.url);
   if (
     request.method !== "GET" ||
@@ -136,7 +133,7 @@ async function liveNavigate(request, { mayPushState = true } = {}) {
         signal: liveNavigate.abortController.signal,
       });
       if (typeof response.headers.get("Location") === "string") {
-        beforeunload = false;
+        documentState = "navigatingOut";
         window.location.href = response.headers.get("Location");
         return;
       }
@@ -228,7 +225,7 @@ export async function liveConnection(requestId, { reload = false } = {}) {
         delete liveConnection.failedToConnectGlobalError;
         if (reloadOnConnect) {
           liveConnection.backgroundJob.stop();
-          beforeunload = false;
+          documentState = "navigatingOut";
           window.location.reload();
           return;
         }
@@ -300,7 +297,7 @@ export function documentMount(content) {
     typeof contentVersion === "string" &&
     documentVersion !== contentVersion
   ) {
-    beforeunload = false;
+    documentState = "navigatingOut";
     document.querySelector('[key~="global-error"]')?.remove();
     document
       .querySelector("body")
