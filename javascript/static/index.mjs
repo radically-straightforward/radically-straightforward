@@ -88,7 +88,7 @@ window.addEventListener("popstate", () => {
 
 window.addEventListener("beforeunload", (event) => {
   if (
-    documentState !== "navigatingOut" &&
+    documentState !== "navigatingAway" &&
     isModified(document.querySelector("html"), { includeSubforms: true })
   )
     event.preventDefault();
@@ -133,7 +133,7 @@ async function liveNavigate(request, { mayPushState = true } = {}) {
         signal: liveNavigate.abortController.signal,
       });
       if (typeof response.headers.get("Location") === "string") {
-        documentState = "navigatingOut";
+        documentState = "navigatingAway";
         window.location.href = response.headers.get("Location");
         return;
       }
@@ -225,7 +225,7 @@ export async function liveConnection(requestId, { reload = false } = {}) {
         delete liveConnection.failedToConnectGlobalError;
         if (reloadOnConnect) {
           liveConnection.backgroundJob.stop();
-          documentState = "navigatingOut";
+          documentState = "navigatingAway";
           window.location.reload();
           return;
         }
@@ -297,7 +297,7 @@ export function documentMount(content) {
     typeof contentVersion === "string" &&
     documentVersion !== contentVersion
   ) {
-    documentState = "navigatingOut";
+    documentState = "navigatingAway";
     document.querySelector('[key~="global-error"]')?.remove();
     document
       .querySelector("body")
