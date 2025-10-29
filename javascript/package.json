@@ -38,14 +38,14 @@
     "@floating-ui/dom": "^1.7.4",
     "@radically-straightforward/css": "^3.0.2",
     "@radically-straightforward/html": "^1.0.1",
-    "@radically-straightforward/utilities": "^2.0.9",
+    "@radically-straightforward/utilities": "^2.0.17",
     "fast-myers-diff": "^3.2.0"
   },
   "devDependencies": {
     "@csstools/postcss-light-dark-function": "^2.0.11",
-    "@radically-straightforward/documentation": "^1.0.4",
+    "@radically-straightforward/documentation": "^1.0.5",
     "@radically-straightforward/typescript": "^1.0.0",
-    "@types/node": "^24.6.2",
+    "@types/node": "^24.9.2",
     "postcss": "^8.5.6",
     "prettier": "^3.6.2",
     "typescript": "^5.9.3"
