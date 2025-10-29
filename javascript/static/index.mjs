@@ -142,12 +142,8 @@ async function liveNavigate(request, { mayPushState = true } = {}) {
         responseURL = new URL(response.url);
         responseURL.hash = requestURL.hash;
         responseText = await response.text();
-        if (request.method === "GET") {
-          liveNavigate.cache.delete(response.url);
+        if (request.method === "GET")
           liveNavigate.cache.set(response.url, responseText);
-          for (const key of [...liveNavigate.cache.keys()].slice(0, -15))
-            liveNavigate.cache.delete(key);
-        }
       }
       if (
         mayPushState &&
@@ -191,7 +187,7 @@ async function liveNavigate(request, { mayPushState = true } = {}) {
 }
 liveNavigate.previousLocation = { ...window.location };
 liveNavigate.abortController = undefined;
-liveNavigate.cache = new Map();
+liveNavigate.cache = new utilities.Cache();
 
 /**
  * Open a [Live Connection](https://github.com/radically-straightforward/radically-straightforward/tree/main/server#live-connection) to the server.
@@ -254,10 +250,7 @@ export async function liveConnection(requestId, { reload = false } = {}) {
         while (true) {
           const responseText = (await responseBodyReader.read()).value;
           if (responseText === undefined) break;
-          liveNavigate.cache.delete(response.url);
           liveNavigate.cache.set(response.url, responseText);
-          for (const key of [...liveNavigate.cache.keys()].slice(0, -15))
-            liveNavigate.cache.delete(key);
           documentMount(responseText);
         }
       } catch (error) {
