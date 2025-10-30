@@ -84,7 +84,7 @@ document.addEventListener("click", async (event) => {
 
 window.addEventListener("popstate", () => {
   if (documentState === "liveNavigating") liveNavigate.abortController.abort();
-  liveNavigate(new Request(window.location), { mayPushState: false });
+  liveNavigate(new Request(window.location), { stateAlreadyPushed: true });
 });
 
 window.addEventListener("beforeunload", (event) => {
@@ -95,14 +95,15 @@ window.addEventListener("beforeunload", (event) => {
     event.preventDefault();
 });
 
-async function liveNavigate(request, { mayPushState = true } = {}) {
+async function liveNavigate(request, { stateAlreadyPushed = false } = {}) {
   const requestURL = new URL(request.url);
   if (
     request.method === "GET" &&
     liveNavigate.previousLocation.pathname === requestURL.pathname &&
     liveNavigate.previousLocation.search === requestURL.search
   ) {
-    if (mayPushState) window.history.pushState(null, "", requestURL.href);
+    if (!stateAlreadyPushed)
+      window.history.pushState(null, "", requestURL.href);
     liveNavigate.previousLocation = { ...window.location };
     if (requestURL.hash.trim() !== "")
       document.getElementById(requestURL.hash.slice(1))?.scrollIntoView();
@@ -139,8 +140,9 @@ async function liveNavigate(request, { mayPushState = true } = {}) {
     });
   } catch (error) {
     if (error.name === "AbortError") return;
-    if (mayPushState && request.method === "GET")
+    if (!stateAlreadyPushed && request.method === "GET")
       window.history.pushState(null, "", requestURL.href);
+    liveNavigate.previousLocation = { ...window.location };
     document.querySelector('[key~="global-error"]')?.remove();
     document
       .querySelector("body")
@@ -166,13 +168,12 @@ async function liveNavigate(request, { mayPushState = true } = {}) {
     const responseURL = new URL(response.url);
     responseURL.hash = requestURL.hash;
     if (
-      mayPushState &&
+      !stateAlreadyPushed &&
       (liveNavigate.previousLocation.pathname !== responseURL.pathname ||
         liveNavigate.previousLocation.search !== responseURL.search)
-    ) {
+    )
       window.history.pushState(null, "", responseURL.href);
-      mayPushState = false;
-    }
+    liveNavigate.previousLocation = { ...window.location };
     documentMount(responseText);
     if (responseURL.hash.trim() !== "")
       document.getElementById(responseURL.hash.slice(1))?.scrollIntoView();
@@ -180,7 +181,6 @@ async function liveNavigate(request, { mayPushState = true } = {}) {
   } catch (error) {
   } finally {
     progressBar.remove();
-    liveNavigate.previousLocation = { ...window.location };
     delete liveNavigate.abortController;
   }
 }
