@@ -109,15 +109,13 @@ async function liveNavigate(request, { stateAlreadyPushed = false } = {}) {
       document.getElementById(requestURL.hash.slice(1))?.scrollIntoView();
     return;
   }
+  documentState = "liveNavigating";
   if (documentState === "TODO: ‘liveConnection’ states")
     liveConnection.backgroundJob.stop();
-  documentState = "liveNavigating";
   const cachedResponseText =
     request.method === "GET" ? liveNavigate.cache.get(request.url) : undefined;
   if (typeof cachedResponseText === "string")
     documentMount(cachedResponseText, { dispatchDOMContentLoaded: false });
-  liveNavigate.abortController = new AbortController();
-  request.headers.set("Live-Navigation", "true");
   const progressBar = document
     .querySelector("body")
     .insertAdjacentElement(
@@ -133,6 +131,8 @@ async function liveNavigate(request, { stateAlreadyPushed = false } = {}) {
             return width + (90 - width) / (10 + Math.random() * 50);
           })()) + "%";
   });
+  request.headers.set("Live-Navigation", "true");
+  liveNavigate.abortController = new AbortController();
   let response;
   try {
     response = await fetch(request, {
@@ -140,6 +140,7 @@ async function liveNavigate(request, { stateAlreadyPushed = false } = {}) {
     });
   } catch (error) {
     if (error.name === "AbortError") return;
+    documentState = "navigatingAway";
     if (!stateAlreadyPushed && request.method === "GET")
       window.history.pushState(null, "", requestURL.href);
     liveNavigate.previousLocation = { ...window.location };
