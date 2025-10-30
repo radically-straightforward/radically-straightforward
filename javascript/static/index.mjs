@@ -107,7 +107,6 @@ async function liveNavigate(request, { mayPushState = true } = {}) {
     liveNavigate.previousLocation = { ...window.location };
     return;
   }
-  documentState = "liveNavigating";
   const progressBar = document
     .querySelector("body")
     .insertAdjacentElement(
@@ -123,18 +122,17 @@ async function liveNavigate(request, { mayPushState = true } = {}) {
             return width + (90 - width) / (10 + Math.random() * 50);
           })()) + "%";
   });
+  if (documentState === "TODO: All ‘liveConnection’ states")
+    liveConnection.backgroundJob.stop();
+  if (documentState === "liveNavigating") liveNavigate.abortController.abort();
+  documentState = "liveNavigating";
+  const cachedResponseText =
+    request.method === "GET" ? liveNavigate.cache.get(request.url) : undefined;
+  if (typeof cachedResponseText === "string")
+    documentMount(cachedResponseText, { dispatchDOMContentLoaded: false });
+  liveNavigate.abortController = new AbortController();
+  request.headers.set("Live-Navigation", "true");
   try {
-    liveConnection.backgroundJob?.stop();
-    liveNavigate.abortController?.abort();
-    let responseURL = new URL(request.url);
-    const cachedResponseText =
-      request.method === "GET"
-        ? liveNavigate.cache.get(request.url)
-        : undefined;
-    if (typeof cachedResponseText === "string")
-      documentMount(cachedResponseText);
-    liveNavigate.abortController = new AbortController();
-    request.headers.set("Live-Navigation", "true");
     const response = await fetch(request, {
       signal: liveNavigate.abortController.signal,
     });
@@ -143,7 +141,7 @@ async function liveNavigate(request, { mayPushState = true } = {}) {
       window.location.href = response.headers.get("Location");
       return;
     }
-    responseURL = new URL(response.url);
+    let responseURL = new URL(response.url);
     responseURL.hash = requestURL.hash;
     const responseText = await response.text();
     if (request.method === "GET")
@@ -284,7 +282,10 @@ liveConnection.failedToConnectGlobalError = undefined;
  *
  * If the `document` and the `content` have `<meta name="version" content="___" />` with different `content`s, then `documentMount()` displays an error message in an element with `key="global-error"` which you may style.
  */
-export function documentMount(content) {
+export function documentMount(
+  content,
+  { dispatchDOMContentLoaded = true } = {},
+) {
   if (typeof content === "string") content = documentStringToElement(content);
   const documentVersion = document
     .querySelector('meta[name="version"]')
@@ -312,7 +313,8 @@ export function documentMount(content) {
     return;
   }
   morph(document.querySelector("html"), content);
-  document.dispatchEvent(new Event("DOMContentLoaded"));
+  if (dispatchDOMContentLoaded)
+    document.dispatchEvent(new Event("DOMContentLoaded"));
 }
 
 /**
