@@ -153,7 +153,6 @@ async function liveNavigate(request, { mayPushState = true } = {}) {
         `,
       );
     throw error;
-    return;
   }
   try {
     if (typeof response.headers.get("Location") === "string") {
