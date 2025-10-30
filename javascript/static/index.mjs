@@ -159,31 +159,27 @@ async function liveNavigate(request, { stateAlreadyPushed = false } = {}) {
   } finally {
     progressBar.remove();
   }
-  try {
-    if (typeof response.headers.get("Location") === "string") {
-      documentState = "navigatingAway";
-      window.location.href = response.headers.get("Location");
-      return;
-    }
-    const responseText = await response.text();
-    if (request.method === "GET")
-      liveNavigate.cache.set(response.url, responseText);
-    const responseURL = new URL(response.url);
-    responseURL.hash = requestURL.hash;
-    if (
-      !stateAlreadyPushed &&
-      (liveNavigate.previousLocation.pathname !== responseURL.pathname ||
-        liveNavigate.previousLocation.search !== responseURL.search)
-    )
-      window.history.pushState(null, "", responseURL.href);
-    liveNavigate.previousLocation = { ...window.location };
-    documentMount(responseText);
-    if (responseURL.hash.trim() !== "")
-      document.getElementById(responseURL.hash.slice(1))?.scrollIntoView();
-    document.querySelector("[autofocus]")?.focus();
-  } catch (error) {
-  } finally {
+  if (typeof response.headers.get("Location") === "string") {
+    documentState = "navigatingAway";
+    window.location.href = response.headers.get("Location");
+    return;
   }
+  const responseText = await response.text();
+  if (request.method === "GET")
+    liveNavigate.cache.set(response.url, responseText);
+  const responseURL = new URL(response.url);
+  responseURL.hash = requestURL.hash;
+  if (
+    !stateAlreadyPushed &&
+    (liveNavigate.previousLocation.pathname !== responseURL.pathname ||
+      liveNavigate.previousLocation.search !== responseURL.search)
+  )
+    window.history.pushState(null, "", responseURL.href);
+  liveNavigate.previousLocation = { ...window.location };
+  documentMount(responseText);
+  if (responseURL.hash.trim() !== "")
+    document.getElementById(responseURL.hash.slice(1))?.scrollIntoView();
+  document.querySelector("[autofocus]")?.focus();
 }
 liveNavigate.previousLocation = { ...window.location };
 liveNavigate.abortController = undefined;
