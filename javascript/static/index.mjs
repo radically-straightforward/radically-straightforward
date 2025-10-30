@@ -109,6 +109,15 @@ async function liveNavigate(request, { stateAlreadyPushed = false } = {}) {
       document.getElementById(requestURL.hash.slice(1))?.scrollIntoView();
     return;
   }
+  if (documentState === "TODO: ‘liveConnection’ states")
+    liveConnection.backgroundJob.stop();
+  documentState = "liveNavigating";
+  const cachedResponseText =
+    request.method === "GET" ? liveNavigate.cache.get(request.url) : undefined;
+  if (typeof cachedResponseText === "string")
+    documentMount(cachedResponseText, { dispatchDOMContentLoaded: false });
+  liveNavigate.abortController = new AbortController();
+  request.headers.set("Live-Navigation", "true");
   const progressBar = document
     .querySelector("body")
     .insertAdjacentElement(
@@ -124,15 +133,6 @@ async function liveNavigate(request, { stateAlreadyPushed = false } = {}) {
             return width + (90 - width) / (10 + Math.random() * 50);
           })()) + "%";
   });
-  if (documentState === "TODO: ‘liveConnection’ states")
-    liveConnection.backgroundJob.stop();
-  documentState = "liveNavigating";
-  const cachedResponseText =
-    request.method === "GET" ? liveNavigate.cache.get(request.url) : undefined;
-  if (typeof cachedResponseText === "string")
-    documentMount(cachedResponseText, { dispatchDOMContentLoaded: false });
-  liveNavigate.abortController = new AbortController();
-  request.headers.set("Live-Navigation", "true");
   let response;
   try {
     response = await fetch(request, {
@@ -155,6 +155,8 @@ async function liveNavigate(request, { stateAlreadyPushed = false } = {}) {
         `,
       );
     throw error;
+  } finally {
+    progressBar.remove();
   }
   try {
     if (typeof response.headers.get("Location") === "string") {
@@ -180,8 +182,6 @@ async function liveNavigate(request, { stateAlreadyPushed = false } = {}) {
     document.querySelector("[autofocus]")?.focus();
   } catch (error) {
   } finally {
-    progressBar.remove();
-    delete liveNavigate.abortController;
   }
 }
 liveNavigate.previousLocation = { ...window.location };
