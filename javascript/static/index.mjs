@@ -95,91 +95,91 @@ window.addEventListener("beforeunload", (event) => {
 });
 
 async function liveNavigate(request, { mayPushState = true } = {}) {
-  documentState = "liveNavigating";
   const requestURL = new URL(request.url);
   if (
-    request.method !== "GET" ||
-    liveNavigate.previousLocation.pathname !== requestURL.pathname ||
-    liveNavigate.previousLocation.search !== requestURL.search
+    request.method === "GET" &&
+    liveNavigate.previousLocation.pathname === requestURL.pathname &&
+    liveNavigate.previousLocation.search === requestURL.search
   ) {
-    const progressBar = document
-      .querySelector("body")
-      .insertAdjacentElement(
-        "afterbegin",
-        stringToElement(html`<div key="progress-bar"></div>`),
-      );
-    backgroundJob(progressBar, "progressBar", { interval: 1000 }, () => {
-      progressBar.style.width =
-        (progressBar.style.width.trim() === ""
-          ? "15"
-          : (() => {
-              const width = Number(progressBar.style.width.slice(0, -1));
-              return width + (90 - width) / (10 + Math.random() * 50);
-            })()) + "%";
-    });
-    try {
-      liveConnection.backgroundJob?.stop();
-      liveNavigate.abortController?.abort();
-      let responseURL = new URL(request.url);
-      const cachedResponseText =
-        request.method === "GET"
-          ? liveNavigate.cache.get(request.url)
-          : undefined;
-      if (typeof cachedResponseText === "string")
-        documentMount(cachedResponseText);
-      liveNavigate.abortController = new AbortController();
-      request.headers.set("Live-Navigation", "true");
-      const response = await fetch(request, {
-        signal: liveNavigate.abortController.signal,
-      });
-      if (typeof response.headers.get("Location") === "string") {
-        documentState = "navigatingAway";
-        window.location.href = response.headers.get("Location");
-        return;
-      }
-      responseURL = new URL(response.url);
-      responseURL.hash = requestURL.hash;
-      const responseText = await response.text();
-      if (request.method === "GET")
-        liveNavigate.cache.set(response.url, responseText);
-      if (
-        mayPushState &&
-        (liveNavigate.previousLocation.pathname !== responseURL.pathname ||
-          liveNavigate.previousLocation.search !== responseURL.search)
-      ) {
-        window.history.pushState(null, "", responseURL.href);
-        mayPushState = false;
-      }
-      documentMount(responseText);
-      if (responseURL.hash.trim() !== "")
-        document.getElementById(responseURL.hash.slice(1))?.scrollIntoView();
-      document.querySelector("[autofocus]")?.focus();
-    } catch (error) {
-      if (error.name === "AbortError") return;
-      if (mayPushState && request.method === "GET")
-        window.history.pushState(null, "", requestURL.href);
-      document.querySelector('[key~="global-error"]')?.remove();
-      document
-        .querySelector("body")
-        .insertAdjacentHTML(
-          "afterbegin",
-          html`
-            <div key="global-error">
-              Something went wrong. Please try reloading the page.
-            </div>
-          `,
-        );
-      throw error;
-    } finally {
-      progressBar.remove();
-      liveNavigate.previousLocation = { ...window.location };
-      delete liveNavigate.abortController;
-    }
-  } else {
     if (mayPushState) window.history.pushState(null, "", requestURL.href);
     if (requestURL.hash.trim() !== "")
       document.getElementById(requestURL.hash.slice(1))?.scrollIntoView();
     liveNavigate.previousLocation = { ...window.location };
+    return;
+  }
+  documentState = "liveNavigating";
+  const progressBar = document
+    .querySelector("body")
+    .insertAdjacentElement(
+      "afterbegin",
+      stringToElement(html`<div key="progress-bar"></div>`),
+    );
+  backgroundJob(progressBar, "progressBar", { interval: 1000 }, () => {
+    progressBar.style.width =
+      (progressBar.style.width.trim() === ""
+        ? "15"
+        : (() => {
+            const width = Number(progressBar.style.width.slice(0, -1));
+            return width + (90 - width) / (10 + Math.random() * 50);
+          })()) + "%";
+  });
+  try {
+    liveConnection.backgroundJob?.stop();
+    liveNavigate.abortController?.abort();
+    let responseURL = new URL(request.url);
+    const cachedResponseText =
+      request.method === "GET"
+        ? liveNavigate.cache.get(request.url)
+        : undefined;
+    if (typeof cachedResponseText === "string")
+      documentMount(cachedResponseText);
+    liveNavigate.abortController = new AbortController();
+    request.headers.set("Live-Navigation", "true");
+    const response = await fetch(request, {
+      signal: liveNavigate.abortController.signal,
+    });
+    if (typeof response.headers.get("Location") === "string") {
+      documentState = "navigatingAway";
+      window.location.href = response.headers.get("Location");
+      return;
+    }
+    responseURL = new URL(response.url);
+    responseURL.hash = requestURL.hash;
+    const responseText = await response.text();
+    if (request.method === "GET")
+      liveNavigate.cache.set(response.url, responseText);
+    if (
+      mayPushState &&
+      (liveNavigate.previousLocation.pathname !== responseURL.pathname ||
+        liveNavigate.previousLocation.search !== responseURL.search)
+    ) {
+      window.history.pushState(null, "", responseURL.href);
+      mayPushState = false;
+    }
+    documentMount(responseText);
+    if (responseURL.hash.trim() !== "")
+      document.getElementById(responseURL.hash.slice(1))?.scrollIntoView();
+    document.querySelector("[autofocus]")?.focus();
+  } catch (error) {
+    if (error.name === "AbortError") return;
+    if (mayPushState && request.method === "GET")
+      window.history.pushState(null, "", requestURL.href);
+    document.querySelector('[key~="global-error"]')?.remove();
+    document
+      .querySelector("body")
+      .insertAdjacentHTML(
+        "afterbegin",
+        html`
+          <div key="global-error">
+            Something went wrong. Please try reloading the page.
+          </div>
+        `,
+      );
+    throw error;
+  } finally {
+    progressBar.remove();
+    liveNavigate.previousLocation = { ...window.location };
+    delete liveNavigate.abortController;
   }
 }
 liveNavigate.previousLocation = { ...window.location };
