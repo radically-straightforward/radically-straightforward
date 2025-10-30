@@ -141,11 +141,11 @@ async function liveNavigate(request, { mayPushState = true } = {}) {
       window.location.href = response.headers.get("Location");
       return;
     }
-    let responseURL = new URL(response.url);
-    responseURL.hash = requestURL.hash;
     const responseText = await response.text();
     if (request.method === "GET")
       liveNavigate.cache.set(response.url, responseText);
+    const responseURL = new URL(response.url);
+    responseURL.hash = requestURL.hash;
     if (
       mayPushState &&
       (liveNavigate.previousLocation.pathname !== responseURL.pathname ||
