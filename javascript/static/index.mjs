@@ -12,7 +12,7 @@ document.addEventListener("DOMContentLoaded", () => {
       new XMLSerializer().serializeToString(document),
     );
   execute(document.querySelector("html"));
-  documentState = "loaded";
+  if (documentState === "initial") documentState = "loaded";
 });
 
 document.addEventListener("click", async (event) => {
