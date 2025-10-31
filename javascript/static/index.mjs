@@ -246,7 +246,7 @@ export async function liveConnection(
       try {
         response = await fetch(window.location.href, {
           headers: { "Live-Connection": requestId },
-          signal: abortController.signal,
+          signal: liveConnection.abortController.signal,
         });
         if (response.status !== 200) throw response;
       } catch (error) {
