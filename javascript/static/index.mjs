@@ -198,7 +198,7 @@ liveNavigate.cache = new utilities.Cache();
  * 2. The request method is `GET`.
  * 3. The response status code is 200.
  *
- * The `reload` parameter changes the behavior of Live Connections upon the occasional disconnection. When `reload` is `false` (the default), the client shows an error message to the user and keeps trying to reconnect, which is useful, for example, in case the server malfunctions. When `reload` is `true`, then as soon as the connection is reestablished, the browser reloads the page, which is useful during development.
+ * The `reloadOnReconnect` parameter changes the behavior of Live Connections upon the occasional disconnection. When `reloadOnReconnect` is `false` (the default), the client shows an error message to the user and keeps trying to reconnect, which is useful, for example, in case the server malfunctions. When `reloadOnReconnect` is `true`, then as soon as the connection is reestablished, the browser reloads the page, which is useful during development.
  *
  * **Example**
  *
@@ -209,13 +209,16 @@ liveNavigate.cache = new utilities.Cache();
  * `}"
  * ```
  */
-export async function liveConnection(requestId, { reload = false } = {}) {
+export async function liveConnection(
+  requestId,
+  { reloadOnReconnect = false } = {},
+) {
   let abortController;
   let abortControllerTimeout;
   let reloadOnConnect = false;
   liveConnection.backgroundJob ??= utilities.backgroundJob(
     {
-      interval: reload ? 1000 : 5 * 1000,
+      interval: reloadOnReconnect ? 1000 : 5 * 1000,
       onStop: () => {
         abortController.abort();
         window.clearTimeout(abortControllerTimeout);
@@ -273,7 +276,7 @@ export async function liveConnection(requestId, { reload = false } = {}) {
             "afterbegin",
             stringToElement(html`
               <div key="global-error">
-                ${reload
+                ${reloadOnReconnect
                   ? "Reloading…"
                   : "Failed to connect. Please check your internet connection and try reloading the page."}
               </div>
@@ -283,7 +286,7 @@ export async function liveConnection(requestId, { reload = false } = {}) {
       } finally {
         abortController.abort();
         window.clearTimeout(abortControllerTimeout);
-        reloadOnConnect = reload;
+        reloadOnConnect = reloadOnReconnect;
       }
     },
   );
