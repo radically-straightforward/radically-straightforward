@@ -203,10 +203,29 @@ liveNavigate.cache = new utilities.Cache();
  * **Example**
  *
  * ```typescript
- * javascript="${javascript`
- *   if (${request.liveConnection === undefined && request.method === "GET" && response.statusCode === 200})
- *     javascript.liveConnection(${request.id}, { reload: ${application.configuration.environment === "development"} });
- * `}"
+ * html`
+ *   <!DOCTYPE html>
+ *   <html
+ *     javascript="${javascript`
+ *         if (${
+ *           request.liveConnection === undefined &&
+ *           request.method === "GET" &&
+ *           response.statusCode === 200
+ *         })
+ *           javascript.liveConnection(
+ *             ${request.id}, {
+ *               reloadOnReconnect: ${
+ *                 application.configuration.environment === "development"
+ *               }
+ *             }
+ *           );
+ *       `}"
+ *   >
+ *     <head>
+ *       <meta name="version" content="${application.version}" />
+ *     </head>
+ *   </html>
+ * `;
  * ```
  */
 export async function liveConnection(
