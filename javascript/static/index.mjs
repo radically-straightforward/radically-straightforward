@@ -237,18 +237,24 @@ export async function liveConnection(
   const backgroundJob = utilities.backgroundJob(
     { interval: reloadOnReconnect ? 1000 : 5 * 1000 },
     async () => {
-      let connected = false;
+      liveConnection.abortController = new AbortController();
+      let abortControllerTimeout = window.setTimeout(() => {
+        liveConnection.abortController.abort();
+      }, 60 * 1000);
+      let response;
       try {
-        abortController = new AbortController();
-        abortControllerTimeout = window.setTimeout(() => {
-          abortController.abort();
-        }, 60 * 1000);
-        const response = await fetch(window.location.href, {
+        response = await fetch(window.location.href, {
           headers: { "Live-Connection": requestId },
           signal: abortController.signal,
         });
         if (response.status !== 200) throw response;
-        connected = true;
+      } catch (error) {
+        if (error.name !== "AbortError") {
+          window.clearTimeout(abortControllerTimeout);
+          throw error;
+        }
+      }
+      try {
         liveConnection.failedToConnectGlobalError?.remove();
         delete liveConnection.failedToConnectGlobalError;
         if (reloadOnConnect) {
