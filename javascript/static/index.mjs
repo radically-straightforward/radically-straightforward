@@ -109,9 +109,9 @@ async function liveNavigate(request, { stateAlreadyPushed = false } = {}) {
       document.getElementById(requestURL.hash.slice(1))?.scrollIntoView();
     return;
   }
-  documentState = "liveNavigating";
   if (documentState === "liveConnection")
     liveConnection.abortController.abort();
+  documentState = "liveNavigating";
   const cachedResponseText =
     request.method === "GET" ? liveNavigate.cache.get(request.url) : undefined;
   if (typeof cachedResponseText === "string")
