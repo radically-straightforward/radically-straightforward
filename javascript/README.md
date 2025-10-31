@@ -136,7 +136,10 @@ If `reload` is `true` then the page reloads when the connection is closed and re
 ### `documentMount()`
 
 ```typescript
-export function documentMount(content);
+export function documentMount(
+  content,
+  { dispatchDOMContentLoaded = true } = {},
+);
 ```
 
 > **Note:** This is a low-level function used by Live Navigation and Live Connection updates.
