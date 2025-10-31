@@ -12,7 +12,8 @@ document.addEventListener("DOMContentLoaded", () => {
       new XMLSerializer().serializeToString(document),
     );
   execute(document.querySelector("html"));
-  if (documentState === "initial") documentState = "loaded";
+  if (documentState === "initial" || documentState === "liveNavigating")
+    documentState = "loaded";
 });
 
 document.addEventListener("click", async (event) => {
