@@ -181,9 +181,9 @@ async function liveNavigate(request, { stateAlreadyPushed = false } = {}) {
     document.getElementById(responseURL.hash.slice(1))?.scrollIntoView();
   document.querySelector("[autofocus]")?.focus();
 }
-liveNavigate.previousLocation = { ...window.location };
-liveNavigate.abortController = undefined;
 liveNavigate.cache = new utilities.Cache();
+liveNavigate.abortController = undefined;
+liveNavigate.previousLocation = { ...window.location };
 
 /**
  * Open a [Live Connection](https://github.com/radically-straightforward/radically-straightforward/tree/main/server#live-connection) to the server.
@@ -310,8 +310,7 @@ export async function liveConnection(
     },
   );
 }
-liveConnection.backgroundJob = undefined;
-liveConnection.failedToConnectGlobalError = undefined;
+liveConnection.abortController = undefined;
 
 /**
  * > **Note:** This is a low-level function used by Live Navigation and Live Connection updates.
