@@ -207,19 +207,19 @@ liveNavigate.cache = new utilities.Cache();
  *   <!DOCTYPE html>
  *   <html
  *     javascript="${javascript`
- *         if (${
- *           request.liveConnection === undefined &&
- *           request.method === "GET" &&
- *           response.statusCode === 200
- *         })
- *           javascript.liveConnection(
- *             ${request.id}, {
- *               reloadOnReconnect: ${
- *                 application.configuration.environment === "development"
- *               }
+ *       if (${
+ *         request.liveConnection === undefined &&
+ *         request.method === "GET" &&
+ *         response.statusCode === 200
+ *       })
+ *         javascript.liveConnection(
+ *           ${request.id}, {
+ *             reloadOnReconnect: ${
+ *               application.configuration.environment === "development"
  *             }
- *           );
- *       `}"
+ *           }
+ *         );
+ *     `}"
  *   >
  *     <head>
  *       <meta name="version" content="${application.version}" />
