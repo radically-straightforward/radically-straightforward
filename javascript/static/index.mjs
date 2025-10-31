@@ -249,10 +249,12 @@ export async function liveConnection(
         });
         if (response.status !== 200) throw response;
       } catch (error) {
-        if (error.name !== "AbortError") {
-          window.clearTimeout(abortControllerTimeout);
-          throw error;
+        window.clearTimeout(abortControllerTimeout);
+        if (error.name === "AbortError") {
+          backgroundJob.stop();
+          return;
         }
+        throw error;
       }
       try {
         liveConnection.failedToConnectGlobalError?.remove();
