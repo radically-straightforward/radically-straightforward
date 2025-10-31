@@ -110,8 +110,8 @@ async function liveNavigate(request, { stateAlreadyPushed = false } = {}) {
     return;
   }
   documentState = "liveNavigating";
-  if (documentState === "TODO: ‘liveConnection’ states")
-    liveConnection.backgroundJob.stop();
+  if (documentState === "liveConnection")
+    liveConnection.abortController.abort();
   const cachedResponseText =
     request.method === "GET" ? liveNavigate.cache.get(request.url) : undefined;
   if (typeof cachedResponseText === "string")
@@ -232,18 +232,10 @@ export async function liveConnection(
   requestId,
   { reloadOnReconnect = false } = {},
 ) {
-  let abortController;
-  let abortControllerTimeout;
+  documentState = "liveConnection";
   let reloadOnConnect = false;
-  liveConnection.backgroundJob ??= utilities.backgroundJob(
-    {
-      interval: reloadOnReconnect ? 1000 : 5 * 1000,
-      onStop: () => {
-        abortController.abort();
-        window.clearTimeout(abortControllerTimeout);
-        delete liveConnection.backgroundJob;
-      },
-    },
+  const backgroundJob = utilities.backgroundJob(
+    { interval: reloadOnReconnect ? 1000 : 5 * 1000 },
     async () => {
       let connected = false;
       try {
