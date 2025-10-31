@@ -192,7 +192,22 @@ liveNavigate.cache = new utilities.Cache();
  *
  * If the `content` of the meta tag `<meta name="version" content="___" />` has changed, a Live Connection update doesn’t happen. Instead, an error message is shown in an element with `key="global-error"` which you may style.
  *
- * If `reload` is `true` then the page reloads when the connection is closed and reopened, because presumably the server has been restarted after a code modification during development.
+ * This function is only meant to be called if:
+ *
+ * 1. The request in question is not a Live Connection itself.
+ * 2. The request method is `GET`.
+ * 3. The response status code is 200.
+ *
+ * The `reload` parameter changes the behavior of Live Connections upon the occasional disconnection. When `reload` is `false` (the default), the client shows an error message to the user and keeps trying to reconnect, which is useful, for example, in case the server malfunctions. When `reload` is `true`, then as soon as the connection is reestablished, the browser reloads the page, which is useful during development.
+ *
+ * **Example**
+ *
+ * ```typescript
+ * javascript="${javascript`
+ *   if (${request.liveConnection === undefined && request.method === "GET" && response.statusCode === 200})
+ *     javascript.liveConnection(${request.id}, { reload: ${application.configuration.environment === "development"} });
+ * `}"
+ * ```
  */
 export async function liveConnection(requestId, { reload = false } = {}) {
   let abortController;
