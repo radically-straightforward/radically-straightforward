@@ -238,19 +238,19 @@ export async function liveConnection(
   const backgroundJob = utilities.backgroundJob(
     { interval: reloadOnReconnect ? 1000 : 5 * 1000 },
     async () => {
-      liveConnection.abortController = new AbortController();
+      const abortController = (liveConnection.abortController =
+        new AbortController());
       let abortControllerTimeout = window.setTimeout(() => {
-        liveConnection.abortController.abort();
+        abortController.abort();
       }, 60 * 1000);
       let response;
       try {
         response = await fetch(window.location.href, {
           headers: { "Live-Connection": requestId },
-          signal: liveConnection.abortController.signal,
+          signal: abortController.signal,
         });
         if (response.status !== 200) throw response;
       } catch (error) {
-        window.clearTimeout(abortControllerTimeout);
         if (error.name === "AbortError") {
           backgroundJob.stop();
           return;
