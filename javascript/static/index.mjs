@@ -234,11 +234,11 @@ export async function liveConnection(
   { reloadOnReconnect = false } = {},
 ) {
   documentState = "liveConnection";
-  liveConnection.abortController = new AbortController();
   let reloadOnConnect = false;
   const backgroundJob = utilities.backgroundJob(
     { interval: reloadOnReconnect ? 1000 : 5 * 1000 },
     async () => {
+      liveConnection.abortController = new AbortController();
       const abortControllerTimeout = window.setTimeout(() => {
         liveConnection.abortController.abort();
       }, 60 * 1000);
