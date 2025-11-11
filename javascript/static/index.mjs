@@ -235,6 +235,8 @@ export async function liveConnection(
   documentState = "liveConnection";
   let reloadOnConnect = false;
   let abortController;
+  let abortControllerTimeout;
+  let failedToConnectGlobalError;
   liveConnection.backgroundJob = utilities.backgroundJob(
     {
       interval: reloadOnReconnect ? 1000 : 5 * 1000,
@@ -244,7 +246,8 @@ export async function liveConnection(
     },
     async () => {
       abortController = new AbortController();
-      const abortControllerTimeout = window.setTimeout(() => {
+      window.clearTimeout(abortControllerTimeout);
+      abortControllerTimeout = window.setTimeout(() => {
         abortController.abort();
       }, 60 * 1000);
       let response;
@@ -256,44 +259,8 @@ export async function liveConnection(
         if (response.status !== 200) throw response;
       } catch (error) {
         if (error.name === "AbortError") return;
-        throw error;
-      } finally {
-        window.clearTimeout(abortControllerTimeout);
-      }
-      try {
-        liveConnection.failedToConnectGlobalError?.remove();
-        delete liveConnection.failedToConnectGlobalError;
-        if (reloadOnConnect) {
-          liveConnection.backgroundJob.stop();
-          documentState = "navigatingAway";
-          window.location.reload();
-          return;
-        }
-        const responseBodyReader = response.body
-          .pipeThrough(
-            new TransformStream({
-              async transform(chunk, controller) {
-                window.clearTimeout(abortControllerTimeout);
-                abortControllerTimeout = window.setTimeout(() => {
-                  abortController.abort();
-                }, 60 * 1000);
-                controller.enqueue(await chunk);
-              },
-            }),
-          )
-          .pipeThrough(new TextDecoderStream())
-          .pipeThrough(new utilities.JSONLinesTransformStream())
-          .getReader();
-        while (true) {
-          const responseText = (await responseBodyReader.read()).value;
-          if (responseText === undefined) break;
-          liveNavigate.cache.set(response.url, responseText);
-          documentMount(responseText);
-        }
-      } catch (error) {
-        if (connected) return;
         document.querySelector('[key~="global-error"]')?.remove();
-        liveConnection.failedToConnectGlobalError = document
+        failedToConnectGlobalError = document
           .querySelector("body")
           .insertAdjacentElement(
             "afterbegin",
@@ -306,10 +273,35 @@ export async function liveConnection(
             `),
           );
         throw error;
-      } finally {
-        abortController.abort();
-        window.clearTimeout(abortControllerTimeout);
-        reloadOnConnect = reloadOnReconnect;
+      }
+      if (reloadOnConnect) {
+        liveConnection.backgroundJob.stop();
+        documentState = "navigatingAway";
+        window.location.reload();
+        return;
+      }
+      reloadOnConnect = reloadOnReconnect;
+      failedToConnectGlobalError?.remove();
+      const responseBodyReader = response.body
+        .pipeThrough(
+          new TransformStream({
+            async transform(chunk, controller) {
+              window.clearTimeout(abortControllerTimeout);
+              abortControllerTimeout = window.setTimeout(() => {
+                abortController.abort();
+              }, 60 * 1000);
+              controller.enqueue(await chunk);
+            },
+          }),
+        )
+        .pipeThrough(new TextDecoderStream())
+        .pipeThrough(new utilities.JSONLinesTransformStream())
+        .getReader();
+      while (true) {
+        const responseText = (await responseBodyReader.read()).value;
+        if (responseText === undefined) break;
+        liveNavigate.cache.set(response.url, responseText);
+        documentMount(responseText);
       }
     },
   );
