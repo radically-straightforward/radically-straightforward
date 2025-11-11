@@ -234,20 +234,19 @@ export async function liveConnection(
   { reloadOnReconnect = false } = {},
 ) {
   documentState = "liveConnection";
+  liveConnection.abortController = new AbortController();
   let reloadOnConnect = false;
   const backgroundJob = utilities.backgroundJob(
     { interval: reloadOnReconnect ? 1000 : 5 * 1000 },
     async () => {
-      const abortController = (liveConnection.abortController =
-        new AbortController());
-      let abortControllerTimeout = window.setTimeout(() => {
-        abortController.abort();
+      const abortControllerTimeout = window.setTimeout(() => {
+        liveConnection.abortController.abort();
       }, 60 * 1000);
       let response;
       try {
         response = await fetch(window.location.href, {
           headers: { "Live-Connection": requestId },
-          signal: abortController.signal,
+          signal: liveConnection.abortController.signal,
         });
         if (response.status !== 200) throw response;
       } catch (error) {
@@ -256,6 +255,8 @@ export async function liveConnection(
           return;
         }
         throw error;
+      } finally {
+        window.clearTimeout(abortControllerTimeout);
       }
       try {
         liveConnection.failedToConnectGlobalError?.remove();
@@ -272,7 +273,7 @@ export async function liveConnection(
               async transform(chunk, controller) {
                 window.clearTimeout(abortControllerTimeout);
                 abortControllerTimeout = window.setTimeout(() => {
-                  abortController.abort();
+                  liveConnection.abortController.abort();
                 }, 60 * 1000);
                 controller.enqueue(await chunk);
               },
@@ -304,7 +305,7 @@ export async function liveConnection(
           );
         throw error;
       } finally {
-        abortController.abort();
+        liveConnection.abortController.abort();
         window.clearTimeout(abortControllerTimeout);
         reloadOnConnect = reloadOnReconnect;
       }
