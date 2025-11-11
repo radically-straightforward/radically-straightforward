@@ -110,8 +110,7 @@ async function liveNavigate(request, { stateAlreadyPushed = false } = {}) {
       document.getElementById(requestURL.hash.slice(1))?.scrollIntoView();
     return;
   }
-  if (documentState === "liveConnection")
-    liveConnection.abortController.abort();
+  if (documentState === "liveConnection") liveConnection.backgroundJob.stop();
   documentState = "liveNavigating";
   const cachedResponseText =
     request.method === "GET" ? liveNavigate.cache.get(request.url) : undefined;
@@ -235,7 +234,7 @@ export async function liveConnection(
 ) {
   documentState = "liveConnection";
   let reloadOnConnect = false;
-  const backgroundJob = utilities.backgroundJob(
+  liveConnection.backgroundJob = utilities.backgroundJob(
     { interval: reloadOnReconnect ? 1000 : 5 * 1000 },
     async () => {
       liveConnection.abortController = new AbortController();
@@ -312,7 +311,7 @@ export async function liveConnection(
     },
   );
 }
-liveConnection.abortController = undefined;
+liveConnection.backgroundJob = undefined;
 
 /**
  * > **Note:** This is a low-level function used by Live Navigation and Live Connection updates.
