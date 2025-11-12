@@ -437,40 +437,40 @@ export default function server({
                 throw new Error("Invalid request method.");
               if (liveConnectionId.match(/^[a-z0-9]{5,}$/) === null)
                 throw new Error("Invalid ‘Live-Connection’ header.");
-              request.liveConnection = liveConnections.get(liveConnectionId);
-              if (request.liveConnection === undefined) {
+              let liveConnection = liveConnections.get(liveConnectionId);
+              if (liveConnection === undefined) {
                 request.log("LIVE CONNECTION CREATE", liveConnectionId);
-                request.id = liveConnectionId;
-                request.liveConnection = { request, response };
-                liveConnections.add(request.liveConnection);
-              } else if (
-                request.liveConnection.request.URL.href !== request.URL.href
-              )
-                throw new Error("Unmatched ‘href’ of existing request.");
-              else {
+                liveConnection = {
+                  id: liveConnectionId,
+                  state: "waitingToBeEstablishedAndNeedsUpdate",
+                  URL: request.URL,
+                };
+                liveConnections.set(liveConnection.id, liveConnection);
+              } else {
+                if (request.URL.href !== liveConnection.URL.href)
+                  throw new Error("Unmatched ‘href’.");
                 request.log(
                   "LIVE CONNECTION ESTABLISH",
-                  request.liveConnection.request.id,
-                  request.liveConnection.skipUpdateOnEstablish
-                    ? "SKIP UPDATE"
-                    : "UPDATE",
+                  liveConnection.id,
+                  liveConnection.state,
                 );
-                clearTimeout(
-                  request.liveConnection.waitingToBeEstablishedTimeout,
-                );
-                request.liveConnection.response.liveConnectionEnd?.();
-                request.id = request.liveConnection.request.id;
-                request.liveConnection.request = request;
-                request.liveConnection.response = response;
+                clearTimeout(liveConnection.waitingToBeEstablishedTimeout);
+                liveConnection.response.liveConnectionEnd?.();
+                request.id = liveConnection.request.id;
+                liveConnection.request = request;
+                liveConnection.response = response;
               }
+              request.id = liveConnection.id;
               response.once("close", () => {
                 request.log("LIVE CONNECTION CLOSE");
-                if (request.liveConnection!.request === request)
-                  request.liveConnection!.waitingToBeEstablishedTimeout =
-                    setTimeout(() => {
+                if (liveConnection!.request === request)
+                  liveConnection!.waitingToBeEstablishedTimeout = setTimeout(
+                    () => {
                       request.log("LIVE CONNECTION DELETE");
-                      liveConnections.delete(request.liveConnection!);
-                    }, 30 * 1000).unref();
+                      liveConnections.delete(liveConnection!);
+                    },
+                    30 * 1000,
+                  ).unref();
               });
 
               response.setHeader(
@@ -491,19 +491,19 @@ export default function server({
               const periodicUpdates = node.backgroundJob(
                 { interval: 5 * 60 * 1000 },
                 () => {
-                  request.liveConnection!.update?.();
+                  liveConnection!.update?.();
                 },
               );
               response.once("close", () => {
                 periodicUpdates.stop();
               });
 
-              request.liveConnection.establish = true;
+              liveConnection.establish = true;
 
               response.liveConnectionEnd = response.end;
               response.end = ((data?: string): typeof response => {
                 request.log("LIVE CONNECTION RESPONSE");
-                request.liveConnection!.writableEnded = true;
+                liveConnection!.writableEnded = true;
                 if (typeof data === "string")
                   response.write(JSON.stringify(data) + "\n");
                 return response;
