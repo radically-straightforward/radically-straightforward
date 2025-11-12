@@ -351,7 +351,6 @@ export default function server({
               response.statusCode = 422;
               throw new Error("Missing ‘destination’ search parameter.");
             }
-
             let destination: URL;
             try {
               destination = new URL(request.search.destination);
@@ -367,7 +366,6 @@ export default function server({
               response.statusCode = 422;
               throw new Error("Invalid destination.");
             }
-
             const destinationResponse = await fetch(destination.href, {
               signal: AbortSignal.timeout(30 * 1000),
             });
@@ -382,7 +380,6 @@ export default function server({
               !(destinationResponse.body instanceof ReadableStream)
             )
               throw new Error("Invalid destination response.");
-
             response.setHeader("Content-Type", destinationResponseContentType);
             // @ts-expect-error: https://github.com/DefinitelyTyped/DefinitelyTyped/discussions/68986
             await stream.pipeline(destinationResponse.body, response, {
