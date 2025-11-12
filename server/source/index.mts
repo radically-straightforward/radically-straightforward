@@ -139,7 +139,7 @@ type LiveConnection = {
     | "waitingToBeEstablishedAndNeedsUpdate"
     | "established";
   waitingToBeEstablishedTimeout?: NodeJS.Timeout;
-  pathname: string;
+  URL: URL;
   request?: Request<{}, {}, {}, {}, {}>;
   response?: Response;
   update?: () => void;
@@ -410,7 +410,7 @@ export default function server({
             response.once("close", async () => {
               for (const liveConnection of liveConnections.values()) {
                 if (
-                  liveConnection.pathname.match(
+                  liveConnection.URL.pathname.match(
                     new RegExp(request.body.pathname as string),
                   ) === null
                 )
