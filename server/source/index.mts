@@ -140,8 +140,9 @@ type LiveConnection = {
   waitingToBeEstablishedTimeout?: NodeJS.Timeout;
   pathname: string;
   request?: Request<{}, {}, {}, {}, {}>;
-  response?: Response & { liveConnectionEnd?: () => void };
+  response?: Response;
   update?: () => void;
+  end?: () => void;
 };
 
 /**
@@ -176,7 +177,7 @@ export default function server({
         },
         { [key: string]: unknown }
       >,
-      response: Response & { liveConnectionEnd?: () => void },
+      response: Response,
     ) => {
       try {
         request.id = utilities.randomString();
@@ -692,7 +693,7 @@ export default function server({
   process.once("gracefulTermination", () => {
     httpServer.close();
     for (const liveConnection of liveConnections)
-      liveConnection.response.liveConnectionEnd?.();
+      if (liveConnection.state === "established") liveConnection.end!();
   });
   process.once("beforeExit", () => {
     log("STOP");
