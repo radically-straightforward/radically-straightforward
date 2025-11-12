@@ -133,6 +133,7 @@ export type Response = http.ServerResponse & {
 };
 
 type LiveConnection = {
+  id: string;
   state:
     | "waitingToBeEstablished"
     | "waitingToBeEstablishedAndNeedsUpdate"
@@ -161,7 +162,7 @@ export default function server({
 } = {}): Route[] {
   const routes = new Array<Route>();
   const flashes = new Map<string, string>();
-  const liveConnections = new Set<LiveConnection>();
+  const liveConnections = new Map<LiveConnection["id"], LiveConnection>();
   const httpServer = http
     .createServer((async (
       request: Request<
@@ -407,7 +408,7 @@ export default function server({
             )
               throw new Error("Invalid ‘pathname’.");
             response.once("close", async () => {
-              for (const liveConnection of liveConnections) {
+              for (const liveConnection of liveConnections.values()) {
                 if (
                   liveConnection.pathname.match(
                     new RegExp(request.body.pathname as string),
@@ -432,16 +433,11 @@ export default function server({
           const liveConnectionId = request.headers["live-connection"];
           if (typeof liveConnectionId === "string")
             try {
-              if (
-                request.method !== "GET" ||
-                liveConnectionId.match(/^[a-z0-9]{5,}$/) === null
-              )
+              if (request.method !== "GET")
+                throw new Error("Invalid request method.");
+              if (liveConnectionId.match(/^[a-z0-9]{5,}$/) === null)
                 throw new Error("Invalid ‘Live-Connection’ header.");
-
-              request.liveConnection = [...liveConnections].find(
-                (liveConnection) =>
-                  liveConnection.request.id === liveConnectionId,
-              );
+              request.liveConnection = liveConnections.get(liveConnectionId);
               if (request.liveConnection === undefined) {
                 request.log("LIVE CONNECTION CREATE", liveConnectionId);
                 request.id = liveConnectionId;
@@ -692,7 +688,7 @@ export default function server({
     });
   process.once("gracefulTermination", () => {
     httpServer.close();
-    for (const liveConnection of liveConnections)
+    for (const liveConnection of liveConnections.values())
       if (liveConnection.state === "established") liveConnection.end!();
   });
   process.once("beforeExit", () => {
