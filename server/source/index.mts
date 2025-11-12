@@ -172,7 +172,7 @@ export default function server({
             | RequestBodyFile[];
         },
         { [key: string]: unknown }
-      > & { liveConnection?: LiveConnection },
+      >,
       response: Response & { liveConnectionEnd?: () => void },
     ) => {
       try {
