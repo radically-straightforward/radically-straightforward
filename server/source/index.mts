@@ -327,6 +327,8 @@ export default function server({
           });
           await Promise.all(filesPromises);
         }
+        if (process.env.NODE_ENV !== "production" && request.method !== "GET")
+          request.log(JSON.stringify(request.body, undefined, 2));
         request.getFlash = () => {
           if (typeof request.cookies.flash !== "string") return undefined;
           const flash = flashes.get(request.cookies.flash);
@@ -334,15 +336,12 @@ export default function server({
           response.deleteCookie("flash");
           return flash;
         };
-        if (process.env.NODE_ENV !== "production" && request.method !== "GET")
-          request.log(JSON.stringify(request.body, undefined, 2));
       } catch (error) {
         request.log("ERROR", String(error));
         if (response.statusCode === 200) response.statusCode = 400;
         response.setHeader("Content-Type", "text/plain; charset=utf-8");
         response.end(String(error));
       }
-
       if (!response.writableEnded) {
         if (request.method === "GET" && request.URL.pathname === "/_health")
           response.end();
@@ -679,7 +678,6 @@ export default function server({
           }
         }
       }
-
       request.log(
         "RESPONSE",
         String(response.statusCode),
