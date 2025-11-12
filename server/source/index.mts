@@ -100,22 +100,29 @@ export type RequestBodyFile = busboy.FileInfo & { path: string };
 /**
  * An extension of [Node.js’s `http.ServerResponse`](https://nodejs.org/api/http.html#class-httpserverresponse) with the following extra functionality:
  *
- * > **Note:** The extra functionality is only available in requests that are **not** Live Connections, because Live Connections must not set headers.
+ * - **`liveConnection()`:** Whether the Response should start a Live Connection, which should only happen under the following conditions:
  *
- * - **`setCookie`:** Sets a [`Set-Cookie` header](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Set-Cookie) with secure settings. Also updates the `request.cookies` object so that the new cookies are visible from within the request itself.
+ *   1. The Request in question is not a Live Connection itself.
+ *   2. The Request method is `GET`.
+ *   3. The Response status code is 200.
+ *
+ * > **Note:** The following extra functionality is only available in requests that are **not** Live Connections, because Live Connections must not set headers.
+ *
+ * - **`setCookie`():** Sets a [`Set-Cookie` header](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Set-Cookie) with secure settings. Also updates the `request.cookies` object so that the new cookies are visible from within the request itself.
  *
  *   > **Note:** The noteworthy cookie settings are the following:
  *   >
  *   > - The cookie name is prefixed with [`__Host-`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Cookies#__host-). This assumes that the application is available under a single domain, and that the application is the only thing running on that domain (it can’t, for example, be mounted under a `/my-application/` pathname and share a domain with other applications).
  *   > - The `SameSite` cookie option is set to `None`, which is necessary for things like SAML to work (for example, when the Identity Provider sends a `POST` request back to the application’s Assertion Consumer Service (ACS), the application needs the cookies to determine if there’s a previously established session).
  *
- * - **`deleteCookie`:** Sets an expired [`Set-Cookie` header](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Set-Cookie) without a value and with the same secure settings used by `setCookie`. Also updates the `request.cookies` object so that the new cookies are visible from within the request itself.
+ * - **`deleteCookie()`:** Sets an expired [`Set-Cookie` header](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Set-Cookie) without a value and with the same secure settings used by `setCookie`. Also updates the `request.cookies` object so that the new cookies are visible from within the request itself.
  *
  * - **`setFlash()`:** Set a flash message that will be available to the next `request` via `getFlash()` (the next `request` typically is the result of a `redirect()`ion). This is useful, for example, for a message such as “User settings updated successfully.”
  *
- * - **`redirect`:** Sends the [`Location` header](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Location) and an HTTP status of [303 (`"see-other"`)](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/303) (default), [307 (`"temporary"`)](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/307), or [308 (`"permanent"`)](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/308). Note that there are no options for the legacy statuses of [301](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/301) and [302](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/302), because they may lead some clients to change the HTTP method of the redirected request by mistake. The `destination` parameter is relative to `request.URL`, for example, if no `destination` is provided, then the default is to redirect to the same `request.URL`.
+ * - **`redirect()`:** Sends the [`Location` header](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Location) and an HTTP status of [303 (`"see-other"`)](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/303) (default), [307 (`"temporary"`)](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/307), or [308 (`"permanent"`)](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/308). Note that there are no options for the legacy statuses of [301](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/301) and [302](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/302), because they may lead some clients to change the HTTP method of the redirected request by mistake. The `destination` parameter is relative to `request.URL`, for example, if no `destination` is provided, then the default is to redirect to the same `request.URL`.
  */
 export type Response = http.ServerResponse & {
+  liveConnection: () => boolean;
   setCookie: (key: string, value: string, maxAge?: number) => Response;
   deleteCookie: (key: string) => Response;
   setFlash: (message: string) => Response;
@@ -125,12 +132,13 @@ export type Response = http.ServerResponse & {
   ) => Response;
 };
 
-type LiveConnection = RequestLiveConnection & {
+type LiveConnection = {
+  state: "waitingToBeEstablished" | "established";
+  waitingToBeEstablishedTimeout?: NodeJS.Timeout;
   request: Request<{}, {}, {}, {}, {}>;
   response: Response & { liveConnectionEnd?: () => void };
   writableEnded?: boolean;
   update?: () => void;
-  deleteTimeout?: NodeJS.Timeout;
 };
 
 /**
@@ -465,7 +473,9 @@ export default function server({
                     ? "SKIP UPDATE"
                     : "UPDATE",
                 );
-                clearTimeout(request.liveConnection.deleteTimeout);
+                clearTimeout(
+                  request.liveConnection.waitingToBeEstablishedTimeout,
+                );
                 request.liveConnection.response.liveConnectionEnd?.();
                 request.id = request.liveConnection.request.id;
                 request.liveConnection.request = request;
@@ -474,10 +484,11 @@ export default function server({
               response.once("close", () => {
                 request.log("LIVE CONNECTION CLOSE");
                 if (request.liveConnection!.request === request)
-                  request.liveConnection!.deleteTimeout = setTimeout(() => {
-                    request.log("LIVE CONNECTION DELETE");
-                    liveConnections.delete(request.liveConnection!);
-                  }, 30 * 1000).unref();
+                  request.liveConnection!.waitingToBeEstablishedTimeout =
+                    setTimeout(() => {
+                      request.log("LIVE CONNECTION DELETE");
+                      liveConnections.delete(request.liveConnection!);
+                    }, 30 * 1000).unref();
               });
 
               response.setHeader(
