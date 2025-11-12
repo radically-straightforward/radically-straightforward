@@ -158,7 +158,6 @@ export default function server({
   const routes = new Array<Route>();
   const flashes = new Map<string, string>();
   const liveConnections = new Set<LiveConnection>();
-
   const httpServer = http
     .createServer((async (
       request: Request<
@@ -713,9 +712,7 @@ export default function server({
   process.once("beforeExit", () => {
     log("STOP");
   });
-
   return routes;
-
   function log(...messageParts: string[]): void {
     utilities.log("SERVER", String(port), ...messageParts);
   }
