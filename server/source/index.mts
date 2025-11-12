@@ -42,7 +42,7 @@ export type Route = {
  *
  * - **`start`:** A timestamp of when the request arrived.
  *
- * - **`log`:** A logging function which includes information about the request and formats the message with [`@radically-straightforward/utilities`’s `log()`](https://github.com/radically-straightforward/radically-straightforward/tree/main/utilities#log).
+ * - **`log()`:** A logging function which includes information about the request and formats the message with [`@radically-straightforward/utilities`’s `log()`](https://github.com/radically-straightforward/radically-straightforward/tree/main/utilities#log).
  *
  * - **`ip`:** The IP address of the request originator as reported by [Caddy](https://github.com/radically-straightforward/radically-straightforward/tree/main/caddy) (the reverse proxy) (uses the `X-Forwarded-For` HTTP request header).
  *
@@ -177,9 +177,7 @@ export default function server({
     ) => {
       try {
         request.id = utilities.randomString();
-
         request.start = process.hrtime.bigint();
-
         request.log = (...messageParts: string[]): void => {
           log(
             request.id,
@@ -187,26 +185,21 @@ export default function server({
             ...messageParts,
           );
         };
-
         request.ip = String(request.headers["x-forwarded-for"] ?? "127.0.0.1");
-
         request.log(
           "REQUEST",
           request.ip,
           request.method ?? "UNDEFINED",
           request.url ?? "UNDEFINED",
         );
-
         if (request.method === undefined || request.url === undefined)
           throw new Error("Missing request ‘method’ or ‘url’.");
-
         request.URL = new URL(
           request.url,
           `${request.headers["x-forwarded-proto"] ?? "http"}://${
             request.headers["x-forwarded-host"] ?? request.headers["host"]
           }`,
         );
-
         if (
           request.method !== "GET" &&
           request.headers["csrf-protection"] !== "true" &&
@@ -221,7 +214,6 @@ export default function server({
             "This request appears to have come from outside the application. Please close this tab and start again. (Cross-Site Request Forgery (CSRF) protection failed.)",
           );
         }
-
         request.search = {};
         for (const [key, value] of request.URL.searchParams)
           if (key.endsWith("[]"))
@@ -229,7 +221,6 @@ export default function server({
               (request.search[key.slice(0, -"[]".length)] ??= []) as string[]
             ).push(value);
           else request.search[key] = value;
-
         request.cookies = Object.fromEntries(
           (request.headers["cookie"] ?? "").split(";").flatMap((pair) => {
             if (pair.trim() === "") return [];
@@ -242,7 +233,6 @@ export default function server({
             return [parts];
           }),
         );
-
         request.body = {};
         if (typeof request.headers["content-type"] === "string") {
           const directoriesToDelete = new Set<string>();
@@ -337,7 +327,6 @@ export default function server({
           });
           await Promise.all(filesPromises);
         }
-
         request.getFlash = () => {
           if (typeof request.cookies.flash !== "string") return undefined;
           const flash = flashes.get(request.cookies.flash);
@@ -345,7 +334,6 @@ export default function server({
           response.deleteCookie("flash");
           return flash;
         };
-
         if (process.env.NODE_ENV !== "production" && request.method !== "GET")
           request.log(JSON.stringify(request.body, undefined, 2));
       } catch (error) {
