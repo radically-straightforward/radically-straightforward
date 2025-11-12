@@ -133,11 +133,14 @@ export type Response = http.ServerResponse & {
 };
 
 type LiveConnection = {
-  state: "waitingToBeEstablished" | "established";
+  state:
+    | "waitingToBeEstablished"
+    | "waitingToBeEstablishedAndNeedsUpdate"
+    | "established";
   waitingToBeEstablishedTimeout?: NodeJS.Timeout;
-  request: Request<{}, {}, {}, {}, {}>;
-  response: Response & { liveConnectionEnd?: () => void };
-  writableEnded?: boolean;
+  pathname: string;
+  request?: Request<{}, {}, {}, {}, {}>;
+  response?: Response & { liveConnectionEnd?: () => void };
   update?: () => void;
 };
 
@@ -405,14 +408,15 @@ export default function server({
             response.once("close", async () => {
               for (const liveConnection of liveConnections) {
                 if (
-                  liveConnection.request.URL.pathname.match(
+                  liveConnection.pathname.match(
                     new RegExp(request.body.pathname as string),
                   ) === null
                 )
                   continue;
-                liveConnection.skipUpdateOnEstablish = false;
-                if (!(liveConnection.response.socket?.destroyed ?? true))
-                  liveConnection.update?.();
+                if (liveConnection.state === "waitingToBeEstablished")
+                  liveConnection.state = "waitingToBeEstablishedAndNeedsUpdate";
+                else if (liveConnection.state === "established")
+                  liveConnection.update!();
                 await timers.setTimeout(200, undefined, { ref: false });
               }
             });
