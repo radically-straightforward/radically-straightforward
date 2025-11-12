@@ -367,7 +367,7 @@ export default function server({
               throw new Error("Invalid destination.");
             }
             const destinationResponse = await fetch(destination.href, {
-              signal: AbortSignal.timeout(30 * 1000),
+              signal: AbortSignal.timeout(5 * 60 * 1000),
             });
             const destinationResponseContentType =
               destinationResponse.headers.get("Content-Type");
@@ -382,9 +382,7 @@ export default function server({
               throw new Error("Invalid destination response.");
             response.setHeader("Content-Type", destinationResponseContentType);
             // @ts-expect-error: https://github.com/DefinitelyTyped/DefinitelyTyped/discussions/68986
-            await stream.pipeline(destinationResponse.body, response, {
-              signal: AbortSignal.timeout(5 * 60 * 1000),
-            });
+            await stream.pipeline(destinationResponse.body, response);
           } catch (error) {
             request.log("ERROR", String(error));
             if (!response.headersSent) {
