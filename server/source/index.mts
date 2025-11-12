@@ -64,7 +64,13 @@ export type Route = {
  *
  *   > **Note:** There’s an special kind of error that may be thrown, which is the string `"validation"`. This sets the HTTP response status to [422](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/422) instead of [500](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500).
  *
- * - **`liveConnection:`** If this is a Live Connection, then this property is set to a `RequestLiveConnection` containing more information about the state of the Live Connection.
+ * - **`liveConnection`:** When the Request is a Live Connection, this property contains information about the state:
+ *
+ *   - **`"establishingWithoutUpdate"`:** This is the first time that this Request is going through the application code, because the Live Connection is just being established. Additionally, a Live Connection update **is not** necessary, because the page **has not** changed since the initial response was sent. You may use this state to, for example, start a [`backgroundJob()`](https://github.com/radically-straightforward/radically-straightforward/tree/main/node#backgroundjob) which updates a timestamp of when a user has last been seen online, and then end the response right away.
+ *
+ *   - **`"establishingWithUpdate"`:** This is the first time that this Request is going through the application code, because the Live Connection is just being established. Additionally, a Live Connection update **is** necessary, because the page **has** changed since the initial response was sent. You may use this state to, for example, start a [`backgroundJob()`](https://github.com/radically-straightforward/radically-straightforward/tree/main/node#backgroundjob) which updates a timestamp of when a user has last been seen online, and then let the Request go though the application code normally to produce a Live Connection update.
+ *
+ *   - **`"update"`:** This is **not** the first time that this Request is going through the application code, because the Live Connection had been established already. This should produce a Live Connection update.
  */
 export type Request<Pathname, Search, Cookies, Body, State> =
   http.IncomingMessage & {
@@ -80,7 +86,10 @@ export type Request<Pathname, Search, Cookies, Body, State> =
     state: Partial<State>;
     getFlash: () => string | undefined;
     error?: unknown;
-    liveConnection?: RequestLiveConnection;
+    liveConnection?:
+      | "establishingWithoutUpdate"
+      | "establishingWithUpdate"
+      | "update";
   };
 
 /**
