@@ -98,18 +98,6 @@ export type Request<Pathname, Search, Cookies, Body, State> =
 export type RequestBodyFile = busboy.FileInfo & { path: string };
 
 /**
- * Information about a Live Connection that is available under `request.liveConnection`.
- *
- * - **`establish`:** Whether the connection is just being established. In other words, whether it’s the first time that the `handler`s are being called for this request. You may use this, for example, to start a [`backgroundJob()`](https://github.com/radically-straightforward/radically-straightforward/tree/main/node#backgroundjob) which updates a timestamp of when a user has last been seen online.
- *
- * - **`skipUpdateOnEstablish`:** Whether it’s necessary to send an update with a new version of the page upon establishing the Live Connection. An update may be skipped if the page hasn’t been marked as modified since the last update was sent. You must only check this variable if `establish` is `true`.
- */
-export type RequestLiveConnection = {
-  establish?: boolean;
-  skipUpdateOnEstablish?: boolean;
-};
-
-/**
  * An extension of [Node.js’s `http.ServerResponse`](https://nodejs.org/api/http.html#class-httpserverresponse) with the following extra functionality:
  *
  * > **Note:** The extra functionality is only available in requests that are **not** Live Connections, because Live Connections must not set headers.
