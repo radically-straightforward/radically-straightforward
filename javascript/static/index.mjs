@@ -144,6 +144,7 @@ async function liveNavigate(request, { stateAlreadyPushed = false } = {}) {
     if (!stateAlreadyPushed && request.method === "GET")
       window.history.pushState(null, "", requestURL.href);
     liveNavigate.previousLocation = { ...window.location };
+    progressBar.remove();
     document.querySelector('[key~="global-error"]')?.remove();
     document
       .querySelector("body")
@@ -156,8 +157,6 @@ async function liveNavigate(request, { stateAlreadyPushed = false } = {}) {
         `,
       );
     throw error;
-  } finally {
-    progressBar.remove();
   }
   if (typeof response.headers.get("Location") === "string") {
     documentState = "navigatingAway";
