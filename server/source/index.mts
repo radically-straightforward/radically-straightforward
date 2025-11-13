@@ -504,16 +504,17 @@ export default function server({
             },
           );
           response.once("close", () => {
-            request.log("LIVE CONNECTION", "CLOSE");
             liveConnections.delete(liveConnection.id);
             heartbeat.stop();
             periodicUpdates.stop();
+            request.log("LIVE CONNECTION", "CLOSE");
           });
         } catch (error) {
-          request.log("LIVE CONNECTION", "ERROR", String(error));
           response.statusCode = 400;
           response.setHeader("Content-Type", "text/plain; charset=utf-8");
           response.end(String(error));
+          request.log("LIVE CONNECTION", "ERROR", String(error));
+          return;
         }
       else {
         response.setHeader("Content-Type", "text/html; charset=utf-8");
