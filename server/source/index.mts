@@ -411,9 +411,11 @@ export default function server({
                   ) === null
                 )
                   continue;
-                if (liveConnection.state === "waitingToBeEstablished")
-                  liveConnection.state = "waitingToBeEstablishedAndNeedsUpdate";
-                else if (liveConnection.state === "established")
+                if (
+                  liveConnection.state === "waitingForConnectionWithoutUpdate"
+                )
+                  liveConnection.state = "waitingForConnectionWithUpdate";
+                else if (liveConnection.state === "connected")
                   liveConnection.update!();
                 await timers.setTimeout(200, undefined, { ref: false });
               }
