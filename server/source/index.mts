@@ -607,14 +607,17 @@ export default function server({
             if (match === null) continue;
             request.pathname = match.groups ?? {};
           }
-          if ((request.error !== undefined) !== (route.error ?? false))
+          if (
+            (request.error === undefined && route.error === true) ||
+            (request.error !== undefined && route.error !== true)
+          )
             continue;
           try {
             await route.handler(request, response);
           } catch (error) {
-            request.log("ERROR", String(error), (error as Error)?.stack ?? "");
             response.statusCode = error === "validation" ? 422 : 500;
             request.error = error;
+            request.log("ERROR", String(error), (error as Error)?.stack ?? "");
           }
           responded =
             (request.liveConnection === undefined && !response.writableEnded) ||
