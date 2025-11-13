@@ -89,7 +89,8 @@ export type Request<Pathname, Search, Cookies, Body, State> =
     liveConnection?:
       | "connectingWithoutUpdate"
       | "connectingWithUpdate"
-      | "connected";
+      | "connected"
+      | "updated";
   };
 
 /**
@@ -547,6 +548,7 @@ export default function server({
           response.end = ((data?: string): typeof response => {
             if (typeof data === "string")
               response.write(JSON.stringify(data) + "\n");
+            request.liveConnection = "updated";
             return response;
           }) as (typeof response)["end"];
           response.setHeader(
@@ -575,7 +577,7 @@ export default function server({
           request.log("LIVE CONNECTION", "ERROR", String(error));
           return;
         }
-      do {
+      while (true) {
         let liveConnectionUpdatePromise;
         if (liveConnection !== undefined) {
           request.log("LIVE CONNECTION", "REQUEST");
@@ -585,6 +587,7 @@ export default function server({
         }
         request.state = {};
         delete request.error;
+        let responded = false;
         for (const route of routes) {
           if (
             (typeof route.method === "string" &&
@@ -616,28 +619,30 @@ export default function server({
             request.error = error;
           }
 
-          if ((request.liveConnection ?? response).writableEnded) break;
+          responded =
+            (request.liveConnection === undefined && !response.writableEnded) ||
+            (typeof request.liveConnection === "string" &&
+              request.liveConnection !== "updated");
+          if (responded) break;
         }
-
-        if (
-          (request.liveConnection === undefined && !response.writableEnded) ||
-          !(request.liveConnection ?? response).writableEnded
-        ) {
+        if (responded)
           request.log(
-            "ERROR",
-            "The application didn’t finish handling this request.",
+            "RESPONSE",
+            String(response.statusCode),
+            String(response.getHeader("Location") ?? ""),
           );
+        else {
           if (!response.headersSent) {
             response.statusCode = 500;
             response.setHeader("Content-Type", "text/plain; charset=utf-8");
           }
-          response.end("The application didn’t finish handling this request.");
-        }
-
-        if (request.liveConnection !== undefined) {
-          request.liveConnection.establish = false;
-          request.liveConnection.skipUpdateOnEstablish = true;
-          await liveConnectionUpdatePromise;
+          response.end(
+            "The application didn’t finish responding to this request.",
+          );
+          request.log(
+            "ERROR",
+            "The application didn’t finish responding to this request.",
+          );
         }
         if (response.mayStartLiveConnection()) {
           const liveConnection: LiveConnection = {
@@ -652,17 +657,12 @@ export default function server({
           liveConnections.set(liveConnection.id, liveConnection);
           request.log("LIVE CONNECTION", "CREATE", liveConnection.id);
         }
-        if (
-          request.liveConnection === "connectingWithUpdate" ||
-          request.liveConnection === "connectingWithoutUpdate"
-        )
+        if (liveConnection === undefined) break;
+        else {
           request.liveConnection = "connected";
-        request.log(
-          "RESPONSE",
-          String(response.statusCode),
-          String(response.getHeader("Location") ?? ""),
-        );
-      } while (request.liveConnection === "connected");
+          await liveConnectionUpdatePromise;
+        }
+      }
     }) as (
       request: http.IncomingMessage,
       response: http.ServerResponse,
