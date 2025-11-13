@@ -514,7 +514,6 @@ export default function server({
             }
           else {
             response.setHeader("Content-Type", "text/html; charset=utf-8");
-
             response.setCookie = (
               key: string,
               value: string,
@@ -527,7 +526,6 @@ export default function server({
               ]);
               return response;
             };
-
             response.deleteCookie = (key: string): typeof response => {
               delete request.cookies[key];
               response.setHeader("Set-Cookie", [
@@ -536,7 +534,6 @@ export default function server({
               ]);
               return response;
             };
-
             response.setFlash = (message: string): typeof response => {
               const flashIdentifier = utilities.randomString();
               flashes.set(flashIdentifier, message);
@@ -549,7 +546,6 @@ export default function server({
               response.setCookie("flash", flashIdentifier, 2 * 60);
               return response;
             };
-
             response.redirect = (
               destination: string = "",
               type:
