@@ -653,12 +653,17 @@ export default function server({
           liveConnections.set(liveConnection.id, liveConnection);
           request.log("LIVE CONNECTION", "CREATE", liveConnection.id);
         }
+        if (
+          request.liveConnection === "connectingWithUpdate" ||
+          request.liveConnection === "connectingWithoutUpdate"
+        )
+          request.liveConnection = "connected";
         request.log(
           "RESPONSE",
           String(response.statusCode),
           String(response.getHeader("Location") ?? ""),
         );
-      } while (request.liveConnection !== undefined);
+      } while (request.liveConnection === "connected");
     }) as (
       request: http.IncomingMessage,
       response: http.ServerResponse,
