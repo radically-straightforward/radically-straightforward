@@ -596,7 +596,6 @@ export default function server({
               request.method!.match(route.method) === null)
           )
             continue;
-
           if (
             typeof route.pathname === "string" &&
             request.URL.pathname !== route.pathname
@@ -607,10 +606,8 @@ export default function server({
             if (match === null) continue;
             request.pathname = match.groups ?? {};
           } else request.pathname = {};
-
           if ((request.error !== undefined) !== (route.error ?? false))
             continue;
-
           try {
             await route.handler(request, response);
           } catch (error) {
@@ -618,7 +615,6 @@ export default function server({
             response.statusCode = error === "validation" ? 422 : 500;
             request.error = error;
           }
-
           responded =
             (request.liveConnection === undefined && !response.writableEnded) ||
             (typeof request.liveConnection === "string" &&
