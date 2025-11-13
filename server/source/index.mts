@@ -437,6 +437,7 @@ export default function server({
           request.log("ERROR", String(error));
           return;
         }
+      let liveConnection: LiveConnection | undefined;
       if (typeof request.headers["live-connection"] !== "string") {
         response.setHeader("Content-Type", "text/html; charset=utf-8");
         response.setCookie = (
@@ -504,7 +505,7 @@ export default function server({
             request.headers["live-connection"].match(/^[a-z0-9]{5,}$/) === null
           )
             throw new Error("Invalid ‘Live-Connection’ header.");
-          let liveConnection = liveConnections.get(
+          liveConnection = liveConnections.get(
             request.headers["live-connection"],
           );
           if (liveConnection !== undefined) {
@@ -558,11 +559,11 @@ export default function server({
           const periodicUpdates = node.backgroundJob(
             { interval: 5 * 60 * 1000 },
             () => {
-              liveConnection.update!();
+              liveConnection!.update!();
             },
           );
           response.once("close", () => {
-            liveConnections.delete(liveConnection.id);
+            liveConnections.delete(liveConnection!.id);
             heartbeat.stop();
             periodicUpdates.stop();
             request.log("LIVE CONNECTION", "CLOSE");
@@ -575,16 +576,13 @@ export default function server({
           return;
         }
       do {
-        let liveConnectionUpdate;
-        if (request.liveConnection !== undefined) {
-          if (!request.liveConnection.establish)
-            request.log("LIVE CONNECTION REQUEST");
-          request.liveConnection.writableEnded = false;
-          liveConnectionUpdate = new Promise<void>((resolve) => {
-            request.liveConnection!.update = resolve;
+        let liveConnectionUpdatePromise;
+        if (liveConnection !== undefined) {
+          request.log("LIVE CONNECTION", "REQUEST");
+          liveConnectionUpdatePromise = new Promise<void>((resolve) => {
+            liveConnection.update = resolve;
           });
         }
-
         request.state = {};
         delete request.error;
         for (const route of routes) {
@@ -621,7 +619,10 @@ export default function server({
           if ((request.liveConnection ?? response).writableEnded) break;
         }
 
-        if (!(request.liveConnection ?? response).writableEnded) {
+        if (
+          (request.liveConnection === undefined && !response.writableEnded) ||
+          !(request.liveConnection ?? response).writableEnded
+        ) {
           request.log(
             "ERROR",
             "The application didn’t finish handling this request.",
@@ -636,7 +637,7 @@ export default function server({
         if (request.liveConnection !== undefined) {
           request.liveConnection.establish = false;
           request.liveConnection.skipUpdateOnEstablish = true;
-          await liveConnectionUpdate;
+          await liveConnectionUpdatePromise;
         }
         if (response.mayStartLiveConnection()) {
           const liveConnection: LiveConnection = {
