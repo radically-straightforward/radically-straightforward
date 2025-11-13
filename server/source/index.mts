@@ -440,7 +440,66 @@ export default function server({
           return;
         }
       const liveConnectionId = request.headers["live-connection"];
-      if (typeof liveConnectionId === "string")
+      if (typeof liveConnectionId !== "string") {
+        response.setHeader("Content-Type", "text/html; charset=utf-8");
+        response.setCookie = (
+          key: string,
+          value: string,
+          maxAge: number = 150 * 24 * 60 * 60,
+        ): typeof response => {
+          request.cookies[key] = value;
+          response.setHeader("Set-Cookie", [
+            ...((response.getHeader("Set-Cookie") as string[]) ?? []),
+            `__Host-${encodeURIComponent(key)}=${encodeURIComponent(value)}; Max-Age=${maxAge}; Path=/; Secure; HttpOnly; SameSite=None`,
+          ]);
+          return response;
+        };
+        response.deleteCookie = (key: string): typeof response => {
+          delete request.cookies[key];
+          response.setHeader("Set-Cookie", [
+            ...((response.getHeader("Set-Cookie") as string[]) ?? []),
+            `__Host-${encodeURIComponent(key)}=; Max-Age=0; Path=/; Secure; HttpOnly; SameSite=None`,
+          ]);
+          return response;
+        };
+        response.setFlash = (message: string): typeof response => {
+          const flashIdentifier = utilities.randomString();
+          flashes.set(flashIdentifier, message);
+          setTimeout(
+            () => {
+              flashes.delete(flashIdentifier);
+            },
+            2 * 60 * 1000,
+          ).unref();
+          response.setCookie("flash", flashIdentifier, 2 * 60);
+          return response;
+        };
+        response.redirect = (
+          destination: string = "",
+          type:
+            | "see-other"
+            | "temporary"
+            | "permanent"
+            | "live-navigation" = "see-other",
+        ): typeof response => {
+          response.statusCode =
+            request.headers["live-navigation"] === "true" &&
+            !destination.startsWith("/")
+              ? 200
+              : {
+                  "see-other": 303,
+                  temporary: 307,
+                  permanent: 308,
+                  "live-navigation": 200,
+                }[type];
+          response.setHeader(
+            "Location",
+            new URL(destination, request.URL).href,
+          );
+          response.end();
+          return response;
+        };
+      } else
         try {
           if (request.method !== "GET")
             throw new Error("Invalid request method.");
@@ -516,66 +575,6 @@ export default function server({
           request.log("LIVE CONNECTION", "ERROR", String(error));
           return;
         }
-      else {
-        response.setHeader("Content-Type", "text/html; charset=utf-8");
-        response.setCookie = (
-          key: string,
-          value: string,
-          maxAge: number = 150 * 24 * 60 * 60,
-        ): typeof response => {
-          request.cookies[key] = value;
-          response.setHeader("Set-Cookie", [
-            ...((response.getHeader("Set-Cookie") as string[]) ?? []),
-            `__Host-${encodeURIComponent(key)}=${encodeURIComponent(value)}; Max-Age=${maxAge}; Path=/; Secure; HttpOnly; SameSite=None`,
-          ]);
-          return response;
-        };
-        response.deleteCookie = (key: string): typeof response => {
-          delete request.cookies[key];
-          response.setHeader("Set-Cookie", [
-            ...((response.getHeader("Set-Cookie") as string[]) ?? []),
-            `__Host-${encodeURIComponent(key)}=; Max-Age=0; Path=/; Secure; HttpOnly; SameSite=None`,
-          ]);
-          return response;
-        };
-        response.setFlash = (message: string): typeof response => {
-          const flashIdentifier = utilities.randomString();
-          flashes.set(flashIdentifier, message);
-          setTimeout(
-            () => {
-              flashes.delete(flashIdentifier);
-            },
-            2 * 60 * 1000,
-          ).unref();
-          response.setCookie("flash", flashIdentifier, 2 * 60);
-          return response;
-        };
-        response.redirect = (
-          destination: string = "",
-          type:
-            | "see-other"
-            | "temporary"
-            | "permanent"
-            | "live-navigation" = "see-other",
-        ): typeof response => {
-          response.statusCode =
-            request.headers["live-navigation"] === "true" &&
-            !destination.startsWith("/")
-              ? 200
-              : {
-                  "see-other": 303,
-                  temporary: 307,
-                  permanent: 308,
-                  "live-navigation": 200,
-                }[type];
-          response.setHeader(
-            "Location",
-            new URL(destination, request.URL).href,
-          );
-          response.end();
-          return response;
-        };
-      }
       do {
         let liveConnectionUpdate;
         if (request.liveConnection !== undefined) {
