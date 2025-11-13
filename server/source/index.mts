@@ -340,7 +340,8 @@ export default function server({
         response.mayStartLiveConnection = () =>
           request.liveConnection === undefined &&
           request.method === "GET" &&
-          response.statusCode === 200;
+          response.statusCode === 200 &&
+          response.getHeader("Content-Type") === "text/html; charset=utf-8";
       } catch (error) {
         request.log("ERROR", String(error));
         if (response.statusCode === 200) response.statusCode = 400;
@@ -652,23 +653,18 @@ export default function server({
                 await liveConnectionUpdate;
               }
             } while (request.liveConnection !== undefined);
-
-          if (
-            request.method === "GET" &&
-            response.statusCode === 200 &&
-            response.getHeader("Content-Type") === "text/html; charset=utf-8"
-          ) {
-            request.log("LIVE CONNECTION PREPARE");
-            const liveConnection = {
-              request,
-              response,
-              skipUpdateOnEstablish: true,
-              deleteTimeout: setTimeout(() => {
-                request.log("LIVE CONNECTION DELETE");
-                liveConnections.delete(liveConnection);
+          if (response.mayStartLiveConnection()) {
+            const liveConnection: LiveConnection = {
+              id: request.id,
+              state: "waitingForConnectionWithoutUpdate",
+              waitingForConnectionTimeout: setTimeout(() => {
+                request.log("LIVE CONNECTION", "DELETE");
+                liveConnections.delete(liveConnection.id);
               }, 30 * 1000).unref(),
+              URL: request.URL,
             };
-            liveConnections.add(liveConnection);
+            request.log("LIVE CONNECTION", liveConnection.state);
+            liveConnections.set(liveConnection.id, liveConnection);
           }
         }
       }
