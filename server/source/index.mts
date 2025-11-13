@@ -136,8 +136,6 @@ type LiveConnection = {
     | "connected";
   waitingForConnectionTimeout?: NodeJS.Timeout;
   URL: URL;
-  request?: Request<{}, {}, {}, {}, {}>;
-  response?: Response;
   update?: () => void;
   end?: () => void;
 };
@@ -544,8 +542,6 @@ export default function server({
                   })();
           liveConnection.state = "connected";
           clearTimeout(liveConnection.waitingForConnectionTimeout);
-          liveConnection.request = request;
-          liveConnection.response = response;
           liveConnection.end = response.end;
           response.end = ((data?: string): typeof response => {
             if (typeof data === "string")
