@@ -644,21 +644,22 @@ export default function server({
             "The application didn’t finish responding to this request.",
           );
         }
-        if (response.mayStartLiveConnection()) {
-          const liveConnection: LiveConnection = {
-            id: request.id,
-            state: "waitingForConnectionWithoutUpdate",
-            waitingForConnectionTimeout: setTimeout(() => {
-              liveConnections.delete(liveConnection.id);
-              request.log("LIVE CONNECTION", "DELETE");
-            }, 30 * 1000).unref(),
-            URL: request.URL,
-          };
-          liveConnections.set(liveConnection.id, liveConnection);
-          request.log("LIVE CONNECTION", "CREATE", liveConnection.id);
-        }
-        if (liveConnection === undefined) break;
-        else {
+        if (liveConnection === undefined) {
+          if (response.mayStartLiveConnection()) {
+            const liveConnection: LiveConnection = {
+              id: request.id,
+              state: "waitingForConnectionWithoutUpdate",
+              waitingForConnectionTimeout: setTimeout(() => {
+                liveConnections.delete(liveConnection.id);
+                request.log("LIVE CONNECTION", "DELETE");
+              }, 30 * 1000).unref(),
+              URL: request.URL,
+            };
+            liveConnections.set(liveConnection.id, liveConnection);
+            request.log("LIVE CONNECTION", "CREATE", liveConnection.id);
+          }
+          break;
+        } else {
           request.liveConnection = "connected";
           await liveConnectionUpdatePromise;
         }
