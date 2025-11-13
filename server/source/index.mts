@@ -625,13 +625,7 @@ export default function server({
               request.liveConnection !== "updated");
           if (responded) break;
         }
-        if (responded)
-          request.log(
-            "RESPONSE",
-            String(response.statusCode),
-            String(response.getHeader("Location") ?? ""),
-          );
-        else {
+        if (!responded) {
           if (!response.headersSent) {
             response.statusCode = 500;
             response.setHeader("Content-Type", "text/plain; charset=utf-8");
@@ -643,7 +637,13 @@ export default function server({
             "ERROR",
             "The application didn’t finish responding to this request.",
           );
+          return;
         }
+        request.log(
+          "RESPONSE",
+          String(response.statusCode),
+          String(response.getHeader("Location") ?? ""),
+        );
         if (liveConnection === undefined) {
           if (response.mayStartLiveConnection()) {
             const liveConnection: LiveConnection = {
