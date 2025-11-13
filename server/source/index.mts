@@ -580,10 +580,10 @@ export default function server({
       while (true) {
         let liveConnectionUpdatePromise;
         if (liveConnection !== undefined) {
-          request.log("LIVE CONNECTION", "REQUEST");
           liveConnectionUpdatePromise = new Promise<void>((resolve) => {
             liveConnection.update = resolve;
           });
+          request.log("LIVE CONNECTION", "REQUEST");
         }
         request.state = {};
         delete request.error;
