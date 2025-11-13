@@ -89,8 +89,8 @@ export type Request<Pathname, Search, Cookies, Body, State> =
     liveConnection?:
       | "connectingWithoutUpdate"
       | "connectingWithUpdate"
-      | "connected"
-      | "updated";
+      | "updated"
+      | "connected";
   };
 
 /**
