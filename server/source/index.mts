@@ -439,8 +439,7 @@ export default function server({
           request.log("ERROR", String(error));
           return;
         }
-      const liveConnectionId = request.headers["live-connection"];
-      if (typeof liveConnectionId !== "string") {
+      if (typeof request.headers["live-connection"] !== "string") {
         response.setHeader("Content-Type", "text/html; charset=utf-8");
         response.setCookie = (
           key: string,
@@ -503,9 +502,13 @@ export default function server({
         try {
           if (request.method !== "GET")
             throw new Error("Invalid request method.");
-          if (liveConnectionId.match(/^[a-z0-9]{5,}$/) === null)
+          if (
+            request.headers["live-connection"].match(/^[a-z0-9]{5,}$/) === null
+          )
             throw new Error("Invalid ‘Live-Connection’ header.");
-          let liveConnection = liveConnections.get(liveConnectionId);
+          let liveConnection = liveConnections.get(
+            request.headers["live-connection"],
+          );
           if (liveConnection !== undefined) {
             if (request.URL.href !== liveConnection.URL.href)
               throw new Error("Unmatched ‘href’.");
@@ -519,7 +522,7 @@ export default function server({
             );
           } else {
             liveConnection = {
-              id: liveConnectionId,
+              id: request.headers["live-connection"],
               state: "waitingForConnectionWithUpdate",
               URL: request.URL,
             };
