@@ -640,26 +640,25 @@ export default function server({
           request.liveConnection.skipUpdateOnEstablish = true;
           await liveConnectionUpdate;
         }
-
+        if (response.mayStartLiveConnection()) {
+          const liveConnection: LiveConnection = {
+            id: request.id,
+            state: "waitingForConnectionWithoutUpdate",
+            waitingForConnectionTimeout: setTimeout(() => {
+              liveConnections.delete(liveConnection.id);
+              request.log("LIVE CONNECTION", "DELETE");
+            }, 30 * 1000).unref(),
+            URL: request.URL,
+          };
+          liveConnections.set(liveConnection.id, liveConnection);
+          request.log("LIVE CONNECTION", "CREATE", liveConnection.id);
+        }
         request.log(
           "RESPONSE",
           String(response.statusCode),
           String(response.getHeader("Location") ?? ""),
         );
       } while (request.liveConnection !== undefined);
-      if (response.mayStartLiveConnection()) {
-        const liveConnection: LiveConnection = {
-          id: request.id,
-          state: "waitingForConnectionWithoutUpdate",
-          waitingForConnectionTimeout: setTimeout(() => {
-            liveConnections.delete(liveConnection.id);
-            request.log("LIVE CONNECTION", "DELETE");
-          }, 30 * 1000).unref(),
-          URL: request.URL,
-        };
-        liveConnections.set(liveConnection.id, liveConnection);
-        request.log("LIVE CONNECTION", "CREATE", liveConnection.id);
-      }
     }) as (
       request: http.IncomingMessage,
       response: http.ServerResponse,
