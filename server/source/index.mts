@@ -442,18 +442,25 @@ export default function server({
                 throw new Error("Invalid ‘Live-Connection’ header.");
               let liveConnection = liveConnections.get(liveConnectionId);
               if (liveConnection === undefined) {
-                request.log("LIVE CONNECTION CREATE", liveConnectionId);
                 liveConnection = {
                   id: liveConnectionId,
-                  state: "waitingToBeEstablishedAndNeedsUpdate",
+                  state: "waitingForConnectionWithUpdate",
                   URL: request.URL,
                 };
+                request.log(
+                  "LIVE CONNECTION",
+                  "CREATE & CONNECT",
+                  liveConnection.id,
+                );
                 liveConnections.set(liveConnection.id, liveConnection);
               } else {
                 if (request.URL.href !== liveConnection.URL.href)
                   throw new Error("Unmatched ‘href’.");
+                if (liveConnection.state === "connected")
+                  throw new Error("Already connected.");
                 request.log(
-                  "LIVE CONNECTION ESTABLISH",
+                  "LIVE CONNECTION",
+                  "CONNECT",
                   liveConnection.id,
                   liveConnection.state,
                 );
@@ -663,7 +670,7 @@ export default function server({
               }, 30 * 1000).unref(),
               URL: request.URL,
             };
-            request.log("LIVE CONNECTION", liveConnection.state);
+            request.log("LIVE CONNECTION", "CREATE", liveConnection.id);
             liveConnections.set(liveConnection.id, liveConnection);
           }
         }
