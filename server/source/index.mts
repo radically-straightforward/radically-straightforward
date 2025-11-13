@@ -685,7 +685,7 @@ export default function server({
   process.once("gracefulTermination", () => {
     httpServer.close();
     for (const liveConnection of liveConnections.values())
-      if (liveConnection.state === "established") liveConnection.end!();
+      if (liveConnection.state === "connected") liveConnection.end!();
   });
   process.once("beforeExit", () => {
     log("STOP");
