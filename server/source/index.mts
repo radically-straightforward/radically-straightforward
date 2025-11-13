@@ -337,6 +337,10 @@ export default function server({
           response.deleteCookie("flash");
           return flash;
         };
+        response.mayStartLiveConnection = () =>
+          request.liveConnection === undefined &&
+          request.method === "GET" &&
+          response.statusCode === 200;
       } catch (error) {
         request.log("ERROR", String(error));
         if (response.statusCode === 200) response.statusCode = 400;
