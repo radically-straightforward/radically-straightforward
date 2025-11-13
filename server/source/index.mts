@@ -512,7 +512,7 @@ export default function server({
                 return response;
               }) as (typeof response)["end"];
             } catch (error) {
-              request.log("LIVE CONNECTION ERROR", String(error));
+              request.log("LIVE CONNECTION", "ERROR", String(error));
               response.statusCode = 400;
               response.setHeader("Content-Type", "text/plain; charset=utf-8");
               response.end(String(error));
