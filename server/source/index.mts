@@ -66,11 +66,11 @@ export type Route = {
  *
  * - **`liveConnection`:** When the Request is a Live Connection, this property contains information about the state:
  *
- *   - **`"establishingWithoutUpdate"`:** This is the first time that this Request is going through the application code, because the Live Connection is just being established. Additionally, a Live Connection update **is not** necessary, because the page **has not** changed since the initial response was sent. You may use this state to, for example, start a [`backgroundJob()`](https://github.com/radically-straightforward/radically-straightforward/tree/main/node#backgroundjob) which updates a timestamp of when a user has last been seen online, and then end the response right away.
+ *   - **`"connectingWithoutUpdate"`:** This is the first time that this Request is going through the application code, because the Live Connection is just being established. Additionally, a Live Connection update **is not** necessary, because the page **has not** changed since the initial response was sent. You may use this state to, for example, start a [`backgroundJob()`](https://github.com/radically-straightforward/radically-straightforward/tree/main/node#backgroundjob) which updates a timestamp of when a user has last been seen online, and then `response.end()` right away.
  *
- *   - **`"establishingWithUpdate"`:** This is the first time that this Request is going through the application code, because the Live Connection is just being established. Additionally, a Live Connection update **is** necessary, because the page **has** changed since the initial response was sent. You may use this state to, for example, start a [`backgroundJob()`](https://github.com/radically-straightforward/radically-straightforward/tree/main/node#backgroundjob) which updates a timestamp of when a user has last been seen online, and then let the Request go though the application code normally to produce a Live Connection update.
+ *   - **`"connectingWithUpdate"`:** This is the first time that this Request is going through the application code, because the Live Connection is just being established. Additionally, a Live Connection update **is** necessary, because the page **has** changed since the initial response was sent. You may use this state to, for example, start a [`backgroundJob()`](https://github.com/radically-straightforward/radically-straightforward/tree/main/node#backgroundjob) which updates a timestamp of when a user has last been seen online, and then let the Request go though the application code normally to produce a Live Connection update.
  *
- *   - **`"update"`:** This is **not** the first time that this Request is going through the application code, because the Live Connection had been established already. This should produce a Live Connection update.
+ *   - **`"connected"`:** This is **not** the first time that this Request is going through the application code, because the Live Connection had been established already. This should produce a Live Connection update.
  */
 export type Request<Pathname, Search, Cookies, Body, State> =
   http.IncomingMessage & {
@@ -87,9 +87,9 @@ export type Request<Pathname, Search, Cookies, Body, State> =
     getFlash: () => string | undefined;
     error?: unknown;
     liveConnection?:
-      | "establishingWithoutUpdate"
-      | "establishingWithUpdate"
-      | "update";
+      | "connectingWithoutUpdate"
+      | "connectingWithUpdate"
+      | "connected";
   };
 
 /**
@@ -100,11 +100,7 @@ export type RequestBodyFile = busboy.FileInfo & { path: string };
 /**
  * An extension of [Node.js’s `http.ServerResponse`](https://nodejs.org/api/http.html#class-httpserverresponse) with the following extra functionality:
  *
- * - **`liveConnection()`:** Whether the Response should start a Live Connection, which should only happen under the following conditions:
- *
- *   1. The Request in question is not a Live Connection itself.
- *   2. The Request method is `GET`.
- *   3. The Response status code is 200.
+ * - **`mayStartLiveConnection()`:** Whether the Response may start a Live Connection.
  *
  * > **Note:** The following extra functionality is only available in requests that are **not** Live Connections, because Live Connections must not set headers.
  *
@@ -122,7 +118,7 @@ export type RequestBodyFile = busboy.FileInfo & { path: string };
  * - **`redirect()`:** Sends the [`Location` header](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Location) and an HTTP status of [303 (`"see-other"`)](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/303) (default), [307 (`"temporary"`)](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/307), or [308 (`"permanent"`)](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/308). Note that there are no options for the legacy statuses of [301](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/301) and [302](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/302), because they may lead some clients to change the HTTP method of the redirected request by mistake. The `destination` parameter is relative to `request.URL`, for example, if no `destination` is provided, then the default is to redirect to the same `request.URL`.
  */
 export type Response = http.ServerResponse & {
-  liveConnection: () => boolean;
+  mayStartLiveConnection: () => boolean;
   setCookie: (key: string, value: string, maxAge?: number) => Response;
   deleteCookie: (key: string) => Response;
   setFlash: (message: string) => Response;
@@ -135,10 +131,10 @@ export type Response = http.ServerResponse & {
 type LiveConnection = {
   id: string;
   state:
-    | "waitingToBeEstablished"
-    | "waitingToBeEstablishedAndNeedsUpdate"
-    | "established";
-  waitingToBeEstablishedTimeout?: NodeJS.Timeout;
+    | "waitingForConnectionWithoutUpdate"
+    | "waitingForConnectionWithUpdate"
+    | "connected";
+  waitingForConnectionTimeout?: NodeJS.Timeout;
   URL: URL;
   request?: Request<{}, {}, {}, {}, {}>;
   response?: Response;
