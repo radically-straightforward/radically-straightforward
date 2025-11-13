@@ -441,7 +441,18 @@ export default function server({
               if (liveConnectionId.match(/^[a-z0-9]{5,}$/) === null)
                 throw new Error("Invalid ‘Live-Connection’ header.");
               let liveConnection = liveConnections.get(liveConnectionId);
-              if (liveConnection === undefined) {
+              if (liveConnection !== undefined) {
+                if (request.URL.href !== liveConnection.URL.href)
+                  throw new Error("Unmatched ‘href’.");
+                if (liveConnection.state === "connected")
+                  throw new Error("Already connected.");
+                request.log(
+                  "LIVE CONNECTION",
+                  "CONNECT",
+                  liveConnection.id,
+                  liveConnection.state,
+                );
+              } else {
                 liveConnection = {
                   id: liveConnectionId,
                   state: "waitingForConnectionWithUpdate",
@@ -453,71 +464,49 @@ export default function server({
                   liveConnection.id,
                 );
                 liveConnections.set(liveConnection.id, liveConnection);
-              } else {
-                if (request.URL.href !== liveConnection.URL.href)
-                  throw new Error("Unmatched ‘href’.");
-                if (liveConnection.state === "connected")
-                  throw new Error("Already connected.");
-                request.log(
-                  "LIVE CONNECTION",
-                  "CONNECT",
-                  liveConnection.id,
-                  liveConnection.state,
-                );
-                clearTimeout(liveConnection.waitingToBeEstablishedTimeout);
-                liveConnection.response.liveConnectionEnd?.();
-                request.id = liveConnection.request.id;
-                liveConnection.request = request;
-                liveConnection.response = response;
               }
               request.id = liveConnection.id;
-              response.once("close", () => {
-                request.log("LIVE CONNECTION CLOSE");
-                if (liveConnection!.request === request)
-                  liveConnection!.waitingToBeEstablishedTimeout = setTimeout(
-                    () => {
-                      request.log("LIVE CONNECTION DELETE");
-                      liveConnections.delete(liveConnection!);
-                    },
-                    30 * 1000,
-                  ).unref();
-              });
-
+              request.liveConnection =
+                liveConnection.state === "waitingForConnectionWithoutUpdate"
+                  ? "connectingWithoutUpdate"
+                  : liveConnection.state === "waitingForConnectionWithUpdate"
+                    ? "connectingWithUpdate"
+                    : (() => {
+                        throw new Error("Invalid Live Connection state.");
+                      })();
+              liveConnection.state = "connected";
+              clearTimeout(liveConnection.waitingForConnectionTimeout);
+              liveConnection.request = request;
+              liveConnection.response = response;
+              liveConnection.end = response.end;
+              response.end = ((data?: string): typeof response => {
+                request.log("LIVE CONNECTION", "RESPONSE");
+                if (typeof data === "string")
+                  response.write(JSON.stringify(data) + "\n");
+                return response;
+              }) as (typeof response)["end"];
               response.setHeader(
                 "Content-Type",
                 "application/json-lines; charset=utf-8",
               );
-
               const heartbeat = node.backgroundJob(
                 { interval: 30 * 1000 },
                 () => {
                   response.write("\n");
                 },
               );
-              response.once("close", () => {
-                heartbeat.stop();
-              });
-
               const periodicUpdates = node.backgroundJob(
                 { interval: 5 * 60 * 1000 },
                 () => {
-                  liveConnection!.update?.();
+                  liveConnection.update!();
                 },
               );
               response.once("close", () => {
+                request.log("LIVE CONNECTION", "CLOSE");
+                liveConnections.delete(liveConnection.id);
+                heartbeat.stop();
                 periodicUpdates.stop();
               });
-
-              liveConnection.establish = true;
-
-              response.liveConnectionEnd = response.end;
-              response.end = ((data?: string): typeof response => {
-                request.log("LIVE CONNECTION RESPONSE");
-                liveConnection!.writableEnded = true;
-                if (typeof data === "string")
-                  response.write(JSON.stringify(data) + "\n");
-                return response;
-              }) as (typeof response)["end"];
             } catch (error) {
               request.log("LIVE CONNECTION", "ERROR", String(error));
               response.statusCode = 400;
