@@ -343,332 +343,330 @@ export default function server({
           response.statusCode === 200 &&
           response.getHeader("Content-Type") === "text/html; charset=utf-8";
       } catch (error) {
-        request.log("ERROR", String(error));
         if (response.statusCode === 200) response.statusCode = 400;
         response.setHeader("Content-Type", "text/plain; charset=utf-8");
         response.end(String(error));
+        request.log("ERROR", String(error));
+        return;
       }
-      if (!response.writableEnded) {
-        if (request.method === "GET" && request.URL.pathname === "/_health")
-          response.end();
-        else if (request.method === "GET" && request.URL.pathname === "/_proxy")
-          try {
-            if (typeof request.search.destination !== "string") {
-              response.statusCode = 422;
-              throw new Error("Missing ‘destination’ search parameter.");
-            }
-            let destination: URL;
-            try {
-              destination = new URL(request.search.destination);
-            } catch (error) {
-              response.statusCode = 422;
-              throw new Error("Invalid destination.");
-            }
-            if (
-              (destination.protocol !== "http:" &&
-                destination.protocol !== "https:") ||
-              destination.hostname === request.URL.hostname
-            ) {
-              response.statusCode = 422;
-              throw new Error("Invalid destination.");
-            }
-            const destinationResponse = await fetch(destination.href, {
-              signal: AbortSignal.timeout(5 * 60 * 1000),
-            });
-            const destinationResponseContentType =
-              destinationResponse.headers.get("Content-Type");
-            if (
-              !destinationResponse.ok ||
-              typeof destinationResponseContentType !== "string" ||
-              destinationResponseContentType.match(
-                new RegExp("^(?:image|video|audio)/"),
-              ) === null ||
-              !(destinationResponse.body instanceof ReadableStream)
-            )
-              throw new Error("Invalid destination response.");
-            response.setHeader("Content-Type", destinationResponseContentType);
-            // @ts-expect-error: https://github.com/DefinitelyTyped/DefinitelyTyped/discussions/68986
-            await stream.pipeline(destinationResponse.body, response);
-          } catch (error) {
-            request.log("ERROR", String(error));
-            if (!response.headersSent) {
-              if (response.statusCode === 200) response.statusCode = 502;
-              response.setHeader("Content-Type", "text/plain; charset=utf-8");
-            }
-            if (!response.writableEnded) response.end(String(error));
-          }
-        else if (
-          request.ip === "127.0.0.1" &&
-          request.method === "POST" &&
-          request.URL.pathname === "/__live-connections"
-        )
-          try {
-            if (
-              typeof request.body.pathname !== "string" ||
-              request.body.pathname.trim() === ""
-            )
-              throw new Error("Invalid ‘pathname’.");
-            response.once("close", async () => {
-              for (const liveConnection of liveConnections.values()) {
-                if (
-                  liveConnection.URL.pathname.match(
-                    new RegExp(request.body.pathname as string),
-                  ) === null
-                )
-                  continue;
-                if (
-                  liveConnection.state === "waitingForConnectionWithoutUpdate"
-                )
-                  liveConnection.state = "waitingForConnectionWithUpdate";
-                else if (liveConnection.state === "connected")
-                  liveConnection.update!();
-                await timers.setTimeout(200, undefined, { ref: false });
-              }
-            });
-            response.end();
-          } catch (error) {
-            request.log("ERROR", String(error));
+      if (request.method === "GET" && request.URL.pathname === "/_health") {
+        response.end();
+        request.log("RESPONSE", String(response.statusCode));
+        return;
+      }
+      if (request.method === "GET" && request.URL.pathname === "/_proxy")
+        try {
+          if (typeof request.search.destination !== "string") {
             response.statusCode = 422;
+            throw new Error("Missing ‘destination’ search parameter.");
+          }
+          let destination: URL;
+          try {
+            destination = new URL(request.search.destination);
+          } catch (error) {
+            response.statusCode = 422;
+            throw new Error("Invalid destination.");
+          }
+          if (
+            (destination.protocol !== "http:" &&
+              destination.protocol !== "https:") ||
+            destination.hostname === request.URL.hostname
+          ) {
+            response.statusCode = 422;
+            throw new Error("Invalid destination.");
+          }
+          const destinationResponse = await fetch(destination.href, {
+            signal: AbortSignal.timeout(5 * 60 * 1000),
+          });
+          const destinationResponseContentType =
+            destinationResponse.headers.get("Content-Type");
+          if (
+            !destinationResponse.ok ||
+            typeof destinationResponseContentType !== "string" ||
+            destinationResponseContentType.match(
+              new RegExp("^(?:image|video|audio)/"),
+            ) === null ||
+            !(destinationResponse.body instanceof ReadableStream)
+          )
+            throw new Error("Invalid destination response.");
+          response.setHeader("Content-Type", destinationResponseContentType);
+          // @ts-expect-error: https://github.com/DefinitelyTyped/DefinitelyTyped/discussions/68986
+          stream.pipeline(destinationResponse.body, response);
+          request.log("RESPONSE");
+          return;
+        } catch (error) {
+          if (!response.headersSent) {
+            if (response.statusCode === 200) response.statusCode = 502;
             response.setHeader("Content-Type", "text/plain; charset=utf-8");
-            response.end(String(error));
           }
-        else {
-          const liveConnectionId = request.headers["live-connection"];
-          if (typeof liveConnectionId === "string")
-            try {
-              if (request.method !== "GET")
-                throw new Error("Invalid request method.");
-              if (liveConnectionId.match(/^[a-z0-9]{5,}$/) === null)
-                throw new Error("Invalid ‘Live-Connection’ header.");
-              let liveConnection = liveConnections.get(liveConnectionId);
-              if (liveConnection !== undefined) {
-                if (request.URL.href !== liveConnection.URL.href)
-                  throw new Error("Unmatched ‘href’.");
-                if (liveConnection.state === "connected")
-                  throw new Error("Already connected.");
-                request.log(
-                  "LIVE CONNECTION",
-                  "CONNECT",
-                  liveConnection.id,
-                  liveConnection.state,
-                );
-              } else {
-                liveConnection = {
-                  id: liveConnectionId,
-                  state: "waitingForConnectionWithUpdate",
-                  URL: request.URL,
-                };
-                request.log(
-                  "LIVE CONNECTION",
-                  "CREATE & CONNECT",
-                  liveConnection.id,
-                );
-                liveConnections.set(liveConnection.id, liveConnection);
-              }
-              request.id = liveConnection.id;
-              request.liveConnection =
-                liveConnection.state === "waitingForConnectionWithoutUpdate"
-                  ? "connectingWithoutUpdate"
-                  : liveConnection.state === "waitingForConnectionWithUpdate"
-                    ? "connectingWithUpdate"
-                    : (() => {
-                        throw new Error("Invalid Live Connection state.");
-                      })();
-              liveConnection.state = "connected";
-              clearTimeout(liveConnection.waitingForConnectionTimeout);
-              liveConnection.request = request;
-              liveConnection.response = response;
-              liveConnection.end = response.end;
-              response.end = ((data?: string): typeof response => {
-                request.log("LIVE CONNECTION", "RESPONSE");
-                if (typeof data === "string")
-                  response.write(JSON.stringify(data) + "\n");
-                return response;
-              }) as (typeof response)["end"];
-              response.setHeader(
-                "Content-Type",
-                "application/json-lines; charset=utf-8",
-              );
-              const heartbeat = node.backgroundJob(
-                { interval: 30 * 1000 },
-                () => {
-                  response.write("\n");
-                },
-              );
-              const periodicUpdates = node.backgroundJob(
-                { interval: 5 * 60 * 1000 },
-                () => {
-                  liveConnection.update!();
-                },
-              );
-              response.once("close", () => {
-                request.log("LIVE CONNECTION", "CLOSE");
-                liveConnections.delete(liveConnection.id);
-                heartbeat.stop();
-                periodicUpdates.stop();
-              });
-            } catch (error) {
-              request.log("LIVE CONNECTION", "ERROR", String(error));
-              response.statusCode = 400;
-              response.setHeader("Content-Type", "text/plain; charset=utf-8");
-              response.end(String(error));
+          if (!response.writableEnded) response.end(String(error));
+          request.log("ERROR", String(error));
+          return;
+        }
+      if (
+        request.ip === "127.0.0.1" &&
+        request.method === "POST" &&
+        request.URL.pathname === "/__live-connections"
+      )
+        try {
+          if (
+            typeof request.body.pathname !== "string" ||
+            request.body.pathname.trim() === ""
+          )
+            throw new Error("Invalid ‘pathname’.");
+          response.once("close", async () => {
+            for (const liveConnection of liveConnections.values()) {
+              if (
+                liveConnection.URL.pathname.match(
+                  new RegExp(request.body.pathname as string),
+                ) === null
+              )
+                continue;
+              if (liveConnection.state === "waitingForConnectionWithoutUpdate")
+                liveConnection.state = "waitingForConnectionWithUpdate";
+              else if (liveConnection.state === "connected")
+                liveConnection.update!();
+              await timers.setTimeout(200, undefined, { ref: false });
             }
-          else {
-            response.setHeader("Content-Type", "text/html; charset=utf-8");
-            response.setCookie = (
-              key: string,
-              value: string,
-              maxAge: number = 150 * 24 * 60 * 60,
-            ): typeof response => {
-              request.cookies[key] = value;
-              response.setHeader("Set-Cookie", [
-                ...((response.getHeader("Set-Cookie") as string[]) ?? []),
-                `__Host-${encodeURIComponent(key)}=${encodeURIComponent(value)}; Max-Age=${maxAge}; Path=/; Secure; HttpOnly; SameSite=None`,
-              ]);
-              return response;
-            };
-            response.deleteCookie = (key: string): typeof response => {
-              delete request.cookies[key];
-              response.setHeader("Set-Cookie", [
-                ...((response.getHeader("Set-Cookie") as string[]) ?? []),
-                `__Host-${encodeURIComponent(key)}=; Max-Age=0; Path=/; Secure; HttpOnly; SameSite=None`,
-              ]);
-              return response;
-            };
-            response.setFlash = (message: string): typeof response => {
-              const flashIdentifier = utilities.randomString();
-              flashes.set(flashIdentifier, message);
-              setTimeout(
-                () => {
-                  flashes.delete(flashIdentifier);
-                },
-                2 * 60 * 1000,
-              ).unref();
-              response.setCookie("flash", flashIdentifier, 2 * 60);
-              return response;
-            };
-            response.redirect = (
-              destination: string = "",
-              type:
-                | "see-other"
-                | "temporary"
-                | "permanent"
-                | "live-navigation" = "see-other",
-            ): typeof response => {
-              response.statusCode =
-                request.headers["live-navigation"] === "true" &&
-                !destination.startsWith("/")
-                  ? 200
-                  : {
-                      "see-other": 303,
-                      temporary: 307,
-                      permanent: 308,
-                      "live-navigation": 200,
-                    }[type];
-              response.setHeader(
-                "Location",
-                new URL(destination, request.URL).href,
-              );
-              response.end();
-              return response;
-            };
-          }
-
-          if (!response.writableEnded)
-            do {
-              let liveConnectionUpdate;
-              if (request.liveConnection !== undefined) {
-                if (!request.liveConnection.establish)
-                  request.log("LIVE CONNECTION REQUEST");
-                request.liveConnection.writableEnded = false;
-                liveConnectionUpdate = new Promise<void>((resolve) => {
-                  request.liveConnection!.update = resolve;
-                });
-              }
-
-              request.state = {};
-              delete request.error;
-              for (const route of routes) {
-                if (
-                  (typeof route.method === "string" &&
-                    request.method !== route.method) ||
-                  (route.method instanceof RegExp &&
-                    request.method!.match(route.method) === null)
-                )
-                  continue;
-
-                if (
-                  typeof route.pathname === "string" &&
-                  request.URL.pathname !== route.pathname
-                )
-                  continue;
-                else if (route.pathname instanceof RegExp) {
-                  const match = request.URL.pathname.match(route.pathname);
-                  if (match === null) continue;
-                  request.pathname = match.groups ?? {};
-                } else request.pathname = {};
-
-                if ((request.error !== undefined) !== (route.error ?? false))
-                  continue;
-
-                try {
-                  await route.handler(request, response);
-                } catch (error) {
-                  request.log(
-                    "ERROR",
-                    String(error),
-                    (error as Error)?.stack ?? "",
-                  );
-                  response.statusCode = error === "validation" ? 422 : 500;
-                  request.error = error;
-                }
-
-                if ((request.liveConnection ?? response).writableEnded) break;
-              }
-
-              if (!(request.liveConnection ?? response).writableEnded) {
-                request.log(
-                  "ERROR",
-                  "The application didn’t finish handling this request.",
-                );
-                if (!response.headersSent) {
-                  response.statusCode = 500;
-                  response.setHeader(
-                    "Content-Type",
-                    "text/plain; charset=utf-8",
-                  );
-                }
-                response.end(
-                  "The application didn’t finish handling this request.",
-                );
-              }
-
-              if (request.liveConnection !== undefined) {
-                request.liveConnection.establish = false;
-                request.liveConnection.skipUpdateOnEstablish = true;
-                await liveConnectionUpdate;
-              }
-            } while (request.liveConnection !== undefined);
-          if (response.mayStartLiveConnection()) {
-            const liveConnection: LiveConnection = {
-              id: request.id,
-              state: "waitingForConnectionWithoutUpdate",
-              waitingForConnectionTimeout: setTimeout(() => {
-                request.log("LIVE CONNECTION", "DELETE");
-                liveConnections.delete(liveConnection.id);
-              }, 30 * 1000).unref(),
+          });
+          response.end();
+          request.log("RESPONSE");
+          return;
+        } catch (error) {
+          response.statusCode = 422;
+          response.setHeader("Content-Type", "text/plain; charset=utf-8");
+          response.end(String(error));
+          request.log("ERROR", String(error));
+          return;
+        }
+      const liveConnectionId = request.headers["live-connection"];
+      if (typeof liveConnectionId === "string")
+        try {
+          if (request.method !== "GET")
+            throw new Error("Invalid request method.");
+          if (liveConnectionId.match(/^[a-z0-9]{5,}$/) === null)
+            throw new Error("Invalid ‘Live-Connection’ header.");
+          let liveConnection = liveConnections.get(liveConnectionId);
+          if (liveConnection !== undefined) {
+            if (request.URL.href !== liveConnection.URL.href)
+              throw new Error("Unmatched ‘href’.");
+            if (liveConnection.state === "connected")
+              throw new Error("Already connected.");
+            request.log(
+              "LIVE CONNECTION",
+              "CONNECT",
+              liveConnection.id,
+              liveConnection.state,
+            );
+          } else {
+            liveConnection = {
+              id: liveConnectionId,
+              state: "waitingForConnectionWithUpdate",
               URL: request.URL,
             };
-            request.log("LIVE CONNECTION", "CREATE", liveConnection.id);
+            request.log(
+              "LIVE CONNECTION",
+              "CREATE & CONNECT",
+              liveConnection.id,
+            );
             liveConnections.set(liveConnection.id, liveConnection);
           }
+          request.id = liveConnection.id;
+          request.liveConnection =
+            liveConnection.state === "waitingForConnectionWithoutUpdate"
+              ? "connectingWithoutUpdate"
+              : liveConnection.state === "waitingForConnectionWithUpdate"
+                ? "connectingWithUpdate"
+                : (() => {
+                    throw new Error("Invalid Live Connection state.");
+                  })();
+          liveConnection.state = "connected";
+          clearTimeout(liveConnection.waitingForConnectionTimeout);
+          liveConnection.request = request;
+          liveConnection.response = response;
+          liveConnection.end = response.end;
+          response.end = ((data?: string): typeof response => {
+            if (typeof data === "string")
+              response.write(JSON.stringify(data) + "\n");
+            return response;
+          }) as (typeof response)["end"];
+          response.setHeader(
+            "Content-Type",
+            "application/json-lines; charset=utf-8",
+          );
+          const heartbeat = node.backgroundJob({ interval: 30 * 1000 }, () => {
+            response.write("\n");
+          });
+          const periodicUpdates = node.backgroundJob(
+            { interval: 5 * 60 * 1000 },
+            () => {
+              liveConnection.update!();
+            },
+          );
+          response.once("close", () => {
+            request.log("LIVE CONNECTION", "CLOSE");
+            liveConnections.delete(liveConnection.id);
+            heartbeat.stop();
+            periodicUpdates.stop();
+          });
+        } catch (error) {
+          request.log("LIVE CONNECTION", "ERROR", String(error));
+          response.statusCode = 400;
+          response.setHeader("Content-Type", "text/plain; charset=utf-8");
+          response.end(String(error));
         }
+      else {
+        response.setHeader("Content-Type", "text/html; charset=utf-8");
+        response.setCookie = (
+          key: string,
+          value: string,
+          maxAge: number = 150 * 24 * 60 * 60,
+        ): typeof response => {
+          request.cookies[key] = value;
+          response.setHeader("Set-Cookie", [
+            ...((response.getHeader("Set-Cookie") as string[]) ?? []),
+            `__Host-${encodeURIComponent(key)}=${encodeURIComponent(value)}; Max-Age=${maxAge}; Path=/; Secure; HttpOnly; SameSite=None`,
+          ]);
+          return response;
+        };
+        response.deleteCookie = (key: string): typeof response => {
+          delete request.cookies[key];
+          response.setHeader("Set-Cookie", [
+            ...((response.getHeader("Set-Cookie") as string[]) ?? []),
+            `__Host-${encodeURIComponent(key)}=; Max-Age=0; Path=/; Secure; HttpOnly; SameSite=None`,
+          ]);
+          return response;
+        };
+        response.setFlash = (message: string): typeof response => {
+          const flashIdentifier = utilities.randomString();
+          flashes.set(flashIdentifier, message);
+          setTimeout(
+            () => {
+              flashes.delete(flashIdentifier);
+            },
+            2 * 60 * 1000,
+          ).unref();
+          response.setCookie("flash", flashIdentifier, 2 * 60);
+          return response;
+        };
+        response.redirect = (
+          destination: string = "",
+          type:
+            | "see-other"
+            | "temporary"
+            | "permanent"
+            | "live-navigation" = "see-other",
+        ): typeof response => {
+          response.statusCode =
+            request.headers["live-navigation"] === "true" &&
+            !destination.startsWith("/")
+              ? 200
+              : {
+                  "see-other": 303,
+                  temporary: 307,
+                  permanent: 308,
+                  "live-navigation": 200,
+                }[type];
+          response.setHeader(
+            "Location",
+            new URL(destination, request.URL).href,
+          );
+          response.end();
+          return response;
+        };
       }
-      request.log(
-        "RESPONSE",
-        String(response.statusCode),
-        String(response.getHeader("Location") ?? ""),
-      );
+
+      if (!response.writableEnded)
+        do {
+          let liveConnectionUpdate;
+          if (request.liveConnection !== undefined) {
+            if (!request.liveConnection.establish)
+              request.log("LIVE CONNECTION REQUEST");
+            request.liveConnection.writableEnded = false;
+            liveConnectionUpdate = new Promise<void>((resolve) => {
+              request.liveConnection!.update = resolve;
+            });
+          }
+
+          request.state = {};
+          delete request.error;
+          for (const route of routes) {
+            if (
+              (typeof route.method === "string" &&
+                request.method !== route.method) ||
+              (route.method instanceof RegExp &&
+                request.method!.match(route.method) === null)
+            )
+              continue;
+
+            if (
+              typeof route.pathname === "string" &&
+              request.URL.pathname !== route.pathname
+            )
+              continue;
+            else if (route.pathname instanceof RegExp) {
+              const match = request.URL.pathname.match(route.pathname);
+              if (match === null) continue;
+              request.pathname = match.groups ?? {};
+            } else request.pathname = {};
+
+            if ((request.error !== undefined) !== (route.error ?? false))
+              continue;
+
+            try {
+              await route.handler(request, response);
+            } catch (error) {
+              request.log(
+                "ERROR",
+                String(error),
+                (error as Error)?.stack ?? "",
+              );
+              response.statusCode = error === "validation" ? 422 : 500;
+              request.error = error;
+            }
+
+            if ((request.liveConnection ?? response).writableEnded) break;
+          }
+
+          if (!(request.liveConnection ?? response).writableEnded) {
+            request.log(
+              "ERROR",
+              "The application didn’t finish handling this request.",
+            );
+            if (!response.headersSent) {
+              response.statusCode = 500;
+              response.setHeader("Content-Type", "text/plain; charset=utf-8");
+            }
+            response.end(
+              "The application didn’t finish handling this request.",
+            );
+          }
+
+          if (request.liveConnection !== undefined) {
+            request.liveConnection.establish = false;
+            request.liveConnection.skipUpdateOnEstablish = true;
+            await liveConnectionUpdate;
+          }
+
+          request.log(
+            "RESPONSE",
+            String(response.statusCode),
+            String(response.getHeader("Location") ?? ""),
+          );
+        } while (request.liveConnection !== undefined);
+      if (response.mayStartLiveConnection()) {
+        const liveConnection: LiveConnection = {
+          id: request.id,
+          state: "waitingForConnectionWithoutUpdate",
+          waitingForConnectionTimeout: setTimeout(() => {
+            liveConnections.delete(liveConnection.id);
+            request.log("LIVE CONNECTION", "DELETE");
+          }, 30 * 1000).unref(),
+          URL: request.URL,
+        };
+        liveConnections.set(liveConnection.id, liveConnection);
+        request.log("LIVE CONNECTION", "CREATE", liveConnection.id);
+      }
     }) as (
       request: http.IncomingMessage,
       response: http.ServerResponse,
