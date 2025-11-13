@@ -620,8 +620,8 @@ export default function server({
             request.log("ERROR", String(error), (error as Error)?.stack ?? "");
           }
           responded =
-            (request.liveConnection === undefined && !response.writableEnded) ||
-            (typeof request.liveConnection === "string" &&
+            (liveConnection === undefined && !response.writableEnded) ||
+            (liveConnection !== undefined &&
               request.liveConnection !== "updated");
           if (responded) break;
         }
