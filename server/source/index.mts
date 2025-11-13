@@ -596,16 +596,17 @@ export default function server({
               request.method!.match(route.method) === null)
           )
             continue;
+          request.pathname = {};
           if (
             typeof route.pathname === "string" &&
             request.URL.pathname !== route.pathname
           )
             continue;
-          else if (route.pathname instanceof RegExp) {
+          if (route.pathname instanceof RegExp) {
             const match = request.URL.pathname.match(route.pathname);
             if (match === null) continue;
             request.pathname = match.groups ?? {};
-          } else request.pathname = {};
+          }
           if ((request.error !== undefined) !== (route.error ?? false))
             continue;
           try {
