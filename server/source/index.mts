@@ -639,11 +639,6 @@ export default function server({
           );
           return;
         }
-        request.log(
-          "RESPONSE",
-          String(response.statusCode),
-          String(response.getHeader("Location") ?? ""),
-        );
         if (liveConnection === undefined) {
           if (response.mayStartLiveConnection()) {
             const liveConnection: LiveConnection = {
@@ -658,9 +653,15 @@ export default function server({
             liveConnections.set(liveConnection.id, liveConnection);
             request.log("LIVE CONNECTION", "CREATE", liveConnection.id);
           }
-          break;
+          request.log(
+            "RESPONSE",
+            String(response.statusCode),
+            String(response.getHeader("Location") ?? ""),
+          );
+          return;
         } else {
           request.liveConnection = "connected";
+          request.log("LIVE CONNECTION", "RESPONSE");
           await liveConnectionUpdatePromise;
         }
       }
