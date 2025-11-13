@@ -651,7 +651,7 @@ export default function server({
               URL: request.URL,
             };
             liveConnections.set(liveConnection.id, liveConnection);
-            request.log("LIVE CONNECTION", "CREATE", liveConnection.id);
+            request.log("LIVE CONNECTION", "CREATE");
           }
           request.log(
             "RESPONSE",
