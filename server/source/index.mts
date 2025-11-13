@@ -576,85 +576,77 @@ export default function server({
           return response;
         };
       }
+      do {
+        let liveConnectionUpdate;
+        if (request.liveConnection !== undefined) {
+          if (!request.liveConnection.establish)
+            request.log("LIVE CONNECTION REQUEST");
+          request.liveConnection.writableEnded = false;
+          liveConnectionUpdate = new Promise<void>((resolve) => {
+            request.liveConnection!.update = resolve;
+          });
+        }
 
-      if (!response.writableEnded)
-        do {
-          let liveConnectionUpdate;
-          if (request.liveConnection !== undefined) {
-            if (!request.liveConnection.establish)
-              request.log("LIVE CONNECTION REQUEST");
-            request.liveConnection.writableEnded = false;
-            liveConnectionUpdate = new Promise<void>((resolve) => {
-              request.liveConnection!.update = resolve;
-            });
+        request.state = {};
+        delete request.error;
+        for (const route of routes) {
+          if (
+            (typeof route.method === "string" &&
+              request.method !== route.method) ||
+            (route.method instanceof RegExp &&
+              request.method!.match(route.method) === null)
+          )
+            continue;
+
+          if (
+            typeof route.pathname === "string" &&
+            request.URL.pathname !== route.pathname
+          )
+            continue;
+          else if (route.pathname instanceof RegExp) {
+            const match = request.URL.pathname.match(route.pathname);
+            if (match === null) continue;
+            request.pathname = match.groups ?? {};
+          } else request.pathname = {};
+
+          if ((request.error !== undefined) !== (route.error ?? false))
+            continue;
+
+          try {
+            await route.handler(request, response);
+          } catch (error) {
+            request.log("ERROR", String(error), (error as Error)?.stack ?? "");
+            response.statusCode = error === "validation" ? 422 : 500;
+            request.error = error;
           }
 
-          request.state = {};
-          delete request.error;
-          for (const route of routes) {
-            if (
-              (typeof route.method === "string" &&
-                request.method !== route.method) ||
-              (route.method instanceof RegExp &&
-                request.method!.match(route.method) === null)
-            )
-              continue;
+          if ((request.liveConnection ?? response).writableEnded) break;
+        }
 
-            if (
-              typeof route.pathname === "string" &&
-              request.URL.pathname !== route.pathname
-            )
-              continue;
-            else if (route.pathname instanceof RegExp) {
-              const match = request.URL.pathname.match(route.pathname);
-              if (match === null) continue;
-              request.pathname = match.groups ?? {};
-            } else request.pathname = {};
-
-            if ((request.error !== undefined) !== (route.error ?? false))
-              continue;
-
-            try {
-              await route.handler(request, response);
-            } catch (error) {
-              request.log(
-                "ERROR",
-                String(error),
-                (error as Error)?.stack ?? "",
-              );
-              response.statusCode = error === "validation" ? 422 : 500;
-              request.error = error;
-            }
-
-            if ((request.liveConnection ?? response).writableEnded) break;
-          }
-
-          if (!(request.liveConnection ?? response).writableEnded) {
-            request.log(
-              "ERROR",
-              "The application didn’t finish handling this request.",
-            );
-            if (!response.headersSent) {
-              response.statusCode = 500;
-              response.setHeader("Content-Type", "text/plain; charset=utf-8");
-            }
-            response.end(
-              "The application didn’t finish handling this request.",
-            );
-          }
-
-          if (request.liveConnection !== undefined) {
-            request.liveConnection.establish = false;
-            request.liveConnection.skipUpdateOnEstablish = true;
-            await liveConnectionUpdate;
-          }
-
+        if (!(request.liveConnection ?? response).writableEnded) {
           request.log(
-            "RESPONSE",
-            String(response.statusCode),
-            String(response.getHeader("Location") ?? ""),
+            "ERROR",
+            "The application didn’t finish handling this request.",
           );
-        } while (request.liveConnection !== undefined);
+          if (!response.headersSent) {
+            response.statusCode = 500;
+            response.setHeader("Content-Type", "text/plain; charset=utf-8");
+          }
+          response.end("The application didn’t finish handling this request.");
+        }
+
+        if (request.liveConnection !== undefined) {
+          request.liveConnection.establish = false;
+          request.liveConnection.skipUpdateOnEstablish = true;
+          await liveConnectionUpdate;
+        }
+
+        request.log(
+          "RESPONSE",
+          String(response.statusCode),
+          String(response.getHeader("Location") ?? ""),
+        );
+      } while (request.liveConnection !== undefined);
       if (response.mayStartLiveConnection()) {
         const liveConnection: LiveConnection = {
           id: request.id,
