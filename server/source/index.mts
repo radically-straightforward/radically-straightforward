@@ -29,10 +29,7 @@ export type Route = {
   method?: string | RegExp;
   pathname?: string | RegExp;
   error?: boolean;
-  handler: (
-    request: Request<{}, {}, {}, {}, {}>,
-    response: Response,
-  ) => void | Promise<void>;
+  handler: (request: Request, response: Response) => void | Promise<void>;
 };
 
 /**
@@ -72,25 +69,32 @@ export type Route = {
  *
  *   - **`"connected"`:** This is **not** the first time that this Request is going through the application code, because the Live Connection had been established already. This should produce a Live Connection update.
  */
-export type Request<Pathname, Search, Cookies, Body, State> =
-  http.IncomingMessage & {
-    id: string;
-    start: bigint;
-    log: (...messageParts: string[]) => void;
-    ip: string;
-    URL: URL;
-    pathname: Partial<Pathname>;
-    search: Partial<Search>;
-    cookies: Partial<Cookies>;
-    body: Partial<Body>;
-    state: Partial<State>;
-    getFlash: () => string | undefined;
-    error?: unknown;
-    liveConnection?:
-      | "connectingWithoutUpdate"
-      | "connectingWithUpdate"
-      | "connected";
-  };
+export type Request<
+  Pathname = { [key: string]: string },
+  Search = { [key: string]: string | string[] },
+  Cookies = { [key: string]: string },
+  Body = {
+    [key: string]: string | RequestBodyFile | string[] | RequestBodyFile[];
+  },
+  State = { [key: string]: unknown },
+> = http.IncomingMessage & {
+  id: string;
+  start: bigint;
+  log: (...messageParts: string[]) => void;
+  ip: string;
+  URL: URL;
+  pathname: Partial<Pathname>;
+  search: Partial<Search>;
+  cookies: Partial<Cookies>;
+  body: Partial<Body>;
+  state: Partial<State>;
+  getFlash: () => string | undefined;
+  error?: unknown;
+  liveConnection?:
+    | "connectingWithoutUpdate"
+    | "connectingWithUpdate"
+    | "connected";
+};
 
 /**
  * A type that may appear under elements of `request.body` which includes information about the file that was uploaded and the `path` in a temporary directory where you may find the file. The files are deleted after the response is sent—if you wish to keep them you must move them to a permanent location.
@@ -160,22 +164,7 @@ export default function server({
   const flashes = new Map<string, string>();
   const liveConnections = new Map<LiveConnection["id"], LiveConnection>();
   const httpServer = http
-    .createServer((async (
-      request: Request<
-        { [key: string]: string },
-        { [key: string]: string | string[] },
-        { [key: string]: string },
-        {
-          [key: string]:
-            | string
-            | RequestBodyFile
-            | string[]
-            | RequestBodyFile[];
-        },
-        { [key: string]: unknown }
-      >,
-      response: Response,
-    ) => {
+    .createServer((async (request: Request, response: Response) => {
       try {
         request.id = utilities.randomString();
         request.start = process.hrtime.bigint();
