@@ -334,6 +334,10 @@ export default function server({
             return flash;
           };
           response.setHeader("Content-Type", "text/html; charset=utf-8");
+          response.mayStartLiveConnection = () =>
+            request.method === "GET" &&
+            response.statusCode === 200 &&
+            response.getHeader("Content-Type") === "text/html; charset=utf-8";
           response.setCookie = (
             key: string,
             value: string,
@@ -434,6 +438,7 @@ export default function server({
                 : (() => {
                     throw new Error("Invalid Live Connection state.");
                   })();
+          response.mayStartLiveConnection = () => false;
           liveConnection.state = "connected";
           clearTimeout(liveConnection.waitingForConnectionTimeout);
           liveConnection.end = response.end;
@@ -463,11 +468,6 @@ export default function server({
             request.log("LIVE CONNECTION", "CLOSE");
           });
         }
-        response.mayStartLiveConnection = () =>
-          liveConnection === undefined &&
-          request.method === "GET" &&
-          response.statusCode === 200 &&
-          response.getHeader("Content-Type") === "text/html; charset=utf-8";
       } catch (error) {
         if (response.statusCode === 200) response.statusCode = 400;
         response.setHeader("Content-Type", "text/plain; charset=utf-8");
