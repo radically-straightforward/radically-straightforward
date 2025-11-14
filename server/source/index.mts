@@ -337,7 +337,7 @@ export default function server({
         if (response.statusCode === 200) response.statusCode = 400;
         response.setHeader("Content-Type", "text/plain; charset=utf-8");
         response.end(String(error));
-        request.log("ERROR", String(error));
+        request.log("ERROR", String(response.statusCode), String(error));
         return;
       }
       if (request.method === "GET" && request.URL.pathname === "/_health") {
@@ -354,17 +354,15 @@ export default function server({
           let destination: URL;
           try {
             destination = new URL(request.search.destination);
+            if (
+              (destination.protocol !== "http:" &&
+                destination.protocol !== "https:") ||
+              destination.hostname === request.URL.hostname
+            )
+              throw new Error();
           } catch (error) {
             response.statusCode = 422;
-            throw new Error("Invalid destination.");
-          }
-          if (
-            (destination.protocol !== "http:" &&
-              destination.protocol !== "https:") ||
-            destination.hostname === request.URL.hostname
-          ) {
-            response.statusCode = 422;
-            throw new Error("Invalid destination.");
+            throw new Error("Invalid ‘destination’ search parameter.");
           }
           const destinationResponse = await fetch(destination.href, {
             signal: AbortSignal.timeout(5 * 60 * 1000),
@@ -383,7 +381,7 @@ export default function server({
           response.setHeader("Content-Type", destinationResponseContentType);
           // @ts-expect-error: https://github.com/DefinitelyTyped/DefinitelyTyped/discussions/68986
           stream.pipeline(destinationResponse.body, response);
-          request.log("RESPONSE");
+          request.log("RESPONSE", String(response.statusCode));
           return;
         } catch (error) {
           if (!response.headersSent) {
@@ -391,7 +389,7 @@ export default function server({
             response.setHeader("Content-Type", "text/plain; charset=utf-8");
           }
           if (!response.writableEnded) response.end(String(error));
-          request.log("ERROR", String(error));
+          request.log("ERROR", String(response.statusCode), String(error));
           return;
         }
       if (
@@ -421,13 +419,13 @@ export default function server({
             }
           });
           response.end();
-          request.log("RESPONSE");
+          request.log("RESPONSE", String(response.statusCode));
           return;
         } catch (error) {
           response.statusCode = 422;
           response.setHeader("Content-Type", "text/plain; charset=utf-8");
           response.end(String(error));
-          request.log("ERROR", String(error));
+          request.log("ERROR", String(response.statusCode), String(error));
           return;
         }
       let liveConnection: LiveConnection | undefined;
@@ -566,7 +564,12 @@ export default function server({
           response.statusCode = 400;
           response.setHeader("Content-Type", "text/plain; charset=utf-8");
           response.end(String(error));
-          request.log("LIVE CONNECTION", "ERROR", String(error));
+          request.log(
+            "LIVE CONNECTION",
+            "ERROR",
+            String(response.statusCode),
+            String(error),
+          );
           return;
         }
       while (true) {
