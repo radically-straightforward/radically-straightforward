@@ -325,6 +325,78 @@ export default function server({
         }
         if (process.env.NODE_ENV !== "production" && request.method !== "GET")
           request.log(JSON.stringify(request.body, undefined, 2));
+        if (typeof request.headers["live-connection"] === "string") {
+          if (request.method !== "GET")
+            throw new Error("Invalid request method.");
+          if (
+            request.headers["live-connection"].match(/^[a-z0-9]{5,}$/) === null
+          )
+            throw new Error("Invalid ‘Live-Connection’ header.");
+          liveConnection = liveConnections.get(
+            request.headers["live-connection"],
+          );
+          if (liveConnection !== undefined) {
+            if (request.URL.href !== liveConnection.URL.href)
+              throw new Error("Unmatched ‘href’.");
+            if (liveConnection.state === "connected")
+              throw new Error("Already connected.");
+            request.log(
+              "LIVE CONNECTION",
+              "CONNECT",
+              liveConnection.id,
+              liveConnection.state,
+            );
+          } else {
+            liveConnection = {
+              id: request.headers["live-connection"],
+              state: "waitingForConnectionWithUpdate",
+              URL: request.URL,
+            };
+            request.log(
+              "LIVE CONNECTION",
+              "CREATE & CONNECT",
+              liveConnection.id,
+            );
+            liveConnections.set(liveConnection.id, liveConnection);
+          }
+          request.id = liveConnection.id;
+          request.liveConnection =
+            liveConnection.state === "waitingForConnectionWithoutUpdate"
+              ? "connectingWithoutUpdate"
+              : liveConnection.state === "waitingForConnectionWithUpdate"
+                ? "connectingWithUpdate"
+                : (() => {
+                    throw new Error("Invalid Live Connection state.");
+                  })();
+          liveConnection.state = "connected";
+          clearTimeout(liveConnection.waitingForConnectionTimeout);
+          liveConnection.end = response.end;
+          response.end = ((data?: string): typeof response => {
+            if (typeof data === "string")
+              response.write(JSON.stringify(data) + "\n");
+            request.liveConnection = "updated";
+            return response;
+          }) as (typeof response)["end"];
+          response.setHeader(
+            "Content-Type",
+            "application/json-lines; charset=utf-8",
+          );
+          const heartbeat = node.backgroundJob({ interval: 30 * 1000 }, () => {
+            response.write("\n");
+          });
+          const periodicUpdates = node.backgroundJob(
+            { interval: 5 * 60 * 1000 },
+            () => {
+              liveConnection!.update?.();
+            },
+          );
+          response.once("close", () => {
+            liveConnections.delete(liveConnection!.id);
+            heartbeat.stop();
+            periodicUpdates.stop();
+            request.log("LIVE CONNECTION", "CLOSE");
+          });
+        }
         request.getFlash = () => {
           if (liveConnection !== undefined)
             throw new Error(
@@ -415,78 +487,6 @@ export default function server({
           response.end();
           return response;
         };
-        if (typeof request.headers["live-connection"] === "string") {
-          if (request.method !== "GET")
-            throw new Error("Invalid request method.");
-          if (
-            request.headers["live-connection"].match(/^[a-z0-9]{5,}$/) === null
-          )
-            throw new Error("Invalid ‘Live-Connection’ header.");
-          liveConnection = liveConnections.get(
-            request.headers["live-connection"],
-          );
-          if (liveConnection !== undefined) {
-            if (request.URL.href !== liveConnection.URL.href)
-              throw new Error("Unmatched ‘href’.");
-            if (liveConnection.state === "connected")
-              throw new Error("Already connected.");
-            request.log(
-              "LIVE CONNECTION",
-              "CONNECT",
-              liveConnection.id,
-              liveConnection.state,
-            );
-          } else {
-            liveConnection = {
-              id: request.headers["live-connection"],
-              state: "waitingForConnectionWithUpdate",
-              URL: request.URL,
-            };
-            request.log(
-              "LIVE CONNECTION",
-              "CREATE & CONNECT",
-              liveConnection.id,
-            );
-            liveConnections.set(liveConnection.id, liveConnection);
-          }
-          request.id = liveConnection.id;
-          request.liveConnection =
-            liveConnection.state === "waitingForConnectionWithoutUpdate"
-              ? "connectingWithoutUpdate"
-              : liveConnection.state === "waitingForConnectionWithUpdate"
-                ? "connectingWithUpdate"
-                : (() => {
-                    throw new Error("Invalid Live Connection state.");
-                  })();
-          liveConnection.state = "connected";
-          clearTimeout(liveConnection.waitingForConnectionTimeout);
-          liveConnection.end = response.end;
-          response.end = ((data?: string): typeof response => {
-            if (typeof data === "string")
-              response.write(JSON.stringify(data) + "\n");
-            request.liveConnection = "updated";
-            return response;
-          }) as (typeof response)["end"];
-          response.setHeader(
-            "Content-Type",
-            "application/json-lines; charset=utf-8",
-          );
-          const heartbeat = node.backgroundJob({ interval: 30 * 1000 }, () => {
-            response.write("\n");
-          });
-          const periodicUpdates = node.backgroundJob(
-            { interval: 5 * 60 * 1000 },
-            () => {
-              liveConnection!.update?.();
-            },
-          );
-          response.once("close", () => {
-            liveConnections.delete(liveConnection!.id);
-            heartbeat.stop();
-            periodicUpdates.stop();
-            request.log("LIVE CONNECTION", "CLOSE");
-          });
-        }
       } catch (error) {
         if (response.statusCode === 200) response.statusCode = 400;
         response.setHeader("Content-Type", "text/plain; charset=utf-8");
