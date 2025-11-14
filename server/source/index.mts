@@ -165,6 +165,7 @@ export default function server({
   const liveConnections = new Map<LiveConnection["id"], LiveConnection>();
   const httpServer = http
     .createServer((async (request: Request, response: Response) => {
+      let liveConnection: LiveConnection | undefined;
       try {
         request.id = utilities.randomString();
         request.start = process.hrtime.bigint();
@@ -322,7 +323,7 @@ export default function server({
         if (process.env.NODE_ENV !== "production" && request.method !== "GET")
           request.log(JSON.stringify(request.body, undefined, 2));
         request.getFlash = () => {
-          if (request.liveConnection !== undefined)
+          if (liveConnection !== undefined)
             throw new Error(
               "‘request.getFlash()’ used in a Live Connection update.",
             );
@@ -334,7 +335,7 @@ export default function server({
         };
         response.setHeader("Content-Type", "text/html; charset=utf-8");
         response.mayStartLiveConnection = () =>
-          request.liveConnection === undefined &&
+          liveConnection === undefined &&
           request.method === "GET" &&
           response.statusCode === 200 &&
           response.getHeader("Content-Type") === "text/html; charset=utf-8";
@@ -343,7 +344,7 @@ export default function server({
           value: string,
           maxAge: number = 150 * 24 * 60 * 60,
         ): typeof response => {
-          if (request.liveConnection !== undefined)
+          if (liveConnection !== undefined)
             throw new Error(
               "‘response.setCookie()’ used in a Live Connection update.",
             );
@@ -355,7 +356,7 @@ export default function server({
           return response;
         };
         response.deleteCookie = (key: string): typeof response => {
-          if (request.liveConnection !== undefined)
+          if (liveConnection !== undefined)
             throw new Error(
               "‘response.deleteCookie()’ used in a Live Connection update.",
             );
@@ -367,7 +368,7 @@ export default function server({
           return response;
         };
         response.setFlash = (message: string): typeof response => {
-          if (request.liveConnection !== undefined)
+          if (liveConnection !== undefined)
             throw new Error(
               "‘response.setFlash()’ used in a Live Connection update.",
             );
@@ -390,7 +391,7 @@ export default function server({
             | "permanent"
             | "live-navigation" = "see-other",
         ): typeof response => {
-          if (request.liveConnection !== undefined)
+          if (liveConnection !== undefined)
             throw new Error(
               "‘response.redirect()’ used in a Live Connection update.",
             );
@@ -506,7 +507,6 @@ export default function server({
           request.log("ERROR", String(response.statusCode), String(error));
           return;
         }
-      let liveConnection: LiveConnection | undefined;
       if (typeof request.headers["live-connection"] === "string")
         try {
           if (request.method !== "GET")
