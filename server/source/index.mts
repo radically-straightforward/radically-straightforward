@@ -123,10 +123,10 @@ export type RequestBodyFile = busboy.FileInfo & { path: string };
  */
 export type Response = http.ServerResponse & {
   mayStartLiveConnection: () => boolean;
-  setCookie: (key: string, value: string, maxAge?: number) => Response;
-  deleteCookie: (key: string) => Response;
-  setFlash: (message: string) => Response;
-  redirect: (
+  setCookie?: (key: string, value: string, maxAge?: number) => Response;
+  deleteCookie?: (key: string) => Response;
+  setFlash?: (message: string) => Response;
+  redirect?: (
     destination?: string,
     type?: "see-other" | "temporary" | "permanent" | "live-navigation",
   ) => Response;
