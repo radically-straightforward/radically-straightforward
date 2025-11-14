@@ -551,7 +551,7 @@ export default function server({
           const periodicUpdates = node.backgroundJob(
             { interval: 5 * 60 * 1000 },
             () => {
-              liveConnection!.update!();
+              liveConnection!.update?.();
             },
           );
           response.once("close", () => {
@@ -630,6 +630,7 @@ export default function server({
           );
           request.log(
             "ERROR",
+            String(response.statusCode),
             "The application didn’t finish responding to this request.",
           );
           return;
