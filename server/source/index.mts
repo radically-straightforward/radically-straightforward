@@ -403,23 +403,23 @@ export default function server({
             request.body.pathname.trim() === ""
           )
             throw new Error("Invalid ‘pathname’.");
-          response.once("close", async () => {
-            for (const liveConnection of liveConnections.values()) {
-              if (
-                liveConnection.URL.pathname.match(
-                  new RegExp(request.body.pathname as string),
-                ) === null
-              )
-                continue;
-              if (liveConnection.state === "waitingForConnectionWithoutUpdate")
-                liveConnection.state = "waitingForConnectionWithUpdate";
-              else if (liveConnection.state === "connected")
-                liveConnection.update!();
-              await timers.setTimeout(200, undefined, { ref: false });
-            }
-          });
           response.end();
           request.log("RESPONSE", String(response.statusCode));
+          for (const liveConnection of liveConnections.values()) {
+            if (
+              liveConnection.URL.pathname.match(
+                new RegExp(request.body.pathname as string),
+              ) === null
+            )
+              continue;
+            if (
+              liveConnection.state === "waitingForConnectionWithoutUpdate" ||
+              liveConnection.state === "waitingForConnectionWithUpdate"
+            )
+              liveConnection.state = "waitingForConnectionWithUpdate";
+            else liveConnection.update?.();
+            await timers.setTimeout(200, undefined, { ref: false });
+          }
           return;
         } catch (error) {
           response.statusCode = 422;
