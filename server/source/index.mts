@@ -325,7 +325,73 @@ export default function server({
         }
         if (process.env.NODE_ENV !== "production" && request.method !== "GET")
           request.log(JSON.stringify(request.body, undefined, 2));
-        if (typeof request.headers["live-connection"] === "string") {
+        if (typeof request.headers["live-connection"] !== "string") {
+          request.getFlash = () => {
+            if (typeof request.cookies.flash !== "string") return undefined;
+            const flash = flashes.get(request.cookies.flash);
+            flashes.delete(request.cookies.flash);
+            response.deleteCookie!("flash");
+            return flash;
+          };
+          response.setHeader("Content-Type", "text/html; charset=utf-8");
+          response.setCookie = (
+            key: string,
+            value: string,
+            maxAge: number = 150 * 24 * 60 * 60,
+          ): typeof response => {
+            request.cookies[key] = value;
+            response.setHeader("Set-Cookie", [
+              ...((response.getHeader("Set-Cookie") as string[]) ?? []),
+              `__Host-${encodeURIComponent(key)}=${encodeURIComponent(value)}; Max-Age=${maxAge}; Path=/; Secure; HttpOnly; SameSite=None`,
+            ]);
+            return response;
+          };
+          response.deleteCookie = (key: string): typeof response => {
+            delete request.cookies[key];
+            response.setHeader("Set-Cookie", [
+              ...((response.getHeader("Set-Cookie") as string[]) ?? []),
+              `__Host-${encodeURIComponent(key)}=; Max-Age=0; Path=/; Secure; HttpOnly; SameSite=None`,
+            ]);
+            return response;
+          };
+          response.setFlash = (message: string): typeof response => {
+            const flashIdentifier = utilities.randomString();
+            flashes.set(flashIdentifier, message);
+            setTimeout(
+              () => {
+                flashes.delete(flashIdentifier);
+              },
+              2 * 60 * 1000,
+            ).unref();
+            response.setCookie("flash", flashIdentifier, 2 * 60);
+            return response;
+          };
+          response.redirect = (
+            destination: string = "",
+            type:
+              | "see-other"
+              | "temporary"
+              | "permanent"
+              | "live-navigation" = "see-other",
+          ): typeof response => {
+            response.statusCode =
+              request.headers["live-navigation"] === "true" &&
+              !destination.startsWith("/")
+                ? 200
+                : {
+                    "see-other": 303,
+                    temporary: 307,
+                    permanent: 308,
+                    "live-navigation": 200,
+                  }[type];
+            response.setHeader(
+              "Location",
+              new URL(destination, request.URL).href,
+            );
+            response.end();
+            return response;
+          };
+        } else {
           if (request.method !== "GET")
             throw new Error("Invalid request method.");
           if (
@@ -396,78 +462,12 @@ export default function server({
             periodicUpdates.stop();
             request.log("LIVE CONNECTION", "CLOSE");
           });
-        } else {
-          response.setHeader("Content-Type", "text/html; charset=utf-8");
-          request.getFlash = () => {
-            if (typeof request.cookies.flash !== "string") return undefined;
-            const flash = flashes.get(request.cookies.flash);
-            flashes.delete(request.cookies.flash);
-            response.deleteCookie!("flash");
-            return flash;
-          };
         }
         response.mayStartLiveConnection = () =>
           liveConnection === undefined &&
           request.method === "GET" &&
           response.statusCode === 200 &&
           response.getHeader("Content-Type") === "text/html; charset=utf-8";
-        response.setCookie = (
-          key: string,
-          value: string,
-          maxAge: number = 150 * 24 * 60 * 60,
-        ): typeof response => {
-          request.cookies[key] = value;
-          response.setHeader("Set-Cookie", [
-            ...((response.getHeader("Set-Cookie") as string[]) ?? []),
-            `__Host-${encodeURIComponent(key)}=${encodeURIComponent(value)}; Max-Age=${maxAge}; Path=/; Secure; HttpOnly; SameSite=None`,
-          ]);
-          return response;
-        };
-        response.deleteCookie = (key: string): typeof response => {
-          delete request.cookies[key];
-          response.setHeader("Set-Cookie", [
-            ...((response.getHeader("Set-Cookie") as string[]) ?? []),
-            `__Host-${encodeURIComponent(key)}=; Max-Age=0; Path=/; Secure; HttpOnly; SameSite=None`,
-          ]);
-          return response;
-        };
-        response.setFlash = (message: string): typeof response => {
-          const flashIdentifier = utilities.randomString();
-          flashes.set(flashIdentifier, message);
-          setTimeout(
-            () => {
-              flashes.delete(flashIdentifier);
-            },
-            2 * 60 * 1000,
-          ).unref();
-          response.setCookie("flash", flashIdentifier, 2 * 60);
-          return response;
-        };
-        response.redirect = (
-          destination: string = "",
-          type:
-            | "see-other"
-            | "temporary"
-            | "permanent"
-            | "live-navigation" = "see-other",
-        ): typeof response => {
-          response.statusCode =
-            request.headers["live-navigation"] === "true" &&
-            !destination.startsWith("/")
-              ? 200
-              : {
-                  "see-other": 303,
-                  temporary: 307,
-                  permanent: 308,
-                  "live-navigation": 200,
-                }[type];
-          response.setHeader(
-            "Location",
-            new URL(destination, request.URL).href,
-          );
-          response.end();
-          return response;
-        };
       } catch (error) {
         if (response.statusCode === 200) response.statusCode = 400;
         response.setHeader("Content-Type", "text/plain; charset=utf-8");
