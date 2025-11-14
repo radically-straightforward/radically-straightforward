@@ -374,7 +374,7 @@ export default function server({
           response.end = ((data?: string): typeof response => {
             if (typeof data === "string")
               response.write(JSON.stringify(data) + "\n");
-            request.liveConnection = "updated";
+            response.ended = true;
             return response;
           }) as (typeof response)["end"];
           response.setHeader(
@@ -396,19 +396,16 @@ export default function server({
             periodicUpdates.stop();
             request.log("LIVE CONNECTION", "CLOSE");
           });
+        } else {
+          response.setHeader("Content-Type", "text/html; charset=utf-8");
+          request.getFlash = () => {
+            if (typeof request.cookies.flash !== "string") return undefined;
+            const flash = flashes.get(request.cookies.flash);
+            flashes.delete(request.cookies.flash);
+            response.deleteCookie!("flash");
+            return flash;
+          };
         }
-        request.getFlash = () => {
-          if (liveConnection !== undefined)
-            throw new Error(
-              "‘request.getFlash()’ used in a Live Connection update.",
-            );
-          if (typeof request.cookies.flash !== "string") return undefined;
-          const flash = flashes.get(request.cookies.flash);
-          flashes.delete(request.cookies.flash);
-          response.deleteCookie("flash");
-          return flash;
-        };
-        response.setHeader("Content-Type", "text/html; charset=utf-8");
         response.mayStartLiveConnection = () =>
           liveConnection === undefined &&
           request.method === "GET" &&
@@ -419,10 +416,6 @@ export default function server({
           value: string,
           maxAge: number = 150 * 24 * 60 * 60,
         ): typeof response => {
-          if (liveConnection !== undefined)
-            throw new Error(
-              "‘response.setCookie()’ used in a Live Connection update.",
-            );
           request.cookies[key] = value;
           response.setHeader("Set-Cookie", [
             ...((response.getHeader("Set-Cookie") as string[]) ?? []),
@@ -431,10 +424,6 @@ export default function server({
           return response;
         };
         response.deleteCookie = (key: string): typeof response => {
-          if (liveConnection !== undefined)
-            throw new Error(
-              "‘response.deleteCookie()’ used in a Live Connection update.",
-            );
           delete request.cookies[key];
           response.setHeader("Set-Cookie", [
             ...((response.getHeader("Set-Cookie") as string[]) ?? []),
@@ -443,10 +432,6 @@ export default function server({
           return response;
         };
         response.setFlash = (message: string): typeof response => {
-          if (liveConnection !== undefined)
-            throw new Error(
-              "‘response.setFlash()’ used in a Live Connection update.",
-            );
           const flashIdentifier = utilities.randomString();
           flashes.set(flashIdentifier, message);
           setTimeout(
@@ -466,10 +451,6 @@ export default function server({
             | "permanent"
             | "live-navigation" = "see-other",
         ): typeof response => {
-          if (liveConnection !== undefined)
-            throw new Error(
-              "‘response.redirect()’ used in a Live Connection update.",
-            );
           response.statusCode =
             request.headers["live-navigation"] === "true" &&
             !destination.startsWith("/")
