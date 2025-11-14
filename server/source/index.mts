@@ -182,8 +182,10 @@ export default function server({
           request.method ?? "UNDEFINED",
           request.url ?? "UNDEFINED",
         );
-        if (request.method === undefined || request.url === undefined)
-          throw new Error("Missing request ‘method’ or ‘url’.");
+        if (request.method === undefined)
+          throw new Error("Missing request ‘method’.");
+        if (request.url === undefined)
+          throw new Error("Missing request ‘url’.");
         request.URL = new URL(
           request.url,
           `${request.headers["x-forwarded-proto"] ?? "http"}://${
