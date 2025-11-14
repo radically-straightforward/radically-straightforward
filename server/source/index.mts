@@ -55,7 +55,7 @@ export type Route = {
  *
  * - **`state`:** An object to communicate state across multiple `handler`s that handle the same request, for example, a handler may authenticate a user and set a `request.state.user` property for subsequent `handler`s to use. Note that the generic `State` in TypeScript is `Partial<>` because the state may not be set depending on which `handler`s ran previously—you may either use runtime checks that the expected `state` is set, or use, for example, `request.state.user!` if you’re sure that the state is set by other means.
  *
- * - **`getFlash()`:** Get a flash message that was set by a previous `response` that `setFlash()` and then `redirect()`ed. This is useful, for example, for a message such as “User settings updated successfully.”
+ * - **`getFlash()`:** Get a flash message that was set by a previous `response` that `setFlash()` and then `redirect()`ed. This is useful, for example, for a message such as “User settings updated successfully.” This function is only available in requests that are **not** Live Connections, because Live Connections must not set headers.
  *
  * - **`error:`** In error handlers, this is the error that was thrown.
  *
@@ -322,6 +322,10 @@ export default function server({
         if (process.env.NODE_ENV !== "production" && request.method !== "GET")
           request.log(JSON.stringify(request.body, undefined, 2));
         request.getFlash = () => {
+          if (request.liveConnection !== undefined)
+            throw new Error(
+              "‘request.getFlash()’ used in a Live Connection update.",
+            );
           if (typeof request.cookies.flash !== "string") return undefined;
           const flash = flashes.get(request.cookies.flash);
           flashes.delete(request.cookies.flash);
@@ -339,6 +343,10 @@ export default function server({
           value: string,
           maxAge: number = 150 * 24 * 60 * 60,
         ): typeof response => {
+          if (request.liveConnection !== undefined)
+            throw new Error(
+              "‘response.setCookie()’ used in a Live Connection update.",
+            );
           request.cookies[key] = value;
           response.setHeader("Set-Cookie", [
             ...((response.getHeader("Set-Cookie") as string[]) ?? []),
@@ -347,6 +355,10 @@ export default function server({
           return response;
         };
         response.deleteCookie = (key: string): typeof response => {
+          if (request.liveConnection !== undefined)
+            throw new Error(
+              "‘response.deleteCookie()’ used in a Live Connection update.",
+            );
           delete request.cookies[key];
           response.setHeader("Set-Cookie", [
             ...((response.getHeader("Set-Cookie") as string[]) ?? []),
@@ -355,6 +367,10 @@ export default function server({
           return response;
         };
         response.setFlash = (message: string): typeof response => {
+          if (request.liveConnection !== undefined)
+            throw new Error(
+              "‘response.setFlash()’ used in a Live Connection update.",
+            );
           const flashIdentifier = utilities.randomString();
           flashes.set(flashIdentifier, message);
           setTimeout(
@@ -374,6 +390,10 @@ export default function server({
             | "permanent"
             | "live-navigation" = "see-other",
         ): typeof response => {
+          if (request.liveConnection !== undefined)
+            throw new Error(
+              "‘response.redirect()’ used in a Live Connection update.",
+            );
           response.statusCode =
             request.headers["live-navigation"] === "true" &&
             !destination.startsWith("/")
