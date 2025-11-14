@@ -55,11 +55,11 @@ export type Route = {
  *
  * - **`state`:** An object to communicate state across multiple `handler`s that handle the same request, for example, a handler may authenticate a user and set a `request.state.user` property for subsequent `handler`s to use. Note that the generic `State` in TypeScript is `Partial<>` because the state may not be set depending on which `handler`s ran previously—you may either use runtime checks that the expected `state` is set, or use, for example, `request.state.user!` if you’re sure that the state is set by other means.
  *
- * - **`getFlash()`:** Get a flash message that was set by a previous `response` that `setFlash()` and then `redirect()`ed. This is useful, for example, for a message such as “User settings updated successfully.” This function is only available in requests that are **not** Live Connections, because Live Connections must not set headers.
- *
- * - **`error:`** In error handlers, this is the error that was thrown.
+ * - **`error:`** In error handlers, this is the error that was thrown by a previous handler.
  *
  *   > **Note:** There’s an special kind of error that may be thrown, which is the string `"validation"`. This sets the HTTP response status to [422](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/422) instead of [500](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500).
+ *
+ * - **`getFlash()`:** Get a flash message that was set by a previous `response` that `setFlash()` and then `redirect()`ed. This is useful, for example, for a message such as “User settings updated successfully.” (This function is only available in requests that are **not** Live Connections, because Live Connections must not set headers.)
  *
  * - **`liveConnection`:** When the Request is a Live Connection, this property contains information about the state:
  *
@@ -88,8 +88,8 @@ export type Request<
   cookies: Partial<Cookies>;
   body: Partial<Body>;
   state: Partial<State>;
-  getFlash: () => string | undefined;
   error?: unknown;
+  getFlash?: () => string | undefined;
   liveConnection?:
     | "connectingWithoutUpdate"
     | "connectingWithUpdate"
