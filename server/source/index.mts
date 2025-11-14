@@ -674,12 +674,11 @@ export default function server({
       log("START");
     });
   process.once("gracefulTermination", () => {
-    httpServer.close();
+    httpServer.close(() => {
+      log("STOP");
+    });
     for (const liveConnection of liveConnections.values())
-      if (liveConnection.state === "connected") liveConnection.end!();
-  });
-  process.once("beforeExit", () => {
-    log("STOP");
+      liveConnection.end?.();
   });
   return routes;
   function log(...messageParts: string[]): void {
