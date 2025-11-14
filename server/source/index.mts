@@ -367,7 +367,7 @@ export default function server({
               },
               2 * 60 * 1000,
             ).unref();
-            response.setCookie("flash", flashIdentifier, 2 * 60);
+            response.setCookie!("flash", flashIdentifier, 2 * 60);
             return response;
           };
           response.redirect = (
@@ -438,9 +438,11 @@ export default function server({
                 : (() => {
                     throw new Error("Invalid Live Connection state.");
                   })();
+          response.setHeader(
+            "Content-Type",
+            "application/json-lines; charset=utf-8",
+          );
           response.mayStartLiveConnection = () => false;
-          liveConnection.state = "connected";
-          clearTimeout(liveConnection.waitingForConnectionTimeout);
           liveConnection.end = response.end;
           response.end = ((data?: string): typeof response => {
             if (typeof data === "string")
@@ -448,10 +450,6 @@ export default function server({
             response.ended = true;
             return response;
           }) as (typeof response)["end"];
-          response.setHeader(
-            "Content-Type",
-            "application/json-lines; charset=utf-8",
-          );
           const heartbeat = node.backgroundJob({ interval: 30 * 1000 }, () => {
             response.write("\n");
           });
@@ -467,6 +465,8 @@ export default function server({
             periodicUpdates.stop();
             request.log("LIVE CONNECTION", "CLOSE");
           });
+          liveConnection.state = "connected";
+          clearTimeout(liveConnection.waitingForConnectionTimeout);
         }
       } catch (error) {
         if (response.statusCode === 200) response.statusCode = 400;
