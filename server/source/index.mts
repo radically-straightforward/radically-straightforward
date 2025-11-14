@@ -146,7 +146,7 @@ type LiveConnection = {
 };
 
 /**
- * An extension of [Node.js’s `http.createServer()`](https://nodejs.org/api/http.html#httpcreateserveroptions-requestlistener) which provides all the extra functionality of `@radically-straightforward/server`. Refer to the `README` for more information.
+ * An extension of [Node.js’s `http.createServer()`](https://nodejs.org/api/http.html#httpcreateserveroptions-requestlistener) which provides the extra functionality of `@radically-straightforward/server`. Refer to the `README` for more information.
  *
  * - **`port`:** A port number for the server. By default it’s `18000`, which is well out of the range of most applications to avoid collisions.
  *
