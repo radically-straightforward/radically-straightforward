@@ -119,7 +119,11 @@ export type RequestBodyFile = busboy.FileInfo & { path: string };
  *
  * - **`redirect()`:** Sends the [`Location` header](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Location) and an HTTP status of [303 (`"see-other"`)](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/303) (default), [307 (`"temporary"`)](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/307), or [308 (`"permanent"`)](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/308). Note that there are no options for the legacy statuses of [301](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/301) and [302](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/302), because they may lead some clients to change the HTTP method of the redirected request by mistake. The `destination` parameter is relative to `request.URL`, for example, if no `destination` is provided, then the default is to redirect to the same `request.URL`. (This function is only available in requests that are **not** Live Connections, because Live Connections must not set headers.)
  *
- * - **`ended`:** Whether `response.end()` has been called. (This is similar to [`response.writableEnded`](https://nodejs.org/docs/latest/api/http.html#responsewritableended) but with support for Live Connection updates.)
+ * - **`ended`:** Whether `response.end()` has been called. This is different from [`response.writableEnded`](https://nodejs.org/docs/latest/api/http.html#responsewritableended) in the following ways:
+ *
+ *   1. Under special circumstances you may **set** this attribute, for example, if you respond with `stream.pipeline(___, response)` then `response.writableEnded` is `false`, but the server shouldn’t continue considering other routes.
+ *
+ *   2. `ended` supports Live Connection updates.
  */
 export type Response = http.ServerResponse & {
   mayStartLiveConnection: () => boolean;
