@@ -581,4 +581,52 @@ export default function server({
   }
 }
 
-const serverRoutes: Route[] = [];
+const serverRoutes: Route[] = [
+  {
+    method: "GET",
+    pathname: "/_health",
+    handler: (request, response) => {
+      response.end();
+    },
+  },
+  {
+    method: "GET",
+    pathname: "/_proxy",
+    handler: async (
+      request: Request<{}, { destination: string }, {}, {}, {}>,
+      response,
+    ) => {
+      if (typeof request.search.destination !== "string") throw "validation";
+      let destination: URL;
+      try {
+        destination = new URL(request.search.destination);
+      } catch (error) {
+        throw "validation";
+      }
+      if (
+        (destination.protocol !== "http:" &&
+          destination.protocol !== "https:") ||
+        destination.hostname === request.URL.hostname
+      )
+        throw "validation";
+      const destinationResponse = await fetch(destination.href, {
+        signal: AbortSignal.timeout(5 * 60 * 1000),
+      });
+      const destinationResponseContentType =
+        destinationResponse.headers.get("Content-Type");
+      if (
+        !destinationResponse.ok ||
+        typeof destinationResponseContentType !== "string" ||
+        destinationResponseContentType.match(
+          new RegExp("^(?:image|video|audio)/"),
+        ) === null ||
+        !(destinationResponse.body instanceof ReadableStream)
+      )
+        throw "validation";
+      response.setHeader("Content-Type", destinationResponseContentType);
+      // @ts-expect-error: https://github.com/DefinitelyTyped/DefinitelyTyped/discussions/68986
+      stream.pipeline(destinationResponse.body, response);
+      response.ended = true;
+    },
+  },
+];
