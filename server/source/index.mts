@@ -17,6 +17,8 @@ export type Server = ReturnType<typeof server>;
 /**
  * A `Route` is a combination of some conditions that the request must satisfy for the `handler` to be called, and the `handler` that produces a response. An application is an Array of `Route`s.
  *
+ * - **`ip`:** The IP address of the request, for example `"127.0.0.1"` or `/^127\.\d+.\d+.\d+$/`.
+ *
  * - **`method`:** The HTTP request method, for example `"GET"` or `/^PATCH|PUT$/`.
  *
  * - **`pathname`:** The [`pathname`](https://nodejs.org/api/url.html#url-strings-and-url-objects) part of the HTTP request. [Named capturing groups](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_expressions/Groups_and_backreferences) are available in the `handler` under `request.pathname`, for example, given `pathname: new RegExp("^/conversations/(?<conversationPublicId>[0-9]+)$")`, the `conversationPublicId` is available at `request.pathname.conversationPublicId`.
@@ -26,6 +28,7 @@ export type Server = ReturnType<typeof server>;
  * - **`handler`:** The function that produces the response. It’s similar to a function that you’d provide to [`http.createServer()`](https://nodejs.org/api/http.html#httpcreateserveroptions-requestlistener) as a `requestListener`, with two differences: 1. The `handler` is called only if the request satisfies the conditions above; and 2. The `request` and `response` parameters are extended with extra functionality (see `Request` and `Response`). The `handler` may be synchronous or asynchronous.
  */
 export type Route = {
+  ip?: string | RegExp;
   method?: string | RegExp;
   pathname?: string | RegExp;
   error?: boolean;
@@ -488,10 +491,13 @@ export default function server({
         response.ended = false;
         for (const route of [...serverRoutes, ...applicationRoutes]) {
           if (
+            (typeof route.ip === "string" && request.ip !== route.ip) ||
+            (route.ip instanceof RegExp &&
+              request.ip.match(route.ip) === null) ||
             (typeof route.method === "string" &&
               request.method !== route.method) ||
             (route.method instanceof RegExp &&
-              request.method!.match(route.method) === null)
+              request.method.match(route.method) === null)
           )
             continue;
           request.pathname = {};
@@ -575,58 +581,85 @@ export default function server({
     for (const liveConnection of liveConnections.values())
       liveConnection.end?.();
   });
+  const serverRoutes: Route[] = [
+    {
+      method: "GET",
+      pathname: "/_health",
+      handler: (request, response) => {
+        response.end();
+      },
+    },
+    {
+      method: "GET",
+      pathname: "/_proxy",
+      handler: async (
+        request: Request<{}, { destination: string }, {}, {}, {}>,
+        response,
+      ) => {
+        if (typeof request.search.destination !== "string") throw "validation";
+        let destination: URL;
+        try {
+          destination = new URL(request.search.destination);
+        } catch (error) {
+          throw "validation";
+        }
+        if (
+          (destination.protocol !== "http:" &&
+            destination.protocol !== "https:") ||
+          destination.hostname === request.URL.hostname
+        )
+          throw "validation";
+        const destinationResponse = await fetch(destination.href, {
+          signal: AbortSignal.timeout(5 * 60 * 1000),
+        });
+        const destinationResponseContentType =
+          destinationResponse.headers.get("Content-Type");
+        if (
+          !destinationResponse.ok ||
+          typeof destinationResponseContentType !== "string" ||
+          destinationResponseContentType.match(
+            new RegExp("^(?:image|video|audio)/"),
+          ) === null ||
+          !(destinationResponse.body instanceof ReadableStream)
+        )
+          throw "validation";
+        response.setHeader("Content-Type", destinationResponseContentType);
+        // @ts-expect-error: https://github.com/DefinitelyTyped/DefinitelyTyped/discussions/68986
+        stream.pipeline(destinationResponse.body, response);
+        response.ended = true;
+      },
+    },
+    {
+      ip: "127.0.0.1",
+      method: "POST",
+      pathname: "/__live-connections",
+      handler: async (
+        request: Request<{}, {}, {}, { pathname: string }, {}>,
+        response,
+      ) => {
+        if (
+          typeof request.body.pathname !== "string" ||
+          request.body.pathname.trim() === ""
+        )
+          throw "validation";
+        response.end();
+        for (const liveConnection of liveConnections.values()) {
+          if (
+            liveConnection.URL.pathname.match(
+              new RegExp(request.body.pathname as string),
+            ) === null
+          )
+            continue;
+          if (liveConnection.state !== "connected")
+            liveConnection.state = "waitingForConnectionWithUpdate";
+          else liveConnection.update?.();
+          await timers.setTimeout(200, undefined, { ref: false });
+        }
+      },
+    },
+  ];
   return applicationRoutes;
   function log(...messageParts: string[]): void {
     utilities.log("SERVER", String(port), ...messageParts);
   }
 }
-
-const serverRoutes: Route[] = [
-  {
-    method: "GET",
-    pathname: "/_health",
-    handler: (request, response) => {
-      response.end();
-    },
-  },
-  {
-    method: "GET",
-    pathname: "/_proxy",
-    handler: async (
-      request: Request<{}, { destination: string }, {}, {}, {}>,
-      response,
-    ) => {
-      if (typeof request.search.destination !== "string") throw "validation";
-      let destination: URL;
-      try {
-        destination = new URL(request.search.destination);
-      } catch (error) {
-        throw "validation";
-      }
-      if (
-        (destination.protocol !== "http:" &&
-          destination.protocol !== "https:") ||
-        destination.hostname === request.URL.hostname
-      )
-        throw "validation";
-      const destinationResponse = await fetch(destination.href, {
-        signal: AbortSignal.timeout(5 * 60 * 1000),
-      });
-      const destinationResponseContentType =
-        destinationResponse.headers.get("Content-Type");
-      if (
-        !destinationResponse.ok ||
-        typeof destinationResponseContentType !== "string" ||
-        destinationResponseContentType.match(
-          new RegExp("^(?:image|video|audio)/"),
-        ) === null ||
-        !(destinationResponse.body instanceof ReadableStream)
-      )
-        throw "validation";
-      response.setHeader("Content-Type", destinationResponseContentType);
-      // @ts-expect-error: https://github.com/DefinitelyTyped/DefinitelyTyped/discussions/68986
-      stream.pipeline(destinationResponse.body, response);
-      response.ended = true;
-    },
-  },
-];
