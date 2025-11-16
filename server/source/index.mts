@@ -485,7 +485,7 @@ export default function server({
         }
         request.state = {};
         delete request.error;
-        let responded = false;
+        response.ended = false;
         for (const route of routes) {
           if (
             (typeof route.method === "string" &&
@@ -517,13 +517,10 @@ export default function server({
             request.error = error;
             request.log("ERROR", String(error), (error as Error)?.stack ?? "");
           }
-          responded =
-            (liveConnection === undefined && !response.writableEnded) ||
-            (liveConnection !== undefined &&
-              request.liveConnection !== "updated");
-          if (responded) break;
+          if (response.writableEnded) response.ended = true;
+          if (response.ended) break;
         }
-        if (!responded) {
+        if (!response.ended) {
           if (!response.headersSent) {
             response.statusCode = 500;
             response.setHeader("Content-Type", "text/plain; charset=utf-8");
@@ -540,7 +537,7 @@ export default function server({
         }
         if (liveConnection === undefined) {
           if (response.mayStartLiveConnection()) {
-            const liveConnection: LiveConnection = {
+            const liveConnection = {
               id: request.id,
               state: "waitingForConnectionWithoutUpdate",
               waitingForConnectionTimeout: setTimeout(() => {
@@ -548,7 +545,7 @@ export default function server({
                 request.log("LIVE CONNECTION", "DELETE");
               }, 30 * 1000).unref(),
               URL: request.URL,
-            };
+            } as const;
             liveConnections.set(liveConnection.id, liveConnection);
             request.log("LIVE CONNECTION", "CREATE");
           }
