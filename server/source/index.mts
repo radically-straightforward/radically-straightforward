@@ -646,7 +646,7 @@ export default function server({
         for (const liveConnection of liveConnections.values()) {
           if (
             liveConnection.URL.pathname.match(
-              new RegExp(request.body.pathname as string),
+              new RegExp(request.body.pathname),
             ) === null
           )
             continue;
