@@ -163,7 +163,7 @@ export default function server({
   port?: number;
   csrfProtectionExceptionPathname?: string | RegExp;
 } = {}): Route[] {
-  const routes = new Array<Route>();
+  const applicationRoutes = new Array<Route>();
   const flashes = new Map<string, string>();
   const liveConnections = new Map<LiveConnection["id"], LiveConnection>();
   const httpServer = http
@@ -486,7 +486,7 @@ export default function server({
         request.state = {};
         delete request.error;
         response.ended = false;
-        for (const route of routes) {
+        for (const route of [...serverRoutes, ...applicationRoutes]) {
           if (
             (typeof route.method === "string" &&
               request.method !== route.method) ||
@@ -575,8 +575,10 @@ export default function server({
     for (const liveConnection of liveConnections.values())
       liveConnection.end?.();
   });
-  return routes;
+  return applicationRoutes;
   function log(...messageParts: string[]): void {
     utilities.log("SERVER", String(port), ...messageParts);
   }
 }
+
+const serverRoutes: Route[] = [];
