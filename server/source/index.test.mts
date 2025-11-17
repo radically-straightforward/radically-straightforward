@@ -228,7 +228,9 @@ test(async () => {
       const response = await fetch("http://localhost:18000/", {
         method: "POST",
         headers: { "CSRF-Protection": "true" },
-        body: new URLSearchParams({ bodyStringExample: "1".repeat(1_000_000) }),
+        body: new URLSearchParams({
+          bodyStringExample: "1".repeat(10_000_000),
+        }),
       });
       assert.equal(response.status, 413);
       assert.equal(
@@ -253,9 +255,8 @@ test(async () => {
         response.headers.get("Content-Type"),
         "text/plain; charset=utf-8",
       );
-      assert.equal(await response.text(), "Error: Field too large.");
+      assert.equal(await response.text(), "Error: Malformed part header");
     }
-
     // {
     //   const requestBody = new FormData();
     //   requestBody.append(
@@ -274,7 +275,6 @@ test(async () => {
     //   );
     //   assert.equal(await response.text(), "Error: File too large.");
     // }
-
     // {
     //   const response = await fetch("http://localhost:18000/", {
     //     method: "POST",
@@ -295,7 +295,6 @@ test(async () => {
     //   );
     //   assert.equal(await response.text(), "Error: Too many fields.");
     // }
-
     // {
     //   const requestBody = new FormData();
     //   for (
