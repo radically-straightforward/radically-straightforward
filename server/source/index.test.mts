@@ -180,35 +180,29 @@ test(async () => {
     assert.equal(await response.text(), "Error: Malformed ‘Cookie’ header.");
   }
   if (process.platform !== "win32") {
-    assert.equal(
-      (
-        await fetch("http://localhost:18000/", {
-          headers: { ["Example-Header".repeat(10_000)]: "TOO LARGE" },
-        })
-      ).status,
-      431,
-    );
-    assert.equal(
-      (
-        await fetch("http://localhost:18000/", {
-          headers: { "Example-Header": "TOO LARGE".repeat(10_000) },
-        })
-      ).status,
-      431,
-    );
-    assert.equal(
-      (
-        await fetch("http://localhost:18000/", {
-          headers: Object.fromEntries(
-            Array.from({ length: 1000 }, (value, key) => [
-              `Example-Header-${key}`,
-              "TOO MANY HEADERS",
-            ]),
-          ),
-        })
-      ).status,
-      431,
-    );
+    {
+      const response = await fetch("http://localhost:18000/", {
+        headers: { ["Example-Header".repeat(10_000)]: "TOO LARGE" },
+      });
+      assert.equal(response.status, 431);
+    }
+    {
+      const response = await fetch("http://localhost:18000/", {
+        headers: { "Example-Header": "TOO LARGE".repeat(10_000) },
+      });
+      assert.equal(response.status, 431);
+    }
+    {
+      const response = await fetch("http://localhost:18000/", {
+        headers: Object.fromEntries(
+          Array.from({ length: 1000 }, (value, key) => [
+            `Example-Header-${key}`,
+            "TOO MANY HEADERS",
+          ]),
+        ),
+      });
+      assert.equal(response.status, 431);
+    }
     {
       const response = await fetch("http://localhost:18000/", {
         method: "POST",
