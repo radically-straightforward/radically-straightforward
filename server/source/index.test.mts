@@ -536,6 +536,7 @@ test(async () => {
       await timers.setTimeout(500);
       assert.equal((await responseBodyReader.read()).value, "connected");
       abortController.abort();
+      await timers.setTimeout(500);
     }
   }
   node.exit();
