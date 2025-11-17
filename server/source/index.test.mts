@@ -497,6 +497,45 @@ test(async () => {
       );
       assert.equal(await response.text(), "Error: Unmatched ‘href’.");
     }
+    {
+      const fetchAbortController = new AbortController();
+      const response = await fetch("http://localhost:18000/live-connection", {
+        headers: { "Live-Connection": liveConnectionId },
+        signal: fetchAbortController.signal,
+      });
+      assert.equal(response.status, 200);
+      assert.equal(
+        response.headers.get("Content-Type"),
+        "application/json-lines; charset=utf-8",
+      );
+      assert(response.body);
+      let body = "";
+      const responseBodyReader = response.body
+        .pipeThrough(new TextDecoderStream())
+        .getReader();
+      (async () => {
+        while (true) {
+          const value = (
+            await responseBodyReader.read().catch(() => ({ value: undefined }))
+          ).value;
+          if (value === undefined) break;
+          body += value;
+        }
+      })();
+      await timers.setTimeout(500);
+      assert.equal(body, `\n"SKIP UPDATE ON ESTABLISH"\n`);
+
+      body = "";
+      await fetch("http://localhost:18000/__live-connections", {
+        method: "POST",
+        headers: { "CSRF-Protection": "true" },
+        body: new URLSearchParams({ pathname: "^/live-connection$" }),
+      });
+      await timers.setTimeout(500);
+      assert.equal(body, `"${liveConnectionId}"\n`);
+      fetchAbortController.abort();
+      await timers.setTimeout(500);
+    }
   }
   node.exit();
 });
