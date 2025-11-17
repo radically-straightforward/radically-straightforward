@@ -366,6 +366,55 @@ test(async () => {
     assert.equal(await response.text(), "<p>Hello World</p>");
   }
   application.push({
+    pathname: "/may-start-live-connection--1",
+    handler: (request: serverTypes.Request<{}, {}, {}, {}, {}>, response) => {
+      response.end(JSON.stringify(response.mayStartLiveConnection()));
+    },
+  });
+  {
+    const response = await fetch(
+      "http://localhost:18000/may-start-live-connection--1",
+    );
+    assert.equal(response.status, 200);
+    assert.equal(JSON.parse(await response.text()), true);
+  }
+  {
+    const response = await fetch(
+      "http://localhost:18000/may-start-live-connection--1",
+      { method: "POST", headers: { "CSRF-Protection": "true" } },
+    );
+    assert.equal(response.status, 200);
+    assert.equal(JSON.parse(await response.text()), false);
+  }
+  application.push({
+    pathname: "/may-start-live-connection--2",
+    handler: (request: serverTypes.Request<{}, {}, {}, {}, {}>, response) => {
+      response.statusCode = 404;
+      response.end(JSON.stringify(response.mayStartLiveConnection()));
+    },
+  });
+  {
+    const response = await fetch(
+      "http://localhost:18000/may-start-live-connection--2",
+    );
+    assert.equal(response.status, 404);
+    assert.equal(JSON.parse(await response.text()), false);
+  }
+  application.push({
+    pathname: "/may-start-live-connection--3",
+    handler: (request: serverTypes.Request<{}, {}, {}, {}, {}>, response) => {
+      response.setHeader("Content-Type", "application/json; charset=utf-8");
+      response.end(JSON.stringify(response.mayStartLiveConnection()));
+    },
+  });
+  {
+    const response = await fetch(
+      "http://localhost:18000/may-start-live-connection--3",
+    );
+    assert.equal(response.status, 200);
+    assert.equal(JSON.parse(await response.text()), false);
+  }
+  application.push({
     method: "GET",
     pathname: "/response-helpers",
     handler: (
