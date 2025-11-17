@@ -179,5 +179,143 @@ test(async () => {
     );
     assert.equal(await response.text(), "Error: Malformed ‘Cookie’ header.");
   }
+  if (process.platform !== "win32") {
+    assert.equal(
+      (
+        await fetch("http://localhost:18000/", {
+          headers: { ["Example-Header".repeat(10_000)]: "TOO LARGE" },
+        })
+      ).status,
+      431,
+    );
+    assert.equal(
+      (
+        await fetch("http://localhost:18000/", {
+          headers: { "Example-Header": "TOO LARGE".repeat(10_000) },
+        })
+      ).status,
+      431,
+    );
+    assert.equal(
+      (
+        await fetch("http://localhost:18000/", {
+          headers: Object.fromEntries(
+            Array.from({ length: 1000 }, (value, key) => [
+              `Example-Header-${key}`,
+              "TOO MANY HEADERS",
+            ]),
+          ),
+        })
+      ).status,
+      431,
+    );
+    {
+      const response = await fetch("http://localhost:18000/", {
+        method: "POST",
+        headers: { "CSRF-Protection": "true" },
+        body: new URLSearchParams({
+          ["bodyStringExample".repeat(10_000)]: "1",
+        }),
+      });
+      assert.equal(response.status, 413);
+      assert.equal(
+        response.headers.get("Content-Type"),
+        "text/plain; charset=utf-8",
+      );
+      assert.equal(await response.text(), "Error: Field too large.");
+    }
+    {
+      const response = await fetch("http://localhost:18000/", {
+        method: "POST",
+        headers: { "CSRF-Protection": "true" },
+        body: new URLSearchParams({ bodyStringExample: "1".repeat(1_000_000) }),
+      });
+      assert.equal(response.status, 413);
+      assert.equal(
+        response.headers.get("Content-Type"),
+        "text/plain; charset=utf-8",
+      );
+      assert.equal(await response.text(), "Error: Field too large.");
+    }
+    {
+      const requestBody = new FormData();
+      requestBody.append(
+        "bodyFileExample".repeat(100_000),
+        new Blob([Buffer.from([1])]),
+      );
+      const response = await fetch("http://localhost:18000/", {
+        method: "POST",
+        headers: { "CSRF-Protection": "true" },
+        body: requestBody,
+      });
+      assert.equal(response.status, 400);
+      assert.equal(
+        response.headers.get("Content-Type"),
+        "text/plain; charset=utf-8",
+      );
+      assert.equal(await response.text(), "Error: Field too large.");
+    }
+
+    // {
+    //   const requestBody = new FormData();
+    //   requestBody.append(
+    //     "bodyFileExample",
+    //     new Blob([Buffer.alloc(100_000_000)]),
+    //   );
+    //   const response = await fetch("http://localhost:18000/", {
+    //     method: "POST",
+    //     headers: { "CSRF-Protection": "true" },
+    //     body: requestBody,
+    //   });
+    //   assert.equal(response.status, 413);
+    //   assert.equal(
+    //     response.headers.get("Content-Type"),
+    //     "text/plain; charset=utf-8",
+    //   );
+    //   assert.equal(await response.text(), "Error: File too large.");
+    // }
+
+    // {
+    //   const response = await fetch("http://localhost:18000/", {
+    //     method: "POST",
+    //     headers: { "CSRF-Protection": "true" },
+    //     body: new URLSearchParams(
+    //       Object.fromEntries(
+    //         Array.from({ length: 1000 }, (value, key) => [
+    //           `bodyStringExample-${key}`,
+    //           "33",
+    //         ]),
+    //       ),
+    //     ),
+    //   });
+    //   assert.equal(response.status, 413);
+    //   assert.equal(
+    //     response.headers.get("Content-Type"),
+    //     "text/plain; charset=utf-8",
+    //   );
+    //   assert.equal(await response.text(), "Error: Too many fields.");
+    // }
+
+    // {
+    //   const requestBody = new FormData();
+    //   for (
+    //     let bodyFileExampleCount = 0;
+    //     bodyFileExampleCount < 1000;
+    //     bodyFileExampleCount++
+    //   )
+    //     requestBody.append("bodyFileExample", new Blob([Buffer.from([1])]));
+    //   const response = await fetch("http://localhost:18000/", {
+    //     method: "POST",
+    //     headers: { "CSRF-Protection": "true" },
+    //     body: requestBody,
+    //   });
+    //   assert.equal(response.status, 413);
+    //   assert.equal(
+    //     response.headers.get("Content-Type"),
+    //     "text/plain; charset=utf-8",
+    //   );
+    //   assert.equal(await response.text(), "Error: Too many files.");
+    // }
+  }
   node.exit();
 });
