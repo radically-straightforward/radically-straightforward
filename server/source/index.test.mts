@@ -365,5 +365,51 @@ test(async () => {
     );
     assert.equal(await response.text(), "<p>Hello World</p>");
   }
+  application.push({
+    method: "GET",
+    pathname: "/response-helpers",
+    handler: (
+      request: serverTypes.Request<
+        {},
+        {},
+        { cookieExample1: string; cookieExample2: string },
+        {},
+        {}
+      >,
+      response,
+    ) => {
+      assert.equal(request.cookies.cookieExample1, undefined);
+      assert.equal(request.cookies.cookieExample2, undefined);
+      response.setCookie?.("example", "1");
+      response.setCookie?.("anotherExample", "2");
+      assert.equal(request.cookies.cookieExample1, "1");
+      assert.equal(request.cookies.cookieExample2, "2");
+      response.deleteCookie?.("anotherExample");
+      assert.equal(request.cookies.cookieExample2, undefined);
+      response.redirect?.("/redirect");
+    },
+  });
+  application.push({
+    method: "GET",
+    pathname: "/response-helpers",
+    handler: (request, response) => {
+      assert.fail();
+    },
+  });
+  {
+    const response = await fetch("http://localhost:18000/response-helpers", {
+      redirect: "manual",
+    });
+    assert.equal(response.status, 303);
+    assert.equal(
+      response.headers.get("Location"),
+      "http://localhost:18000/redirect",
+    );
+    assert.deepEqual(response.headers.getSetCookie(), [
+      "__Host-cookieExample1=1; Max-Age=12960000; Path=/; Secure; HttpOnly; SameSite=None",
+      "__Host-cookieExample2=2; Max-Age=12960000; Path=/; Secure; HttpOnly; SameSite=None",
+      "__Host-cookieExample2=; Max-Age=0; Path=/; Secure; HttpOnly; SameSite=None",
+    ]);
+  }
   node.exit();
 });
