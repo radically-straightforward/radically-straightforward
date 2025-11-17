@@ -349,5 +349,21 @@ test(async () => {
       "Yes flash",
     );
   }
+  application.push({
+    method: "GET",
+    pathname: "/basic",
+    handler: (request, response) => {
+      response.end("<p>Hello World</p>");
+    },
+  });
+  {
+    const response = await fetch("http://localhost:18000/basic");
+    assert.equal(response.status, 200);
+    assert.equal(
+      response.headers.get("Content-Type"),
+      "text/html; charset=utf-8",
+    );
+    assert.equal(await response.text(), "<p>Hello World</p>");
+  }
   node.exit();
 });
