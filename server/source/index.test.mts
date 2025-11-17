@@ -643,5 +643,28 @@ test(async () => {
       "The application didn’t finish responding to this request.",
     );
   }
+  {
+    const abortController = new AbortController();
+    const response = await fetch("http://localhost:18000/nonexisting", {
+      headers: { "Live-Connection": "12345" },
+      signal: abortController.signal,
+    });
+    assert.equal(response.status, 200);
+    assert.equal(
+      response.headers.get("Content-Type"),
+      "application/json-lines; charset=utf-8",
+    );
+    assert(response.body);
+    const responseBodyReader = response.body
+      .pipeThrough(new TextDecoderStream())
+      .pipeThrough(new utilities.JSONLinesTransformStream())
+      .getReader();
+    assert.equal(
+      (await responseBodyReader.read()).value,
+      "The application didn’t finish responding to this request.",
+    );
+    abortController.abort();
+    await timers.setTimeout(500);
+  }
   node.exit();
 });
