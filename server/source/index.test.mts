@@ -509,6 +509,17 @@ test(async () => {
         "application/json-lines; charset=utf-8",
       );
       assert(response.body);
+      {
+        const response = await fetch("http://localhost:18000/live-connection", {
+          headers: { "Live-Connection": liveConnectionId },
+        });
+        assert.equal(response.status, 400);
+        assert.equal(
+          response.headers.get("Content-Type"),
+          "text/plain; charset=utf-8",
+        );
+        assert.equal(await response.text(), "Error: Already connected.");
+      }
       const responseBodyReader = response.body
         .pipeThrough(new TextDecoderStream())
         .pipeThrough(new utilities.JSONLinesTransformStream())
