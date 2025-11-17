@@ -507,7 +507,7 @@ export default function server({
           if (route.pathname instanceof RegExp) {
             const match = request.URL.pathname.match(route.pathname);
             if (match === null) continue;
-            request.pathname = match.groups ?? {};
+            request.pathname = { ...(match.groups ?? {}) };
           }
           if (
             (request.error === undefined && route.error === true) ||

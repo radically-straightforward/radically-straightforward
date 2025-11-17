@@ -15,75 +15,74 @@ if (!process.stdin.isTTY)
 test(async () => {
   const application = server();
   application.push({
+    pathname: new RegExp("^/request-parsing/basic(?:$|/)"),
+    handler: (
+      request: serverTypes.Request<{}, {}, {}, {}, { stateExample: string }>,
+      response,
+    ) => {
+      request.state.stateExample = "10";
+    },
+  });
+  application.push({
     method: "POST",
-    pathname: new RegExp("^/request-parsing/(?<existing>[0-9]+)$"),
-    handler: async (
+    pathname: new RegExp("^/request-parsing/basic/(?<pathnameExample>[0-9]+)$"),
+    handler: (
       request: serverTypes.Request<
-        { existing: string },
-        { existing: string },
-        { existing: string },
-        { existing: string },
-        { existing: string }
+        { pathnameExample: string },
+        { searchStringExample: string; searchArrayExample: string[] },
+        { cookie1: string; cookie2: string },
+        { bodyStringExample: string; bodyArrayExample: string[] },
+        { stateExample: string }
       >,
       response,
     ) => {
+      assert.deepEqual(request.pathname, { pathnameExample: "1" });
       // @ts-expect-error
       request.pathname.nonexisting;
+      assert.deepEqual(request.search, {
+        searchStringExample: "2",
+        searchArrayExample: ["3", "4"],
+      });
       // @ts-expect-error
       request.search.nonexisting;
+      assert.deepEqual(request.cookies, { cookie1: "5", cookie2: "6" });
       // @ts-expect-error
       request.cookies.nonexisting;
+      assert.deepEqual(request.body, {
+        bodyStringExample: "7",
+        bodyArrayExample: ["8", "9"],
+      });
       // @ts-expect-error
       request.body.nonexisting;
+      assert.deepEqual(request.state, { stateExample: "10" });
       // @ts-expect-error
       request.state.nonexisting;
-      for (const values of Object.values(request.body))
-        if (Array.isArray(values))
-          for (const value of values)
-            if (typeof value.path === "string")
-              value.content = [...(await fs.readFile(value.path))];
-      response.setHeader("Content-Type", "application/json; charset=utf-8");
-      response.end(
-        JSON.stringify({
-          href: request.URL.href,
-          pathname: request.pathname,
-          search: request.search,
-          headers: { "custom-header": request.headers["custom-header"] },
-          cookies: request.cookies,
-          body: request.body,
-        }),
-      );
+      assert.equal(request.headers["header-example"], "11");
+      response.end();
     },
   });
   {
     const response = await fetch(
-      "http://localhost:18000/request-parsing/10?searchParameter=20&searchParameterArray[]=10&searchParameterArray[]=15",
+      `http://localhost:18000/request-parsing/basic/1?${new URLSearchParams([
+        ["searchStringExample", "2"],
+        ["searchArrayExample[]", "3"],
+        ["searchArrayExample[]", "4"],
+      ]).toString()}`,
       {
         method: "POST",
         headers: {
           "CSRF-Protection": "true",
-          "Custom-Header": "Hello",
-          Cookie: "__Host-example=abc; __Host-anotherExample=def",
+          Cookie: "__Host-cookie1=5; __Host-cookie2=6",
+          "Header-Example": "11",
         },
         body: new URLSearchParams([
-          ["bodyField", "33"],
-          ["bodyFieldArray[]", "34"],
-          ["bodyFieldArray[]", "35"],
+          ["bodyStringExample", "7"],
+          ["bodyArrayExample[]", "8"],
+          ["bodyArrayExample[]", "9"],
         ]),
       },
     );
-    assert.equal(
-      response.headers.get("Content-Type"),
-      "application/json; charset=utf-8",
-    );
-    assert.deepEqual(await response.json(), {
-      href: "http://localhost:18000/request-parsing/10?searchParameter=20&searchParameterArray[]=10&searchParameterArray[]=15",
-      pathname: { pathnameParameter: "10" },
-      search: { searchParameter: "20", searchParameterArray: ["10", "15"] },
-      headers: { "custom-header": "Hello" },
-      cookies: { example: "abc", anotherExample: "def" },
-      body: { bodyField: "33", bodyFieldArray: ["34", "35"] },
-    });
+    assert.equal(response.status, 200);
   }
   {
     const response = await fetch("http://localhost:18000/", {
