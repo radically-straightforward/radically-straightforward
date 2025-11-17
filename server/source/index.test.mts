@@ -538,6 +538,36 @@ test(async () => {
       abortController.abort();
       await timers.setTimeout(500);
     }
+    {
+      const abortController = new AbortController();
+      const response = await fetch("http://localhost:18000/live-connection", {
+        headers: { "Live-Connection": liveConnectionId },
+        signal: abortController.signal,
+      });
+      assert.equal(response.status, 200);
+      assert.equal(
+        response.headers.get("Content-Type"),
+        "application/json-lines; charset=utf-8",
+      );
+      assert(response.body);
+      const responseBodyReader = response.body
+        .pipeThrough(new TextDecoderStream())
+        .pipeThrough(new utilities.JSONLinesTransformStream())
+        .getReader();
+      assert.equal(
+        (await responseBodyReader.read()).value,
+        "connectingWithUpdate",
+      );
+      await fetch("http://localhost:18000/__live-connections", {
+        method: "POST",
+        headers: { "CSRF-Protection": "true" },
+        body: new URLSearchParams({ pathname: "^/live-connection$" }),
+      });
+      await timers.setTimeout(500);
+      assert.equal((await responseBodyReader.read()).value, "connected");
+      abortController.abort();
+      await timers.setTimeout(500);
+    }
   }
   node.exit();
 });
