@@ -93,6 +93,7 @@ test(async () => {
         {},
         {},
         {
+          bodyStringExample: string;
           bodyFileExample: serverTypes.RequestBodyFile;
           bodyArrayExample: serverTypes.RequestBodyFile[];
         },
@@ -100,6 +101,7 @@ test(async () => {
       >,
       response,
     ) => {
+      assert.equal(request.body.bodyStringExample, "1");
       assert(request.body.bodyFileExample);
       assert.equal(request.body.bodyFileExample.encoding, "7bit");
       assert.equal(
@@ -109,21 +111,46 @@ test(async () => {
       assert.equal(request.body.bodyFileExample.filename, "blob");
       assert.deepEqual(
         [...(await fs.readFile(request.body.bodyFileExample.path))],
-        [1],
+        [2],
       );
       assert(request.body.bodyArrayExample);
       assert.deepEqual(
         [...(await fs.readFile(request.body.bodyArrayExample[0].path))],
-        [2],
+        [3],
       );
       assert.deepEqual(
         [...(await fs.readFile(request.body.bodyArrayExample[1].path))],
-        [3],
+        [4],
       );
       response.setHeader("Content-Type", "application/json; charset=utf-8");
-      response.end(request.body.bodyFileExample.path);
+      response.end(JSON.stringify(request.body.bodyFileExample.path));
     },
   });
+  {
+    const requestBody = new FormData();
+    requestBody.append("bodyStringExample", "1");
+    requestBody.append("bodyFileExample", new Blob([Buffer.from([2])]));
+    requestBody.append("bodyArrayExample[]", new Blob([Buffer.from([3])]));
+    requestBody.append("bodyArrayExample[]", new Blob([Buffer.from([4])]));
+    const response = await fetch(
+      "http://localhost:18000/request-parsing/files",
+      {
+        method: "POST",
+        headers: { "CSRF-Protection": "true" },
+        body: requestBody,
+      },
+    );
+    assert.equal(response.status, 200);
+    assert.equal(
+      response.headers.get("Content-Type"),
+      "application/json; charset=utf-8",
+    );
+    const temporaryFile = await response.json();
+    await timers.setTimeout(500);
+    await assert.rejects(async () => {
+      await fs.access(temporaryFile);
+    });
+  }
   {
     const response = await fetch("http://localhost:18000/", {
       method: "POST",
