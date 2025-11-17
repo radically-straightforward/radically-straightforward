@@ -1,9 +1,9 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import path from "node:path";
 import fs from "node:fs/promises";
 import timers from "node:timers/promises";
 import * as node from "@radically-straightforward/node";
+import * as utilities from "@radically-straightforward/utilities";
 import server from "@radically-straightforward/server";
 import * as serverTypes from "@radically-straightforward/server";
 
@@ -509,32 +509,22 @@ test(async () => {
         "application/json-lines; charset=utf-8",
       );
       assert(response.body);
-      let body = "";
       const responseBodyReader = response.body
         .pipeThrough(new TextDecoderStream())
+        .pipeThrough(new utilities.JSONLinesTransformStream())
         .getReader();
-      (async () => {
-        while (true) {
-          const value = (
-            await responseBodyReader.read().catch(() => ({ value: undefined }))
-          ).value;
-          if (value === undefined) break;
-          body += value;
-        }
-      })();
-      await timers.setTimeout(500);
-      assert.equal(body, `\n"SKIP UPDATE ON ESTABLISH"\n`);
-
-      body = "";
+      assert.equal(
+        (await responseBodyReader.read()).value,
+        "connectingWithoutUpdate",
+      );
       await fetch("http://localhost:18000/__live-connections", {
         method: "POST",
         headers: { "CSRF-Protection": "true" },
         body: new URLSearchParams({ pathname: "^/live-connection$" }),
       });
       await timers.setTimeout(500);
-      assert.equal(body, `"${liveConnectionId}"\n`);
+      assert.equal((await responseBodyReader.read()).value, "connected");
       abortController.abort();
-      await timers.setTimeout(500);
     }
   }
   node.exit();
