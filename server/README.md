@@ -327,17 +327,17 @@ A `Server` is an auxiliary type for convenience.
 
 ```typescript
 export type Route = {
+  ip?: string | RegExp;
   method?: string | RegExp;
   pathname?: string | RegExp;
   error?: boolean;
-  handler: (
-    request: Request<{}, {}, {}, {}, {}>,
-    response: Response,
-  ) => void | Promise<void>;
+  handler: (request: Request, response: Response) => void | Promise<void>;
 };
 ```
 
 A `Route` is a combination of some conditions that the request must satisfy for the `handler` to be called, and the `handler` that produces a response. An application is an Array of `Route`s.
+
+- **`ip`:** The IP address of the request, for example `"127.0.0.1"` or `/^127\.\d+.\d+.\d+$/`.
 
 - **`method`:** The HTTP request method, for example `"GET"` or `/^PATCH|PUT$/`.
 
@@ -350,22 +350,40 @@ A `Route` is a combination of some conditions that the request must satisfy for 
 ### `Request`
 
 ```typescript
-export type Request<Pathname, Search, Cookies, Body, State> =
-  http.IncomingMessage & {
-    id: string;
-    start: bigint;
-    log: (...messageParts: string[]) => void;
-    ip: string;
-    URL: URL;
-    pathname: Partial<Pathname>;
-    search: Partial<Search>;
-    cookies: Partial<Cookies>;
-    body: Partial<Body>;
-    state: Partial<State>;
-    getFlash: () => string | undefined;
-    error?: unknown;
-    liveConnection?: RequestLiveConnection;
-  };
+export type Request<
+  Pathname = {
+    [key: string]: string;
+  },
+  Search = {
+    [key: string]: string | string[];
+  },
+  Cookies = {
+    [key: string]: string;
+  },
+  Body = {
+    [key: string]: string | RequestBodyFile | string[] | RequestBodyFile[];
+  },
+  State = {
+    [key: string]: unknown;
+  },
+> = http.IncomingMessage & {
+  id: string;
+  start: bigint;
+  log: (...messageParts: string[]) => void;
+  ip: string;
+  URL: URL;
+  pathname: Partial<Pathname>;
+  search: Partial<Search>;
+  cookies: Partial<Cookies>;
+  body: Partial<Body>;
+  state: Partial<State>;
+  error?: unknown;
+  getFlash?: () => string | undefined;
+  liveConnection?:
+    | "connectingWithoutUpdate"
+    | "connectingWithUpdate"
+    | "connected";
+};
 ```
 
 An extension of [Node.js’s `http.IncomingMessage`](https://nodejs.org/api/http.html#class-httpincomingmessage) with the following extra functionality:
@@ -374,7 +392,7 @@ An extension of [Node.js’s `http.IncomingMessage`](https://nodejs.org/api/http
 
 - **`start`:** A timestamp of when the request arrived.
 
-- **`log`:** A logging function which includes information about the request and formats the message with [`@radically-straightforward/utilities`’s `log()`](https://github.com/radically-straightforward/radically-straightforward/tree/main/utilities#log).
+- **`log()`:** A logging function which includes information about the request and formats the message with [`@radically-straightforward/utilities`’s `log()`](https://github.com/radically-straightforward/radically-straightforward/tree/main/utilities#log).
 
 - **`ip`:** The IP address of the request originator as reported by [Caddy](https://github.com/radically-straightforward/radically-straightforward/tree/main/caddy) (the reverse proxy) (uses the `X-Forwarded-For` HTTP request header).
 
@@ -390,13 +408,19 @@ An extension of [Node.js’s `http.IncomingMessage`](https://nodejs.org/api/http
 
 - **`state`:** An object to communicate state across multiple `handler`s that handle the same request, for example, a handler may authenticate a user and set a `request.state.user` property for subsequent `handler`s to use. Note that the generic `State` in TypeScript is `Partial<>` because the state may not be set depending on which `handler`s ran previously—you may either use runtime checks that the expected `state` is set, or use, for example, `request.state.user!` if you’re sure that the state is set by other means.
 
-- **`getFlash()`:** Get a flash message that was set by a previous `response` that `setFlash()` and then `redirect()`ed. This is useful, for example, for a message such as “User settings updated successfully.”
-
-- **`error:`** In error handlers, this is the error that was thrown.
+- **`error:`** In error handlers, this is the error that was thrown by a previous handler.
 
   > **Note:** There’s an special kind of error that may be thrown, which is the string `"validation"`. This sets the HTTP response status to [422](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/422) instead of [500](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500).
 
-- **`liveConnection:`** If this is a Live Connection, then this property is set to a `RequestLiveConnection` containing more information about the state of the Live Connection.
+- **`getFlash()`:** Get a flash message that was set by a previous `response` that `setFlash()` and then `redirect()`ed. This is useful, for example, for a message such as “User settings updated successfully.” (This function is only available in requests that are **not** Live Connections, because Live Connections must not set headers.)
+
+- **`liveConnection`:** When the Request is a Live Connection, this property contains information about the state:
+
+  - **`"connectingWithoutUpdate"`:** This is the first time that this Request is going through the application code, because the Live Connection is just being established. Additionally, a Live Connection update **is not** necessary, because the page **has not** changed since the initial response was sent. You may use this state to, for example, start a [`backgroundJob()`](https://github.com/radically-straightforward/radically-straightforward/tree/main/node#backgroundjob) which updates a timestamp of when a user has last been seen online, and then `response.end()` right away.
+
+  - **`"connectingWithUpdate"`:** This is the first time that this Request is going through the application code, because the Live Connection is just being established. Additionally, a Live Connection update **is** necessary, because the page **has** changed since the initial response was sent. You may use this state to, for example, start a [`backgroundJob()`](https://github.com/radically-straightforward/radically-straightforward/tree/main/node#backgroundjob) which updates a timestamp of when a user has last been seen online, and then let the Request go though the application code normally to produce a Live Connection update.
+
+  - **`"connected"`:** This is **not** the first time that this Request is going through the application code, because the Live Connection had been established already. This should produce a Live Connection update.
 
 ### `RequestBodyFile`
 
@@ -408,51 +432,44 @@ export type RequestBodyFile = busboy.FileInfo & {
 
 A type that may appear under elements of `request.body` which includes information about the file that was uploaded and the `path` in a temporary directory where you may find the file. The files are deleted after the response is sent—if you wish to keep them you must move them to a permanent location.
 
-### `RequestLiveConnection`
-
-```typescript
-export type RequestLiveConnection = {
-  establish?: boolean;
-  skipUpdateOnEstablish?: boolean;
-};
-```
-
-Information about a Live Connection that is available under `request.liveConnection`.
-
-- **`establish`:** Whether the connection is just being established. In other words, whether it’s the first time that the `handler`s are being called for this request. You may use this, for example, to start a [`backgroundJob()`](https://github.com/radically-straightforward/radically-straightforward/tree/main/node#backgroundjob) which updates a timestamp of when a user has last been seen online.
-
-- **`skipUpdateOnEstablish`:** Whether it’s necessary to send an update with a new version of the page upon establishing the Live Connection. An update may be skipped if the page hasn’t been marked as modified since the last update was sent. You must only check this variable if `establish` is `true`.
-
 ### `Response`
 
 ```typescript
 export type Response = http.ServerResponse & {
-  setCookie: (key: string, value: string, maxAge?: number) => Response;
-  deleteCookie: (key: string) => Response;
-  setFlash: (message: string) => Response;
-  redirect: (
+  mayStartLiveConnection: () => boolean;
+  setCookie?: (key: string, value: string, maxAge?: number) => Response;
+  deleteCookie?: (key: string) => Response;
+  setFlash?: (message: string) => Response;
+  redirect?: (
     destination?: string,
     type?: "see-other" | "temporary" | "permanent" | "live-navigation",
   ) => Response;
+  ended: boolean;
 };
 ```
 
 An extension of [Node.js’s `http.ServerResponse`](https://nodejs.org/api/http.html#class-httpserverresponse) with the following extra functionality:
 
-> **Note:** The extra functionality is only available in requests that are **not** Live Connections, because Live Connections must not set headers.
+- **`mayStartLiveConnection()`:** Whether the Response may start a Live Connection.
 
-- **`setCookie`:** Sets a [`Set-Cookie` header](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Set-Cookie) with secure settings. Also updates the `request.cookies` object so that the new cookies are visible from within the request itself.
+- **`setCookie`():** Sets a [`Set-Cookie` header](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Set-Cookie) with secure settings. Also updates the `request.cookies` object so that the new cookies are visible from within the request itself. (This function is only available in requests that are **not** Live Connections, because Live Connections must not set headers.)
 
   > **Note:** The noteworthy cookie settings are the following:
   >
   > - The cookie name is prefixed with [`__Host-`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Cookies#__host-). This assumes that the application is available under a single domain, and that the application is the only thing running on that domain (it can’t, for example, be mounted under a `/my-application/` pathname and share a domain with other applications).
   > - The `SameSite` cookie option is set to `None`, which is necessary for things like SAML to work (for example, when the Identity Provider sends a `POST` request back to the application’s Assertion Consumer Service (ACS), the application needs the cookies to determine if there’s a previously established session).
 
-- **`deleteCookie`:** Sets an expired [`Set-Cookie` header](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Set-Cookie) without a value and with the same secure settings used by `setCookie`. Also updates the `request.cookies` object so that the new cookies are visible from within the request itself.
+- **`deleteCookie()`:** Sets an expired [`Set-Cookie` header](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Set-Cookie) without a value and with the same secure settings used by `setCookie`. Also updates the `request.cookies` object so that the new cookies are visible from within the request itself. (This function is only available in requests that are **not** Live Connections, because Live Connections must not set headers.)
 
-- **`setFlash()`:** Set a flash message that will be available to the next `request` via `getFlash()` (the next `request` typically is the result of a `redirect()`ion). This is useful, for example, for a message such as “User settings updated successfully.”
+- **`setFlash()`:** Set a flash message that will be available to the next `request` via `getFlash()` (the next `request` typically is the result of a `redirect()`ion). This is useful, for example, for a message such as “User settings updated successfully.” (This function is only available in requests that are **not** Live Connections, because Live Connections must not set headers.)
 
-- **`redirect`:** Sends the [`Location` header](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Location) and an HTTP status of [303 (`"see-other"`)](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/303) (default), [307 (`"temporary"`)](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/307), or [308 (`"permanent"`)](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/308). Note that there are no options for the legacy statuses of [301](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/301) and [302](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/302), because they may lead some clients to change the HTTP method of the redirected request by mistake. The `destination` parameter is relative to `request.URL`, for example, if no `destination` is provided, then the default is to redirect to the same `request.URL`.
+- **`redirect()`:** Sends the [`Location` header](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Location) and an HTTP status of [303 (`"see-other"`)](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/303) (default), [307 (`"temporary"`)](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/307), or [308 (`"permanent"`)](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/308). Note that there are no options for the legacy statuses of [301](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/301) and [302](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/302), because they may lead some clients to change the HTTP method of the redirected request by mistake. The `destination` parameter is relative to `request.URL`, for example, if no `destination` is provided, then the default is to redirect to the same `request.URL`. (This function is only available in requests that are **not** Live Connections, because Live Connections must not set headers.)
+
+- **`ended`:** Whether `response.end()` has been called. This is different from [`response.writableEnded`](https://nodejs.org/docs/latest/api/http.html#responsewritableended) in the following ways:
+
+  1. Under special circumstances you may **set** this attribute, for example, if you respond with `stream.pipeline(___, response)` then `response.writableEnded` is `false`, but the server shouldn’t continue considering other routes.
+
+  2. `ended` supports Live Connection updates.
 
 ### `server()`
 
@@ -466,7 +483,7 @@ export default function server({
 } = {}): Route[];
 ```
 
-An extension of [Node.js’s `http.createServer()`](https://nodejs.org/api/http.html#httpcreateserveroptions-requestlistener) which provides all the extra functionality of `@radically-straightforward/server`. Refer to the `README` for more information.
+An extension of [Node.js’s `http.createServer()`](https://nodejs.org/api/http.html#httpcreateserveroptions-requestlistener) which provides the extra functionality of `@radically-straightforward/server`. Refer to the `README` for more information.
 
 - **`port`:** A port number for the server. By default it’s `18000`, which is well out of the range of most applications to avoid collisions.
 
