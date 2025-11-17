@@ -666,5 +666,91 @@ test(async () => {
     abortController.abort();
     await timers.setTimeout(500);
   }
+  {
+    const response = await fetch("http://localhost:18000/_health");
+    assert.equal(response.status, 200);
+  }
+  {
+    const response = await fetch("http://localhost:18000/_proxy");
+    assert.equal(response.status, 500);
+  }
+  {
+    const response = await fetch(
+      `http://localhost:18000/_proxy?destination=${encodeURIComponent(
+        "not-a-url",
+      )}`,
+    );
+    assert.equal(response.status, 500);
+  }
+  {
+    const response = await fetch(
+      `http://localhost:18000/_proxy?destination=${encodeURIComponent(
+        "ftp://localhost",
+      )}`,
+    );
+    assert.equal(response.status, 500);
+  }
+  {
+    const response = await fetch(
+      `http://localhost:18000/_proxy?destination=${encodeURIComponent(
+        "http://localhost/",
+      )}`,
+    );
+    assert.equal(response.status, 500);
+  }
+  {
+    const response = await fetch(
+      `http://localhost:18000/_proxy?destination=${encodeURIComponent(
+        "http://a-nonexistent-website-lskjfpqslek41u20.com/",
+      )}`,
+    );
+    assert.equal(response.status, 500);
+  }
+  {
+    const response = await fetch(
+      `http://localhost:18000/_proxy?destination=${encodeURIComponent(
+        "https://developer.mozilla.org/",
+      )}`,
+    );
+    assert.equal(response.status, 500);
+  }
+  {
+    const response = await fetch(
+      `http://localhost:18000/_proxy?destination=${encodeURIComponent(
+        "https://interactive-examples.mdn.mozilla.net/media/cc0-images/grapefruit-slice-332-332.jpg",
+      )}`,
+    );
+    assert.equal(response.status, 200);
+    assert.equal(response.headers.get("Content-Type"), "image/jpeg");
+    await response.blob();
+  }
+  {
+    const response = await fetch(
+      `http://localhost:18000/_proxy?destination=${encodeURIComponent(
+        "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.webm",
+      )}`,
+    );
+    assert.equal(response.status, 200);
+    assert.equal(response.headers.get("Content-Type"), "video/webm");
+    await response.blob();
+  }
+  {
+    const response = await fetch(
+      `http://localhost:18000/_proxy?destination=${encodeURIComponent(
+        "https://interactive-examples.mdn.mozilla.net/media/cc0-audio/t-rex-roar.mp3",
+      )}`,
+    );
+    assert.equal(response.status, 200);
+    assert.equal(response.headers.get("Content-Type"), "audio/mpeg");
+    await response.blob();
+  }
+  {
+    const response = await fetch("http://localhost:18000/__live-connections", {
+      method: "POST",
+      headers: { "CSRF-Protection": "true" },
+      body: new URLSearchParams({}),
+    });
+    assert.equal(response.status, 500);
+  }
   node.exit();
 });
