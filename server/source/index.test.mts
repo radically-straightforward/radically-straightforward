@@ -380,11 +380,11 @@ test(async () => {
     ) => {
       assert.equal(request.cookies.cookieExample1, undefined);
       assert.equal(request.cookies.cookieExample2, undefined);
-      response.setCookie?.("example", "1");
-      response.setCookie?.("anotherExample", "2");
+      response.setCookie?.("cookieExample1", "1");
+      response.setCookie?.("cookieExample2", "2");
       assert.equal(request.cookies.cookieExample1, "1");
       assert.equal(request.cookies.cookieExample2, "2");
-      response.deleteCookie?.("anotherExample");
+      response.deleteCookie?.("cookieExample2");
       assert.equal(request.cookies.cookieExample2, undefined);
       response.redirect?.("/redirect");
     },
