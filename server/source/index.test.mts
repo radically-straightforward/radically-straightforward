@@ -498,10 +498,10 @@ test(async () => {
       assert.equal(await response.text(), "Error: Unmatched ‘href’.");
     }
     {
-      const fetchAbortController = new AbortController();
+      const abortController = new AbortController();
       const response = await fetch("http://localhost:18000/live-connection", {
         headers: { "Live-Connection": liveConnectionId },
-        signal: fetchAbortController.signal,
+        signal: abortController.signal,
       });
       assert.equal(response.status, 200);
       assert.equal(
@@ -533,7 +533,7 @@ test(async () => {
       });
       await timers.setTimeout(500);
       assert.equal(body, `"${liveConnectionId}"\n`);
-      fetchAbortController.abort();
+      abortController.abort();
       await timers.setTimeout(500);
     }
   }
