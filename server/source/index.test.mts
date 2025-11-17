@@ -179,6 +179,5 @@ test(async () => {
     );
     assert.equal(await response.text(), "Error: Malformed ‘Cookie’ header.");
   }
-
   node.exit();
 });
