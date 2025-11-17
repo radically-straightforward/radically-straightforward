@@ -84,6 +84,46 @@ test(async () => {
     );
     assert.equal(response.status, 200);
   }
+  application.push({
+    method: "POST",
+    pathname: "/request-parsing/files",
+    handler: async (
+      request: serverTypes.Request<
+        {},
+        {},
+        {},
+        {
+          bodyFileExample: serverTypes.RequestBodyFile;
+          bodyArrayExample: serverTypes.RequestBodyFile[];
+        },
+        {}
+      >,
+      response,
+    ) => {
+      assert(request.body.bodyFileExample);
+      assert.equal(request.body.bodyFileExample.encoding, "7bit");
+      assert.equal(
+        request.body.bodyFileExample.mimeType,
+        "application/octet-stream",
+      );
+      assert.equal(request.body.bodyFileExample.filename, "blob");
+      assert.deepEqual(
+        [...(await fs.readFile(request.body.bodyFileExample.path))],
+        [1],
+      );
+      assert(request.body.bodyArrayExample);
+      assert.deepEqual(
+        [...(await fs.readFile(request.body.bodyArrayExample[0].path))],
+        [2],
+      );
+      assert.deepEqual(
+        [...(await fs.readFile(request.body.bodyArrayExample[1].path))],
+        [3],
+      );
+      response.setHeader("Content-Type", "application/json; charset=utf-8");
+      response.end(request.body.bodyFileExample.path);
+    },
+  });
   {
     const response = await fetch("http://localhost:18000/", {
       method: "POST",
