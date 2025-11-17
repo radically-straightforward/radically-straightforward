@@ -441,5 +441,50 @@ test(async () => {
       "https://github.com/radically-straightforward/radically-straightforward",
     );
   }
+  application.push({
+    method: "GET",
+    pathname: "/live-connection",
+    handler: (request, response) => {
+      response.end(
+        typeof request.liveConnection === "string"
+          ? request.liveConnection
+          : request.id,
+      );
+    },
+  });
+  {
+    const response = await fetch("http://localhost:18000/live-connection", {
+      method: "POST",
+      headers: {
+        "CSRF-Protection": "true",
+        "Live-Connection": "12345",
+      },
+    });
+    assert.equal(response.status, 400);
+    assert.equal(
+      response.headers.get("Content-Type"),
+      "text/plain; charset=utf-8",
+    );
+    assert.equal(await response.text(), "Error: Invalid request method.");
+  }
+  {
+    const response = await fetch("http://localhost:18000/live-connection", {
+      headers: { "Live-Connection": "12" },
+    });
+    assert.equal(response.status, 400);
+    assert.equal(
+      response.headers.get("Content-Type"),
+      "text/plain; charset=utf-8",
+    );
+    assert.equal(
+      await response.text(),
+      "Error: Invalid ‘Live-Connection’ header.",
+    );
+  }
+  {
+    const liveConnectionId = await (
+      await fetch("http://localhost:18000/live-connection")
+    ).text();
+  }
   node.exit();
 });
