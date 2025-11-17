@@ -30,7 +30,7 @@ test(async () => {
       request: serverTypes.Request<
         { pathnameExample: string },
         { searchStringExample: string; searchArrayExample: string[] },
-        { cookie1: string; cookie2: string },
+        { cookieExample1: string; cookieExample2: string },
         { bodyStringExample: string; bodyArrayExample: string[] },
         { stateExample: string }
       >,
@@ -45,7 +45,10 @@ test(async () => {
       });
       // @ts-expect-error
       request.search.nonexisting;
-      assert.deepEqual(request.cookies, { cookie1: "5", cookie2: "6" });
+      assert.deepEqual(request.cookies, {
+        cookieExample1: "5",
+        cookieExample2: "6",
+      });
       // @ts-expect-error
       request.cookies.nonexisting;
       assert.deepEqual(request.body, {
@@ -72,7 +75,7 @@ test(async () => {
         method: "POST",
         headers: {
           "CSRF-Protection": "true",
-          Cookie: "__Host-cookie1=5; __Host-cookie2=6",
+          Cookie: "__Host-cookieExample1=5; __Host-cookieExample2=6",
           "Header-Example": "11",
         },
         body: new URLSearchParams([
@@ -165,5 +168,17 @@ test(async () => {
       "Error: This request appears to have come from outside the application. Please close this tab and start again. (Cross-Site Request Forgery (CSRF) protection failed.)",
     );
   }
+  {
+    const response = await fetch("http://localhost:18000/", {
+      headers: { Cookie: "__Host-cookieExample" },
+    });
+    assert.equal(response.status, 400);
+    assert.equal(
+      response.headers.get("Content-Type"),
+      "text/plain; charset=utf-8",
+    );
+    assert.equal(await response.text(), "Error: Malformed ‘Cookie’ header.");
+  }
+
   node.exit();
 });
