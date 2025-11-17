@@ -411,5 +411,35 @@ test(async () => {
       "__Host-cookieExample2=; Max-Age=0; Path=/; Secure; HttpOnly; SameSite=None",
     ]);
   }
+  {
+    const response = await fetch("http://localhost:18000/response-helpers", {
+      redirect: "manual",
+      headers: { "Live-Navigation": "true" },
+    });
+    assert.equal(response.status, 303);
+    assert.equal(
+      response.headers.get("Location"),
+      "http://localhost:18000/redirect",
+    );
+  }
+  application.push({
+    method: "GET",
+    pathname: "/external-redirect",
+    handler: (request, response) => {
+      response.redirect?.(
+        "https://github.com/radically-straightforward/radically-straightforward",
+      );
+    },
+  });
+  {
+    const response = await fetch("http://localhost:18000/external-redirect", {
+      headers: { "Live-Navigation": "true" },
+    });
+    assert.equal(response.status, 200);
+    assert.equal(
+      response.headers.get("Location"),
+      "https://github.com/radically-straightforward/radically-straightforward",
+    );
+  }
   node.exit();
 });
