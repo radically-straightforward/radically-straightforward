@@ -122,7 +122,10 @@ Unlike most events, browsers don’t support handling the [`focusin`](https://de
 ### `liveConnection()`
 
 ```typescript
-export async function liveConnection(requestId, { reload = false } = {});
+export async function liveConnection(
+  requestId,
+  { reloadOnReconnect = false } = {},
+);
 ```
 
 Open a [Live Connection](https://github.com/radically-straightforward/radically-straightforward/tree/main/server#live-connection) to the server.
@@ -131,7 +134,41 @@ If a connection can’t be established, then an error message is shown in an ele
 
 If the `content` of the meta tag `<meta name="version" content="___" />` has changed, a Live Connection update doesn’t happen. Instead, an error message is shown in an element with `key="global-error"` which you may style.
 
-If `reload` is `true` then the page reloads when the connection is closed and reopened, because presumably the server has been restarted after a code modification during development.
+This function is only meant to be called if:
+
+1. The request in question is not a Live Connection itself.
+2. The request method is `GET`.
+3. The response status code is 200.
+
+The `reloadOnReconnect` parameter changes the behavior of Live Connections upon the occasional disconnection. When `reloadOnReconnect` is `false` (the default), the client shows an error message to the user and keeps trying to reconnect, which is useful, for example, in case the server malfunctions. When `reloadOnReconnect` is `true`, then as soon as the connection is reestablished, the browser reloads the page, which is useful during development.
+
+**Example**
+
+```typescript
+html`
+  <!DOCTYPE html>
+  <html
+    javascript="${javascript`
+      if (${
+        request.liveConnection === undefined &&
+        request.method === "GET" &&
+        response.statusCode === 200
+      })
+        javascript.liveConnection(
+          ${request.id}, {
+            reloadOnReconnect: ${
+              application.configuration.environment === "development"
+            }
+          }
+        );
+    `}"
+  >
+    <head>
+      <meta name="version" content="${application.version}" />
+    </head>
+  </html>
+`;
+```
 
 ### `documentMount()`
 
