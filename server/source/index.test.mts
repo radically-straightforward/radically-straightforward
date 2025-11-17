@@ -569,5 +569,79 @@ test(async () => {
       await timers.setTimeout(500);
     }
   }
+  {
+    const trace = new Array<string>();
+    application.push({
+      method: "GET",
+      pathname: "/error",
+      handler: (request, response) => {
+        trace.push("BEFORE ERROR");
+        throw new Error("ERROR");
+        trace.push("AFTER ERROR");
+      },
+    });
+    application.push({
+      method: "GET",
+      pathname: "/error",
+      handler: (request, response) => {
+        trace.push("UNREACHABLE HANDLER");
+      },
+    });
+    application.push({
+      method: "GET",
+      pathname: "/error",
+      error: true,
+      handler: (request, response) => {
+        trace.push("REACHABLE ERROR HANDLER");
+        trace.push(String(request.error));
+        response.end();
+      },
+    });
+    application.push({
+      method: "GET",
+      pathname: "/error",
+      error: true,
+      handler: (request, response) => {
+        trace.push("UNREACHABLE ERROR HANDLER");
+      },
+    });
+    assert.equal((await fetch("http://localhost:18000/error")).status, 500);
+    assert.deepEqual(trace, [
+      "BEFORE ERROR",
+      "REACHABLE ERROR HANDLER",
+      "Error: ERROR",
+    ]);
+  }
+  application.push({
+    method: "GET",
+    pathname: "/validation",
+    handler: (request, response) => {
+      throw "validation";
+    },
+  });
+  application.push({
+    method: "GET",
+    pathname: "/validation",
+    error: true,
+    handler: (request, response) => {
+      response.end();
+    },
+  });
+  {
+    const response = await fetch("http://localhost:18000/validation");
+    assert.equal(response.status, 422);
+  }
+  {
+    const response = await fetch("http://localhost:18000/nonexisting");
+    assert.equal(response.status, 500);
+    assert.equal(
+      response.headers.get("Content-Type"),
+      "text/plain; charset=utf-8",
+    );
+    assert.equal(
+      await response.text(),
+      "The application didn’t finish responding to this request.",
+    );
+  }
   node.exit();
 });
