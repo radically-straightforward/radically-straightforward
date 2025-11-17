@@ -414,6 +414,29 @@ test(async () => {
     assert.equal(response.status, 200);
     assert.equal(JSON.parse(await response.text()), false);
   }
+  {
+    const abortController = new AbortController();
+    const response = await fetch(
+      "http://localhost:18000/may-start-live-connection--1",
+      {
+        headers: { "Live-Connection": "12345" },
+        signal: abortController.signal,
+      },
+    );
+    assert.equal(response.status, 200);
+    assert.equal(
+      response.headers.get("Content-Type"),
+      "application/json-lines; charset=utf-8",
+    );
+    assert(response.body);
+    const responseBodyReader = response.body
+      .pipeThrough(new TextDecoderStream())
+      .pipeThrough(new utilities.JSONLinesTransformStream())
+      .getReader();
+    assert.equal(JSON.parse((await responseBodyReader.read()).value), false);
+    abortController.abort();
+    await timers.setTimeout(500);
+  }
   application.push({
     method: "GET",
     pathname: "/response-helpers",
