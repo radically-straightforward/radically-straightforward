@@ -331,7 +331,10 @@ export type Route = {
   method?: string | RegExp;
   pathname?: string | RegExp;
   error?: boolean;
-  handler: (request: Request, response: Response) => void | Promise<void>;
+  handler: (
+    request: Request<{}, {}, {}, {}, {}>,
+    response: Response,
+  ) => void | Promise<void>;
 };
 ```
 
@@ -350,40 +353,25 @@ A `Route` is a combination of some conditions that the request must satisfy for 
 ### `Request`
 
 ```typescript
-export type Request<
-  Pathname = {
-    [key: string]: string;
-  },
-  Search = {
-    [key: string]: string | string[];
-  },
-  Cookies = {
-    [key: string]: string;
-  },
-  Body = {
-    [key: string]: string | RequestBodyFile | string[] | RequestBodyFile[];
-  },
-  State = {
-    [key: string]: unknown;
-  },
-> = http.IncomingMessage & {
-  id: string;
-  start: bigint;
-  log: (...messageParts: string[]) => void;
-  ip: string;
-  URL: URL;
-  pathname: Partial<Pathname>;
-  search: Partial<Search>;
-  cookies: Partial<Cookies>;
-  body: Partial<Body>;
-  state: Partial<State>;
-  error?: unknown;
-  getFlash?: () => string | undefined;
-  liveConnection?:
-    | "connectingWithoutUpdate"
-    | "connectingWithUpdate"
-    | "connected";
-};
+export type Request<Pathname, Search, Cookies, Body, State> =
+  http.IncomingMessage & {
+    id: string;
+    start: bigint;
+    log: (...messageParts: string[]) => void;
+    ip: string;
+    URL: URL;
+    pathname: Partial<Pathname>;
+    search: Partial<Search>;
+    cookies: Partial<Cookies>;
+    body: Partial<Body>;
+    state: Partial<State>;
+    error?: unknown;
+    getFlash?: () => string | undefined;
+    liveConnection?:
+      | "connectingWithoutUpdate"
+      | "connectingWithUpdate"
+      | "connected";
+  };
 ```
 
 An extension of [Node.js’s `http.IncomingMessage`](https://nodejs.org/api/http.html#class-httpincomingmessage) with the following extra functionality:
