@@ -1,5 +1,10 @@
 # Changelog
 
+## 4.0.29 · 2025-11-19
+
+- Fixed caching by using it only for a first paint and making the browser request a new version of the page.
+- Made the management of Live Navigation and Live Connections more explicit by introducing `documentState`.
+
 ## 4.0.27 · 2025-10-24
 
 - Make `onsubmit()` `async`.
