@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.14 · 2025-11-19
+
+- Simplified the way that the server keeps track of Live Connections.
+
 ## 1.0.13 · 2025-07-24
 
 - Added a way for `redirect()` to say that it’s special for Live Connections, sending an HTTP status of 200.
