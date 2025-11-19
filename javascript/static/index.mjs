@@ -297,7 +297,12 @@ export async function liveConnection(
         .pipeThrough(new utilities.JSONLinesTransformStream())
         .getReader();
       while (true) {
-        const responseText = (await responseBodyReader.read()).value;
+        let responseText;
+        try {
+          responseText = (await responseBodyReader.read()).value;
+        } catch (error) {
+          if (error.name !== "AbortError") throw error;
+        }
         if (responseText === undefined) break;
         liveNavigate.cache.set(response.url, responseText);
         documentMount(responseText);
