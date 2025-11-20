@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.0.19 · 2025-11-20
+
+- On `backgroundJob()`, add a parameter to control when the first run happens.
+
 ## 2.0.18 · 2025-11-20
 
 - Changed `backgroundJob()` such that it `setTimeout()`s the first execution of the job, allowing the rest of the application to load.

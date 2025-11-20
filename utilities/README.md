@@ -490,9 +490,11 @@ Similar to `collections-deep-equal` but either incomplete, or lacking type defin
 export function backgroundJob(
   {
     interval,
+    firstRun = "async",
     onStop = () => {},
   }: {
     interval: number;
+    firstRun?: "sync" | "async" | "delayed";
     onStop?: () => void | Promise<void>;
   },
   job: () => void | Promise<void>,

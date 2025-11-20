@@ -636,9 +636,11 @@ intern.finalizationRegistry = new FinalizationRegistry<{
 export function backgroundJob(
   {
     interval,
+    firstRun = "async",
     onStop = () => {},
   }: {
     interval: number;
+    firstRun?: "sync" | "async" | "delayed";
     onStop?: () => void | Promise<void>;
   },
   job: () => void | Promise<void>,
@@ -648,7 +650,7 @@ export function backgroundJob(
 } {
   let state: "sleeping" | "running" | "runningAndMarkedForRerun" | "stopped" =
     "sleeping";
-  let timeout = setTimeout(() => {});
+  let timeout: ReturnType<typeof setTimeout>;
   const backgroundJob = {
     run: async () => {
       if (state === "sleeping") {
@@ -683,9 +685,20 @@ export function backgroundJob(
       await onStop();
     },
   };
-  setTimeout(() => {
-    backgroundJob.run();
-  });
+  if (firstRun === "sync") backgroundJob.run();
+  else
+    timeout = setTimeout(
+      () => {
+        backgroundJob.run();
+      },
+      firstRun === "async"
+        ? 0
+        : firstRun === "delayed"
+          ? interval * (1 + 0.1 * Math.random())
+          : (() => {
+              throw new Error();
+            })(),
+    );
   return backgroundJob;
 }
 
