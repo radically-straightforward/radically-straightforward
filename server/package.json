@@ -27,13 +27,13 @@
     "test": "npm run prepare && node --test \"./build/**/*.test.mjs\" && prettier --check ./README.md ./CHANGELOG.md ./package.json ./tsconfig.json ./source/"
   },
   "dependencies": {
-    "@radically-straightforward/node": "^3.1.7",
-    "@radically-straightforward/utilities": "^2.0.18",
+    "@radically-straightforward/node": "^3.1.9",
+    "@radically-straightforward/utilities": "^2.0.19",
     "@types/busboy": "^1.5.4",
     "busboy": "^1.6.0"
   },
   "devDependencies": {
-    "@radically-straightforward/documentation": "^1.0.5",
+    "@radically-straightforward/documentation": "^1.0.7",
     "@radically-straightforward/typescript": "^1.0.0",
     "@types/node": "^24.10.1",
     "prettier": "^3.6.2",
