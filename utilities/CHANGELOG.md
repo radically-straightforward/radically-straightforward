@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.0.18 · 2025-11-20
+
+- Changed `backgroundJob()` such that it `setTimeout()`s the first execution of the job, allowing the rest of the application to load.
+
 ## 2.0.17 · 2025-10-29
 
 - Added `Cache`.

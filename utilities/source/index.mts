@@ -683,7 +683,9 @@ export function backgroundJob(
       await onStop();
     },
   };
-  backgroundJob.run();
+  setTimeout(() => {
+    backgroundJob.run();
+  });
   return backgroundJob;
 }
 
