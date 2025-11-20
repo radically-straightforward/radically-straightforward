@@ -263,12 +263,13 @@ backgroundJob<Type>(
       timeout = 5 * 60 * 1000,
       retryIn = 5 * 60 * 1000,
       retries = 10,
+      ...nodeBackgroundJobOptions
     }: {
       type: string;
       timeout?: number;
       retryIn?: number;
       retries?: number;
-    },
+    } & Partial<Parameters<typeof node.backgroundJob>[0]>,
     job: (parameters: Type) => void | Promise<void>,
   ): ReturnType<typeof node.backgroundJob>;
 ```
