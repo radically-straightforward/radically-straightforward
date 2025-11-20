@@ -1,6 +1,6 @@
 {
   "name": "@radically-straightforward/javascript",
-  "version": "4.0.29",
+  "version": "4.0.31",
   "description": "⚙️ Browser JavaScript in Tagged Templates",
   "keywords": [
     "javascript",
@@ -43,7 +43,7 @@
   },
   "devDependencies": {
     "@csstools/postcss-light-dark-function": "^2.0.11",
-    "@radically-straightforward/documentation": "^1.0.5",
+    "@radically-straightforward/documentation": "^1.0.7",
     "@radically-straightforward/typescript": "^1.0.0",
     "@types/node": "^24.10.1",
     "postcss": "^8.5.6",
