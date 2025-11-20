@@ -38,7 +38,7 @@
     "@floating-ui/dom": "^1.7.4",
     "@radically-straightforward/css": "^3.0.2",
     "@radically-straightforward/html": "^1.0.1",
-    "@radically-straightforward/utilities": "^2.0.17",
+    "@radically-straightforward/utilities": "^2.0.18",
     "fast-myers-diff": "^3.2.0"
   },
   "devDependencies": {
