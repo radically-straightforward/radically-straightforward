@@ -120,17 +120,22 @@ async function liveNavigate(request, { stateAlreadyPushed = false } = {}) {
     .querySelector("body")
     .insertAdjacentElement(
       "afterbegin",
-      stringToElement(html`<div key="progress-bar"></div>`),
+      stringToElement(html`<div key="progress-bar" style="width: 0%;"></div>`),
     );
-  backgroundJob(progressBar, "progressBar", { interval: 1000 }, () => {
-    progressBar.style.width =
-      (progressBar.style.width.trim() === ""
-        ? "15"
-        : (() => {
-            const width = Number(progressBar.style.width.slice(0, -1));
-            return width + (90 - width) / (10 + Math.random() * 50);
-          })()) + "%";
-  });
+  backgroundJob(
+    progressBar,
+    "progressBar",
+    { interval: 1000, firstRun: "delayed" },
+    () => {
+      const width = Number(progressBar.style.width.slice(0, -"%".length));
+      progressBar.style.width =
+        String(
+          width === 0
+            ? 30
+            : Math.round(width + (90 - width) / (10 + Math.random() * 50)),
+        ) + "%";
+    },
+  );
   request.headers.set("Live-Navigation", "true");
   liveNavigate.abortController = new AbortController();
   let response;
@@ -780,7 +785,7 @@ export function relativizeDateTimeElement(
   backgroundJob(
     element,
     "relativizeDateTimeElementBackgroundJob",
-    { interval: 10 * 1000 },
+    { interval: 10 * 1000, firstRun: "sync" },
     () => {
       element.textContent = relativizeDateTime(
         dateString,
