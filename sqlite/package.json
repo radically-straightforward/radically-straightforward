@@ -29,8 +29,8 @@
     "test": "npm run prepare && node --test \"./build/**/*.test.mjs\" && prettier --check ./README.md ./CHANGELOG.md ./package.json ./tsconfig.json ./source/"
   },
   "dependencies": {
-    "@radically-straightforward/node": "^3.1.8",
-    "@radically-straightforward/utilities": "^2.0.18",
+    "@radically-straightforward/node": "^3.1.9",
+    "@radically-straightforward/utilities": "^2.0.19",
     "@types/better-sqlite3": "^7.6.13",
     "better-sqlite3": "^12.4.1"
   },
