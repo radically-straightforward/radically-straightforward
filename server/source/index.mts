@@ -462,11 +462,14 @@ export default function server({
             response.ended = true;
             return response;
           }) as (typeof response)["end"];
-          const heartbeat = node.backgroundJob({ interval: 30 * 1000 }, () => {
-            response.write("\n");
-          });
+          const heartbeat = node.backgroundJob(
+            { interval: 30 * 1000, firstRun: "sync" },
+            () => {
+              response.write("\n");
+            },
+          );
           const periodicUpdates = node.backgroundJob(
-            { interval: 5 * 60 * 1000 },
+            { interval: 5 * 60 * 1000, firstRun: "delayed" },
             () => {
               liveConnection!.update?.();
             },
