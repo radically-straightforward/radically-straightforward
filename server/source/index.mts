@@ -68,7 +68,7 @@ export type Route = {
  * - **`getFlash()`:** Get a flash message that was set by a previous `response` that `setFlash()` and then `redirect()`ed. This is useful, for example, for a message such as “User settings updated successfully.” (This function is only available in requests that are **not** Live Connections, because Live Connections must not set headers.)
  *
  * - **`liveConnection`:** When the Request is a Live Connection, this property contains information about the state:
- *   - **`"connectingWithoutUpdate"`:** This is the first time that this Request is going through the application code, because the Live Connection is just being established. Additionally, a Live Connection update **is not** necessary, because the page **has not** changed since the initial response was sent. You may use this state to, for example, start a [`backgroundJob()`](https://github.com/radically-straightforward/radically-straightforward/tree/main/node#backgroundjob) which updates a timestamp of when a user has last been seen online, and then `response.end()` right away.
+ *   - **`"connectingWithoutUpdate"`:** This is the first time that this Request is going through the application code, because the Live Connection is just being established. Additionally, a Live Connection update **is not** necessary, because the page **has not** changed since the initial response was sent. You may use this state to, for example, start a [`backgroundJob()`](https://github.com/radically-straightforward/radically-straightforward/tree/main/node#backgroundjob) which updates a timestamp of when a user has last been seen online, and then `response.send()` right away.
  *
  *   - **`"connectingWithUpdate"`:** This is the first time that this Request is going through the application code, because the Live Connection is just being established. Additionally, a Live Connection update **is** necessary, because the page **has** changed since the initial response was sent. You may use this state to, for example, start a [`backgroundJob()`](https://github.com/radically-straightforward/radically-straightforward/tree/main/node#backgroundjob) which updates a timestamp of when a user has last been seen online, and then let the Request go though the application code normally to produce a Live Connection update.
  *
@@ -126,7 +126,7 @@ export type Response = http.ServerResponse & {
   setCookie?: (key: string, value: string, maxAge?: number) => Response;
   deleteCookie?: (key: string) => Response;
   setFlash?: (message: string) => Response;
-  send: (responseBody: string | undefined) => Response;
+  send: (responseBody?: string) => Response;
   redirect?: (
     destination?: string,
     type?: "see-other" | "temporary" | "permanent" | "live-navigation",
@@ -384,14 +384,7 @@ export default function server({
             response.ended = true;
             return response;
           };
-          response.redirect = (
-            destination: string = "",
-            type:
-              | "see-other"
-              | "temporary"
-              | "permanent"
-              | "live-navigation" = "see-other",
-          ): typeof response => {
+          response.redirect = (destination = "", type = "see-other") => {
             response.statusCode =
               request.headers["live-navigation"] === "true" &&
               !destination.startsWith("/")
@@ -406,8 +399,7 @@ export default function server({
               "Location",
               new URL(destination, request.URL).href,
             );
-            response.end();
-            response.ended = true;
+            response.send();
             return response;
           };
         } else {
@@ -539,7 +531,6 @@ export default function server({
             request.error = error;
             request.log("ERROR", String(error), (error as Error)?.stack ?? "");
           }
-          if (response.writableEnded) response.ended = true;
           if (response.ended) break;
         }
         if (!response.ended) {
@@ -547,7 +538,7 @@ export default function server({
             response.statusCode = 500;
             response.setHeader("Content-Type", "text/plain; charset=utf-8");
           }
-          response.end(
+          response.send(
             "The application didn’t finish responding to this request.",
           );
           request.log(
@@ -595,14 +586,14 @@ export default function server({
       log("STOP");
     });
     for (const liveConnection of liveConnections.values())
-      liveConnection.end?.();
+      liveConnection.response?.end();
   });
   const serverRoutes: Route[] = [
     {
       method: "GET",
       pathname: "/_health",
       handler: (request, response) => {
-        response.end();
+        response.send();
       },
     },
     {
@@ -658,7 +649,7 @@ export default function server({
           request.body.pathname.trim() === ""
         )
           throw "validation";
-        response.end();
+        response.send();
         for (const liveConnection of liveConnections.values()) {
           if (
             liveConnection.URL.pathname.match(
