@@ -115,18 +115,18 @@ export type RequestBodyFile = busboy.FileInfo & { path: string };
  *
  * - **`setFlash()`:** Set a flash message that will be available to the next `request` via `getFlash()` (the next `request` typically is the result of a `redirect()`ion). This is useful, for example, for a message such as “User settings updated successfully.” (This function is only available in requests that are **not** Live Connections, because Live Connections must not set headers.)
  *
+ * - **`send()`:** Similar to `response.end()`, but sets the `ended` flag (see below) and supports Live Connections.
+ *
  * - **`redirect()`:** Sends the [`Location` header](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Location) and an HTTP status of [303 (`"see-other"`)](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/303) (default), [307 (`"temporary"`)](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/307), or [308 (`"permanent"`)](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/308). Note that there are no options for the legacy statuses of [301](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/301) and [302](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/302), because they may lead some clients to change the HTTP method of the redirected request by mistake. The `destination` parameter is relative to `request.URL`, for example, if no `destination` is provided, then the default is to redirect to the same `request.URL`. (This function is only available in requests that are **not** Live Connections, because Live Connections must not set headers.)
  *
- * - **`ended`:** Whether `response.end()` has been called. This is different from [`response.writableEnded`](https://nodejs.org/docs/latest/api/http.html#responsewritableended) in the following ways:
- *   1. Under special circumstances you may **set** this attribute, for example, if you respond with `stream.pipeline(___, response)` then `response.writableEnded` is `false`, but the server shouldn’t continue considering other routes.
- *
- *   2. `ended` supports Live Connection updates.
+ * - **`ended`:** Whether the response has been produced and no further Routes need to be considered. This flag is set by `send()` and `redirect()`, and it may be set manually if, for example, you respond with `stream.pipeline(___, response)`.
  */
 export type Response = http.ServerResponse & {
   mayStartLiveConnection: () => boolean;
   setCookie?: (key: string, value: string, maxAge?: number) => Response;
   deleteCookie?: (key: string) => Response;
   setFlash?: (message: string) => Response;
+  send: (responseBody: string | undefined) => Response;
   redirect?: (
     destination?: string,
     type?: "see-other" | "temporary" | "permanent" | "live-navigation",
@@ -142,8 +142,9 @@ type LiveConnection = {
     | "connected";
   waitingForConnectionTimeout?: NodeJS.Timeout;
   URL: URL;
+  request?: Request<{}, {}, {}, {}, {}>;
+  response?: Response;
   update?: () => void;
-  end?: () => void;
 };
 
 /**
@@ -184,7 +185,7 @@ export default function server({
       try {
         request.id = utilities.randomString();
         request.start = process.hrtime.bigint();
-        request.log = (...messageParts: string[]): void => {
+        request.log = (...messageParts) => {
           log(
             request.id,
             `${(process.hrtime.bigint() - request.start) / 1_000_000n}ms`,
@@ -350,11 +351,7 @@ export default function server({
             request.method === "GET" &&
             response.statusCode === 200 &&
             response.getHeader("Content-Type") === "text/html; charset=utf-8";
-          response.setCookie = (
-            key: string,
-            value: string,
-            maxAge: number = 150 * 24 * 60 * 60,
-          ): typeof response => {
+          response.setCookie = (key, value, maxAge = 150 * 24 * 60 * 60) => {
             request.cookies[key] = value;
             response.setHeader("Set-Cookie", [
               ...((response.getHeader("Set-Cookie") as string[]) ?? []),
@@ -362,7 +359,7 @@ export default function server({
             ]);
             return response;
           };
-          response.deleteCookie = (key: string): typeof response => {
+          response.deleteCookie = (key) => {
             delete request.cookies[key];
             response.setHeader("Set-Cookie", [
               ...((response.getHeader("Set-Cookie") as string[]) ?? []),
@@ -370,7 +367,7 @@ export default function server({
             ]);
             return response;
           };
-          response.setFlash = (message: string): typeof response => {
+          response.setFlash = (message) => {
             const flashIdentifier = utilities.randomString();
             flashes.set(flashIdentifier, message);
             setTimeout(
@@ -380,6 +377,11 @@ export default function server({
               2 * 60 * 1000,
             ).unref();
             response.setCookie!("flash", flashIdentifier, 2 * 60);
+            return response;
+          };
+          response.send = (responseBody) => {
+            response.end(responseBody);
+            response.ended = true;
             return response;
           };
           response.redirect = (
@@ -405,6 +407,7 @@ export default function server({
               new URL(destination, request.URL).href,
             );
             response.end();
+            response.ended = true;
             return response;
           };
         } else {
@@ -455,13 +458,14 @@ export default function server({
             "application/json-lines; charset=utf-8",
           );
           response.mayStartLiveConnection = () => false;
-          liveConnection.end = response.end;
-          response.end = ((data?: string): typeof response => {
-            if (typeof data === "string")
-              response.write(JSON.stringify(data) + "\n");
+          liveConnection.request = request;
+          liveConnection.response = response;
+          response.send = (responseBody) => {
+            if (typeof responseBody === "string")
+              response.write(JSON.stringify(responseBody) + "\n");
             response.ended = true;
             return response;
-          }) as (typeof response)["end"];
+          };
           const heartbeat = node.backgroundJob(
             { interval: 30 * 1000, firstRun: "sync" },
             () => {
