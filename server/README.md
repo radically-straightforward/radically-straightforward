@@ -46,7 +46,7 @@ application.push({
   method: "GET",
   pathname: "/",
   handler: (request, response) => {
-    response.end(html`
+    response.send(html`
       <!doctype html>
       <html>
         <head></head>
@@ -132,7 +132,7 @@ See the [`Response` type](#response) for more details.
 
 > **Compared to Other Libraries**
 >
-> `@radically-straightforward/server` offers fewer settings and less **sugar**, for example, instead of [Express’s `response.json(___)`](https://expressjs.com/en/4x/api.html#res.json), you should use Node.js’s `response.setHeader("Content-Type", "application/json; charset=utf-8").end(JSON.stringify(___))`.
+> `@radically-straightforward/server` offers fewer settings and less **sugar**, for example, instead of [Express’s `response.json(___)`](https://expressjs.com/en/4x/api.html#res.json), you should use `response.setHeader("Content-Type", "application/json; charset=utf-8").send(JSON.stringify(___))`.
 
 ### Live Connection
 
@@ -152,7 +152,7 @@ Live Connections are a simple but powerful solution to many typical problems in 
 
 > **Note:** Use Live Connections with [`@radically-straightforward/javascript`](https://github.com/radically-straightforward/radically-straightforward/tree/main/javascript#liveconnection), which implements the browser side of these features and subsumes many of the details below.
 
-A Live Connection is a variation on a `GET` request in which the server doesn’t `response.end()`, but leaves the connection open and the browser waiting for more content. When there’s a change that requires an update on the page, the server runs the `request` and `response` through the routes again and sends the updated page to the browser through that connection.
+A Live Connection is a variation on a `GET` request in which the server keeps the connection open and the browser waiting for more content. When there’s a change that requires an update on the page, the server runs the `request` and `response` through the routes again and sends the updated page to the browser through that connection.
 
 From the perspective of the application developer this is advantageous because there’s a single source of truth for how to present a page to the user: the server-side rendered page. It’s as if the browser knew that a new version of a page is available and requested it. Also, in combination with [`@radically-straightforward/javascript`](https://github.com/radically-straightforward/radically-straightforward/tree/main/javascript#liveconnection) only the part of the page that changed is touched (without the need for virtual DOMs, complex browser state management, and so forth).
 
@@ -170,7 +170,7 @@ This changes the behavior of `@radically-straightforward/server`:
 
 - You may not set headers or cookies (which includes not being able to manipulate user sessions).
 
-- `response.end(___)` doesn’t end the response, but `response.write(___)`s it in a new line of JSON, so that the browser stays connected and waiting for more content.
+- `response.send(___)` doesn’t end the response, but `response.write(___)`s it in a new line of JSON, so that the browser stays connected and waiting for more content.
 
 - Periodically a heartbeat (a newline without any JSON) is sent to keep the connection alive even when there are pieces of infrastructure that would otherwise close inactive connections, for example, a proxy on the user’s network.
 
@@ -194,7 +194,7 @@ application.push({
   handler: (request, response) => {
     if (request.liveConnection?.establish) {
       // Here there could be, for example, a [`backgroundJob()`](https://github.com/radically-straightforward/radically-straightforward/tree/main/utilities#backgroundjob) which updates a timestamp of when a user has last been seen online.
-      if (request.liveConnection?.skipUpdateOnEstablish) response.end();
+      if (request.liveConnection?.skipUpdateOnEstablish) response.send();
     }
   },
 });
@@ -203,7 +203,7 @@ application.push({
   method: "GET",
   pathname: new RegExp("^/conversations/(?<conversationId>[0-9]+)$"),
   handler: (request, response) => {
-    response.end(
+    response.send(
       `<!DOCTYPE html>
         <html>
           <head>

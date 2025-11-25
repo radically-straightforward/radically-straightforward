@@ -47,7 +47,7 @@ application.push({
   method: "GET",
   pathname: "/",
   handler: (request, response) => {
-    response.end(html`
+    response.send(html`
       <!doctype html>
       <html>
         <head>

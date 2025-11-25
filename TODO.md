@@ -124,7 +124,7 @@
 - Client-side templating from within server-side templating:
 
   ```javascript
-  response.end(html`
+  response.send(html`
     <div javascript="${javascript`
       this.insertAdjacentHTML("beforestart", html`[...] ${HAVE THIS RESOLVE ON THE CLIENT} [...]`);
     `}"></div>
