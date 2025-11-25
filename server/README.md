@@ -192,10 +192,13 @@ const application = server();
 
 application.push({
   handler: (request, response) => {
-    if (request.liveConnection?.establish) {
+    if (
+      request.liveConnection === "connectingWithoutUpdate" ||
+      request.liveConnection === "connectingWithUpdate"
+    ) {
       // Here there could be, for example, a [`backgroundJob()`](https://github.com/radically-straightforward/radically-straightforward/tree/main/utilities#backgroundjob) which updates a timestamp of when a user has last been seen online.
-      if (request.liveConnection?.skipUpdateOnEstablish) response.send();
     }
+    if (request.liveConnection === "connectingWithoutUpdate") response.send();
   },
 });
 
