@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.0.0 · 2025-11-25
+
+- **Breaking change:** Introduced `response.send()`, which must be used instead of `response.end()`.
+
 ## 1.0.14 · 2025-11-19
 
 - Simplified the way that the server keeps track of Live Connections.
