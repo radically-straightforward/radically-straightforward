@@ -411,31 +411,22 @@ export default function server({
             throw new Error("Invalid ‘Live-Connection’ header.");
           liveConnection = liveConnections.get(
             request.headers["live-connection"],
+          ) ?? {
+            id: request.headers["live-connection"],
+            state: "waitingForConnectionWithUpdate",
+            URL: request.URL,
+          };
+          if (request.URL.href !== liveConnection.URL.href)
+            throw new Error("Unmatched ‘href’.");
+          if (liveConnection.state === "connected")
+            throw new Error("Already connected.");
+          liveConnections.set(liveConnection.id, liveConnection);
+          request.log(
+            "LIVE CONNECTION",
+            "CONNECT",
+            liveConnection.id,
+            liveConnection.state,
           );
-          if (liveConnection !== undefined) {
-            if (request.URL.href !== liveConnection.URL.href)
-              throw new Error("Unmatched ‘href’.");
-            if (liveConnection.state === "connected")
-              throw new Error("Already connected.");
-            request.log(
-              "LIVE CONNECTION",
-              "CONNECT",
-              liveConnection.id,
-              liveConnection.state,
-            );
-          } else {
-            liveConnection = {
-              id: request.headers["live-connection"],
-              state: "waitingForConnectionWithUpdate",
-              URL: request.URL,
-            };
-            request.log(
-              "LIVE CONNECTION",
-              "CREATE & CONNECT",
-              liveConnection.id,
-            );
-            liveConnections.set(liveConnection.id, liveConnection);
-          }
           request.id = liveConnection.id;
           request.liveConnection =
             liveConnection.state === "waitingForConnectionWithoutUpdate"
@@ -450,8 +441,6 @@ export default function server({
             "application/json-lines; charset=utf-8",
           );
           response.mayStartLiveConnection = () => false;
-          liveConnection.request = request;
-          liveConnection.response = response;
           response.send = (responseBody) => {
             if (typeof responseBody === "string")
               response.write(JSON.stringify(responseBody) + "\n");
@@ -478,6 +467,8 @@ export default function server({
           });
           liveConnection.state = "connected";
           clearTimeout(liveConnection.waitingForConnectionTimeout);
+          liveConnection.request = request;
+          liveConnection.response = response;
         }
       } catch (error) {
         if (response.statusCode === 200) response.statusCode = 400;
