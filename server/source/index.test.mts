@@ -61,7 +61,7 @@ test(async () => {
       // @ts-expect-error
       request.state.nonexisting;
       assert.equal(request.headers["header-example"], "11");
-      response.end();
+      response.send();
     },
   });
   {
@@ -126,7 +126,7 @@ test(async () => {
         [4],
       );
       response.setHeader("Content-Type", "application/json; charset=utf-8");
-      response.end(JSON.stringify(request.body.bodyFileExample.path));
+      response.send(JSON.stringify(request.body.bodyFileExample.path));
     },
   });
   {
@@ -318,7 +318,7 @@ test(async () => {
       method: "GET",
       pathname: "/flash",
       handler: (request, response) => {
-        response.end(request.getFlash?.() ?? "No flash");
+        response.send(request.getFlash?.() ?? "No flash");
       },
     });
     application.push({
@@ -353,7 +353,7 @@ test(async () => {
     method: "GET",
     pathname: "/basic",
     handler: (request, response) => {
-      response.end("<p>Hello World</p>");
+      response.send("<p>Hello World</p>");
     },
   });
   {
@@ -368,7 +368,7 @@ test(async () => {
   application.push({
     pathname: "/may-start-live-connection--1",
     handler: (request: serverTypes.Request<{}, {}, {}, {}, {}>, response) => {
-      response.end(JSON.stringify(response.mayStartLiveConnection()));
+      response.send(JSON.stringify(response.mayStartLiveConnection()));
     },
   });
   {
@@ -390,7 +390,7 @@ test(async () => {
     pathname: "/may-start-live-connection--2",
     handler: (request: serverTypes.Request<{}, {}, {}, {}, {}>, response) => {
       response.statusCode = 404;
-      response.end(JSON.stringify(response.mayStartLiveConnection()));
+      response.send(JSON.stringify(response.mayStartLiveConnection()));
     },
   });
   {
@@ -404,7 +404,7 @@ test(async () => {
     pathname: "/may-start-live-connection--3",
     handler: (request: serverTypes.Request<{}, {}, {}, {}, {}>, response) => {
       response.setHeader("Content-Type", "application/json; charset=utf-8");
-      response.end(JSON.stringify(response.mayStartLiveConnection()));
+      response.send(JSON.stringify(response.mayStartLiveConnection()));
     },
   });
   {
@@ -517,7 +517,7 @@ test(async () => {
     method: "GET",
     pathname: "/live-connection",
     handler: (request, response) => {
-      response.end(
+      response.send(
         typeof request.liveConnection === "string"
           ? request.liveConnection
           : request.id,
@@ -698,7 +698,7 @@ test(async () => {
       handler: (request, response) => {
         trace.push("REACHABLE ERROR HANDLER");
         trace.push(String(request.error));
-        response.end();
+        response.send();
       },
     });
     application.push({
@@ -728,7 +728,7 @@ test(async () => {
     pathname: "/validation",
     error: true,
     handler: (request, response) => {
-      response.end();
+      response.send();
     },
   });
   {
