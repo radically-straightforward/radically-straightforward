@@ -592,39 +592,22 @@ export function isModified(
 }
 
 /**
- * Reset form fields from `element` and its `children()` using their `defaultValue` and `defaultChecked` properties, including dispatching the `input` and `change` events.
+ * Reset form fields from `element` and its `children()` using their `defaultValue` and `defaultChecked` properties, including dispatching the `input` event.
  */
 export function reset(element, { includeSubforms = false } = {}) {
   const elements = children(element, { includeSubforms });
   for (const element of elements) {
     if (!element.matches("input, textarea")) continue;
-    let dispatchEvent = false;
     if (element.type === "checkbox" || element.type === "radio") {
       if (element.checked !== element.defaultChecked) {
         element.checked = element.defaultChecked;
-        dispatchEvent = true;
+        element.dispatchEvent(new Event("input", { bubbles: true }));
       }
     } else {
       if (element.value !== element.defaultValue) {
         element.value = element.defaultValue;
-        dispatchEvent = true;
+        element.dispatchEvent(new Event("input", { bubbles: true }));
       }
-    }
-    if (dispatchEvent) {
-      element.dispatchEvent(
-        new Event("input", {
-          bubbles: true,
-          cancelable: false,
-          composed: true,
-        }),
-      );
-      element.dispatchEvent(
-        new Event("change", {
-          bubbles: true,
-          cancelable: false,
-          composed: false,
-        }),
-      );
     }
   }
 }

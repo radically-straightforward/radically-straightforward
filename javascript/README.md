@@ -297,7 +297,7 @@ You may set the `disabled` attribute on a parent element to disable an entire su
 export function reset(element, { includeSubforms = false } = {});
 ```
 
-Reset form fields from `element` and its `children()` using their `defaultValue` and `defaultChecked` properties, including dispatching the `input` and `change` events.
+Reset form fields from `element` and its `children()` using their `defaultValue` and `defaultChecked` properties, including dispatching the `input` event.
 
 ### `validate()`
 
