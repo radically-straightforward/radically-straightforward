@@ -1,5 +1,9 @@
 # Changelog
 
+## 4.0.34 · 2025-11-25
+
+- Replace `onchange` events with `oninput`.
+
 ## 4.0.29 · 2025-11-19
 
 - Fixed caching by using it only for a first paint and making the browser request a new version of the page.
