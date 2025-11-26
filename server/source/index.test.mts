@@ -518,9 +518,10 @@ test(async () => {
     pathname: "/live-connection",
     handler: (request, response) => {
       response.send(
-        typeof request.liveConnection === "string"
-          ? request.liveConnection
-          : request.id,
+        JSON.stringify({
+          requestId: request.id,
+          requestLiveConnection: request.liveConnection,
+        }),
       );
     },
   });
@@ -554,13 +555,14 @@ test(async () => {
     );
   }
   {
-    const liveConnectionId = await (
+    const liveConnectionResponse = await (
       await fetch("http://localhost:18000/live-connection")
-    ).text();
+    ).json();
+    assert.equal(liveConnectionResponse.requestLiveConnection, false);
     {
       const response = await fetch(
         "http://localhost:18000/live-connection?unmatched-url",
-        { headers: { "Live-Connection": liveConnectionId } },
+        { headers: { "Live-Connection": liveConnectionResponse.requestId } },
       );
       assert.equal(response.status, 400);
       assert.equal(
@@ -572,7 +574,7 @@ test(async () => {
     {
       const abortController = new AbortController();
       const response = await fetch("http://localhost:18000/live-connection", {
-        headers: { "Live-Connection": liveConnectionId },
+        headers: { "Live-Connection": liveConnectionResponse.requestId },
         signal: abortController.signal,
       });
       assert.equal(response.status, 200);
@@ -583,7 +585,7 @@ test(async () => {
       assert(response.body);
       {
         const response = await fetch("http://localhost:18000/live-connection", {
-          headers: { "Live-Connection": liveConnectionId },
+          headers: { "Live-Connection": liveConnectionResponse.requestId },
         });
         assert.equal(response.status, 400);
         assert.equal(
@@ -596,24 +598,28 @@ test(async () => {
         .pipeThrough(new TextDecoderStream())
         .pipeThrough(new utilities.JSONLinesTransformStream())
         .getReader();
-      assert.equal(
-        (await responseBodyReader.read()).value,
-        "connectingWithoutUpdate",
-      );
+      let responseBodyRequestLiveConnection;
+      assert.rejects(async () => {
+        await utilities.timeout(1000, async () => {
+          responseBodyRequestLiveConnection = JSON.parse(
+            (await responseBodyReader.read()).value,
+          ).requestLiveConnection;
+        });
+      });
       await fetch("http://localhost:18000/__live-connections", {
         method: "POST",
         headers: { "CSRF-Protection": "true" },
         body: new URLSearchParams({ pathname: "^/live-connection$" }),
       });
       await timers.setTimeout(500);
-      assert.equal((await responseBodyReader.read()).value, "connected");
+      assert.equal(responseBodyRequestLiveConnection, true);
       abortController.abort();
       await timers.setTimeout(500);
     }
     {
       const abortController = new AbortController();
       const response = await fetch("http://localhost:18000/live-connection", {
-        headers: { "Live-Connection": liveConnectionId },
+        headers: { "Live-Connection": liveConnectionResponse.requestId },
         signal: abortController.signal,
       });
       assert.equal(response.status, 200);
@@ -627,8 +633,9 @@ test(async () => {
         .pipeThrough(new utilities.JSONLinesTransformStream())
         .getReader();
       assert.equal(
-        (await responseBodyReader.read()).value,
-        "connectingWithUpdate",
+        JSON.parse((await responseBodyReader.read()).value)
+          .requestLiveConnection,
+        true,
       );
       await fetch("http://localhost:18000/__live-connections", {
         method: "POST",
@@ -636,15 +643,19 @@ test(async () => {
         body: new URLSearchParams({ pathname: "^/live-connection$" }),
       });
       await timers.setTimeout(500);
-      assert.equal((await responseBodyReader.read()).value, "connected");
+      assert.equal(
+        JSON.parse((await responseBodyReader.read()).value)
+          .requestLiveConnection,
+        true,
+      );
       abortController.abort();
       await timers.setTimeout(500);
     }
   }
   {
-    const liveConnectionId = await (
+    const liveConnectionResponse = await (
       await fetch("http://localhost:18000/live-connection")
-    ).text();
+    ).json();
     await fetch("http://localhost:18000/__live-connections", {
       method: "POST",
       headers: { "CSRF-Protection": "true" },
@@ -653,7 +664,7 @@ test(async () => {
     await timers.setTimeout(500);
     const abortController = new AbortController();
     const response = await fetch("http://localhost:18000/live-connection", {
-      headers: { "Live-Connection": liveConnectionId },
+      headers: { "Live-Connection": liveConnectionResponse.requestId },
       signal: abortController.signal,
     });
     assert.equal(response.status, 200);
@@ -667,8 +678,8 @@ test(async () => {
       .pipeThrough(new utilities.JSONLinesTransformStream())
       .getReader();
     assert.equal(
-      (await responseBodyReader.read()).value,
-      "connectingWithUpdate",
+      JSON.parse((await responseBodyReader.read()).value).requestLiveConnection,
+      true,
     );
     abortController.abort();
     await timers.setTimeout(500);

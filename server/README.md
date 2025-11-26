@@ -370,10 +370,7 @@ export type Request<Pathname, Search, Cookies, Body, State> =
     state: Partial<State>;
     error?: unknown;
     getFlash?: () => string | undefined;
-    liveConnection?:
-      | "connectingWithoutUpdate"
-      | "connectingWithUpdate"
-      | "connected";
+    liveConnection: boolean;
   };
 ```
 
@@ -405,12 +402,7 @@ An extension of [Node.js’s `http.IncomingMessage`](https://nodejs.org/api/http
 
 - **`getFlash()`:** Get a flash message that was set by a previous `response` that `setFlash()` and then `redirect()`ed. This is useful, for example, for a message such as “User settings updated successfully.” (This function is only available in requests that are **not** Live Connections, because Live Connections must not set headers.)
 
-- **`liveConnection`:** When the Request is a Live Connection, this property contains information about the state:
-  - **`"connectingWithoutUpdate"`:** This is the first time that this Request is going through the application code, because the Live Connection is just being established. Additionally, a Live Connection update **is not** necessary, because the page **has not** changed since the initial response was sent. You may use this state to, for example, start a [`backgroundJob()`](https://github.com/radically-straightforward/radically-straightforward/tree/main/node#backgroundjob) which updates a timestamp of when a user has last been seen online, and then `response.send()` right away.
-
-  - **`"connectingWithUpdate"`:** This is the first time that this Request is going through the application code, because the Live Connection is just being established. Additionally, a Live Connection update **is** necessary, because the page **has** changed since the initial response was sent. You may use this state to, for example, start a [`backgroundJob()`](https://github.com/radically-straightforward/radically-straightforward/tree/main/node#backgroundjob) which updates a timestamp of when a user has last been seen online, and then let the Request go though the application code normally to produce a Live Connection update.
-
-  - **`"connected"`:** This is **not** the first time that this Request is going through the application code, because the Live Connection had been established already. This should produce a Live Connection update.
+- **`liveConnection`:** Whether the Request is a Live Connection.
 
 ### `RequestBodyFile`
 
