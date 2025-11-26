@@ -149,11 +149,7 @@ html`
   <!DOCTYPE html>
   <html
     javascript="${javascript`
-      if (${
-        request.liveConnection === undefined &&
-        request.method === "GET" &&
-        response.statusCode === 200
-      })
+      if (${response.mayStartLiveConnection()})
         javascript.liveConnection(
           ${request.id}, {
             reloadOnReconnect: ${

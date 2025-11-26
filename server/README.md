@@ -191,18 +191,6 @@ import * as serverTypes from "@radically-straightforward/server";
 const application = server();
 
 application.push({
-  handler: (request, response) => {
-    if (
-      request.liveConnection === "connectingWithoutUpdate" ||
-      request.liveConnection === "connectingWithUpdate"
-    ) {
-      // Here there could be, for example, a [`backgroundJob()`](https://github.com/radically-straightforward/radically-straightforward/tree/main/utilities#backgroundjob) which updates a timestamp of when a user has last been seen online.
-    }
-    if (request.liveConnection === "connectingWithoutUpdate") response.send();
-  },
-});
-
-application.push({
   method: "GET",
   pathname: new RegExp("^/conversations/(?<conversationId>[0-9]+)$"),
   handler: (request, response) => {
