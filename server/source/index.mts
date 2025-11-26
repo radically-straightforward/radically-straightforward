@@ -67,12 +67,7 @@ export type Route = {
  *
  * - **`getFlash()`:** Get a flash message that was set by a previous `response` that `setFlash()` and then `redirect()`ed. This is useful, for example, for a message such as “User settings updated successfully.” (This function is only available in requests that are **not** Live Connections, because Live Connections must not set headers.)
  *
- * - **`liveConnection`:** When the Request is a Live Connection, this property contains information about the state:
- *   - **`"connectingWithoutUpdate"`:** This is the first time that this Request is going through the application code, because the Live Connection is just being established. Additionally, a Live Connection update **is not** necessary, because the page **has not** changed since the initial response was sent. You may use this state to, for example, start a [`backgroundJob()`](https://github.com/radically-straightforward/radically-straightforward/tree/main/node#backgroundjob) which updates a timestamp of when a user has last been seen online, and then `response.send()` right away.
- *
- *   - **`"connectingWithUpdate"`:** This is the first time that this Request is going through the application code, because the Live Connection is just being established. Additionally, a Live Connection update **is** necessary, because the page **has** changed since the initial response was sent. You may use this state to, for example, start a [`backgroundJob()`](https://github.com/radically-straightforward/radically-straightforward/tree/main/node#backgroundjob) which updates a timestamp of when a user has last been seen online, and then let the Request go though the application code normally to produce a Live Connection update.
- *
- *   - **`"connected"`:** This is **not** the first time that this Request is going through the application code, because the Live Connection had been established already. This should produce a Live Connection update.
+ * - **`liveConnection`:** Whether the Request is a Live Connection.
  */
 export type Request<Pathname, Search, Cookies, Body, State> =
   http.IncomingMessage & {
@@ -88,10 +83,7 @@ export type Request<Pathname, Search, Cookies, Body, State> =
     state: Partial<State>;
     error?: unknown;
     getFlash?: () => string | undefined;
-    liveConnection?:
-      | "connectingWithoutUpdate"
-      | "connectingWithUpdate"
-      | "connected";
+    liveConnection: boolean;
   };
 
 /**
@@ -144,7 +136,8 @@ type LiveConnection = {
   URL: URL;
   request?: Request<{}, {}, {}, {}, {}>;
   response?: Response;
-  update?: () => void;
+  updatePromise?: Promise<void>;
+  updateResolve?: () => void;
 };
 
 /**
@@ -346,6 +339,7 @@ export default function server({
             response.deleteCookie!("flash");
             return flash;
           };
+          request.liveConnection = false;
           response.setHeader("Content-Type", "text/html; charset=utf-8");
           response.mayStartLiveConnection = () =>
             request.method === "GET" &&
@@ -428,14 +422,7 @@ export default function server({
             liveConnection.state,
           );
           request.id = liveConnection.id;
-          request.liveConnection =
-            liveConnection.state === "waitingForConnectionWithoutUpdate"
-              ? "connectingWithoutUpdate"
-              : liveConnection.state === "waitingForConnectionWithUpdate"
-                ? "connectingWithUpdate"
-                : (() => {
-                    throw new Error("Invalid Live Connection state.");
-                  })();
+          request.liveConnection = true;
           response.setHeader(
             "Content-Type",
             "application/json-lines; charset=utf-8",
@@ -456,7 +443,7 @@ export default function server({
           const periodicUpdates = node.backgroundJob(
             { interval: 5 * 60 * 1000, firstRun: "delayed" },
             () => {
-              liveConnection!.update?.();
+              liveConnection!.updateResolve!();
             },
           );
           response.once("close", () => {
@@ -465,6 +452,11 @@ export default function server({
             periodicUpdates.stop();
             request.log("LIVE CONNECTION", "CLOSE");
           });
+          liveConnection.updatePromise = new Promise<void>((resolve) => {
+            liveConnection!.updateResolve = resolve;
+          });
+          if (liveConnection.state === "waitingForConnectionWithoutUpdate")
+            liveConnection!.updateResolve!();
           liveConnection.state = "connected";
           clearTimeout(liveConnection.waitingForConnectionTimeout);
           liveConnection.request = request;
@@ -478,10 +470,10 @@ export default function server({
         return;
       }
       while (true) {
-        let liveConnectionUpdatePromise;
         if (liveConnection !== undefined) {
-          liveConnectionUpdatePromise = new Promise<void>((resolve) => {
-            liveConnection.update = resolve;
+          await liveConnection.updatePromise!;
+          liveConnection.updatePromise = new Promise<void>((resolve) => {
+            liveConnection!.updateResolve = resolve;
           });
           request.log("LIVE CONNECTION", "REQUEST");
         }
@@ -539,31 +531,24 @@ export default function server({
           );
           return;
         }
-        if (liveConnection === undefined) {
-          if (response.mayStartLiveConnection()) {
-            const liveConnection = {
-              id: request.id,
-              state: "waitingForConnectionWithoutUpdate",
-              waitingForConnectionTimeout: setTimeout(() => {
-                liveConnections.delete(liveConnection.id);
-                request.log("LIVE CONNECTION", "DELETE");
-              }, 30 * 1000).unref(),
-              URL: request.URL,
-            } as const;
-            liveConnections.set(liveConnection.id, liveConnection);
-            request.log("LIVE CONNECTION", "CREATE");
-          }
-          request.log(
-            "RESPONSE",
-            String(response.statusCode),
-            String(response.getHeader("Location") ?? ""),
-          );
-          return;
-        } else {
-          request.liveConnection = "connected";
-          request.log("LIVE CONNECTION", "RESPONSE");
-          await liveConnectionUpdatePromise;
+        if (response.mayStartLiveConnection()) {
+          const liveConnection = {
+            id: request.id,
+            state: "waitingForConnectionWithoutUpdate",
+            waitingForConnectionTimeout: setTimeout(() => {
+              liveConnections.delete(liveConnection.id);
+              request.log("LIVE CONNECTION", "DELETE");
+            }, 30 * 1000).unref(),
+            URL: request.URL,
+          } as const;
+          liveConnections.set(liveConnection.id, liveConnection);
+          request.log("LIVE CONNECTION", "CREATE");
         }
+        request.log(
+          "RESPONSE",
+          String(response.statusCode),
+          String(response.getHeader("Location") ?? ""),
+        );
       }
     }) as (
       request: http.IncomingMessage,
@@ -650,7 +635,7 @@ export default function server({
             continue;
           if (liveConnection.state !== "connected")
             liveConnection.state = "waitingForConnectionWithUpdate";
-          else liveConnection.update?.();
+          else liveConnection.updateResolve!();
           await timers.setTimeout(200, undefined, { ref: false });
         }
       },
