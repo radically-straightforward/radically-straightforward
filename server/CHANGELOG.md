@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.0.1 · 2025-11-26
+
+- **Breaking change:** Requests don’t go through the application routes when a Live Connection connects and doesn’t need an update. The `request.liveConnection` field becomes a boolean.
+
 ## 2.0.0 · 2025-11-25
 
 - **Breaking change:** Introduced `response.send()`, which must be used instead of `response.end()`.
