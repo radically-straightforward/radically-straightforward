@@ -455,7 +455,7 @@ export default function server({
           liveConnection.updatePromise = new Promise<void>((resolve) => {
             liveConnection!.updateResolve = resolve;
           });
-          if (liveConnection.state === "waitingForConnectionWithoutUpdate")
+          if (liveConnection.state === "waitingForConnectionWithUpdate")
             liveConnection!.updateResolve!();
           liveConnection.state = "connected";
           clearTimeout(liveConnection.waitingForConnectionTimeout);
