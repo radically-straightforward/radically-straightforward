@@ -599,7 +599,7 @@ test(async () => {
         .pipeThrough(new utilities.JSONLinesTransformStream())
         .getReader();
       let responseBodyRequestLiveConnection;
-      assert.rejects(async () => {
+      await assert.rejects(async () => {
         await utilities.timeout(1000, async () => {
           responseBodyRequestLiveConnection = JSON.parse(
             (await responseBodyReader.read()).value,

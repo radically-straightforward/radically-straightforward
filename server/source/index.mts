@@ -469,7 +469,7 @@ export default function server({
         request.log("ERROR", String(response.statusCode), String(error));
         return;
       }
-      while (true) {
+      do {
         if (liveConnection !== undefined) {
           await liveConnection.updatePromise!;
           liveConnection.updatePromise = new Promise<void>((resolve) => {
@@ -549,7 +549,7 @@ export default function server({
           String(response.statusCode),
           String(response.getHeader("Location") ?? ""),
         );
-      }
+      } while (liveConnection !== undefined);
     }) as (
       request: http.IncomingMessage,
       response: http.ServerResponse,
