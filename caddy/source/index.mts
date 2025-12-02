@@ -194,6 +194,7 @@ export function application({
           .map((port) => `http://localhost:${port}`)
           .join(" ")} {
             lb_policy cookie
+            ${systemAdministratorEmail === undefined ? `trusted_proxies private_ranges` : ``}
           }
       }
     }
