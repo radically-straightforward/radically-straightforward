@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.0.7 · 2025-12-02
+
+- When running in development mode, trust proxy headers, which is necessary for port forwarding.
+
 ## 2.0.6 · 2025-03-15
 
 - Changed `Content-Security-Policy` header to work around a bug in Safari.
