@@ -15,6 +15,7 @@ $ npm install --save-dev @radically-straightforward/typescript
 ```json
 {
   "extends": "@radically-straightforward/typescript",
+  "include": ["source/**/*"],
   "compilerOptions": {
     "rootDir": "./source/",
     "outDir": "./build/"

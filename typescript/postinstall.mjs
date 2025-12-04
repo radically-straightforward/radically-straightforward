@@ -10,6 +10,7 @@ if ((await fs.access(tsconfig).catch(() => false)) === false)
     tsconfig,
     `{
   "extends": "@radically-straightforward/typescript",
+  "include": ["source/**/*"],
   "compilerOptions": {
     "rootDir": "./source/",
     "outDir": "./build/"
