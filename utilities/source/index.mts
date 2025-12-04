@@ -119,7 +119,7 @@ export function dedent(
   templateStrings: TemplateStringsArray,
   ...substitutions: any[]
 ) {
-  const indentationLevel = templateStrings
+  let indentationLevel = templateStrings
     .join("")
     .split("\n")
     .reduce(
@@ -129,6 +129,7 @@ export function dedent(
           : Math.min(indentationLevel, line.match(/^[ ]*/)![0].length),
       Infinity,
     );
+  if (indentationLevel === Infinity) indentationLevel = 0;
   let output = "";
   for (const index of substitutions.keys()) {
     output += templateStrings[index].replaceAll(

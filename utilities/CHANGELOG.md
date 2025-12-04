@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.0.20 · 2025-12-04
+
+- Fixed `dedent("")`.
+
 ## 2.0.19 · 2025-11-20
 
 - On `backgroundJob()`, add a parameter to control when the first run happens.

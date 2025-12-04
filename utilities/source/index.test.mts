@@ -59,9 +59,9 @@ test("capitalize()", () => {
 });
 
 test("dedent()", () => {
+  assert.equal(utilities.dedent``, "");
   const exampleOfInterpolatedString =
     "example of\n an interpolated string including a newline and indentation";
-
   assert.equal(
     utilities.dedent`
       Here is an
