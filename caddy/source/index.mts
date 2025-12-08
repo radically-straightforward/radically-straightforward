@@ -138,6 +138,8 @@ export function application({
     }
 
     ${systemAdministratorEmail !== undefined ? hostname : `localhost`} {
+      encode
+
       header ?Strict-Transport-Security "max-age=31536000; includeSubDomains${
         hstsPreload ? `; preload` : ``
       }"

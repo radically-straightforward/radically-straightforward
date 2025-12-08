@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.0.8 · 2025-12-08
+
+- Compress responses.
+
 ## 2.0.7 · 2025-12-02
 
 - When running in development mode, trust proxy headers, which is necessary for port forwarding.
