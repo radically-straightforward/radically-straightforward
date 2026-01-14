@@ -1,5 +1,9 @@
 # Changelog
 
+## 4.0.35 · 2026-01-14
+
+- Changed Live Navigation to perform a request even if the request URL is the same current URL.
+
 ## 4.0.34 · 2025-11-25
 
 - Replace `onchange` events with `oninput`.

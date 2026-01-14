@@ -101,7 +101,8 @@ async function liveNavigate(request, { stateAlreadyPushed = false } = {}) {
   if (
     request.method === "GET" &&
     liveNavigate.previousLocation.pathname === requestURL.pathname &&
-    liveNavigate.previousLocation.search === requestURL.search
+    liveNavigate.previousLocation.search === requestURL.search &&
+    liveNavigate.previousLocation.hash !== requestURL.hash
   ) {
     if (!stateAlreadyPushed)
       window.history.pushState(null, "", requestURL.href);
