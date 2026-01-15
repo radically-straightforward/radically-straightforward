@@ -774,34 +774,3 @@ export function foregroundJob(
     }
   }
 }
-
-/**
- * An in-memory caching mechanism with the Least Recently Used (LRU) policy.
- *
- * Designed for simple tasks, for example, caching visited pages in Live Navigation.
- *
- * Designed for values that take a long time to produce, for example, a page in Live Navigation.
- *
- * Not designed for frequent access.
- */
-export class Cache<Type> {
-  #storage = new Map<string, Type>();
-
-  constructor(public size: number = 15) {}
-
-  set(key: string, value: Type): void {
-    this.#storage.delete(key);
-    this.#storage.set(key, value);
-    for (const key of [...this.#storage.keys()].slice(0, -this.size))
-      this.#storage.delete(key);
-  }
-
-  get(key: string): Type | undefined {
-    const value = this.#storage.get(key);
-    if (value !== undefined) {
-      this.#storage.delete(key);
-      this.#storage.set(key, value);
-    }
-    return value;
-  }
-}

@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.0.21 · 2026-01-15
+
+- Removed `Cache`, because it became so specific to Live Navigation cache that it was moved there.
+
 ## 2.0.20 · 2025-12-04
 
 - Fixed `dedent("")`.
