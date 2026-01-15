@@ -12,7 +12,7 @@ document.addEventListener("DOMContentLoaded", () => {
       new XMLSerializer().serializeToString(document),
     );
   execute(document.querySelector("html"));
-  if (documentState === "initial" || documentState === "liveNavigating")
+  if (documentState === "initial" || documentState === "liveNavigated")
     documentState = "loaded";
 });
 
@@ -111,12 +111,11 @@ async function liveNavigate(request, { stateAlreadyPushed = false } = {}) {
       document.getElementById(requestURL.hash.slice(1))?.scrollIntoView();
     return;
   }
-  if (documentState === "liveConnection") liveConnection.backgroundJob.stop();
+  if (documentState === "liveConnected") liveConnection.backgroundJob.stop();
   documentState = "liveNavigating";
   const cachedResponseText =
     request.method === "GET" ? liveNavigate.cache.get(request.url) : undefined;
-  if (typeof cachedResponseText === "string")
-    documentMount(cachedResponseText, { dispatchDOMContentLoaded: false });
+  if (typeof cachedResponseText === "string") documentMount(cachedResponseText);
   const progressBar = document
     .querySelector("body")
     .insertAdjacentElement(
@@ -181,6 +180,7 @@ async function liveNavigate(request, { stateAlreadyPushed = false } = {}) {
   )
     window.history.pushState(null, "", responseURL.href);
   liveNavigate.previousLocation = { ...window.location };
+  documentState = "liveNavigated";
   documentMount(responseText);
   if (responseURL.hash.trim() !== "")
     document.getElementById(responseURL.hash.slice(1))?.scrollIntoView();
@@ -246,7 +246,8 @@ export async function liveConnection(
   requestId,
   { reloadOnReconnect = false } = {},
 ) {
-  documentState = "liveConnection";
+  if (documentState === "liveNavigating") return;
+  documentState = "liveConnected";
   let reloadOnConnect = false;
   let abortController;
   let abortControllerTimeout;
@@ -334,10 +335,7 @@ liveConnection.backgroundJob = undefined;
  *
  * If the `document` and the `content` have `<meta name="version" content="___" />` with different `content`s, then `documentMount()` displays an error message in an element with `key="global-error"` which you may style.
  */
-export function documentMount(
-  content,
-  { dispatchDOMContentLoaded = true } = {},
-) {
+export function documentMount(content) {
   if (typeof content === "string") content = documentStringToElement(content);
   const documentVersion = document
     .querySelector('meta[name="version"]')
@@ -365,8 +363,7 @@ export function documentMount(
     return;
   }
   morph(document.querySelector("html"), content);
-  if (dispatchDOMContentLoaded)
-    document.dispatchEvent(new Event("DOMContentLoaded"));
+  document.dispatchEvent(new Event("DOMContentLoaded"));
 }
 
 /**

@@ -1,5 +1,7 @@
 # Changelog
 
+- Fixed visual glitches in Live Navigation cache by `execute()`ing the JavaScript of the page retried from cache.
+
 ## 4.0.36 · 2026-01-15
 
 - Fixed a Live Navigation cache issue: A route that used to produce an HTML and becomes a redirect didn’t get evicted from the cache, because `get()` put it at the front of the LRU queue.
