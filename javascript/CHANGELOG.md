@@ -1,6 +1,10 @@
 # Changelog
 
 - Fixed visual glitches in Live Navigation cache by `execute()`ing the JavaScript of the page retried from cache.
+- Made the following functions private:
+  - `documentMount()`
+  - `morph()`
+  - `documentStringToElement()`
 
 ## 4.0.36 · 2026-01-15
 

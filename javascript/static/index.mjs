@@ -96,6 +96,11 @@ window.addEventListener("beforeunload", (event) => {
     event.preventDefault();
 });
 
+/*
+ * Internal navigation within the application that doesn’t cause a full-page reload. Beyond the benefits of not reloading CSS and JavaScript, this maintains client-side state, for example, the scrolling position of a sidebar.
+ *
+ * This is similar to [Turbo Drive](https://turbo.hotwired.dev/handbook/drive), but it’s aware of Live Connections.
+ */
 async function liveNavigate(request, { stateAlreadyPushed = false } = {}) {
   const requestURL = new URL(request.url);
   if (
@@ -328,14 +333,12 @@ export async function liveConnection(
 }
 liveConnection.backgroundJob = undefined;
 
-/**
- * > **Note:** This is a low-level function used by Live Navigation and Live Connection updates.
- *
+/*
  * Similar to `mount()`, but suited for morphing the entire `document`, for example, `documentMount()` dispatches the `DOMContentLoaded` event.
  *
  * If the `document` and the `content` have `<meta name="version" content="___" />` with different `content`s, then `documentMount()` displays an error message in an element with `key="global-error"` which you may style.
  */
-export function documentMount(content) {
+function documentMount(content) {
   if (typeof content === "string") content = documentStringToElement(content);
   const documentVersion = document
     .querySelector('meta[name="version"]')
@@ -377,9 +380,7 @@ export function mount(element, content) {
   element.morph = false;
 }
 
-/**
- * > **Note:** This is a low-level function—in most cases you want to call `mount()` instead.
- *
+/*
  * Morph the contents of the `from` element into the contents of the `to` element with minimal DOM manipulation by using a diffing algorithm.
  *
  * Elements may provide a `key="___"` attribute to help identify them with respect to the diffing algorithm. This is similar to [React’s `key`s](https://react.dev/learn/rendering-lists#keeping-list-items-in-order-with-key), but sibling elements may have the same `key` (at the risk of potentially getting them mixed up if they’re reordered).
@@ -408,7 +409,7 @@ export function mount(element, content) {
  *
  * `morph()` is different from [React](https://react.dev/) in that it works with the DOM, not a Virtual DOM.
  */
-export function morph(from, to) {
+function morph(from, to) {
   if (from.morph === false) return;
   if (
     from.matches("input, textarea") &&
@@ -534,10 +535,10 @@ export function execute(element) {
 }
 execute.functions = new Map();
 
-/**
+/*
  * Similar to `stringToElement()` but for a `string` which is a whole document, for example, starting with `<!DOCTYPE html>`. [`document.adoptNode()`](https://developer.mozilla.org/en-US/docs/Web/API/Document/adoptNode) is used so that the resulting element belongs to the current `document`.
  */
-export function documentStringToElement(string) {
+function documentStringToElement(string) {
   return document.adoptNode(
     new DOMParser().parseFromString(string, "text/html").querySelector("html"),
   );

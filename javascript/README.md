@@ -166,21 +166,6 @@ html`
 `;
 ```
 
-### `documentMount()`
-
-```typescript
-export function documentMount(
-  content,
-  { dispatchDOMContentLoaded = true } = {},
-);
-```
-
-> **Note:** This is a low-level function used by Live Navigation and Live Connection updates.
-
-Similar to `mount()`, but suited for morphing the entire `document`, for example, `documentMount()` dispatches the `DOMContentLoaded` event.
-
-If the `document` and the `content` have `<meta name="version" content="___" />` with different `content`s, then `documentMount()` displays an error message in an element with `key="global-error"` which you may style.
-
 ### `mount()`
 
 ```typescript
@@ -188,42 +173,6 @@ export function mount(element, content);
 ```
 
 `morph()` the `element` container to include `content`. `execute()` the browser JavaScript in the `element`. Protect the `element` from changing in Live Connection updates.
-
-### `morph()`
-
-```typescript
-export function morph(from, to);
-```
-
-> **Note:** This is a low-level function—in most cases you want to call `mount()` instead.
-
-Morph the contents of the `from` element into the contents of the `to` element with minimal DOM manipulation by using a diffing algorithm.
-
-Elements may provide a `key="___"` attribute to help identify them with respect to the diffing algorithm. This is similar to [React’s `key`s](https://react.dev/learn/rendering-lists#keeping-list-items-in-order-with-key), but sibling elements may have the same `key` (at the risk of potentially getting them mixed up if they’re reordered).
-
-Elements may define a `state="___"` attribute, typically through the `state___()` functions below, which is not morphed and is meant to include browser state, for example, whether a sidebar is open.
-
-In general, the following attributes aren’t morphed: `state`, `style`, `hidden`, `open`, and `disabled`.
-
-Elements may set a `morph` attribute, which when `false` prevents the element from being morphed. This is useful, for example, for elements that have been `mount()`ed and shouldn’t be removed.
-
-> **Note:** `to` is expected to already belong to the `document`. You may need to call [`importNode()`](https://developer.mozilla.org/en-US/docs/Web/API/Document/importNode) or [`adoptNode()`](https://developer.mozilla.org/en-US/docs/Web/API/Document/adoptNode) on a node before passing it to `morph()`. `documentStringToElement()` does that for you.
-
-> **Note:** `to` is mutated destructively in the process of morphing. Create a clone of `to` before passing it into `morph()` if you wish to continue using it.
-
-> **Note:** Elements may define an `onremove()` function, which is called before the element is removed during morphing. This is useful, for example, to prevent leaks of attached `IntersectionObserver`s and `MutationObserver`s by calling [`IntersectionObserver.disconnect()`](https://developer.mozilla.org/en-US/docs/Web/API/IntersectionObserver/disconnect) and [`MutationObserver.disconnect()`](https://developer.mozilla.org/en-US/docs/Web/API/MutationObserver/disconnect).
-
-**Related Work**
-
-`morph()` is different from `from.innerHTML = to.innerHTML` because setting `innerHTML` loses browser state, for example, form inputs, scrolling position, and so forth.
-
-`morph()` is different form [`morphdom`](https://github.com/patrick-steele-idem/morphdom) and its derivatives in the following ways:
-
-- `morph()` deals better with insertions/deletions/moves in the middle of a list. In some situations `morphdom` touches all subsequent elements, while `morph()` tends to only touch the affected elements.
-
-- `morph()` supports `key="___"` instead of `morphdom`’s `id="___"`s. `key`s don’t have to be unique across the document and don’t even have to be unique across the element siblings—they’re just a hint at the identity of the element that’s used in the diffing process.
-
-`morph()` is different from [React](https://react.dev/) in that it works with the DOM, not a Virtual DOM.
 
 ### `execute()`
 
@@ -245,14 +194,6 @@ javascript.execute(
     ),
 );
 ```
-
-### `documentStringToElement()`
-
-```typescript
-export function documentStringToElement(string);
-```
-
-Similar to `stringToElement()` but for a `string` which is a whole document, for example, starting with `<!DOCTYPE html>`. [`document.adoptNode()`](https://developer.mozilla.org/en-US/docs/Web/API/Document/adoptNode) is used so that the resulting element belongs to the current `document`.
 
 ### `stringToElements()`
 
