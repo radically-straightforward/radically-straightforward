@@ -1,6 +1,6 @@
 {
   "name": "@radically-straightforward/sqlite",
-  "version": "1.1.13",
+  "version": "1.1.14",
   "description": "🗃️ SQLite with tagged templates and migrations",
   "keywords": [
     "sqlite",
@@ -30,15 +30,15 @@
   },
   "dependencies": {
     "@radically-straightforward/node": "^3.1.9",
-    "@radically-straightforward/utilities": "^2.0.19",
+    "@radically-straightforward/utilities": "^2.0.20",
     "@types/better-sqlite3": "^7.6.13",
-    "better-sqlite3": "^12.4.1"
+    "better-sqlite3": "^12.6.0"
   },
   "devDependencies": {
     "@radically-straightforward/documentation": "^1.0.7",
-    "@radically-straightforward/typescript": "^1.0.0",
-    "@types/node": "^24.10.1",
-    "prettier": "^3.6.2",
+    "@radically-straightforward/typescript": "^1.0.1",
+    "@types/node": "^25.0.8",
+    "prettier": "^3.8.0",
     "typescript": "^5.9.3"
   },
   "prettier": {}
