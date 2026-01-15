@@ -186,7 +186,20 @@ async function liveNavigate(request, { stateAlreadyPushed = false } = {}) {
     document.getElementById(responseURL.hash.slice(1))?.scrollIntoView();
   document.querySelector("[autofocus]")?.focus();
 }
-liveNavigate.cache = new utilities.Cache();
+liveNavigate.cache = {
+  storage: new Map(),
+  set: (key, value) => {
+    liveNavigate.cache.storage.delete(key);
+    liveNavigate.cache.storage.set(key, value);
+    for (const key of [...liveNavigate.cache.storage.keys()].slice(0, -15))
+      liveNavigate.cache.storage.delete(key);
+  },
+  get: (key) => {
+    const value = liveNavigate.cache.storage.get(key);
+    liveNavigate.cache.storage.delete(key);
+    return value;
+  },
+};
 liveNavigate.abortController = undefined;
 liveNavigate.previousLocation = { ...window.location };
 
