@@ -17,13 +17,16 @@ if (process.argv[2] === "postinstall") {
     ).caddy;
   } catch {}
   if (version === undefined)
-    version = (
-      await (
-        await fetch(
-          "https://api.github.com/repos/caddyserver/caddy/releases/latest",
-        )
-      ).json()
-    ).tag_name.slice(1);
+    try {
+      version = (
+        await (
+          await fetch(
+            "https://api.github.com/repos/caddyserver/caddy/releases/latest",
+          )
+        ).json()
+      ).tag_name.slice(1);
+    } catch {}
+  if (version === undefined) version = "2.10.2";
   const downloadDirectory = await fs.mkdtemp(
     path.join(os.tmpdir(), "radically-straightforward--caddy--"),
   );
