@@ -24,7 +24,6 @@ if (process.argv[2] === "postinstall") {
         )
       ).json()
     ).tag_name.slice(1);
-
   const downloadDirectory = await fs.mkdtemp(
     path.join(os.tmpdir(), "radically-straightforward--caddy--"),
   );
