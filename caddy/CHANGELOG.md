@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.0.9 · 2026-01-16
+
+- Have a default version in case the GitHub API isn’t accessible, which should fix intermittent issues in builds in GitHub Actions in macOS.
+
 ## 2.0.8 · 2025-12-08
 
 - Compress responses.
