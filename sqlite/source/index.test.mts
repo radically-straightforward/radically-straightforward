@@ -140,7 +140,7 @@ test("Database", async () => {
     database.executeTransaction<void>(() => {
       database.run(
         sql`
-          insert into "users" ("name") values (${"Abigail Wall"});
+          insert into "users" ("name") values (${"Scott Smith"});
         `,
       );
       throw new Error();
@@ -149,7 +149,7 @@ test("Database", async () => {
   assert.equal(
     database.get<{ id: number; name: string }>(
       sql`
-        select "id", "name" from "users" where "name" = ${"Abigail Wall"};
+        select "id", "name" from "users" where "name" = ${"Scott Smith"};
       `,
     ),
     undefined,
@@ -158,7 +158,7 @@ test("Database", async () => {
     database.executeTransaction<ReturnType<Database["run"]>>(() => {
       return database.run(
         sql`
-          insert into "users" ("name") values (${"Abigail Wall"});
+          insert into "users" ("name") values (${"Scott Smith"});
         `,
       );
     }),
@@ -167,10 +167,10 @@ test("Database", async () => {
   assert.deepEqual(
     database.all<{ id: number; name: string }>(
       sql`
-        select "id", "name" from "users" where "name" = ${"Abigail Wall"};
+        select "id", "name" from "users" where "name" = ${"Scott Smith"};
       `,
     ),
-    [{ id: 4, name: "Abigail Wall" }],
+    [{ id: 4, name: "Scott Smith" }],
   );
 
   let runsToCompletion = 0;

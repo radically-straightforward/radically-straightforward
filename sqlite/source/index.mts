@@ -698,7 +698,7 @@ export type Query = {
  * ```javascript
  * sql`select "id", "name" from "users" where "name" in ${[
  *   "Leandro Facchinetti",
- *   "David Adler",
+ *   "Scott Smith",
  * ]};`;
  * ```
  *

@@ -418,7 +418,7 @@ Arrays and Sets may be interpolated for `in` clauses, for example:
 ```javascript
 sql`select "id", "name" from "users" where "name" in ${[
   "Leandro Facchinetti",
-  "David Adler",
+  "Scott Smith",
 ]};`;
 ```
 

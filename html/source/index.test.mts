@@ -98,18 +98,18 @@ test("html`___`", () => {
 test("sanitize()", () => {
   assert.equal(
     htmlUtilities.sanitize(
-      `"Leandro Facchinetti \u{0}\b<radically-straightforward@leafac.com>" & 'Louie'`,
+      `"Leandro Facchinetti \u{0}\b<radically-straightforward@leafac.com>" & 'Scott'`,
     ),
-    `&quot;Leandro Facchinetti &lt;radically-straightforward@leafac.com&gt;&quot; &amp; &apos;Louie&apos;`,
+    `&quot;Leandro Facchinetti &lt;radically-straightforward@leafac.com&gt;&quot; &amp; &apos;Scott&apos;`,
   );
 });
 
 test("escape()", () => {
   assert.equal(
     htmlUtilities.escape(
-      `"Leandro Facchinetti <radically-straightforward@leafac.com>" & 'Louie'`,
+      `"Leandro Facchinetti <radically-straightforward@leafac.com>" & 'Scott'`,
     ),
-    `&quot;Leandro Facchinetti &lt;radically-straightforward@leafac.com&gt;&quot; &amp; &apos;Louie&apos;`,
+    `&quot;Leandro Facchinetti &lt;radically-straightforward@leafac.com&gt;&quot; &amp; &apos;Scott&apos;`,
   );
 });
 
