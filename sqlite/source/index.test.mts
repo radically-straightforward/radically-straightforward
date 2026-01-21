@@ -43,10 +43,10 @@ test("Database", async () => {
   assert.deepEqual(
     database.get<{ id: number; name: string }>(
       sql`
-        insert into "users" ("name") values (${"Louie Renner"}) returning *;
+        insert into "users" ("name") values (${"Ali Madooei"}) returning *;
       `,
     ),
-    { id: 3, name: "Louie Renner" },
+    { id: 3, name: "Ali Madooei" },
   );
 
   assert.deepEqual(
@@ -76,7 +76,7 @@ test("Database", async () => {
     [
       { id: 1, name: "Leandro Facchinetti" },
       { id: 2, name: "David Adler" },
-      { id: 3, name: "Louie Renner" },
+      { id: 3, name: "Ali Madooei" },
     ],
   );
 
@@ -130,7 +130,7 @@ test("Database", async () => {
     [
       { id: 1, name: "Leandro Facchinetti" },
       { id: 2, name: "David Adler" },
-      { id: 3, name: "Louie Renner" },
+      { id: 3, name: "Ali Madooei" },
     ],
   );
 
