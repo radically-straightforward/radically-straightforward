@@ -227,7 +227,7 @@ export default function server({
           (request.headers["cookie"] ?? "").split(";").flatMap((pair) => {
             if (pair.trim() === "") return [];
             const parts = pair
-              .split("=")
+              .split(/(?<=^[^=]+)=/u)
               .map((part) => decodeURIComponent(part.trim()));
             if (parts.length !== 2 || parts.some((part) => part === ""))
               throw new Error("Malformed ‘Cookie’ header.");

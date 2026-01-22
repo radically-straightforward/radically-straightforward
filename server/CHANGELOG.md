@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.0.3 · 2026-01-22
+
+- Fixed an issue in parsing cookies whose values include the character `=`.
+
 ## 2.0.2 · 2026-01-22
 
 - Increased the limits on form fields.
