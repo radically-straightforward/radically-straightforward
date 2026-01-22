@@ -195,7 +195,7 @@ test(async () => {
     {
       const response = await fetch("http://localhost:18000/", {
         headers: Object.fromEntries(
-          Array.from({ length: 1000 }, (value, key) => [
+          Array.from({ length: 10_001 }, (value, key) => [
             `Example-Header--${key}`,
             "TOO MANY HEADERS",
           ]),
@@ -239,7 +239,7 @@ test(async () => {
         headers: { "CSRF-Protection": "true" },
         body: new URLSearchParams(
           Object.fromEntries(
-            Array.from({ length: 1000 }, (value, key) => [
+            Array.from({ length: 10_001 }, (value, key) => [
               `bodyStringExample--${key}`,
               "1",
             ]),
@@ -293,7 +293,7 @@ test(async () => {
       const requestBody = new FormData();
       for (
         let bodyFileExampleCount = 0;
-        bodyFileExampleCount < 1000;
+        bodyFileExampleCount < 1_001;
         bodyFileExampleCount++
       )
         requestBody.append(

@@ -252,11 +252,11 @@ export default function server({
                 headers: request.headers,
                 preservePath: true,
                 limits: {
-                  headerPairs: 200,
-                  fields: 300,
-                  fieldNameSize: 300,
+                  headerPairs: 10_000,
+                  fields: 10_000,
+                  fieldNameSize: 1_000,
                   fieldSize: 2 ** 20,
-                  files: 100,
+                  files: 1_000,
                   fileSize: 10 * 2 ** 20,
                 },
               })

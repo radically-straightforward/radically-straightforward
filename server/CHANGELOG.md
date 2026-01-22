@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.0.2 · 2026-01-22
+
+- Increased the limits on form fields.
+
 ## 2.0.1 · 2025-11-26
 
 - **Breaking change:** Requests don’t go through the application routes when a Live Connection connects and doesn’t need an update. The `request.liveConnection` field becomes a boolean.
