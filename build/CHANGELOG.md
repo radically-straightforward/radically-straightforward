@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.0.17 · 2026-01-23
+
+- Changed from [`globby`](https://www.npmjs.com/package/globby) to [Node.js’s `fs.glob()`](https://nodejs.org/docs/latest/api/fs.html#fspromisesglobpattern-options).
+
 ## 2.0.12 · 2025-09-04
 
 - Added support for `` html`___` `` in `` css`___` ``.

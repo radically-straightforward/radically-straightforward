@@ -1,6 +1,6 @@
 {
   "name": "@radically-straightforward/build",
-  "version": "2.0.16",
+  "version": "2.0.17",
   "description": "🏗️ Build static assets",
   "keywords": [
     "build",
@@ -36,7 +36,6 @@
     "@radically-straightforward/javascript": "^4.0.29",
     "base-x": "^5.0.1",
     "esbuild": "^0.27.0",
-    "globby": "^16.0.0",
     "make-synchronized": "^0.8.0",
     "postcss": "^8.5.6",
     "prettier": "^3.6.2",

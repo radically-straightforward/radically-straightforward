@@ -3,7 +3,6 @@
 import path from "node:path";
 import fs from "node:fs/promises";
 import util from "node:util";
-import { globby } from "globby";
 import babel from "@babel/core";
 import babelGenerator from "@babel/generator";
 // @ts-ignore
@@ -38,7 +37,7 @@ const inlineCSSs = new Set<CSS>();
 const globalJavaScripts = new Array<JavaScript>();
 const inlineJavaScripts = new Set<JavaScript>();
 const baseIdentifier = baseX("abcdefghijklmnopqrstuvwxyz");
-for (const source of await globby("./build/**/*.mjs")) {
+for await (const source of fs.glob("./build/**/*.mjs")) {
   const babelResult = await babel.transformFileAsync(source, {
     compact: false,
     sourceMaps: true,
@@ -218,8 +217,8 @@ await fs.writeFile(
 );
 
 const baseFileHash = baseX("ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789");
-for (const source of await globby([
-  "./static/",
+for await (const source of fs.glob([
+  "./static/**/*.*",
   ...commandLineArguments.values["copy-with-hash"]!,
 ])) {
   const destination = path.join(
@@ -236,7 +235,7 @@ for (const source of await globby([
 
 await fs.writeFile("./build/static.json", JSON.stringify(paths, undefined, 2));
 
-for (const source of await globby([
+for await (const source of fs.glob([
   "./static/favicon.ico",
   "./static/apple-touch-icon.png",
   ...commandLineArguments.values["copy-without-hash"]!,
