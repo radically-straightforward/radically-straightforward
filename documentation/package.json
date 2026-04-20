@@ -1,6 +1,6 @@
 {
   "name": "@radically-straightforward/documentation",
-  "version": "1.0.8",
+  "version": "1.0.9",
   "description": "📚 Extract documentation from TypeScript source files to Markdown",
   "keywords": [
     "documentation",
@@ -33,7 +33,7 @@
     "prettier": "^3.8.3"
   },
   "devDependencies": {
-    "@radically-straightforward/typescript": "^1.0.3",
+    "@radically-straightforward/typescript": "^1.0.4",
     "@radically-straightforward/utilities": "^2.0.22",
     "@types/babel__core": "^7.20.5",
     "@types/babel__generator": "^7.27.0",
