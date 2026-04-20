@@ -1,6 +1,6 @@
 {
   "name": "@radically-straightforward/development",
-  "version": "1.0.77",
+  "version": "1.0.78",
   "description": "🧰 Radically Straightforward packages for development",
   "keywords": [
     "radically straightforward",
@@ -24,11 +24,11 @@
     "test": ""
   },
   "dependencies": {
-    "@radically-straightforward/build": "^2.0.17",
-    "@radically-straightforward/css": "^3.0.2",
-    "@radically-straightforward/documentation": "^1.0.7",
-    "@radically-straightforward/javascript": "^4.0.37",
-    "@radically-straightforward/package": "^2.0.3",
-    "@radically-straightforward/typescript": "^1.0.3"
+    "@radically-straightforward/build": "^2.0.18",
+    "@radically-straightforward/css": "^3.0.3",
+    "@radically-straightforward/documentation": "^1.0.9",
+    "@radically-straightforward/javascript": "^4.0.38",
+    "@radically-straightforward/package": "^2.0.4",
+    "@radically-straightforward/typescript": "^1.0.4"
   }
 }
