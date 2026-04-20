@@ -35,7 +35,7 @@
     "test": "npm run prepare && node --test \"./build/**/*.test.mjs\" && prettier --check ./README.md ./CHANGELOG.md ./package.json ./tsconfig.json ./source/ ./static/"
   },
   "dependencies": {
-    "@floating-ui/dom": "^1.7.4",
+    "@floating-ui/dom": "^1.7.6",
     "@radically-straightforward/css": "^3.0.2",
     "@radically-straightforward/html": "^1.0.1",
     "@radically-straightforward/utilities": "^2.0.21",
@@ -44,11 +44,11 @@
   "devDependencies": {
     "@csstools/postcss-light-dark-function": "^3.0.0",
     "@radically-straightforward/documentation": "^1.0.7",
-    "@radically-straightforward/typescript": "^1.0.1",
-    "@types/node": "^25.0.8",
-    "postcss": "^8.5.6",
-    "prettier": "^3.8.0",
-    "typescript": "^5.9.3"
+    "@radically-straightforward/typescript": "^1.0.3",
+    "@types/node": "^25.6.0",
+    "postcss": "^8.5.10",
+    "prettier": "^3.8.3",
+    "typescript": "^6.0.3"
   },
   "prettier": {}
 }

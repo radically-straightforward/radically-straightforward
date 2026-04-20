@@ -561,18 +561,4 @@ This is different from Lodash’s [`debounce()`](https://lodash.com/docs/4.17.15
 
 There’s a promise available under the `.promise` property of the returned value that resolves when there’s no job running. It’s useful to synchronize actions that must wait on the job to be over.
 
-### `Cache`
-
-```typescript
-export class Cache<Type>;
-```
-
-An in-memory caching mechanism with the Least Recently Used (LRU) policy.
-
-Designed for simple tasks, for example, caching visited pages in Live Navigation.
-
-Designed for values that take a long time to produce, for example, a page in Live Navigation.
-
-Not designed for frequent access.
-
 <!-- DOCUMENTATION END: ./source/index.mts -->

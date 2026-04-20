@@ -29,6 +29,6 @@
     "@radically-straightforward/documentation": "^1.0.7",
     "@radically-straightforward/javascript": "^4.0.37",
     "@radically-straightforward/package": "^2.0.3",
-    "@radically-straightforward/typescript": "^1.0.2"
+    "@radically-straightforward/typescript": "^1.0.3"
   }
 }

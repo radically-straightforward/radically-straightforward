@@ -42,7 +42,7 @@
     "xxhash-addon": "^2.1.0"
   },
   "devDependencies": {
-    "@radically-straightforward/typescript": "^1.0.2",
+    "@radically-straightforward/typescript": "^1.0.3",
     "@types/babel__core": "^7.20.5",
     "@types/babel__generator": "^7.27.0",
     "@types/node": "^25.6.0",

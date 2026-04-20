@@ -33,7 +33,7 @@
     "prettier": "^3.8.3"
   },
   "devDependencies": {
-    "@radically-straightforward/typescript": "^1.0.2",
+    "@radically-straightforward/typescript": "^1.0.3",
     "@radically-straightforward/utilities": "^2.0.21",
     "@types/babel__core": "^7.20.5",
     "@types/babel__generator": "^7.27.0",

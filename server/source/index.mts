@@ -607,7 +607,6 @@ export default function server({
         )
           throw "validation";
         response.setHeader("Content-Type", destinationResponseContentType);
-        // @ts-expect-error: https://github.com/DefinitelyTyped/DefinitelyTyped/discussions/68986
         stream.pipeline(destinationResponse.body, response);
         response.ended = true;
       },
