@@ -1,6 +1,6 @@
 {
   "name": "@radically-straightforward/server",
-  "version": "2.0.3",
+  "version": "2.0.4",
   "description": "🦾 HTTP server in Node.js",
   "keywords": [
     "server",
@@ -27,14 +27,14 @@
     "test": "npm run prepare && node --test \"./build/**/*.test.mjs\" && prettier --check ./README.md ./CHANGELOG.md ./package.json ./tsconfig.json ./source/"
   },
   "dependencies": {
-    "@radically-straightforward/node": "^3.1.9",
-    "@radically-straightforward/utilities": "^2.0.21",
+    "@radically-straightforward/node": "^3.1.10",
+    "@radically-straightforward/utilities": "^2.0.23",
     "@types/busboy": "^1.5.4",
     "busboy": "^1.6.0"
   },
   "devDependencies": {
-    "@radically-straightforward/documentation": "^1.0.7",
-    "@radically-straightforward/typescript": "^1.0.3",
+    "@radically-straightforward/documentation": "^1.0.9",
+    "@radically-straightforward/typescript": "^1.0.4",
     "@types/node": "^25.6.0",
     "prettier": "^3.8.3",
     "typescript": "^6.0.3"
