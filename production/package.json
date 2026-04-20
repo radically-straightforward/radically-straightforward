@@ -1,6 +1,6 @@
 {
   "name": "@radically-straightforward/production",
-  "version": "1.0.63",
+  "version": "1.0.65",
   "description": "🧰 Radically Straightforward packages for production",
   "keywords": [
     "radically straightforward",
@@ -24,12 +24,12 @@
     "test": ""
   },
   "dependencies": {
-    "@radically-straightforward/caddy": "^2.0.9",
-    "@radically-straightforward/examples": "^1.0.1",
-    "@radically-straightforward/html": "^1.0.1",
-    "@radically-straightforward/node": "^3.1.9",
-    "@radically-straightforward/server": "^2.0.3",
-    "@radically-straightforward/sqlite": "^1.1.14",
-    "@radically-straightforward/utilities": "^2.0.21"
+    "@radically-straightforward/caddy": "^2.0.10",
+    "@radically-straightforward/examples": "^1.0.2",
+    "@radically-straightforward/html": "^1.0.3",
+    "@radically-straightforward/node": "^3.1.10",
+    "@radically-straightforward/server": "^2.0.4",
+    "@radically-straightforward/sqlite": "^1.1.15",
+    "@radically-straightforward/utilities": "^2.0.23"
   }
 }
