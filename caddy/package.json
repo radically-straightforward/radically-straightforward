@@ -1,6 +1,6 @@
 {
   "name": "@radically-straightforward/caddy",
-  "version": "2.0.9",
+  "version": "2.0.10",
   "description": "☁️ Install Caddy as an npm package",
   "keywords": [
     "caddy",
@@ -31,11 +31,11 @@
     "test": "npm run prepare && node --test ./scripts.test.mjs \"./build/**/*.test.mjs\" && prettier --check ./README.md ./CHANGELOG.md ./package.json ./scripts.mjs ./scripts.test.mjs ./tsconfig.json ./source/"
   },
   "dependencies": {
-    "@radically-straightforward/node": "^3.1.9"
+    "@radically-straightforward/node": "^3.1.10"
   },
   "devDependencies": {
-    "@radically-straightforward/documentation": "^1.0.7",
-    "@radically-straightforward/typescript": "^1.0.3",
+    "@radically-straightforward/documentation": "^1.0.9",
+    "@radically-straightforward/typescript": "^1.0.4",
     "@types/node": "^25.6.0",
     "prettier": "^3.8.3",
     "typescript": "^6.0.3"
