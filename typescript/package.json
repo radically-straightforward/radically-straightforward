@@ -1,6 +1,6 @@
 {
   "name": "@radically-straightforward/typescript",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "✅ TypeScript configuration",
   "keywords": [
     "typescript",
@@ -25,7 +25,7 @@
     "test": "prettier --check ./README.md ./CHANGELOG.md ./package.json ./tsconfig.json"
   },
   "devDependencies": {
-    "prettier": "^3.6.2"
+    "prettier": "^3.8.3"
   },
   "prettier": {}
 }
