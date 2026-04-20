@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.3 · 2026-04-20
+
+- Adapted `tsconfig.json` to TypeScript 6.
+
 ## 1.0.1 · 2025-12-04
 
 - Added `include` in default configuration. You must change your `tsconfig.json` accordingly.

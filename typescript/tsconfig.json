@@ -2,6 +2,7 @@
   "compilerOptions": {
     "types": ["node"],
     "isolatedModules": true,
+    "skipLibCheck": true,
     "sourceMap": true,
     "declaration": true,
     "declarationMap": true

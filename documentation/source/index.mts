@@ -5,7 +5,7 @@ import path from "node:path";
 import childProcess from "node:child_process";
 import util from "node:util";
 import babel from "@babel/core";
-import babelGenerator from "@babel/generator";
+import * as babelGenerator from "@babel/generator";
 import prettier from "prettier";
 
 for (const input of process.argv.length === 2
@@ -63,7 +63,7 @@ for (const input of process.argv.length === 2
                                   `Unknown ‘Declaration’: ‘${
                                     path.node.declaration.type
                                   }’\n${
-                                    babelGenerator.default({
+                                    babelGenerator.generate({
                                       ...path.node,
                                       leadingComments: [],
                                       trailingComments: [],
@@ -75,7 +75,7 @@ for (const input of process.argv.length === 2
                     (async () =>
                       (
                         await prettier.format(
-                          babelGenerator.default(
+                          babelGenerator.generate(
                             path.node.declaration.type === "FunctionDeclaration"
                               ? {
                                   ...path.node,
@@ -128,7 +128,7 @@ for (const input of process.argv.length === 2
                                           `Unknown ‘Declaration’: ‘${
                                             path.node.declaration.type
                                           }’\n${
-                                            babelGenerator.default({
+                                            babelGenerator.generate({
                                               ...path.node,
                                               leadingComments: [],
                                               trailingComments: [],
@@ -160,7 +160,7 @@ for (const input of process.argv.length === 2
                                           `Unknown ‘Declaration’: ‘${
                                             path.node.declaration.type
                                           }’\n${
-                                            babelGenerator.default({
+                                            babelGenerator.generate({
                                               ...path.node,
                                               leadingComments: [],
                                               trailingComments: [],
@@ -199,7 +199,7 @@ for (const input of process.argv.length === 2
                           (
                             await prettier.format(
                               `class ___ {${
-                                babelGenerator.default(
+                                babelGenerator.generate(
                                   classBodyNode.type === "ClassMethod"
                                     ? {
                                         ...classBodyNode,
@@ -219,7 +219,7 @@ for (const input of process.argv.length === 2
                                             `Unknown ‘ClassBody.body’ element type: ‘${
                                               classBodyNode.type
                                             }’\n${
-                                              babelGenerator.default({
+                                              babelGenerator.generate({
                                                 ...classBodyNode,
                                                 leadingComments: [],
                                                 trailingComments: [],
@@ -247,7 +247,7 @@ for (const input of process.argv.length === 2
                                           `Unknown ‘ClassBody.body’ element type: ‘${
                                             classBodyNode.type
                                           }’\n${
-                                            babelGenerator.default({
+                                            babelGenerator.generate({
                                               ...classBodyNode,
                                               leadingComments: [],
                                               trailingComments: [],

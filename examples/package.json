@@ -36,10 +36,10 @@
     "linkedom": "^0.18.12"
   },
   "devDependencies": {
-    "@radically-straightforward/documentation": "^1.0.5",
-    "@radically-straightforward/typescript": "^1.0.0",
-    "@types/node": "^24.10.1",
-    "typescript": "^5.9.3"
+    "@radically-straightforward/documentation": "^1.0.7",
+    "@radically-straightforward/typescript": "^1.0.2",
+    "@types/node": "^25.6.0",
+    "typescript": "^6.0.3"
   },
   "prettier": {}
 }
