@@ -183,7 +183,7 @@ try {
     entryNames: "[dir]/[name]--[hash]",
     assetNames: "[dir]/[name]--[hash]",
     loader: { ".woff2": "file", ".woff": "file", ".ttf": "file" },
-    target: ["chrome100", "safari14", "edge100", "firefox100", "ios14"],
+    target: ["es2022"],
     bundle: true,
     minify: true,
     sourcemap: true,
