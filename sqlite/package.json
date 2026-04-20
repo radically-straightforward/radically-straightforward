@@ -1,6 +1,6 @@
 {
   "name": "@radically-straightforward/sqlite",
-  "version": "1.1.14",
+  "version": "1.1.15",
   "description": "🗃️ SQLite with tagged templates and migrations",
   "keywords": [
     "sqlite",
@@ -29,14 +29,14 @@
     "test": "npm run prepare && node --test \"./build/**/*.test.mjs\" && prettier --check ./README.md ./CHANGELOG.md ./package.json ./tsconfig.json ./source/"
   },
   "dependencies": {
-    "@radically-straightforward/node": "^3.1.9",
-    "@radically-straightforward/utilities": "^2.0.21",
+    "@radically-straightforward/node": "^3.1.10",
+    "@radically-straightforward/utilities": "^2.0.23",
     "@types/better-sqlite3": "^7.6.13",
     "better-sqlite3": "^12.9.0"
   },
   "devDependencies": {
-    "@radically-straightforward/documentation": "^1.0.7",
-    "@radically-straightforward/typescript": "^1.0.3",
+    "@radically-straightforward/documentation": "^1.0.9",
+    "@radically-straightforward/typescript": "^1.0.4",
     "@types/node": "^25.6.0",
     "prettier": "^3.8.3",
     "typescript": "^6.0.3"
