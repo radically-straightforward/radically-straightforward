@@ -7,22 +7,22 @@ jobs:
       fail-fast: false
       matrix:
         package:
-          - server
-          - sqlite
-          - html
-          - css
-          - javascript
-          - utilities
-          - node
           - typescript
-          - examples
           - documentation
-          - caddy
-          - ffmpeg
-          - build
+          - html
+          - examples
+          - utilities
+          - css
+          - node
           - package
+          - javascript
+          - caddy
+          - sqlite
+          - server
+          - build
           - production
           - development
+          - ffmpeg
         os:
           - windows
           - macos
