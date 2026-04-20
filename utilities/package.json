@@ -1,6 +1,6 @@
 {
   "name": "@radically-straightforward/utilities",
-  "version": "2.0.22",
+  "version": "2.0.23",
   "description": "🛠️ Utilities for Node.js and the browser",
   "keywords": [
     "node",
@@ -28,8 +28,8 @@
     "test": "npm run prepare && node --test \"./build/**/*.test.mjs\" && prettier --check ./README.md ./CHANGELOG.md ./package.json ./tsconfig.json ./source/"
   },
   "devDependencies": {
-    "@radically-straightforward/documentation": "^1.0.7",
-    "@radically-straightforward/typescript": "^1.0.3",
+    "@radically-straightforward/documentation": "^1.0.9",
+    "@radically-straightforward/typescript": "^1.0.4",
     "@types/node": "^25.6.0",
     "natural": "^8.1.1",
     "prettier": "^3.8.3",
