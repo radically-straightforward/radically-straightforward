@@ -1,5 +1,41 @@
 # TODO
 
+Draw a graph of the order in which packages must be released (to be used with https://dreampuf.github.io/GraphvizOnline/):
+
+```javascript
+console.log(
+  `
+digraph {
+${(
+  await Promise.all(
+    (await fs.promises.readdir(".")).map(async (child) => {
+      let packageJSON = JSON.parse(
+        await fs.promises
+          .readFile(path.join(child, "package.json"), "utf-8")
+          .catch(() => "{}"),
+      );
+      return [
+        ...Object.keys(packageJSON.dependencies ?? {}),
+        ...Object.keys(packageJSON.devDependencies ?? {}),
+      ]
+        .flatMap((dependency) =>
+          dependency.startsWith("@radically-straightforward/")
+            ? [
+                `  "${dependency.slice("@radically-straightforward/".length)}" -> "${child}";`,
+              ]
+            : [],
+        )
+        .join("\n");
+    }),
+  )
+)
+  .filter((line) => line !== "")
+  .join("\n")}
+}
+`,
+);
+```
+
 ## Introduction
 
 - Example application
