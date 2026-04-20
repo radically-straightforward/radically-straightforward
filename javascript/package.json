@@ -1,6 +1,6 @@
 {
   "name": "@radically-straightforward/javascript",
-  "version": "4.0.37",
+  "version": "4.0.38",
   "description": "⚙️ Browser JavaScript in Tagged Templates",
   "keywords": [
     "javascript",
@@ -36,15 +36,15 @@
   },
   "dependencies": {
     "@floating-ui/dom": "^1.7.6",
-    "@radically-straightforward/css": "^3.0.2",
-    "@radically-straightforward/html": "^1.0.1",
-    "@radically-straightforward/utilities": "^2.0.21",
+    "@radically-straightforward/css": "^3.0.3",
+    "@radically-straightforward/html": "^1.0.3",
+    "@radically-straightforward/utilities": "^2.0.23",
     "fast-myers-diff": "^3.2.0"
   },
   "devDependencies": {
     "@csstools/postcss-light-dark-function": "^3.0.0",
-    "@radically-straightforward/documentation": "^1.0.7",
-    "@radically-straightforward/typescript": "^1.0.3",
+    "@radically-straightforward/documentation": "^1.0.9",
+    "@radically-straightforward/typescript": "^1.0.4",
     "@types/node": "^25.6.0",
     "postcss": "^8.5.10",
     "prettier": "^3.8.3",
