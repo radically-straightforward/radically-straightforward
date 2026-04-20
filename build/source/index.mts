@@ -4,7 +4,7 @@ import path from "node:path";
 import fs from "node:fs/promises";
 import util from "node:util";
 import babel from "@babel/core";
-import babelGenerator from "@babel/generator";
+import * as babelGenerator from "@babel/generator";
 // @ts-ignore
 import makeSynchronized from "make-synchronized";
 const prettierSync = makeSynchronized(import.meta.resolve("prettier"));
@@ -62,7 +62,7 @@ for await (const source of fs.glob("./build/**/*.mjs")) {
                 new Function(
                   "html",
                   "css",
-                  `return (${babelGenerator.default(path.node).code});`,
+                  `return (${babelGenerator.generate(path.node).code});`,
                 )(html, css),
                 { parser: "css" },
               );
