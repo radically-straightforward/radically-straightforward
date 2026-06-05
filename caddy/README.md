@@ -87,7 +87,7 @@ export function application({
   hstsPreload = false,
   ports = [18000],
   trustedStaticFilesRoots = [
-    `* "${path.join(path.join(import.meta.dirname, "..").split("/node_modules/")[0], "build/static/")}"`,
+    `* "${path.join(path.join(import.meta.dirname, "..").split(`${path.sep}node_modules${path.sep}`)[0], "build/static/")}"`,
   ],
   untrustedStaticFilesRoots = [],
   extraGlobalOptions = caddyfile``,

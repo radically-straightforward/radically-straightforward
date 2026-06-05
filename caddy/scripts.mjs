@@ -4,7 +4,9 @@ import fs from "node:fs/promises";
 import childProcess from "node:child_process";
 import util from "node:util";
 
-const installationDirectory = import.meta.dirname.split("/node_modules/")[0];
+const installationDirectory = import.meta.dirname.split(
+  `${path.sep}node_modules${path.sep}`,
+)[0];
 
 if (process.argv[2] === "postinstall") {
   let version;
