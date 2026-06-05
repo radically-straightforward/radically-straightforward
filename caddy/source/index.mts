@@ -166,7 +166,7 @@ export function application({
           .map(
             (trustedStaticFilesRoot) => caddyfile`
               route {
-                root ${trustedStaticFilesRoot}
+                root ${trustedStaticFilesRoot.replaceAll("\\", "\\\\")}
                 @file_exists file
                 route @file_exists {
                   header Cache-Control "public, max-age=31536000, immutable"
@@ -181,7 +181,7 @@ export function application({
           .map(
             (untrustedStaticFilesRoot) => caddyfile`
               route {
-                root ${untrustedStaticFilesRoot}
+                root ${untrustedStaticFilesRoot.replaceAll("\\", "\\\\")}
                 @file_exists file
                 route @file_exists {
                   header Cache-Control "private, max-age=31536000, immutable"
