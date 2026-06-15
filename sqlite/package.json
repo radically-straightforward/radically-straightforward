@@ -32,7 +32,8 @@
     "@radically-straightforward/node": "^3.1.10",
     "@radically-straightforward/utilities": "^2.0.23",
     "@types/better-sqlite3": "^7.6.13",
-    "better-sqlite3": "^12.10.1"
+    "better-sqlite3": "^12.10.1",
+    "cron-parser": "^5.5.0"
   },
   "devDependencies": {
     "@radically-straightforward/documentation": "^1.0.9",
