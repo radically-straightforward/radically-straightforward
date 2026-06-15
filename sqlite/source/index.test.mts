@@ -470,7 +470,7 @@ test(
     const database = await new Database(":memory:").migrate();
 
     database.scheduledBackgroundJob(
-      { type: "test", schedule: "*/10 * * * * *" },
+      { type: "test", schedule: "@minutely" },
       () => {
         console.log("scheduledBackgroundJob()");
       },
