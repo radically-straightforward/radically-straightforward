@@ -195,7 +195,7 @@ export class Database extends BetterSQLite3Database {
             create table if not exists "_scheduledBackgroundJobs" (
               "id" integer primary key autoincrement,
               "type" text not null unique,
-              "lastRanAt" text not null
+              "lastScheduledAt" text not null
             ) strict;
 
             create table if not exists "_cache" (
@@ -566,10 +566,10 @@ export class Database extends BetterSQLite3Database {
         this.executeTransaction(() => {
           const lastScheduledBackgroundJob = this.get<{
             id: number;
-            lastRanAt: string;
+            lastScheduledAt: string;
           }>(
             sql`
-              select "id", "lastRanAt"
+              select "id", "lastScheduledAt"
               from "_scheduledBackgroundJobs"
               where "type" = ${sqliteBackgroundJobOptions.type};
             `,
@@ -583,7 +583,7 @@ export class Database extends BetterSQLite3Database {
           if (
             lastScheduledBackgroundJob === undefined ||
             CronExpressionParser.parse(schedule, {
-              currentDate: new Date(lastScheduledBackgroundJob.lastRanAt),
+              currentDate: new Date(lastScheduledBackgroundJob.lastScheduledAt),
             })
               .next()
               .toISOString()! < new Date().toISOString()
@@ -606,7 +606,7 @@ export class Database extends BetterSQLite3Database {
               sql`
                 insert into "_scheduledBackgroundJobs" (
                   "type",
-                  "lastRanAt"
+                  "lastScheduledAt"
                 )
                 values (
                   ${sqliteBackgroundJobOptions.type},
