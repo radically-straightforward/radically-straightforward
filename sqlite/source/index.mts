@@ -560,61 +560,64 @@ export class Database extends BetterSQLite3Database {
     job: Parameters<typeof utilities.backgroundJob>[1],
   ): void {
     this.backgroundJob(sqliteBackgroundJobOptions, job);
-    utilities.backgroundJob({ interval: 5000 }, () => {
-      this.executeTransaction(() => {
-        const lastScheduledBackgroundJob = this.get<{
-          id: number;
-          lastRanAt: string;
-        }>(
-          sql`
-            select "id", "lastRanAt"
-            from "_scheduledBackgroundJobs"
-            where "type" = ${sqliteBackgroundJobOptions.type};
-          `,
-        );
-        if (lastScheduledBackgroundJob !== undefined)
-          this.run(
+    node.backgroundJob(
+      { ...sqliteBackgroundJobOptions, interval: 5000 },
+      () => {
+        this.executeTransaction(() => {
+          const lastScheduledBackgroundJob = this.get<{
+            id: number;
+            lastRanAt: string;
+          }>(
             sql`
-                delete from "_scheduledBackgroundJobs" where "id" = ${lastScheduledBackgroundJob.id};
+              select "id", "lastRanAt"
+              from "_scheduledBackgroundJobs"
+              where "type" = ${sqliteBackgroundJobOptions.type};
+            `,
+          );
+          if (lastScheduledBackgroundJob !== undefined)
+            this.run(
+              sql`
+                  delete from "_scheduledBackgroundJobs" where "id" = ${lastScheduledBackgroundJob.id};
+                `,
+            );
+          if (
+            lastScheduledBackgroundJob === undefined ||
+            CronExpressionParser.parse(schedule, {
+              currentDate: new Date(lastScheduledBackgroundJob.lastRanAt),
+            })
+              .next()
+              .toISOString()! < new Date().toISOString()
+          ) {
+            this.run(
+              sql`
+                insert into "_backgroundJobs" (
+                  "type",
+                  "startAt",
+                  "parameters"
+                )
+                values (
+                  ${sqliteBackgroundJobOptions.type},
+                  ${new Date().toISOString()},
+                  ${JSON.stringify({})}
+                );
               `,
-          );
-        if (
-          lastScheduledBackgroundJob === undefined ||
-          CronExpressionParser.parse(schedule, {
-            currentDate: new Date(lastScheduledBackgroundJob.lastRanAt),
-          })
-            .next()
-            .toISOString()! < new Date().toISOString()
-        ) {
-          this.run(
-            sql`
-              insert into "_backgroundJobs" (
-                "type",
-                "startAt",
-                "parameters"
-              )
-              values (
-                ${sqliteBackgroundJobOptions.type},
-                ${new Date().toISOString()},
-                ${JSON.stringify({})}
-              );
-            `,
-          );
-          this.run(
-            sql`
-              insert into "_scheduledBackgroundJobs" (
-                "type",
-                "lastRanAt"
-              )
-              values (
-                ${sqliteBackgroundJobOptions.type},
-                ${new Date().toISOString()}
-              );
-            `,
-          );
-        }
-      });
-    });
+            );
+            this.run(
+              sql`
+                insert into "_scheduledBackgroundJobs" (
+                  "type",
+                  "lastRanAt"
+                )
+                values (
+                  ${sqliteBackgroundJobOptions.type},
+                  ${new Date().toISOString()}
+                );
+              `,
+            );
+          }
+        });
+      },
+    );
   }
 
   cacheSize = 10_000;

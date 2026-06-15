@@ -325,6 +325,22 @@ database.run(
 - https://github.com/litements/litequeue
 - https://github.com/diamondio/better-queue-sqlite
 
+#### `Database.scheduledBackgroundJob()`
+
+```typescript
+scheduledBackgroundJob(
+    {
+      schedule,
+      ...sqliteBackgroundJobOptions
+    }: {
+      schedule: string;
+    } & Parameters<typeof this.backgroundJob>[0],
+    job: Parameters<typeof utilities.backgroundJob>[1],
+  ): void;
+```
+
+Schedule background jobs with a certain periodicity, similar to `cron`. The `schedule` uses the syntax of [`cron-parser`](https://npm.im/cron-parser).
+
 #### `Database.cache()`
 
 ```typescript
