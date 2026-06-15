@@ -186,14 +186,16 @@ export class Database extends BetterSQLite3Database {
               "startedAt" text null,
               "retries" integer null
             ) strict;
-            drop index if exists "_backgroundJobsType";
-            drop index if exists "_backgroundJobsStartAt";
-            drop index if exists "_backgroundJobsStartedAt";
-            drop index if exists "_backgroundJobsRetries";
             create index if not exists "_index_backgroundJobs_type" on "_backgroundJobs" ("type");
             create index if not exists "_index_backgroundJobs_startAt" on "_backgroundJobs" ("startAt");
             create index if not exists "_index_backgroundJobs_startedAt" on "_backgroundJobs" ("startedAt");
             create index if not exists "_index_backgroundJobs_retries" on "_backgroundJobs" ("retries");
+
+            create table if not exists "_scheduledBackgroundJobs" (
+              "id" integer primary key autoincrement,
+              "type" text not null unique,
+              "lastRanAt" text not null
+            ) strict;
 
             create table if not exists "_cache" (
               "id" integer primary key autoincrement,
