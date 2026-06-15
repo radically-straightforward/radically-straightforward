@@ -37,10 +37,7 @@ for (const signal of [
  * ```
  */
 export function backgroundJob(
-  {
-    onStop,
-    ...utilitiesBackgroundJobOptions
-  }: Parameters<typeof utilities.backgroundJob>[0],
+  utilitiesBackgroundJobOptions: Parameters<typeof utilities.backgroundJob>[0],
   job: Parameters<typeof utilities.backgroundJob>[1],
 ): ReturnType<typeof utilities.backgroundJob> {
   const backgroundJob = utilities.backgroundJob(
@@ -48,7 +45,7 @@ export function backgroundJob(
       ...utilitiesBackgroundJobOptions,
       onStop: async () => {
         process.off("gracefulTermination", gracefulTerminationEventListener);
-        await onStop?.();
+        await utilitiesBackgroundJobOptions.onStop?.();
       },
     },
     job,

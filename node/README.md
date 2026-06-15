@@ -77,10 +77,7 @@ process.once("beforeExit", () => {
 
 ```typescript
 export function backgroundJob(
-  {
-    onStop,
-    ...utilitiesBackgroundJobOptions
-  }: Parameters<typeof utilities.backgroundJob>[0],
+  utilitiesBackgroundJobOptions: Parameters<typeof utilities.backgroundJob>[0],
   job: Parameters<typeof utilities.backgroundJob>[1],
 ): ReturnType<typeof utilities.backgroundJob>;
 ```
