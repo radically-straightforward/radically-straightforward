@@ -1,5 +1,6 @@
 import timers from "node:timers/promises";
 import BetterSQLite3Database from "better-sqlite3";
+import { CronExpressionParser } from "cron-parser";
 import * as utilities from "@radically-straightforward/utilities";
 import * as node from "@radically-straightforward/node";
 
@@ -544,6 +545,76 @@ export class Database extends BetterSQLite3Database {
         }
       },
     );
+  }
+
+  /**
+   * Schedule background jobs with a certain periodicity, similar to `cron`. The `schedule` uses the syntax of [`cron-parser`](https://npm.im/cron-parser).
+   */
+  scheduledBackgroundJob(
+    {
+      schedule,
+      ...sqliteBackgroundJobOptions
+    }: {
+      schedule: string;
+    } & Parameters<typeof this.backgroundJob>[0],
+    job: Parameters<typeof utilities.backgroundJob>[1],
+  ): void {
+    this.backgroundJob(sqliteBackgroundJobOptions, job);
+    utilities.backgroundJob({ interval: 5000 }, () => {
+      this.executeTransaction(() => {
+        const lastScheduledBackgroundJob = this.get<{
+          id: number;
+          lastRanAt: string;
+        }>(
+          sql`
+            select "id", "lastRanAt"
+            from "_scheduledBackgroundJobs"
+            where "type" = ${sqliteBackgroundJobOptions.type};
+          `,
+        );
+        if (lastScheduledBackgroundJob !== undefined)
+          this.run(
+            sql`
+                delete from "_scheduledBackgroundJobs" where "id" = ${lastScheduledBackgroundJob.id};
+              `,
+          );
+        if (
+          lastScheduledBackgroundJob === undefined ||
+          CronExpressionParser.parse(schedule, {
+            currentDate: new Date(lastScheduledBackgroundJob.lastRanAt),
+          })
+            .next()
+            .toISOString()! < new Date().toISOString()
+        ) {
+          this.run(
+            sql`
+              insert into "_backgroundJobs" (
+                "type",
+                "startAt",
+                "parameters"
+              )
+              values (
+                ${sqliteBackgroundJobOptions.type},
+                ${new Date().toISOString()},
+                ${JSON.stringify({})}
+              );
+            `,
+          );
+          this.run(
+            sql`
+              insert into "_scheduledBackgroundJobs" (
+                "type",
+                "lastRanAt"
+              )
+              values (
+                ${sqliteBackgroundJobOptions.type},
+                ${new Date().toISOString()}
+              );
+            `,
+          );
+        }
+      });
+    });
   }
 
   cacheSize = 10_000;

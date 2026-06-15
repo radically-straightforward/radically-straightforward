@@ -352,9 +352,10 @@ test("Database", async () => {
 test(
   "backgroundJob()",
   {
-    skip: process.stdin.isTTY
-      ? false
-      : `Run interactive test with ‘node ./build/index.test.mjs’.`,
+    skip:
+      process.stdin.isTTY && process.argv[2] === "backgroundJob()"
+        ? false
+        : `Run interactive test with ‘node ./build/index.test.mjs "backgroundJob()"’.`,
   },
   async () => {
     const database = await new Database(":memory:").migrate();
@@ -454,5 +455,25 @@ test(
     await new Promise((resolve) => process.once("SIGTSTP", resolve));
 
     node.exit();
+  },
+);
+
+test(
+  "scheduledBackgroundJob()",
+  {
+    skip:
+      process.stdin.isTTY && process.argv[2] === "scheduledBackgroundJob()"
+        ? false
+        : `Run interactive test with ‘node ./build/index.test.mjs "scheduledBackgroundJob()"’.`,
+  },
+  async () => {
+    const database = await new Database(":memory:").migrate();
+
+    database.scheduledBackgroundJob(
+      { type: "test", schedule: "*/10 * * * * *" },
+      () => {
+        console.log("scheduledBackgroundJob()");
+      },
+    );
   },
 );
