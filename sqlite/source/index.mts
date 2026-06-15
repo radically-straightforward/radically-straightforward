@@ -574,12 +574,6 @@ export class Database extends BetterSQLite3Database {
               where "type" = ${sqliteBackgroundJobOptions.type};
             `,
           );
-          if (lastScheduledBackgroundJob !== undefined)
-            this.run(
-              sql`
-                  delete from "_scheduledBackgroundJobs" where "id" = ${lastScheduledBackgroundJob.id};
-                `,
-            );
           if (
             lastScheduledBackgroundJob === undefined ||
             CronExpressionParser.parse(schedule, {
@@ -602,6 +596,12 @@ export class Database extends BetterSQLite3Database {
                 );
               `,
             );
+            if (lastScheduledBackgroundJob !== undefined)
+              this.run(
+                sql`
+                  delete from "_scheduledBackgroundJobs" where "id" = ${lastScheduledBackgroundJob.id};
+                `,
+              );
             this.run(
               sql`
                 insert into "_scheduledBackgroundJobs" (
