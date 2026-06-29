@@ -269,9 +269,9 @@ backgroundJob<Type>(
       timeout?: number;
       retryIn?: number;
       retries?: number;
-    } & Partial<Parameters<typeof node.backgroundJob>[0]>,
+    } & Partial<Parameters<typeof node.setInterval>[0]>,
     job: (parameters: Type) => void | Promise<void>,
-  ): ReturnType<typeof node.backgroundJob>;
+  ): ReturnType<typeof node.setInterval>;
 ```
 
 A background job system that builds upon [`@radically-straightforward/node`](https://github.com/radically-straightforward/radically-straightforward/tree/main/node)’s `backgroundJob()` to provide the following features:
@@ -335,7 +335,7 @@ scheduledBackgroundJob(
     }: {
       schedule: string;
     } & Parameters<typeof this.backgroundJob>[0],
-    job: Parameters<typeof utilities.backgroundJob>[1],
+    job: Parameters<typeof utilities.setInterval>[1],
   ): void;
 ```
 

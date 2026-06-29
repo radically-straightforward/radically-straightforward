@@ -29,17 +29,17 @@
     "test": "npm run prepare && node --test \"./build/**/*.test.mjs\" && prettier --check ./README.md ./CHANGELOG.md ./package.json ./tsconfig.json ./source/"
   },
   "dependencies": {
-    "@radically-straightforward/node": "^3.1.10",
-    "@radically-straightforward/utilities": "^2.0.23",
+    "@radically-straightforward/node": "^3.1.11",
+    "@radically-straightforward/utilities": "^2.0.24",
     "@types/better-sqlite3": "^7.6.13",
-    "better-sqlite3": "^12.10.1",
-    "cron-parser": "^5.5.0"
+    "better-sqlite3": "^12.11.1",
+    "cron-parser": "^5.6.1"
   },
   "devDependencies": {
     "@radically-straightforward/documentation": "^1.0.9",
     "@radically-straightforward/typescript": "^1.0.5",
-    "@types/node": "^25.9.3",
-    "prettier": "^3.8.4",
+    "@types/node": "^26.0.1",
+    "prettier": "^3.9.3",
     "typescript": "^6.0.3"
   },
   "prettier": {}
