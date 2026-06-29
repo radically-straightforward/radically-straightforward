@@ -434,14 +434,14 @@ export default function server({
             response.ended = true;
             return response;
           };
-          const heartbeat = node.backgroundJob(
-            { interval: 30 * 1000, firstRun: "sync" },
+          const heartbeat = node.setInterval(
+            { duration: 30 * 1000, firstRun: "sync" },
             () => {
               response.write("\n");
             },
           );
-          const periodicUpdates = node.backgroundJob(
-            { interval: 5 * 60 * 1000, firstRun: "delayed" },
+          const periodicUpdates = node.setInterval(
+            { duration: 5 * 60 * 1000, firstRun: "delayed" },
             () => {
               liveConnection!.updateResolve!();
             },
