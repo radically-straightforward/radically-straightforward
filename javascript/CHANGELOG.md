@@ -1,5 +1,10 @@
 # Changelog
 
+## 4.0.39 · 2026-06-29
+
+- **Breaking changes:**
+  - `javascript.backgroundJob()` was renamed to `javascript.setInterval()` and the `interval` parameter was renamed to `duration`.
+
 ## 4.0.37 · 2026-01-15
 
 - Fixed visual glitches in Live Navigation cache by `execute()`ing the JavaScript of the page retried from cache.
