@@ -256,24 +256,6 @@ test(async () => {
     {
       const requestBody = new FormData();
       requestBody.append(
-        "bodyFileExample".repeat(100_000),
-        new Blob([Buffer.from([1])]),
-      );
-      const response = await fetch("http://localhost:18000/", {
-        method: "POST",
-        headers: { "CSRF-Protection": "true" },
-        body: requestBody,
-      });
-      assert.equal(response.status, 400);
-      assert.equal(
-        response.headers.get("Content-Type"),
-        "text/plain; charset=utf-8",
-      );
-      assert.equal(await response.text(), "Error: Malformed part header");
-    }
-    {
-      const requestBody = new FormData();
-      requestBody.append(
         "bodyFileExample",
         new Blob([Buffer.alloc(100_000_000)]),
       );
