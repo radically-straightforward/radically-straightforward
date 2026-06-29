@@ -165,10 +165,7 @@ export default function server({
         { [key: string]: string },
         {
           [key: string]:
-            | string
-            | RequestBodyFile
-            | string[]
-            | RequestBodyFile[];
+            string | RequestBodyFile | string[] | RequestBodyFile[];
         },
         { [key: string]: unknown }
       >,
@@ -268,8 +265,7 @@ export default function server({
                   if (name.endsWith("[]"))
                     (
                       (request.body[name.slice(0, -"[]".length)] ??= []) as (
-                        | string
-                        | RequestBodyFile
+                        string | RequestBodyFile
                       )[]
                     ).push(value);
                   else request.body[name] = value;
@@ -294,8 +290,7 @@ export default function server({
                   if (name.endsWith("[]"))
                     (
                       (request.body[name.slice(0, -"[]".length)] ??= []) as (
-                        | string
-                        | RequestBodyFile
+                        string | RequestBodyFile
                       )[]
                     ).push(value);
                   else request.body[name] = value;
