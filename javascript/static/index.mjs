@@ -116,7 +116,7 @@ async function liveNavigate(request, { stateAlreadyPushed = false } = {}) {
       document.getElementById(requestURL.hash.slice(1))?.scrollIntoView();
     return;
   }
-  if (documentState === "liveConnected") liveConnection.backgroundJob.stop();
+  if (documentState === "liveConnected") liveConnection.interval.stop();
   documentState = "liveNavigating";
   const cachedResponseText =
     request.method === "GET" ? liveNavigate.cache.get(request.url) : undefined;
@@ -257,9 +257,9 @@ export async function liveConnection(
   let abortController;
   let abortControllerTimeout;
   let failedToConnectGlobalError;
-  liveConnection.backgroundJob = utilities.backgroundJob(
+  liveConnection.interval = utilities.setInterval(
     {
-      interval: reloadOnReconnect ? 1000 : 5 * 1000,
+      duration: reloadOnReconnect ? 1000 : 5 * 1000,
       onStop: () => {
         abortController.abort();
       },
@@ -295,7 +295,7 @@ export async function liveConnection(
         throw error;
       }
       if (reloadOnConnect) {
-        liveConnection.backgroundJob.stop();
+        liveConnection.interval.stop();
         documentState = "navigatingAway";
         window.location.reload();
         return;
@@ -331,7 +331,7 @@ export async function liveConnection(
     },
   );
 }
-liveConnection.backgroundJob = undefined;
+liveConnection.interval = undefined;
 
 /*
  * Similar to `mount()`, but suited for morphing the entire `document`, for example, `documentMount()` dispatches the `DOMContentLoaded` event.
@@ -1175,7 +1175,7 @@ export function backgroundJob(
   job,
 ) {
   element[elementProperty]?.stop();
-  element[elementProperty] = utilities.backgroundJob(
+  element[elementProperty] = utilities.setInterval(
     utilitiesBackgroundJobOptions,
     async () => {
       if (!element.isConnected) {

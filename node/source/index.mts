@@ -37,10 +37,10 @@ for (const signal of [
  * ```
  */
 export function backgroundJob(
-  utilitiesBackgroundJobOptions: Parameters<typeof utilities.backgroundJob>[0],
-  job: Parameters<typeof utilities.backgroundJob>[1],
-): ReturnType<typeof utilities.backgroundJob> {
-  const backgroundJob = utilities.backgroundJob(
+  utilitiesBackgroundJobOptions: Parameters<typeof utilities.setInterval>[0],
+  job: Parameters<typeof utilities.setInterval>[1],
+): ReturnType<typeof utilities.setInterval> {
+  const backgroundJob = utilities.setInterval(
     {
       ...utilitiesBackgroundJobOptions,
       onStop: async () => {

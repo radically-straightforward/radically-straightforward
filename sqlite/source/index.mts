@@ -557,7 +557,7 @@ export class Database extends BetterSQLite3Database {
     }: {
       schedule: string;
     } & Parameters<typeof this.backgroundJob>[0],
-    job: Parameters<typeof utilities.backgroundJob>[1],
+    job: Parameters<typeof utilities.setInterval>[1],
   ): void {
     this.backgroundJob(sqliteBackgroundJobOptions, job);
     node.backgroundJob(
