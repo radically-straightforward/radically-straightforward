@@ -1,5 +1,10 @@
 # Changelog
 
+## 3.1.11 · 2026-06-29
+
+- **Breaking changes:**
+  - `node.backgroundJob()` was renamed to `node.setInterval()` and the `interval` parameter was renamed to `duration`.
+
 ## 3.1.7 · 2024-05-30
 
 - Increased `process.setMaxListeners()` from the default of 10 to 50, because `gracefulTermination`, `backgroundJob()`s, and so forth often lead to more event listeners, which generates a warning.
