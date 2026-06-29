@@ -541,10 +541,10 @@ export async function timeout<Type>(
 
 Run the given `function_` up to the timeout. If the timeout is reached, the returned promise rejects, but there is no way to guarantee that the `function_` execution will stop.
 
-### `foregroundJob()`
+### `throttle()`
 
 ```typescript
-export function foregroundJob(
+export function throttle(
   job: () => void | Promise<void>,
 ): (() => Promise<void>) & {
   promise: Promise<void>;

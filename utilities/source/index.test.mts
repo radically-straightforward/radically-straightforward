@@ -342,27 +342,27 @@ test("timeout()", async () => {
 });
 
 test(
-  "foregroundJob()",
+  "throttle()",
   {
     skip:
-      process.stdin.isTTY && process.argv[2] === "foregroundJob()"
+      process.stdin.isTTY && process.argv[2] === "throttle()"
         ? false
-        : `Run interactive test with ‘node ./build/index.test.mjs "foregroundJob()"’.`,
+        : `Run interactive test with ‘node ./build/index.test.mjs "throttle()"’.`,
   },
   async () => {
-    const foregroundJob = utilities.foregroundJob(async () => {
-      console.log("foregroundJob(): Running foreground job...");
+    const throttledFunction = utilities.throttle(async () => {
+      console.log("throttle(): Running foreground job...");
       await utilities.sleep(3 * 1000);
-      console.log("foregroundJob(): ...finished running foreground job.");
+      console.log("throttle(): ...finished running foreground job.");
       if (Math.random() < 0.3)
         throw new Error(
           "There’s a 30% chance that the foreground job results in error.",
         );
     });
     process.on("SIGTSTP", () => {
-      foregroundJob();
+      throttledFunction();
     });
-    console.log("foregroundJob(): Press ⌃Z to run foreground job...");
+    console.log("throttle(): Press ⌃Z to run foreground job...");
     setInterval(() => {});
   },
 );

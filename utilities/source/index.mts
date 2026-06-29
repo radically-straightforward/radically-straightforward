@@ -726,18 +726,28 @@ export async function timeout<Type>(
 }
 
 /**
- * Controls the execution of the given `job` such that it can’t execute until the previous execution finished.
+ * Ensures that the given `function_` is running at most once at any given moment.
  *
- * This is useful, for example, for an autocomplete feature in which an event listener of the `input` event `fetch()`es from the server. If the `job` is called again while it’s running, then it schedules itself to be rerun as soon as it completes.
+ * If the function is called only once, it runs immediately (this is different from Lodash’s [`debounce()`](https://lodash.com/docs/4.17.15#debounce) and [`throttle()`](https://lodash.com/docs/4.17.15#throttle) that can include a waiting time—the timing of `utilities.throttle()` is based on how long the `function_` takes to finish):
  *
- * This is different from `backgroundJob()` because it doesn’t run periodically—it only runs when it’s called.
+ * ```
+ * Calls:     ↓
+ * Execution: |------|
+ * ```
  *
- * This is different from Lodash’s [`debounce()`](https://lodash.com/docs/4.17.15#debounce) and [`throttle()`](https://lodash.com/docs/4.17.15#throttle) because it doesn’t `wait`. Instead, it depends on the timing of the `job` itself to pace the execution, so it works best when the `job` is slow.
+ * If the function is called multiple times, it’s scheduled to rerun **once** after completion (this is different from enqueuing the function calls, which would run the function three times instead of twice in the following example):
  *
- * There’s a promise available under the `.promise` property of the returned value that resolves when there’s no job running. It’s useful to synchronize actions that must wait on the job to be over.
+ * ```
+ * Calls:     ↓ ↓ ↓
+ * Execution: |------|----|
+ * ```
+ *
+ * This is useful, for example, for an autocomplete feature in which an event listener of the `input` event `fetch()`es from the server.
+ *
+ * There’s a promise available under the `.promise` property of the returned value that resolves when there’s no `function_` running. It’s useful to synchronize actions that must wait on the `function_` to be over.
  */
-export function foregroundJob(
-  job: () => void | Promise<void>,
+export function throttle(
+  function_: () => void | Promise<void>,
 ): (() => Promise<void>) & { promise: Promise<void> } {
   let state: "available" | "running" | "runningAndMarkedForRerun" | "rerun" =
     "available";
@@ -751,23 +761,18 @@ export function foregroundJob(
       }
       state = "running";
       try {
-        await job();
-      } catch (error) {
-        log(
-          "FOREGROUND JOB ERROR",
-          String(error),
-          (error as Error)?.stack ?? "",
-        );
+        await function_();
+      } finally {
+        if (
+          (state as "running" | "runningAndMarkedForRerun") ===
+          "runningAndMarkedForRerun"
+        ) {
+          state = "rerun";
+          await run();
+        }
+        state = "available";
+        promiseWithResolvers.resolve(undefined);
       }
-      if (
-        (state as "running" | "runningAndMarkedForRerun") ===
-        "runningAndMarkedForRerun"
-      ) {
-        state = "rerun";
-        await run();
-      }
-      state = "available";
-      promiseWithResolvers.resolve(undefined);
     } else {
       state = "runningAndMarkedForRerun";
       await promiseWithResolvers.promise;
