@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.0.24 · 2026-06-29
+
+- **Breaking changes:**
+  - `utilities.foregroundJob()` was renamed to `utilities.throttle()`.
+  - `utilities.backgroundJob()` was renamed to `utilities.setInterval()` and the `interval` parameter was renamed to `duration`.
+
 ## 2.0.21 · 2026-01-15
 
 - Removed `Cache`, because it became so specific to Live Navigation cache that it was moved there.
