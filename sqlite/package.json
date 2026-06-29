@@ -1,6 +1,6 @@
 {
   "name": "@radically-straightforward/sqlite",
-  "version": "1.1.15",
+  "version": "1.1.16",
   "description": "🗃️ SQLite with tagged templates and migrations",
   "keywords": [
     "sqlite",

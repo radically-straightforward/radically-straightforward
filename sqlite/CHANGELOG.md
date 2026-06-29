@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.1.16 · 2026-06-29
+
+- **Breaking changes:**
+  - `sqlite.backgroundJob()` was renamed to `sqlite.backgroundJobWorker()`.
+- Added `scheduledBackgroundJobWorker()`.
+
 ## 1.1.8 · 2025-02-04
 
 - **Breaking change:** Changed `cache()` to be synchronous, similar to other database operations, and added `cacheAsync()`.
