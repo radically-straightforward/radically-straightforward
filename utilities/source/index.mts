@@ -675,24 +675,19 @@ export function setInterval(
         state = "running";
         try {
           await function_();
-        } catch (error) {
-          log(
-            "BACKGROUND JOB ERROR",
-            String(error),
-            (error as Error)?.stack ?? "",
-          );
-        }
-        if (state === "running" || state === "runningAndMarkedForRerun") {
-          timeout = setTimeout(
-            () => {
-              interval.run();
-            },
-            (state as "running" | "runningAndMarkedForRerun") ===
-              "runningAndMarkedForRerun"
-              ? 0
-              : duration * (1 + 0.1 * Math.random()),
-          );
-          state = "waiting";
+        } finally {
+          if (state === "running" || state === "runningAndMarkedForRerun") {
+            timeout = setTimeout(
+              () => {
+                interval.run();
+              },
+              (state as "running" | "runningAndMarkedForRerun") ===
+                "runningAndMarkedForRerun"
+                ? 0
+                : duration * (1 + 0.1 * Math.random()),
+            );
+            state = "waiting";
+          }
         }
       } else if (state === "running") state = "runningAndMarkedForRerun";
     },
