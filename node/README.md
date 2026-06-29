@@ -73,16 +73,16 @@ process.once("beforeExit", () => {
 
 <!-- DOCUMENTATION START: ./source/index.mts -->
 
-### `backgroundJob()`
+### `setInterval()`
 
 ```typescript
-export function backgroundJob(
-  utilitiesBackgroundJobOptions: Parameters<typeof utilities.backgroundJob>[0],
-  job: Parameters<typeof utilities.backgroundJob>[1],
-): ReturnType<typeof utilities.backgroundJob>;
+export function setInterval(
+  utilitiesSetIntervalOptions: Parameters<typeof utilities.setInterval>[0],
+  function_: Parameters<typeof utilities.setInterval>[1],
+): ReturnType<typeof utilities.setInterval>;
 ```
 
-This is an extension of [`@radically-straightforward/utilities`](https://github.com/radically-straightforward/radically-straightforward/tree/main/utilities)’s `backgroundJob()` which adds support for graceful termination.
+This is an extension of [`@radically-straightforward/utilities`](https://github.com/radically-straightforward/radically-straightforward/tree/main/utilities)’s `setInterval()` which adds support for graceful termination.
 
 **Example**
 
@@ -90,10 +90,10 @@ This is an extension of [`@radically-straightforward/utilities`](https://github.
 import timers from "node:timers/promises";
 import * as node from "@radically-straightforward/node";
 
-node.backgroundJob({ interval: 3 * 1000 }, async () => {
-  console.log("backgroundJob(): Running background job...");
+node.setInterval({ duration: 3 * 1000 }, async () => {
+  console.log("setInterval(): Running ‘function_’...");
   await timers.setTimeout(3 * 1000);
-  console.log("backgroundJob(): ...finished running background job.");
+  console.log("setInterval(): ...finished running ‘function_’.");
 });
 ```
 

@@ -78,7 +78,7 @@ export function childProcessKeepAlive(
   let childProcessInstance: ReturnType<(typeof childProcess)["spawn"]>;
   setInterval(
     {
-      interval: 200,
+      duration: 200,
       onStop: () => {
         childProcessInstance.kill();
       },
