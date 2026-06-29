@@ -127,7 +127,7 @@ async function liveNavigate(request, { stateAlreadyPushed = false } = {}) {
       "afterbegin",
       stringToElement(html`<div key="progress-bar" style="width: 0%;"></div>`),
     );
-  backgroundJob(
+  setInterval(
     progressBar,
     "progressBar",
     { interval: 1000, firstRun: "delayed" },
@@ -286,9 +286,11 @@ export async function liveConnection(
             "afterbegin",
             stringToElement(html`
               <div key="global-error">
-                ${reloadOnReconnect
-                  ? "Reloading…"
-                  : "Failed to connect. Please check your internet connection and try reloading the page."}
+                ${
+                  reloadOnReconnect
+                    ? "Reloading…"
+                    : "Failed to connect. Please check your internet connection and try reloading the page."
+                }
               </div>
             `),
           );
@@ -746,7 +748,7 @@ export function serialize(element, { includeSubforms = false } = {}) {
 }
 
 /**
- * Keep an element updated with the relative datetime. See `relativizeDateTime()` (which provides the relative datetime) and `backgroundJob()` (which provides the background job management).
+ * Keep an element updated with the relative datetime.
  *
  * **Example**
  *
@@ -773,9 +775,9 @@ export function relativizeDateTimeElement(
   dateString,
   { capitalize = false, ...relativizeDateTimeOptions } = {},
 ) {
-  backgroundJob(
+  setInterval(
     element,
-    "relativizeDateTimeElementBackgroundJob",
+    "relativizeDateTimeElementInterval",
     { interval: 10 * 1000, firstRun: "sync" },
     () => {
       element.textContent = relativizeDateTime(
@@ -1158,31 +1160,31 @@ export function previousSiblings(element) {
 }
 
 /**
- * This is an extension of [`@radically-straightforward/utilities`](https://github.com/radically-straightforward/radically-straightforward/tree/main/utilities)’s `backgroundJob()` with the following additions:
+ * This is an extension of [`@radically-straightforward/utilities`](https://github.com/radically-straightforward/radically-straightforward/tree/main/utilities)’s `setTimeout()` with the following additions:
  *
- * 1. If called multiple times, this version of `backgroundJob()` `stop()`s the previous background job so that at most one background job is active at any given time.
+ * 1. If called multiple times, this version of `setTimeout()` `stop()`s the previous interval so that at most one interval is active at any given time.
  *
- * 2. When the `element`’s [`isConnected`](https://developer.mozilla.org/en-US/docs/Web/API/Node/isConnected) is `false`, the background job is `stop()`ped.
+ * 2. When the `element`’s [`isConnected`](https://developer.mozilla.org/en-US/docs/Web/API/Node/isConnected) is `false`, the interval is `stop()`ped.
  *
- * The background job object which offers the `run()` and `stop()` methods is available at `element[name]`.
+ * The interval object which offers the `run()` and `stop()` methods is available at `element[name]`.
  *
- * See, for example, `relativizeDateTimeElement()`, which uses `backgroundJob()` to periodically update a relative datetime, for example, “2 hours ago”.
+ * See, for example, `relativizeDateTimeElement()`, which uses `setInterval()` to periodically update a relative datetime, for example, “2 hours ago”.
  */
-export function backgroundJob(
+export function setInterval(
   element,
   elementProperty,
-  utilitiesBackgroundJobOptions,
-  job,
+  utilitiesSetIntervalOptions,
+  function_,
 ) {
   element[elementProperty]?.stop();
   element[elementProperty] = utilities.setInterval(
-    utilitiesBackgroundJobOptions,
+    utilitiesSetIntervalOptions,
     async () => {
       if (!element.isConnected) {
         element[elementProperty].stop();
         return;
       }
-      await job();
+      await function_();
     },
   );
 }
