@@ -351,18 +351,18 @@ test(
   },
   async () => {
     const throttledFunction = utilities.throttle(async () => {
-      console.log("throttle(): Running foreground job...");
+      console.log("throttle(): Running the throttled function...");
       await utilities.sleep(3 * 1000);
-      console.log("throttle(): ...finished running foreground job.");
+      console.log("throttle(): ...finished running the throttled function.");
       if (Math.random() < 0.3)
         throw new Error(
-          "There’s a 30% chance that the foreground job results in error.",
+          "There’s a 30% chance that the the throttled function results in error.",
         );
     });
     process.on("SIGTSTP", () => {
       throttledFunction();
     });
-    console.log("throttle(): Press ⌃Z to run foreground job...");
+    console.log("throttle(): Press ⌃Z to run the throttled function...");
     setInterval(() => {});
   },
 );
