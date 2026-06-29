@@ -17,7 +17,9 @@ import * as node from "@radically-straightforward/node";
  *
  * 5. A background job mechanism.
  *
- * 6. A caching mechanism.
+ * 6. A scheduled background job mechanism.
+ *
+ * 7. A caching mechanism.
  *
  * To appreciate the difference in ergonomics between `better-sqlite3` and `@radically-straightforward/sqlite`, consider the following example:
  *
@@ -284,8 +286,7 @@ export class Database extends BetterSQLite3Database {
    */
   get<Type>(query: Query): Type | undefined {
     return this.getStatement(query).get(...query.parameters) as
-      | Type
-      | undefined;
+      Type | undefined;
   }
 
   /**
