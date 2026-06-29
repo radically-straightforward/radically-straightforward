@@ -129,8 +129,8 @@ async function liveNavigate(request, { stateAlreadyPushed = false } = {}) {
     );
   setInterval(
     progressBar,
-    "progressBar",
-    { interval: 1000, firstRun: "delayed" },
+    "progressBarInterval",
+    { duration: 1000, firstRun: "delayed" },
     () => {
       const width = Number(progressBar.style.width.slice(0, -"%".length));
       progressBar.style.width =
@@ -778,7 +778,7 @@ export function relativizeDateTimeElement(
   setInterval(
     element,
     "relativizeDateTimeElementInterval",
-    { interval: 10 * 1000, firstRun: "sync" },
+    { duration: 10 * 1000, firstRun: "sync" },
     () => {
       element.textContent = relativizeDateTime(
         dateString,
