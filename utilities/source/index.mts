@@ -660,21 +660,21 @@ export function setInterval(
     firstRun?: "sync" | "async" | "delayed";
     onStop?: () => void | Promise<void>;
   },
-  job: () => void | Promise<void>,
+  function_: () => void | Promise<void>,
 ): {
   run: () => Promise<void>;
   stop: () => Promise<void>;
 } {
-  let state: "sleeping" | "running" | "runningAndMarkedForRerun" | "stopped" =
-    "sleeping";
+  let state: "waiting" | "running" | "runningAndMarkedForRerun" | "stopped" =
+    "waiting";
   let timeout: ReturnType<typeof setTimeout>;
-  const backgroundJob = {
+  const interval = {
     run: async () => {
-      if (state === "sleeping") {
+      if (state === "waiting") {
         clearTimeout(timeout);
         state = "running";
         try {
-          await job();
+          await function_();
         } catch (error) {
           log(
             "BACKGROUND JOB ERROR",
@@ -685,14 +685,14 @@ export function setInterval(
         if (state === "running" || state === "runningAndMarkedForRerun") {
           timeout = setTimeout(
             () => {
-              backgroundJob.run();
+              interval.run();
             },
             (state as "running" | "runningAndMarkedForRerun") ===
               "runningAndMarkedForRerun"
               ? 0
               : duration * (1 + 0.1 * Math.random()),
           );
-          state = "sleeping";
+          state = "waiting";
         }
       } else if (state === "running") state = "runningAndMarkedForRerun";
     },
@@ -702,11 +702,11 @@ export function setInterval(
       await onStop();
     },
   };
-  if (firstRun === "sync") backgroundJob.run();
+  if (firstRun === "sync") interval.run();
   else
     timeout = setTimeout(
       () => {
-        backgroundJob.run();
+        interval.run();
       },
       firstRun === "async"
         ? 0
@@ -716,7 +716,7 @@ export function setInterval(
               throw new Error();
             })(),
     );
-  return backgroundJob;
+  return interval;
 }
 
 /**
