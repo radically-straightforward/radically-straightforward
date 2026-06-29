@@ -38,7 +38,9 @@ An extension of [`better-sqlite3`](https://www.npmjs.com/package/better-sqlite3)
 
 5. A background job mechanism.
 
-6. A caching mechanism.
+6. A scheduled background job mechanism.
+
+7. A caching mechanism.
 
 To appreciate the difference in ergonomics between `better-sqlite3` and `@radically-straightforward/sqlite`, consider the following example:
 
@@ -254,27 +256,27 @@ executeTransaction<Type>(fn: () => Type): Type;
 
 Execute a function in a transaction. All the [caveats](https://github.com/WiseLibs/better-sqlite3/blob/bd55c76c1520c7796aa9d904fe65b3fb4fe7aac0/docs/api.md#caveats) about `better-sqlite3`’s transactions still apply. Transactions are `immediate` to avoid `SQLITE_BUSY` errors. See <https://kerkour.com/sqlite-for-servers>.
 
-#### `Database.backgroundJob()`
+#### `Database.backgroundJobWorker()`
 
 ```typescript
-backgroundJob<Type>(
+backgroundJobWorker<Type>(
     {
       type,
       timeout = 5 * 60 * 1000,
       retryIn = 5 * 60 * 1000,
       retries = 10,
-      ...nodeBackgroundJobOptions
+      ...nodeSetTimeoutOptions
     }: {
       type: string;
       timeout?: number;
       retryIn?: number;
       retries?: number;
     } & Partial<Parameters<typeof node.setInterval>[0]>,
-    job: (parameters: Type) => void | Promise<void>,
+    function_: (parameters: Type) => void | Promise<void>,
   ): ReturnType<typeof node.setInterval>;
 ```
 
-A background job system that builds upon [`@radically-straightforward/node`](https://github.com/radically-straightforward/radically-straightforward/tree/main/node)’s `backgroundJob()` to provide the following features:
+A background job system with the following features:
 
 - Persist background jobs in the database so that they are preserved to run later even if the process crashes.
 
@@ -325,17 +327,17 @@ database.run(
 - https://github.com/litements/litequeue
 - https://github.com/diamondio/better-queue-sqlite
 
-#### `Database.scheduledBackgroundJob()`
+#### `Database.scheduledBackgroundJobWorker()`
 
 ```typescript
-scheduledBackgroundJob(
+scheduledBackgroundJobWorker(
     {
       schedule,
-      ...sqliteBackgroundJobOptions
+      ...sqliteBackgroundJobWorkerOptions
     }: {
       schedule: string;
-    } & Parameters<typeof this.backgroundJob>[0],
-    job: Parameters<typeof utilities.setInterval>[1],
+    } & Parameters<typeof this.backgroundJobWorker>[0],
+    function_: Parameters<typeof utilities.setInterval>[1],
   ): void;
 ```
 

@@ -329,7 +329,7 @@ export class Database extends BetterSQLite3Database {
   }
 
   /**
-   * A background job system that builds upon [`@radically-straightforward/node`](https://github.com/radically-straightforward/radically-straightforward/tree/main/node)’s `backgroundJob()` to provide the following features:
+   * A background job system with the following features:
    *
    * - Persist background jobs in the database so that they are preserved to run later even if the process crashes.
    *
@@ -380,23 +380,23 @@ export class Database extends BetterSQLite3Database {
    * - https://github.com/litements/litequeue
    * - https://github.com/diamondio/better-queue-sqlite
    */
-  backgroundJob<Type>(
+  backgroundJobWorker<Type>(
     {
       type,
       timeout = 5 * 60 * 1000,
       retryIn = 5 * 60 * 1000,
       retries = 10,
-      ...nodeBackgroundJobOptions
+      ...nodeSetTimeoutOptions
     }: {
       type: string;
       timeout?: number;
       retryIn?: number;
       retries?: number;
     } & Partial<Parameters<typeof node.setInterval>[0]>,
-    job: (parameters: Type) => void | Promise<void>,
+    function_: (parameters: Type) => void | Promise<void>,
   ): ReturnType<typeof node.setInterval> {
     return node.setInterval(
-      { ...nodeBackgroundJobOptions, duration: 5000 },
+      { ...nodeSetTimeoutOptions, duration: 5000 },
       async () => {
         this.executeTransaction(() => {
           for (const backgroundJob of this.all<{
@@ -506,7 +506,7 @@ export class Database extends BetterSQLite3Database {
               String(backgroundJob.id),
             );
             await utilities.timeout(timeout, async () => {
-              await job(JSON.parse(backgroundJob.parameters));
+              await function_(JSON.parse(backgroundJob.parameters));
             });
             this.run(
               sql`
@@ -551,71 +551,74 @@ export class Database extends BetterSQLite3Database {
   /**
    * Schedule background jobs with a certain periodicity, similar to `cron`. The `schedule` uses the syntax of [`cron-parser`](https://npm.im/cron-parser).
    */
-  scheduledBackgroundJob(
+  scheduledBackgroundJobWorker(
     {
       schedule,
-      ...sqliteBackgroundJobOptions
+      ...sqliteBackgroundJobWorkerOptions
     }: {
       schedule: string;
-    } & Parameters<typeof this.backgroundJob>[0],
-    job: Parameters<typeof utilities.setInterval>[1],
+    } & Parameters<typeof this.backgroundJobWorker>[0],
+    function_: Parameters<typeof utilities.setInterval>[1],
   ): void {
-    this.backgroundJob(sqliteBackgroundJobOptions, job);
-    node.setInterval({ ...sqliteBackgroundJobOptions, duration: 5000 }, () => {
-      this.executeTransaction(() => {
-        const lastScheduledBackgroundJob = this.get<{
-          id: number;
-          lastScheduledAt: string;
-        }>(
-          sql`
+    this.backgroundJobWorker(sqliteBackgroundJobWorkerOptions, function_);
+    node.setInterval(
+      { ...sqliteBackgroundJobWorkerOptions, duration: 5000 },
+      () => {
+        this.executeTransaction(() => {
+          const lastScheduledBackgroundJob = this.get<{
+            id: number;
+            lastScheduledAt: string;
+          }>(
+            sql`
               select "id", "lastScheduledAt"
               from "_scheduledBackgroundJobs"
-              where "type" = ${sqliteBackgroundJobOptions.type};
+              where "type" = ${sqliteBackgroundJobWorkerOptions.type};
             `,
-        );
-        if (
-          lastScheduledBackgroundJob === undefined ||
-          CronExpressionParser.parse(schedule, {
-            currentDate: new Date(lastScheduledBackgroundJob.lastScheduledAt),
-          })
-            .next()
-            .toISOString()! < new Date().toISOString()
-        ) {
-          this.run(
-            sql`
+          );
+          if (
+            lastScheduledBackgroundJob === undefined ||
+            CronExpressionParser.parse(schedule, {
+              currentDate: new Date(lastScheduledBackgroundJob.lastScheduledAt),
+            })
+              .next()
+              .toISOString()! < new Date().toISOString()
+          ) {
+            this.run(
+              sql`
                 insert into "_backgroundJobs" (
                   "type",
                   "startAt",
                   "parameters"
                 )
                 values (
-                  ${sqliteBackgroundJobOptions.type},
+                  ${sqliteBackgroundJobWorkerOptions.type},
                   ${new Date().toISOString()},
                   ${JSON.stringify({})}
                 );
               `,
-          );
-          if (lastScheduledBackgroundJob !== undefined)
-            this.run(
-              sql`
+            );
+            if (lastScheduledBackgroundJob !== undefined)
+              this.run(
+                sql`
                   delete from "_scheduledBackgroundJobs" where "id" = ${lastScheduledBackgroundJob.id};
                 `,
-            );
-          this.run(
-            sql`
+              );
+            this.run(
+              sql`
                 insert into "_scheduledBackgroundJobs" (
                   "type",
                   "lastScheduledAt"
                 )
                 values (
-                  ${sqliteBackgroundJobOptions.type},
+                  ${sqliteBackgroundJobWorkerOptions.type},
                   ${new Date().toISOString()}
                 );
               `,
-          );
-        }
-      });
-    });
+            );
+          }
+        });
+      },
+    );
   }
 
   cacheSize = 10_000;

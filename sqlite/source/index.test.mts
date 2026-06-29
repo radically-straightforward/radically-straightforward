@@ -350,12 +350,12 @@ test("Database", async () => {
 });
 
 test(
-  "backgroundJob()",
+  "backgroundJobWorker()",
   {
     skip:
-      process.stdin.isTTY && process.argv[2] === "backgroundJob()"
+      process.stdin.isTTY && process.argv[2] === "backgroundJobWorker()"
         ? false
-        : `Run interactive test with ‘node ./build/index.test.mjs "backgroundJob()"’.`,
+        : `Run interactive test with ‘node ./build/index.test.mjs "backgroundJobWorker()"’.`,
   },
   async () => {
     const database = await new Database(":memory:").migrate();
@@ -393,12 +393,15 @@ test(
         );
       `,
     );
-    database.backgroundJob({ type: "a-job-which-was-left-behind" }, () => {});
+    database.backgroundJobWorker(
+      { type: "a-job-which-was-left-behind" },
+      () => {},
+    );
 
-    console.log("BackgroundJobs: Press ⌃Z to continue...");
+    console.log("backgroundJobWorker(): Press ⌃Z to continue...");
     await new Promise((resolve) => process.once("SIGTSTP", resolve));
 
-    database.backgroundJob(
+    database.backgroundJobWorker(
       {
         type: "a-job-which-times-out",
         timeout: 1000,
@@ -423,10 +426,10 @@ test(
       `,
     );
 
-    console.log("BackgroundJobs: Press ⌃Z to continue...");
+    console.log("backgroundJobWorker(): Press ⌃Z to continue...");
     await new Promise((resolve) => process.once("SIGTSTP", resolve));
 
-    database.backgroundJob(
+    database.backgroundJobWorker(
       {
         type: "a-job-which-throws-an-exception",
         retryIn: 1000,
@@ -451,7 +454,7 @@ test(
       `,
     );
 
-    console.log("BackgroundJobs: Press ⌃Z to continue...");
+    console.log("backgroundJobWorker(): Press ⌃Z to continue...");
     await new Promise((resolve) => process.once("SIGTSTP", resolve));
 
     node.exit();
@@ -459,20 +462,21 @@ test(
 );
 
 test(
-  "scheduledBackgroundJob()",
+  "scheduledBackgroundJobWorker()",
   {
     skip:
-      process.stdin.isTTY && process.argv[2] === "scheduledBackgroundJob()"
+      process.stdin.isTTY &&
+      process.argv[2] === "scheduledBackgroundJobWorker()"
         ? false
-        : `Run interactive test with ‘node ./build/index.test.mjs "scheduledBackgroundJob()"’.`,
+        : `Run interactive test with ‘node ./build/index.test.mjs "scheduledBackgroundJobWorker()"’.`,
   },
   async () => {
     const database = await new Database(":memory:").migrate();
 
-    database.scheduledBackgroundJob(
+    database.scheduledBackgroundJobWorker(
       { type: "test", schedule: "@minutely" },
       () => {
-        console.log("scheduledBackgroundJob()");
+        console.log("scheduledBackgroundJobWorker()");
       },
     );
   },
