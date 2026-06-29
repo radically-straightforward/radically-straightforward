@@ -292,33 +292,32 @@ test("intern()", () => {
 });
 
 test(
-  "backgroundJob()",
+  "setInterval()",
   {
     skip:
-      process.stdin.isTTY && process.argv[2] === "backgroundJob()"
+      process.stdin.isTTY && process.argv[2] === "setInterval()"
         ? false
-        : `Run interactive test with ‘node ./build/index.test.mjs "backgroundJob()"’.`,
+        : `Run interactive test with ‘node ./build/index.test.mjs "setInterval()"’.`,
   },
   async () => {
-    const backgroundJob = utilities.setInterval(
-      { duration: 3 * 1000 },
-      async () => {
-        console.log("backgroundJob(): Running background job...");
-        await utilities.sleep(3 * 1000);
-        console.log("backgroundJob(): ...finished running background job.");
-        if (Math.random() < 0.3)
-          throw new Error(
-            "There’s a 30% chance that the background job results in error.",
-          );
-      },
-    );
+    const interval = utilities.setInterval({ duration: 3 * 1000 }, async () => {
+      console.log("setInterval(): Running ‘function_’...");
+      await utilities.sleep(3 * 1000);
+      console.log("setInterval(): ...finished running ‘function_’.");
+      if (Math.random() < 0.3)
+        throw new Error(
+          "There’s a 30% chance that the ‘function_’ results in error.",
+        );
+    });
     process.on("SIGTSTP", () => {
-      backgroundJob.run();
+      interval.run();
     });
     process.on("SIGINT", () => {
-      backgroundJob.stop();
+      interval.stop();
     });
-    console.log("backgroundJob(): Press ⌃Z to ‘run()’ and ⌃C to ‘stop()’...");
+    console.log(
+      "setInterval(): Press ⌃Z to ‘interval.run()’ and ⌃C to ‘interval.stop()’...",
+    );
   },
 );
 
@@ -351,18 +350,18 @@ test(
   },
   async () => {
     const throttledFunction = utilities.throttle(async () => {
-      console.log("throttle(): Running the throttled function...");
+      console.log("throttle(): Running ‘function_’...");
       await utilities.sleep(3 * 1000);
-      console.log("throttle(): ...finished running the throttled function.");
+      console.log("throttle(): ...finished running ‘function_’.");
       if (Math.random() < 0.3)
         throw new Error(
-          "There’s a 30% chance that the the throttled function results in error.",
+          "There’s a 30% chance that the ‘function_’ results in error.",
         );
     });
     process.on("SIGTSTP", () => {
       throttledFunction();
     });
-    console.log("throttle(): Press ⌃Z to run the throttled function...");
+    console.log("throttle(): Press ⌃Z to run ‘function_’...");
     setInterval(() => {});
   },
 );
