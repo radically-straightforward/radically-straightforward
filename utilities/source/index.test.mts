@@ -300,7 +300,7 @@ test(
         : `Run interactive test with ‘node ./build/index.test.mjs "backgroundJob()"’.`,
   },
   async () => {
-    const backgroundJob = utilities.backgroundJob(
+    const backgroundJob = utilities.setInterval(
       { interval: 3 * 1000 },
       async () => {
         console.log("backgroundJob(): Running background job...");

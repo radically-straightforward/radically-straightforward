@@ -567,18 +567,16 @@ export function intern<
       return internValue as any;
   }
   for (const innerValue of Object.values(value))
-    if (
-      !(
-        typeof innerValue === "string" ||
-        typeof innerValue === "number" ||
-        typeof innerValue === "bigint" ||
-        typeof innerValue === "boolean" ||
-        typeof innerValue === "symbol" ||
-        innerValue === undefined ||
-        innerValue === null ||
-        (innerValue as any)[internSymbol] === true
-      )
-    )
+    if (!(
+      typeof innerValue === "string" ||
+      typeof innerValue === "number" ||
+      typeof innerValue === "bigint" ||
+      typeof innerValue === "boolean" ||
+      typeof innerValue === "symbol" ||
+      innerValue === undefined ||
+      innerValue === null ||
+      (innerValue as any)[internSymbol] === true
+    ))
       throw new Error(
         `Failed to intern value because of non-interned inner value.`,
       );
@@ -608,33 +606,51 @@ intern.finalizationRegistry = new FinalizationRegistry<{
 });
 
 /**
- * > **Note:** This is a lower level utility. See `@radically-straightforward/node`’s and `@radically-straightforward/javascript`’s extensions to `backgroundJob()` that are better suited for their specific environments.
+ * > **Note:** This is a lower level utility. See `@radically-straightforward/node`’s and `@radically-straightforward/javascript`’s extensions to `setInterval()` that are better suited for their specific environments.
  *
- * Start a background job that runs every `interval`.
+ * JavaScript’s `setInterval()` and `utilities.setInterval()` are different in the following ways:
  *
- * `backgroundJob()` is different from `setInterval()` in the following ways:
- *
- * 1. The interval counts **between** jobs, so slow background jobs don’t get called concurrently:
+ * 1. In JavaScript’s `setInterval()`, the `interval` starts counting when the `function_` **starts** running, so if the `function_` takes too long to run, then there may be multiple runs of `function_` happening at the same time:
  *
  *    ```
- *    setInterval()
- *    | SLOW BACKGROUND JOB |
- *    | INTERVAL | SLOW BACKGROUND JOB |
- *               | INTERVAL | ...
- *
- *    backgroundJob()
- *    | SLOW BACKGROUND JOB | INTERVAL | SLOW BACKGROUND JOB | INTERVAL | ...
+ *    Interval:  |--------------|--------------|...
+ *    Execution: |-------------------|
+ *                              |-------------------|
+ *                                             |-------------------|
  *    ```
  *
- * 2. You may use `backgroundJob.run()` to force the background job to run right away. If the background job is already running, calling `backgroundJob.run()` schedules it to run again as soon as possible (with a wait interval of `0`).
+ *    In `utilities.setInterval()`, the `interval` starts counting when `function_` **ends** running, so there’s always at most one run of `function_` happening at any given time:
  *
- * 3. You may use `backgroundJob.stop()` to stop the background job. If the background job is in the middle of running, it will finish but it will not be scheduled to run again. This is similar to how an HTTP server may terminate gracefully by stopping accepting new requests but finishing responding to existing requests. After a job has been stopped, you may not `backgroundJob.run()` it again (calling `backgroundJob.run()` has no effect).
+ *    ```
+ *    Interval:               |--------------|            |--------------|
+ *    Execution: |------------|              |------------|              ...
+ *    ```
  *
- * 4. We introduce a random interval variance of 10% on top of the given `interval` to avoid many background jobs from starting at the same time and overloading the machine.
+ * 2. You may use `interval.run()` to force the `function_` to run right away. If the `function_` is already running, calling `interval.run()` schedules it to run again:
  *
- * > **Note:** If the job throws an exception, the exception is logged and the background job continues.
+ *    ```
+ *    interval.run():                     ↓                                ↓ ↓ ↓
+ *    Interval:                    |------XXXXXXXX|    |--------------|                         ...
+ *    Execution:      |------------|      |------------|              |------------|------------|
+ *    ```
+ *
+ *
+ * 3. You may use `interval.stop()` to stop the interval. If the `function_` is in the middle of running, it will finish, but it will not be scheduled to run again. This is similar to how an HTTP server may terminate gracefully by stopping accepting new requests but finishing responding to existing requests. After a job has been stopped, you may not `interval.run()` it again (calling `interval.run()` has no effect).
+ *
+ *    ```
+ *    interval.stop():                 ↓
+ *    Interval:               |--------XXXXXXX|
+ *    Execution: |------------|
+ *
+ *
+ *    interval.stop():                             ↓
+ *    Interval:               |--------------|
+ *    Execution: |------------|              |------------|
+ *    ```
+ *
+ * 4. We introduce a random interval variance of 10% on top of the given `interval` to avoid many `function_`s from starting at the same time and overloading the machine.
  */
-export function backgroundJob(
+export function setInterval(
   {
     interval,
     firstRun = "async",
