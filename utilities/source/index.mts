@@ -610,7 +610,7 @@ intern.finalizationRegistry = new FinalizationRegistry<{
  *
  * JavaScript’s `setInterval()` and `utilities.setInterval()` are different in the following ways:
  *
- * 1. In JavaScript’s `setInterval()`, the `interval` starts counting when the `function_` **starts** running, so if the `function_` takes too long to run, then there may be multiple runs of `function_` happening at the same time:
+ * 1. In JavaScript’s `setInterval()`, the interval starts counting when the `function_` **starts** running, so if the `function_` takes too long to run, then there may be multiple runs of `function_` happening at the same time:
  *
  *    ```
  *    Interval:  |--------------|--------------|...
@@ -619,7 +619,7 @@ intern.finalizationRegistry = new FinalizationRegistry<{
  *                                             |-------------------|
  *    ```
  *
- *    In `utilities.setInterval()`, the `interval` starts counting when `function_` **ends** running, so there’s always at most one run of `function_` happening at any given time:
+ *    In `utilities.setInterval()`, the interval starts counting when `function_` **ends** running, so there’s always at most one run of `function_` happening at any given time:
  *
  *    ```
  *    Interval:               |--------------|            |--------------|
@@ -648,15 +648,15 @@ intern.finalizationRegistry = new FinalizationRegistry<{
  *    Execution: |------------|              |------------|
  *    ```
  *
- * 4. We introduce a random interval variance of 10% on top of the given `interval` to avoid many `function_`s from starting at the same time and overloading the machine.
+ * 4. We introduce a random variance of 10% on top of the given `duration` to avoid the `function_`s from different processes of the same kind from starting at the same time and overloading the machine.
  */
 export function setInterval(
   {
-    interval,
+    duration,
     firstRun = "async",
     onStop = () => {},
   }: {
-    interval: number;
+    duration: number;
     firstRun?: "sync" | "async" | "delayed";
     onStop?: () => void | Promise<void>;
   },
@@ -690,7 +690,7 @@ export function setInterval(
             (state as "running" | "runningAndMarkedForRerun") ===
               "runningAndMarkedForRerun"
               ? 0
-              : interval * (1 + 0.1 * Math.random()),
+              : duration * (1 + 0.1 * Math.random()),
           );
           state = "sleeping";
         }
@@ -711,7 +711,7 @@ export function setInterval(
       firstRun === "async"
         ? 0
         : firstRun === "delayed"
-          ? interval * (1 + 0.1 * Math.random())
+          ? duration * (1 + 0.1 * Math.random())
           : (() => {
               throw new Error();
             })(),

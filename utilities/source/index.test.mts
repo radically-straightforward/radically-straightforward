@@ -301,7 +301,7 @@ test(
   },
   async () => {
     const backgroundJob = utilities.setInterval(
-      { interval: 3 * 1000 },
+      { duration: 3 * 1000 },
       async () => {
         console.log("backgroundJob(): Running background job...");
         await utilities.sleep(3 * 1000);
