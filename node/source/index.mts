@@ -21,7 +21,7 @@ for (const signal of [
   });
 
 /**
- * This is an extension of [`@radically-straightforward/utilities`](https://github.com/radically-straightforward/radically-straightforward/tree/main/utilities)’s `backgroundJob()` which adds support for graceful termination.
+ * This is an extension of [`@radically-straightforward/utilities`](https://github.com/radically-straightforward/radically-straightforward/tree/main/utilities)’s `setInterval()` which adds support for graceful termination.
  *
  * **Example**
  *
@@ -29,32 +29,32 @@ for (const signal of [
  * import timers from "node:timers/promises";
  * import * as node from "@radically-straightforward/node";
  *
- * node.backgroundJob({ interval: 3 * 1000 }, async () => {
- *   console.log("backgroundJob(): Running background job...");
+ * node.setInterval({ duration: 3 * 1000 }, async () => {
+ *   console.log("setInterval(): Running ‘function_’...");
  *   await timers.setTimeout(3 * 1000);
- *   console.log("backgroundJob(): ...finished running background job.");
+ *   console.log("setInterval(): ...finished running ‘function_’.");
  * });
  * ```
  */
-export function backgroundJob(
-  utilitiesBackgroundJobOptions: Parameters<typeof utilities.setInterval>[0],
-  job: Parameters<typeof utilities.setInterval>[1],
+export function setInterval(
+  utilitiesSetIntervalOptions: Parameters<typeof utilities.setInterval>[0],
+  function_: Parameters<typeof utilities.setInterval>[1],
 ): ReturnType<typeof utilities.setInterval> {
-  const backgroundJob = utilities.setInterval(
+  const interval = utilities.setInterval(
     {
-      ...utilitiesBackgroundJobOptions,
+      ...utilitiesSetIntervalOptions,
       onStop: async () => {
         process.off("gracefulTermination", gracefulTerminationEventListener);
-        await utilitiesBackgroundJobOptions.onStop?.();
+        await utilitiesSetIntervalOptions.onStop?.();
       },
     },
-    job,
+    function_,
   );
   const gracefulTerminationEventListener = () => {
-    backgroundJob.stop();
+    interval.stop();
   };
   process.once("gracefulTermination", gracefulTerminationEventListener);
-  return backgroundJob;
+  return interval;
 }
 
 /**
@@ -76,7 +76,7 @@ export function childProcessKeepAlive(
     | Promise<ReturnType<(typeof childProcess)["spawn"]>>,
 ): void {
   let childProcessInstance: ReturnType<(typeof childProcess)["spawn"]>;
-  backgroundJob(
+  setInterval(
     {
       interval: 200,
       onStop: () => {

@@ -27,7 +27,7 @@
     "test": "npm run prepare && node --test \"./build/**/*.test.mjs\" && prettier --check ./README.md ./CHANGELOG.md ./package.json ./tsconfig.json ./source/"
   },
   "dependencies": {
-    "@radically-straightforward/utilities": "^2.0.23"
+    "@radically-straightforward/utilities": "^2.0.24"
   },
   "devDependencies": {
     "@radically-straightforward/documentation": "^1.0.9",

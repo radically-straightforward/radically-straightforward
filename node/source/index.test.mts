@@ -33,35 +33,31 @@ test(
 );
 
 test(
-  "backgroundJob()",
+  "setInterval()",
   {
     skip:
-      process.stdin.isTTY && process.argv[2] === "backgroundJob()"
+      process.stdin.isTTY && process.argv[2] === "setInterval()"
         ? false
-        : `Run interactive test with ‘node ./build/index.test.mjs "backgroundJob()"’.`,
+        : `Run interactive test with ‘node ./build/index.test.mjs "setInterval()"’.`,
   },
   async () => {
     for (let iteration = 0; iteration < 1000; iteration++) {
-      const backgroundJob = node.backgroundJob(
-        { interval: 3 * 1000 },
-        () => {},
-      );
-      backgroundJob.stop();
+      const interval = node.setInterval({ duration: 3 * 1000 }, () => {});
+      interval.stop();
       // If background jobs leak ‘process.once("gracefulTermination")’ event listeners, then we get a warning in the console.
     }
 
-    const backgroundJob = node.backgroundJob(
-      { interval: 3 * 1000 },
-      async () => {
-        console.log("backgroundJob(): Running background job...");
-        await timers.setTimeout(3 * 1000);
-        console.log("backgroundJob(): ...finished running background job.");
-      },
-    );
-    process.on("SIGTSTP", () => {
-      backgroundJob.run();
+    const interval = node.setInterval({ duration: 3 * 1000 }, async () => {
+      console.log("setInterval(): Running ‘function_’...");
+      await timers.setTimeout(3 * 1000);
+      console.log("setInterval(): ...finished running ‘function_’.");
     });
-    console.log("backgroundJob(): Press ⌃Z to ‘run()’ and ⌃C to ‘stop()’...");
+    process.on("SIGTSTP", () => {
+      interval.run();
+    });
+    console.log(
+      "setInterval(): Press ⌃Z to ‘interval.run()’ and ⌃C to ‘interval.stop()’...",
+    );
   },
 );
 
