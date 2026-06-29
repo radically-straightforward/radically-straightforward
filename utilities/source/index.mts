@@ -634,7 +634,6 @@ intern.finalizationRegistry = new FinalizationRegistry<{
  *    Execution:      |------------|      |------------|              |------------|------------|
  *    ```
  *
- *
  * 3. You may use `interval.stop()` to stop the interval. If the `function_` is in the middle of running, it will finish, but it will not be scheduled to run again. This is similar to how an HTTP server may terminate gracefully by stopping accepting new requests but finishing responding to existing requests. After a job has been stopped, you may not `interval.run()` it again (calling `interval.run()` has no effect).
  *
  *    ```
