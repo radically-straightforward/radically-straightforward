@@ -31,5 +31,9 @@
     "@radically-straightforward/server": "^2.0.6",
     "@radically-straightforward/sqlite": "^1.1.16",
     "@radically-straightforward/utilities": "^2.0.24"
+  },
+  "allowScripts": {
+    "@radically-straightforward/caddy@2.0.12": true,
+    "better-sqlite3@12.11.1": true
   }
 }
