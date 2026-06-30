@@ -28,17 +28,20 @@
     "test": "npm run prepare && node --test \"./build/**/*.test.mjs\" && prettier --check ./README.md ./CHANGELOG.md ./package.json ./tsconfig.json ./source/"
   },
   "dependencies": {
-    "@babel/core": "^7.29.0",
-    "@babel/generator": "^7.29.1",
-    "prettier": "^3.8.3"
+    "@babel/core": "^8.0.1",
+    "@babel/generator": "^8.0.0",
+    "prettier": "^3.9.4"
   },
   "devDependencies": {
-    "@radically-straightforward/typescript": "^1.0.4",
-    "@radically-straightforward/utilities": "^2.0.22",
+    "@radically-straightforward/typescript": "^1.0.5",
+    "@radically-straightforward/utilities": "^2.0.24",
     "@types/babel__core": "^7.20.5",
     "@types/babel__generator": "^7.27.0",
-    "@types/node": "^25.6.0",
+    "@types/node": "^26.0.1",
     "typescript": "^6.0.3"
+  },
+  "allowScripts": {
+    "@radically-straightforward/typescript@1.0.5": true
   },
   "prettier": {}
 }
