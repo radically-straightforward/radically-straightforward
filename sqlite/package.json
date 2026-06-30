@@ -42,9 +42,9 @@
     "prettier": "^3.9.4",
     "typescript": "^6.0.3"
   },
-  "prettier": {},
   "allowScripts": {
     "@radically-straightforward/typescript@1.0.5": true,
     "better-sqlite3@12.11.1": true
-  }
+  },
+  "prettier": {}
 }
