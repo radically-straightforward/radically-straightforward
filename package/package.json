@@ -1,6 +1,6 @@
 {
   "name": "@radically-straightforward/package",
-  "version": "2.0.4",
+  "version": "2.0.5",
   "description": "📦 Package a Node.js application",
   "keywords": [
     "package",
