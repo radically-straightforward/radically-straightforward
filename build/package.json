@@ -28,25 +28,30 @@
     "test": "npm run prepare && node --test \"./build/**/*.test.mjs\" && prettier --check ./README.md ./CHANGELOG.md ./package.json ./tsconfig.json ./source/"
   },
   "dependencies": {
-    "@babel/core": "^7.29.0",
-    "@babel/generator": "^7.29.1",
-    "@csstools/postcss-light-dark-function": "^3.0.0",
+    "@babel/core": "^8.0.1",
+    "@babel/generator": "^8.0.0",
+    "@csstools/postcss-light-dark-function": "^3.0.2",
     "@radically-straightforward/css": "^3.0.3",
     "@radically-straightforward/html": "^1.0.3",
-    "@radically-straightforward/javascript": "^4.0.38",
+    "@radically-straightforward/javascript": "^4.0.39",
     "base-x": "^5.0.1",
-    "esbuild": "^0.28.0",
+    "esbuild": "^0.28.1",
     "make-synchronized": "^0.8.0",
-    "postcss": "^8.5.10",
-    "prettier": "^3.8.3",
+    "postcss": "^8.5.16",
+    "prettier": "^3.9.4",
     "xxhash-addon": "^2.1.0"
   },
   "devDependencies": {
-    "@radically-straightforward/typescript": "^1.0.4",
+    "@radically-straightforward/typescript": "^1.0.5",
     "@types/babel__core": "^7.20.5",
     "@types/babel__generator": "^7.27.0",
-    "@types/node": "^25.6.0",
+    "@types/node": "^26.0.1",
     "typescript": "^6.0.3"
+  },
+  "allowScripts": {
+    "@radically-straightforward/typescript@1.0.5": true,
+    "esbuild@0.28.1": true,
+    "xxhash-addon@2.1.0": true
   },
   "prettier": {}
 }
