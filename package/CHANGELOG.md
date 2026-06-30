@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.0.5 · 2026-06-30
+
+- Recently Node.js started dynamically linking the main features when distributed with Homebrew, so now instead of copying the `node` executable, we download it from the distribution website.
+
 ## 2.0.1 · 2024-05-08
 
 - Fixed an issue on Windows in which Node.js starting version 22 doesn’t allow for `execFile()` with `.cmd`.

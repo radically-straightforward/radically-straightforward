@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
 import path from "node:path";
+import os from "node:os";
 import fs from "node:fs/promises";
 import childProcess from "node:child_process";
 import util from "node:util";
@@ -15,11 +16,42 @@ await util.promisify(childProcess.exec)(
   { env: { ...process.env, NODE_ENV: "production" } },
 );
 
-await fs.mkdir("./node_modules/.bin", { recursive: true });
-await fs.cp(
-  process.execPath,
-  path.join("./node_modules/.bin", path.basename(process.execPath)),
+const downloadDirectory = await fs.mkdtemp(
+  path.join(os.tmpdir(), "radically-straightforward--package--"),
 );
+await fs.writeFile(
+  path.join(
+    downloadDirectory,
+    `node.${process.platform === "win32" ? "zip" : "tar.gz"}`,
+  ),
+  (
+    await fetch(
+      `https://nodejs.org/download/release/${process.version}/node-${process.version}-${
+        { win32: "win", darwin: "darwin", linux: "linux" }[
+          process.platform as "win32" | "darwin" | "linux"
+        ]
+      }-${process.arch}.${process.platform === "win32" ? "zip" : "tar.gz"}`,
+    )
+  ).body!,
+);
+await util.promisify(childProcess.execFile)(
+  "tar",
+  ["-xzf", `node.${process.platform === "win32" ? "zip" : "tar.gz"}`],
+  { cwd: downloadDirectory },
+);
+await fs.mkdir("./node_modules/.bin", { recursive: true });
+await fs.copyFile(
+  path.join(
+    downloadDirectory,
+    `node-${process.version}-${
+      { win32: "win", darwin: "darwin", linux: "linux" }[
+        process.platform as "win32" | "darwin" | "linux"
+      ]
+    }-${process.arch}/bin/node${process.platform === "win32" ? ".exe" : ""}`,
+  ),
+  `./node_modules/.bin/node${process.platform === "win32" ? ".exe" : ""}`,
+);
+await fs.rm(downloadDirectory, { recursive: true, force: true });
 
 const archive =
   process.platform === "win32"
