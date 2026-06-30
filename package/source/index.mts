@@ -6,7 +6,7 @@ import childProcess from "node:child_process";
 import util from "node:util";
 import fsStream from "node:fs";
 import stream from "node:stream/promises";
-import archiver from "archiver";
+import * as archiver from "archiver";
 import { dedent as batch } from "@radically-straightforward/utilities";
 import { dedent as sh } from "@radically-straightforward/utilities";
 
@@ -23,8 +23,8 @@ await fs.cp(
 
 const archive =
   process.platform === "win32"
-    ? archiver("zip")
-    : archiver("tar", { gzip: true });
+    ? new archiver.ZipArchive()
+    : new archiver.TarArchive({ gzip: true });
 const archiveStream = fsStream.createWriteStream(
   path.join(
     `../${path.basename(process.cwd())}.${
