@@ -30,5 +30,10 @@
     "@radically-straightforward/javascript": "^4.0.39",
     "@radically-straightforward/package": "^2.0.4",
     "@radically-straightforward/typescript": "^1.0.5"
+  },
+  "allowScripts": {
+    "@radically-straightforward/typescript@1.0.5": true,
+    "esbuild@0.28.0": true,
+    "xxhash-addon@2.1.0": true
   }
 }
