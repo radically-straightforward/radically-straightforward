@@ -4,7 +4,7 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import childProcess from "node:child_process";
 import util from "node:util";
-import babel from "@babel/core";
+import * as babel from "@babel/core";
 import * as babelGenerator from "@babel/generator";
 import prettier from "prettier";
 
@@ -36,7 +36,7 @@ for (const input of process.argv.length === 2
         {
           parserOpts: { plugins: ["typescript"] },
           plugins: [
-            {
+            () => ({
               visitor: {
                 "ExportDefaultDeclaration|ExportNamedDeclaration": (
                   path: any,
@@ -267,7 +267,7 @@ for (const input of process.argv.length === 2
                     }
                 },
               },
-            },
+            }),
           ],
         },
       );
