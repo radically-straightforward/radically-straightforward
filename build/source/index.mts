@@ -3,7 +3,7 @@
 import path from "node:path";
 import fs from "node:fs/promises";
 import util from "node:util";
-import babel from "@babel/core";
+import * as babel from "@babel/core";
 import * as babelGenerator from "@babel/generator";
 // @ts-ignore
 import makeSynchronized from "make-synchronized";
@@ -42,7 +42,7 @@ for await (const source of fs.glob("./build/**/*.mjs")) {
     compact: false,
     sourceMaps: true,
     plugins: [
-      {
+      () => ({
         visitor: {
           ImportDeclaration: (path) => {
             if (
@@ -135,7 +135,7 @@ for await (const source of fs.glob("./build/**/*.mjs")) {
             }
           },
         },
-      },
+      }),
     ],
   });
   if (

@@ -150,13 +150,15 @@ In some situations you may need to control the CSS at run time, depending on use
    ```javascript
    html`
      <div
-       css="${userIsSignedIn
-         ? css`
-             background-color: green;
-           `
-         : css`
-             background-color: red;
-           `}"
+       css="${
+         userIsSignedIn
+           ? css`
+               background-color: green;
+             `
+           : css`
+               background-color: red;
+             `
+       }"
      ></div>
    `;
    ```
