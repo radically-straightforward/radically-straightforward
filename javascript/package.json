@@ -47,8 +47,11 @@
     "@radically-straightforward/typescript": "^1.0.5",
     "@types/node": "^26.0.1",
     "postcss": "^8.5.16",
-    "prettier": "^3.9.3",
+    "prettier": "^3.9.4",
     "typescript": "^6.0.3"
+  },
+  "allowScripts": {
+    "@radically-straightforward/typescript@1.0.5": true
   },
   "prettier": {}
 }
