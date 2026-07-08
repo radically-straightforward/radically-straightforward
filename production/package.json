@@ -1,6 +1,6 @@
 {
   "name": "@radically-straightforward/production",
-  "version": "1.0.68",
+  "version": "1.0.69",
   "description": "🧰 Radically Straightforward packages for production",
   "keywords": [
     "radically straightforward",
@@ -29,7 +29,7 @@
     "@radically-straightforward/html": "^1.0.3",
     "@radically-straightforward/node": "^3.1.11",
     "@radically-straightforward/server": "^2.0.6",
-    "@radically-straightforward/sqlite": "^1.1.16",
+    "@radically-straightforward/sqlite": "^1.1.17",
     "@radically-straightforward/utilities": "^2.0.24"
   },
   "allowScripts": {
