@@ -360,20 +360,7 @@ test(
   async () => {
     const database = await new Database(":memory:").migrate();
 
-    database.run(
-      sql`
-        insert into "_backgroundJobs" (
-          "type",
-          "startAt",
-          "parameters"
-        )
-        values (
-          ${"a-job-with-no-worker"},
-          ${new Date().toISOString()},
-          ${JSON.stringify(null)}
-        );
-      `,
-    );
+    database.backgroundJob({ type: "a-job-with-no-worker" });
 
     database.run(
       sql`
@@ -411,20 +398,10 @@ test(
         await timers.setTimeout(5 * 1000);
       },
     );
-    database.run(
-      sql`
-        insert into "_backgroundJobs" (
-          "type",
-          "startAt",
-          "parameters"
-        )
-        values (
-          ${"a-job-which-times-out"},
-          ${new Date().toISOString()},
-          ${JSON.stringify({ name: "Leandro" })}
-        );
-      `,
-    );
+    database.backgroundJob({
+      type: "a-job-which-times-out",
+      parameters: { name: "Leandro" },
+    });
 
     console.log("backgroundJobWorker(): Press ⌃Z to continue...");
     await new Promise((resolve) => process.once("SIGTSTP", resolve));
@@ -439,20 +416,10 @@ test(
         throw new Error("AN ERROR");
       },
     );
-    database.run(
-      sql`
-        insert into "_backgroundJobs" (
-          "type",
-          "startAt",
-          "parameters"
-        )
-        values (
-          ${"a-job-which-throws-an-exception"},
-          ${new Date().toISOString()},
-          ${JSON.stringify({ name: "Leandro" })}
-        );
-      `,
-    );
+    database.backgroundJob({
+      type: "a-job-which-throws-an-exception",
+      parameters: { name: "Leandro" },
+    });
 
     console.log("backgroundJobWorker(): Press ⌃Z to continue...");
     await new Promise((resolve) => process.once("SIGTSTP", resolve));

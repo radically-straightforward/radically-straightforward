@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.1.17 · 2026-07-08
+
+- Added `backgroundJob()` as an auxiliary function to enqueue a job.
+
 ## 1.1.16 · 2026-06-29
 
 - **Breaking changes:**

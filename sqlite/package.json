@@ -1,6 +1,6 @@
 {
   "name": "@radically-straightforward/sqlite",
-  "version": "1.1.16",
+  "version": "1.1.17",
   "description": "🗃️ SQLite with tagged templates and migrations",
   "keywords": [
     "sqlite",
@@ -38,7 +38,7 @@
   "devDependencies": {
     "@radically-straightforward/documentation": "^1.0.9",
     "@radically-straightforward/typescript": "^1.0.5",
-    "@types/node": "^26.0.1",
+    "@types/node": "^26.1.1",
     "prettier": "^3.9.4",
     "typescript": "^6.0.3"
   },

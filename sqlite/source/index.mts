@@ -345,28 +345,7 @@ export class Database extends BetterSQLite3Database {
    *
    * > **Note:** You may use the same database for application data and background jobs, which is simpler to manage, or separate databases for application data for background jobs, which may be faster because background jobs write to the database often and SQLite locks the database on writes.
    *
-   * You may schedule a background job by `insert`ing it into the `_backgroundJobs` table that’s created by `migrate()`, for example:
-   *
-   * ```typescript
-   * database.run(
-   *   sql`
-   *     insert into "_backgroundJobs" (
-   *       "type",
-   *       "startAt",
-   *       "parameters"
-   *     )
-   *     values (
-   *       ${"email"},
-   *       ${new Date(Date.now() + 5 * 60 * 1000).toISOString()},
-   *       ${JSON.stringify({
-   *         from: "example@example.com",
-   *         to: "radically-straightforward@leafac.com",
-   *         text: "This was sent from a background job.",
-   *       })}
-   *     );
-   *   `,
-   * );
-   * ```
+   * This method adds a background job to the queue, and `backgroundJobWorker()` defines the worker.
    *
    * > **Note:** A job that times out may actually end up running to completion, despite being marked for retrying in the future. This is a consequence of using [`@radically-straightforward/utilities`](https://github.com/radically-straightforward/radically-straightforward/tree/main/utilities)’s `timeout()`.
    *
@@ -379,6 +358,34 @@ export class Database extends BetterSQLite3Database {
    * - https://github.com/bensheldon/good_job
    * - https://github.com/litements/litequeue
    * - https://github.com/diamondio/better-queue-sqlite
+   */
+  backgroundJob({
+    type,
+    startAt = new Date().toISOString(),
+    parameters = null,
+  }: {
+    type: string;
+    startAt?: string;
+    parameters?: any;
+  }): void {
+    this.run(
+      sql`
+        insert into "_backgroundJobs" (
+          "type",
+          "startAt",
+          "parameters"
+        )
+        values (
+          ${type},
+          ${startAt},
+          ${JSON.stringify(parameters)}
+        );
+      `,
+    );
+  }
+
+  /**
+   * This defined a background job worker. See `backgroundJob()`.
    */
   backgroundJobWorker<Type>(
     {
