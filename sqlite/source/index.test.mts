@@ -360,7 +360,7 @@ test(
   async () => {
     const database = await new Database(":memory:").migrate();
 
-    database.backgroundJob({ type: "a-job-with-no-worker" });
+    database.backgroundJob({ type: "aJobWithNoWorker" });
 
     database.run(
       sql`
@@ -372,7 +372,7 @@ test(
           "parameters"
         )
         values (
-          ${"a-job-which-was-left-behind"},
+          ${"aJobWhichWasLeftBehind"},
           ${new Date(Date.now() - 20 * 60 * 1000).toISOString()},
           ${new Date(Date.now() - 15 * 60 * 1000).toISOString()},
           ${0},
@@ -380,17 +380,14 @@ test(
         );
       `,
     );
-    database.backgroundJobWorker(
-      { type: "a-job-which-was-left-behind" },
-      () => {},
-    );
+    database.backgroundJobWorker({ type: "aJobWhichWasLeftBehind" }, () => {});
 
     console.log("backgroundJobWorker(): Press ⌃Z to continue...");
     await new Promise((resolve) => process.once("SIGTSTP", resolve));
 
     database.backgroundJobWorker(
       {
-        type: "a-job-which-times-out",
+        type: "aJobWhichTimesOut",
         timeout: 1000,
         retries: 2,
       },
@@ -399,7 +396,7 @@ test(
       },
     );
     database.backgroundJob({
-      type: "a-job-which-times-out",
+      type: "aJobWhichTimesOut",
       parameters: { name: "Leandro" },
     });
 
@@ -408,7 +405,7 @@ test(
 
     database.backgroundJobWorker(
       {
-        type: "a-job-which-throws-an-exception",
+        type: "aJobWhichThrowsAnException",
         retryIn: 1000,
         retries: 2,
       },
@@ -417,7 +414,7 @@ test(
       },
     );
     database.backgroundJob({
-      type: "a-job-which-throws-an-exception",
+      type: "aJobWhichThrowsAnException",
       parameters: { name: "Leandro" },
     });
 
