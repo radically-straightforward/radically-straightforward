@@ -175,4 +175,23 @@ static decrypt(key: crypto.KeyObject, encryptedText: string): string;
 
 
 
+### `AsymmetricEncryption`
+
+```typescript
+export class AsymmetricEncryption;
+```
+
+
+
+#### `AsymmetricEncryption.generateKeyPair()`
+
+```typescript
+static async generateKeyPair(): Promise<{
+    privateKey: string;
+    publicKey: string;
+  }>;
+```
+
+
+
 <!-- DOCUMENTATION END: ./source/index.mts -->

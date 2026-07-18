@@ -167,3 +167,18 @@ export class SymmetricEncryption {
     ]).toString("utf-8");
   }
 }
+
+/***/
+export class AsymmetricEncryption {
+  /***/
+  static async generateKeyPair(): Promise<{
+    privateKey: string;
+    publicKey: string;
+  }> {
+    return await util.promisify(crypto.generateKeyPair)("rsa", {
+      modulusLength: 3072,
+      publicKeyEncoding: { format: "pem", type: "spki" },
+      privateKeyEncoding: { format: "pem", type: "pkcs8" },
+    });
+  }
+}

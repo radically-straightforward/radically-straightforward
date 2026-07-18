@@ -108,3 +108,9 @@ test("SymmetricEncryption", async () => {
   const decryptedText = node.SymmetricEncryption.decrypt(key, encryptedText);
   assert.deepStrictEqual(plainText, decryptedText);
 });
+
+test("AsymmetricEncryption", async () => {
+  const keyPair = await node.AsymmetricEncryption.generateKeyPair();
+  assert(keyPair.privateKey.startsWith("-----BEGIN PRIVATE KEY-----"));
+  assert(keyPair.publicKey.startsWith("-----BEGIN PUBLIC KEY-----"));
+});
