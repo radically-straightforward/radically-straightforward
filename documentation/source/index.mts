@@ -172,10 +172,12 @@ for (const input of process.argv.length === 2
                         )
                         .trim())(),
                     ";\n```\n\n",
-                    path.node.leadingComments[0].value
-                      .replace(/^\s*\* ?/gmu, "")
-                      .trim(),
-                    "\n\n",
+                    ...(() => {
+                      const comment = path.node.leadingComments[0].value
+                        .replace(/^\s*\* ?/gmu, "")
+                        .trim();
+                      return comment !== "" ? [comment, "\n\n"] : [];
+                    })(),
                   );
                   if (
                     path.node.declaration.type === "ClassDeclaration" &&

@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.10 · 2026-07-18
+
+- Added support for comments of the kind `/***/`, which add only the signature into the documentation.
+
 ## 1.0.4 · 2024-03-23
 
 - Removed an explicit dependency on `@babel/types` in favor of `@babel/core`.
