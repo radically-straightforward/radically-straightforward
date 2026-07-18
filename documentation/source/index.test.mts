@@ -69,6 +69,9 @@ test(async () => {
          * Example of \`ClassProperty\`.
          */
         exampleOfClassProperty: string = "exampleOfClassProperty";
+
+        /***/
+        exampleOfEmptyComment: string = "exampleOfEmptyComment";
       }
 
       /**
@@ -140,6 +143,12 @@ test(async () => {
       \`\`\`
       
       Example of \`ClassProperty\`.
+      
+      #### \`ExampleOfClassDeclaration.exampleOfEmptyComment\`
+      
+      \`\`\`typescript
+      exampleOfEmptyComment: string;
+      \`\`\`
       
       ### \`ExampleOfTSTypeAliasDeclaration\`
       

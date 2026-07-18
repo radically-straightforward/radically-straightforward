@@ -261,10 +261,12 @@ for (const input of process.argv.length === 2
                             )
                             .trim())(),
                         ";\n```\n\n",
-                        classBodyNode.leadingComments[0].value
-                          .replace(/^\s*\* ?/gmu, "")
-                          .trim(),
-                        "\n\n",
+                        ...(() => {
+                          const comment = classBodyNode.leadingComments[0].value
+                            .replace(/^\s*\* ?/gmu, "")
+                            .trim();
+                          return comment !== "" ? [comment, "\n\n"] : [];
+                        })(),
                       );
                     }
                 },
