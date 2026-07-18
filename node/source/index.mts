@@ -104,18 +104,26 @@ export function exit(): void {
   } else process.kill(process.pid);
 }
 
+/**
+ * Utilities for cryptography that make it secure and easy to use.
+ */
 export class SymmetricEncryption {
+  /***/
   static async generateKey(): Promise<crypto.KeyObject> {
     return await util.promisify(crypto.generateKey)("aes", { length: 256 });
   }
 
+  /***/
   static exportKey(key: crypto.KeyObject): string {
     return key.export().toString("hex");
   }
 
+  /***/
   static importKey(keyString: string): crypto.KeyObject {
     return crypto.createSecretKey(keyString, "hex");
   }
+
+  /***/
   static encrypt(key: crypto.KeyObject, plainText: string): string {
     const initializationVector = crypto.randomBytes(12);
     const cipher = crypto.createCipheriv(
@@ -135,6 +143,7 @@ export class SymmetricEncryption {
     });
   }
 
+  /***/
   static decrypt(key: crypto.KeyObject, encryptedText: string): string {
     const encryptedTextParts = JSON.parse(encryptedText);
     const initializationVector = Buffer.from(

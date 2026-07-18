@@ -127,4 +127,52 @@ export function exit(): void;
 
 On platforms other than Windows, `exit()` sends a `SIGTERM` to the process itself, which starts graceful termination. On Windows, this `process.emit()`s the `gracefulTermination` event and `process.exit()`s.
 
+### `SymmetricEncryption`
+
+```typescript
+export class SymmetricEncryption;
+```
+
+Utilities for cryptography that make it secure and easy to use.
+
+#### `SymmetricEncryption.generateKey()`
+
+```typescript
+static async generateKey(): Promise<crypto.KeyObject>;
+```
+
+
+
+#### `SymmetricEncryption.exportKey()`
+
+```typescript
+static exportKey(key: crypto.KeyObject): string;
+```
+
+
+
+#### `SymmetricEncryption.importKey()`
+
+```typescript
+static importKey(keyString: string): crypto.KeyObject;
+```
+
+
+
+#### `SymmetricEncryption.encrypt()`
+
+```typescript
+static encrypt(key: crypto.KeyObject, plainText: string): string;
+```
+
+
+
+#### `SymmetricEncryption.decrypt()`
+
+```typescript
+static decrypt(key: crypto.KeyObject, encryptedText: string): string;
+```
+
+
+
 <!-- DOCUMENTATION END: ./source/index.mts -->
