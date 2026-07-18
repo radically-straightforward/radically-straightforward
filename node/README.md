@@ -141,15 +141,11 @@ Utilities for cryptography that make it secure and easy to use.
 static async generateKey(): Promise<crypto.KeyObject>;
 ```
 
-
-
 #### `SymmetricEncryption.exportKey()`
 
 ```typescript
 static exportKey(key: crypto.KeyObject): string;
 ```
-
-
 
 #### `SymmetricEncryption.importKey()`
 
@@ -157,23 +153,17 @@ static exportKey(key: crypto.KeyObject): string;
 static importKey(keyString: string): crypto.KeyObject;
 ```
 
-
-
 #### `SymmetricEncryption.encrypt()`
 
 ```typescript
 static encrypt(key: crypto.KeyObject, plainText: string): string;
 ```
 
-
-
 #### `SymmetricEncryption.decrypt()`
 
 ```typescript
 static decrypt(key: crypto.KeyObject, encryptedText: string): string;
 ```
-
-
 
 ### `AsymmetricEncryption`
 
@@ -190,8 +180,6 @@ static async generateKeyPair(): Promise<{
   }>;
 ```
 
-
-
 ### `TokenHash`
 
 ```typescript
@@ -204,15 +192,11 @@ export class TokenHash;
 static hash(token: string): string;
 ```
 
-
-
 #### `TokenHash.verify()`
 
 ```typescript
 static verify(hash: string, token: string): boolean;
 ```
-
-
 
 ### `PasswordHash`
 
@@ -226,8 +210,6 @@ export class PasswordHash;
 static async hash(password: string): Promise<string>;
 ```
 
-
-
 #### `PasswordHash.verify()`
 
 ```typescript
@@ -236,7 +218,5 @@ static async verify(
     password: string,
   ): Promise<boolean>;
 ```
-
-
 
 <!-- DOCUMENTATION END: ./source/index.mts -->

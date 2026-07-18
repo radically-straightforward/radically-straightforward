@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.1.12 · 2026-07-18
+
+- Added support for cryptographic utilities.
+
 ## 3.1.11 · 2026-06-29
 
 - **Breaking changes:**
