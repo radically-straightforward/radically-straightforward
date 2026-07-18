@@ -1,4 +1,6 @@
 import childProcess from "node:child_process";
+import util from "node:util";
+import crypto from "node:crypto";
 import * as utilities from "@radically-straightforward/utilities";
 
 process.setMaxListeners(50);
@@ -100,4 +102,59 @@ export function exit(): void {
     process.emit("gracefulTermination" as any);
     process.exit();
   } else process.kill(process.pid);
+}
+
+export class SymmetricEncryption {
+  static async generateKey(): Promise<crypto.KeyObject> {
+    return await util.promisify(crypto.generateKey)("aes", { length: 256 });
+  }
+
+  static exportKey(key: crypto.KeyObject): string {
+    return key.export().toString("hex");
+  }
+
+  static importKey(keyString: string): crypto.KeyObject {
+    return crypto.createSecretKey(keyString, "hex");
+  }
+  static encrypt(key: crypto.KeyObject, plainText: string): string {
+    const initializationVector = crypto.randomBytes(12);
+    const cipher = crypto.createCipheriv(
+      "aes-256-gcm",
+      key,
+      initializationVector,
+    );
+    const cipherText = Buffer.concat([
+      cipher.update(plainText),
+      cipher.final(),
+    ]);
+    const authenticationTag = cipher.getAuthTag();
+    return JSON.stringify({
+      initializationVector: initializationVector.toString("hex"),
+      cipherText: cipherText.toString("base64"),
+      authenticationTag: authenticationTag.toString("hex"),
+    });
+  }
+
+  static decrypt(key: crypto.KeyObject, encryptedText: string): string {
+    const encryptedTextParts = JSON.parse(encryptedText);
+    const initializationVector = Buffer.from(
+      encryptedTextParts.initializationVector,
+      "hex",
+    );
+    const cipherText = Buffer.from(encryptedTextParts.cipherText, "base64");
+    const authenticationTag = Buffer.from(
+      encryptedTextParts.authenticationTag,
+      "hex",
+    );
+    const decipher = crypto.createDecipheriv(
+      "aes-256-gcm",
+      key,
+      initializationVector,
+    );
+    decipher.setAuthTag(authenticationTag);
+    return Buffer.concat([
+      decipher.update(cipherText),
+      decipher.final(),
+    ]).toString("utf-8");
+  }
 }
