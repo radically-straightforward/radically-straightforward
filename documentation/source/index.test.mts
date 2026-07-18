@@ -76,6 +76,9 @@ test(async () => {
        */
       export type ExampleOfTSTypeAliasDeclaration = string;
 
+      /***/
+      export const exampleOfEmptyComment: string = "exampleOfEmptyComment";
+
       // Example of last line for command.
     `,
   );
@@ -145,6 +148,12 @@ test(async () => {
       \`\`\`
       
       Example of \`TSTypeAliasDeclaration\`.
+
+      ### \`exampleOfEmptyComment\`
+
+      \`\`\`typescript
+      export const exampleOfEmptyComment: string;
+      \`\`\`
       
       <!-- DOCUMENTATION END: ./index.mts -->
       
