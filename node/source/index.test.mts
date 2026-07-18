@@ -1,4 +1,5 @@
 import test from "node:test";
+import assert from "node:assert/strict";
 import http from "node:http";
 import timers from "node:timers/promises";
 import childProcess from "node:child_process";
@@ -96,3 +97,14 @@ test(
     node.exit();
   },
 );
+
+test("SymmetricEncryption", async () => {
+  const key = await node.SymmetricEncryption.generateKey();
+  const exportedKey = node.SymmetricEncryption.exportKey(key);
+  const importedKey = node.SymmetricEncryption.importKey(exportedKey);
+  assert.deepStrictEqual(key, importedKey);
+  const plainText = "Radically Straightforward";
+  const encryptedText = node.SymmetricEncryption.encrypt(key, plainText);
+  const decryptedText = node.SymmetricEncryption.decrypt(key, encryptedText);
+  assert.deepStrictEqual(plainText, decryptedText);
+});
