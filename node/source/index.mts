@@ -182,3 +182,61 @@ export class AsymmetricEncryption {
     });
   }
 }
+
+/***/
+export class TokenHash {
+  /***/
+  static hash(token: string): string {
+    return crypto.hash("sha256", token);
+  }
+
+  /***/
+  static verify(hash: string, token: string): boolean {
+    return crypto.timingSafeEqual(
+      Buffer.from(hash, "hex"),
+      crypto.hash("sha256", token, "buffer"),
+    );
+  }
+}
+
+/***/
+export class PasswordHash {
+  static #argon2Options = {
+    tagLength: 32,
+    parallelism: 1,
+    memory: 12288,
+    passes: 3,
+  };
+
+  /***/
+  static async hash(password: string): Promise<string> {
+    const nonce = crypto.randomBytes(16);
+    const hash = await util.promisify(crypto.argon2)("argon2id", {
+      message: password,
+      nonce,
+      ...this.#argon2Options,
+    });
+    return JSON.stringify({
+      nonce: nonce.toString("hex"),
+      hash: hash.toString("hex"),
+    });
+  }
+
+  /***/
+  static async verify(
+    hashedPassword: string,
+    password: string,
+  ): Promise<boolean> {
+    const hashedPasswordParts = JSON.parse(hashedPassword);
+    const nonce = Buffer.from(hashedPasswordParts.nonce, "hex");
+    const hash = Buffer.from(hashedPasswordParts.hash, "hex");
+    return crypto.timingSafeEqual(
+      hash,
+      await util.promisify(crypto.argon2)("argon2id", {
+        message: password,
+        nonce,
+        ...this.#argon2Options,
+      }),
+    );
+  }
+}

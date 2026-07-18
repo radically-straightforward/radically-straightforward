@@ -194,4 +194,55 @@ static async generateKeyPair(): Promise<{
 
 
 
+### `TokenHash`
+
+```typescript
+export class TokenHash;
+```
+
+
+
+#### `TokenHash.hash()`
+
+```typescript
+static hash(token: string): string;
+```
+
+
+
+#### `TokenHash.verify()`
+
+```typescript
+static verify(hash: string, token: string): boolean;
+```
+
+
+
+### `PasswordHash`
+
+```typescript
+export class PasswordHash;
+```
+
+
+
+#### `PasswordHash.hash()`
+
+```typescript
+static async hash(password: string): Promise<string>;
+```
+
+
+
+#### `PasswordHash.verify()`
+
+```typescript
+static async verify(
+    hashedPassword: string,
+    password: string,
+  ): Promise<boolean>;
+```
+
+
+
 <!-- DOCUMENTATION END: ./source/index.mts -->

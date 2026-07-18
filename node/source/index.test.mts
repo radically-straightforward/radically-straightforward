@@ -114,3 +114,15 @@ test("AsymmetricEncryption", async () => {
   assert(keyPair.privateKey.startsWith("-----BEGIN PRIVATE KEY-----"));
   assert(keyPair.publicKey.startsWith("-----BEGIN PUBLIC KEY-----"));
 });
+
+test("TokenHash", async () => {
+  const token = "12345678";
+  const hash = node.TokenHash.hash(token);
+  assert(node.TokenHash.verify(hash, token));
+});
+
+test("PasswordHash", async () => {
+  const password = "12345678";
+  const hash = await node.PasswordHash.hash(password);
+  assert(await node.PasswordHash.verify(hash, password));
+});
