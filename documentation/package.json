@@ -30,15 +30,15 @@
   "dependencies": {
     "@babel/core": "^8.0.1",
     "@babel/generator": "^8.0.0",
-    "prettier": "^3.9.4"
+    "prettier": "^3.9.5"
   },
   "devDependencies": {
     "@radically-straightforward/typescript": "^1.0.5",
     "@radically-straightforward/utilities": "^2.0.24",
     "@types/babel__core": "^7.20.5",
     "@types/babel__generator": "^7.27.0",
-    "@types/node": "^26.0.1",
-    "typescript": "^6.0.3"
+    "@types/node": "^26.1.1",
+    "typescript": "^7.0.2"
   },
   "allowScripts": {
     "@radically-straightforward/typescript@1.0.5": true
