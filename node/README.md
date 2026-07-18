@@ -181,8 +181,6 @@ static decrypt(key: crypto.KeyObject, encryptedText: string): string;
 export class AsymmetricEncryption;
 ```
 
-
-
 #### `AsymmetricEncryption.generateKeyPair()`
 
 ```typescript
@@ -199,8 +197,6 @@ static async generateKeyPair(): Promise<{
 ```typescript
 export class TokenHash;
 ```
-
-
 
 #### `TokenHash.hash()`
 
@@ -223,8 +219,6 @@ static verify(hash: string, token: string): boolean;
 ```typescript
 export class PasswordHash;
 ```
-
-
 
 #### `PasswordHash.hash()`
 
