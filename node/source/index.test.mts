@@ -14,7 +14,7 @@ test(
         : `Run interactive test with ‘node ./build/index.test.mjs "exit()"’.`,
   },
   async () => {
-    const server = http.createServer().listen(8000);
+    const server = http.createServer().listen(18000);
     process.once("gracefulTermination", () => {
       // If you comment the line below the application remains running for 10 seconds and then it is forcefully terminated.
       server.close();
