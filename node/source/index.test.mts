@@ -14,19 +14,6 @@ test(
         : `Run interactive test with ‘node ./build/index.test.mjs "exit()"’.`,
   },
   async () => {
-    node.exit();
-  },
-);
-
-test(
-  "gracefulTermination",
-  {
-    skip:
-      process.stdin.isTTY && process.argv[2] === "gracefulTermination"
-        ? false
-        : `Run interactive test with ‘node ./build/index.test.mjs "gracefulTermination"’.`,
-  },
-  async () => {
     const server = http
       .createServer((request, response) => {
         response.end("gracefulTermination");

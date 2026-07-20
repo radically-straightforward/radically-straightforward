@@ -4,10 +4,7 @@ import crypto from "node:crypto";
 import * as utilities from "@radically-straightforward/utilities";
 
 /**
- * Similar to `process.exit()`, but with the following differences:
- *
- * 1. Emits the `"gracefulTermination"` event.
- * 2. After a timeout of 10 seconds, if the process hasn’t exited cleanly, forcefully terminate it.
+ * `exit()` emits the `"gracefulTermination"` event. Upon this event, the application is supposed to finish any operations that are in progress (for example, finish answering to HTTP requests) and empty the event loop by closing HTTP servers, clearing timeouts, and so forth. If the application is still running 10 seconds after `exit()` is called, then it’s terminated forcefully with `process.exit(1)`.
  */
 let exiting = false;
 export function exit(): void {
