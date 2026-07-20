@@ -3,13 +3,11 @@ import util from "node:util";
 import crypto from "node:crypto";
 import * as utilities from "@radically-straightforward/utilities";
 
-/**
- * `exit()` emits the `"gracefulTermination"` event. Upon this event, the application is supposed to finish any operations that are in progress (for example, finish answering to HTTP requests) and empty the event loop by closing HTTP servers, clearing timeouts, and so forth. If the application is still running 10 seconds after `exit()` is called, then it’s terminated forcefully with `process.exit(1)`.
- */
-let exiting = false;
-export function exit(): void {
-  if (exiting) return;
-  exiting = true;
+let gracefulTerminationInProgress = false;
+
+function gracefulTermination(): void {
+  if (gracefulTerminationInProgress) return;
+  gracefulTerminationInProgress = true;
   setTimeout(() => {
     process.exit(1);
   }, 10 * 1000).unref();
@@ -25,8 +23,17 @@ for (const signal of [
   "SIGUSR2",
 ])
   process.once(signal, () => {
-    exit();
+    gracefulTermination();
   });
+
+/**
+ * `exit()` emits the `"gracefulTermination"` event. Upon this event, the application is supposed to finish any operations that are in progress (for example, finish answering to HTTP requests) and empty the event loop by closing HTTP servers, clearing timeouts, and so forth. After that, the `"beforeExit"` event is emitted (unlike what happens with `process.exit()`). If the application is still running 10 seconds after `exit()` is called, then it’s terminated forcefully with `process.exit(1)`.
+ */
+export function exit(): void {
+  gracefulTermination();
+  process.emit("beforeExit" as any);
+  process.exit();
+}
 
 /**
  * This is an extension of [`@radically-straightforward/utilities`](https://github.com/radically-straightforward/radically-straightforward/tree/main/utilities)’s `setInterval()` which adds support for graceful termination.
