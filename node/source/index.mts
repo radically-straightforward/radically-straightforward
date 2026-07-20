@@ -24,7 +24,7 @@ for (const signal of [
   "SIGTERM",
   "SIGUSR2",
 ])
-  process.once(signal, () => {
+  process.on(signal, () => {
     exit();
   });
 
