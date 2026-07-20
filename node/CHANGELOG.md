@@ -1,9 +1,5 @@
 # Changelog
 
-## 3.1.13 · 2026-07-20
-
-- Improved `exit()` so that it terminates the process right away, similar to `process.exit()`.
-
 ## 3.1.12 · 2026-07-18
 
 - Added support for cryptographic utilities.
