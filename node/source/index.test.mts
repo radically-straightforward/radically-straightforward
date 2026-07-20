@@ -23,7 +23,7 @@ test(
     process.once("gracefulTermination", () => {
       console.log("exit(): Starting...");
     });
-    process.once("exit", () => {
+    process.once("beforeExit", () => {
       console.log("exit(): Finished.");
     });
   },
