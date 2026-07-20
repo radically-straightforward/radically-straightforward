@@ -6,7 +6,7 @@ import * as utilities from "@radically-straightforward/utilities";
 /**
  * Similar to `process.exit()`, but with the following differences:
  *
- * 1. Emits the `gracefulTermination` event.
+ * 1. Emits the `"gracefulTermination"` event.
  * 2. After a timeout of 10 seconds, if the process hasn’t exited cleanly, forcefully terminate it.
  */
 let exiting = false;
@@ -17,7 +17,6 @@ export function exit(): void {
     process.exit(1);
   }, 10 * 1000).unref();
   process.emit("gracefulTermination" as any);
-  process.exit();
 }
 
 for (const signal of [

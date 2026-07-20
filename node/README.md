@@ -31,7 +31,7 @@ Graceful termination works by listening to the following signals:
 
 When one of these signals is received, the `process.once("gracefulTermination")` event is emitted, and your application should handle it to [close HTTP servers](https://nodejs.org/api/http.html#serverclosecallback), [clear timers](https://nodejs.org/api/timers.html#clearimmediateimmediate), and so forth. The goal is to leave the Node.js event loop empty so that the process may terminate naturally.
 
-> **Note:** The `"gracefulTermination"` signal is emitted only once.
+> **Note:** The `"gracefulTermination"` event is emitted only once.
 
 As one last step before termination, you may handle [Node.js’s `process.once("beforeExit")` event](https://nodejs.org/api/process.html#event-beforeexit), which is emitted after the Node.js event loop is empty, but before the application terminates. This is useful, for example, to close a database connection, to log that the application terminated gracefully, and so forth.
 
@@ -118,14 +118,6 @@ node.childProcessKeepAlive(() =>
   }),
 );
 ```
-
-### `exit()`
-
-```typescript
-export function exit(): void;
-```
-
-On platforms other than Windows, `exit()` sends a `SIGTERM` to the process itself, which starts graceful termination. On Windows, this `process.emit()`s the `gracefulTermination` event and `process.exit()`s.
 
 ### `SymmetricEncryption`
 
