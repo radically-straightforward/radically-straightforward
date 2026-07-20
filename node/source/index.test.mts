@@ -6,6 +6,19 @@ import childProcess from "node:child_process";
 import * as node from "@radically-straightforward/node";
 
 test(
+  "exit()",
+  {
+    skip:
+      process.stdin.isTTY && process.argv[2] === "exit()"
+        ? false
+        : `Run interactive test with ‘node ./build/index.test.mjs "exit()"’.`,
+  },
+  async () => {
+    node.exit();
+  },
+);
+
+test(
   "gracefulTermination",
   {
     skip:
@@ -82,19 +95,6 @@ test(
       );
       return childProcessInstance;
     });
-  },
-);
-
-test(
-  "exit()",
-  {
-    skip:
-      process.stdin.isTTY && process.argv[2] === "exit()"
-        ? false
-        : `Run interactive test with ‘node ./build/index.test.mjs "exit()"’.`,
-  },
-  async () => {
-    node.exit();
   },
 );
 

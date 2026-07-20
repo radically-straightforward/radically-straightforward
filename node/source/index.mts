@@ -3,8 +3,23 @@ import util from "node:util";
 import crypto from "node:crypto";
 import * as utilities from "@radically-straightforward/utilities";
 
-process.setMaxListeners(50);
-let gracefulTerminationEmitted = false;
+/**
+ * Similar to `process.exit()`, but with the following differences:
+ *
+ * 1. Emits the `gracefulTermination` event.
+ * 2. After a timeout of 10 seconds, if the process hasn’t exited cleanly, forcefully terminate it.
+ */
+let exiting = false;
+export function exit(): void {
+  if (exiting) return;
+  exiting = true;
+  setTimeout(() => {
+    process.exit(1);
+  }, 10 * 1000).unref();
+  process.emit("gracefulTermination" as any);
+  process.exit();
+}
+
 for (const signal of [
   "SIGINT",
   "SIGQUIT",
@@ -13,13 +28,8 @@ for (const signal of [
   "SIGTERM",
   "SIGUSR2",
 ])
-  process.on(signal, () => {
-    if (gracefulTerminationEmitted) return;
-    gracefulTerminationEmitted = true;
-    setTimeout(() => {
-      process.exit(1);
-    }, 10 * 1000).unref();
-    process.emit("gracefulTermination" as any);
+  process.once(signal, () => {
+    exit();
   });
 
 /**
@@ -58,6 +68,7 @@ export function setInterval(
   process.once("gracefulTermination", gracefulTerminationEventListener);
   return interval;
 }
+process.setMaxListeners(50);
 
 /**
  * Keep a child process alive. If the child process crashes, respawn it. When the process gracefully terminates, gracefully terminate the child process as well.
@@ -92,16 +103,6 @@ export function childProcessKeepAlive(
       });
     },
   );
-}
-
-/**
- * On platforms other than Windows, `exit()` sends a `SIGTERM` to the process itself, which starts graceful termination. On Windows, this `process.emit()`s the `gracefulTermination` event and `process.exit()`s.
- */
-export function exit(): void {
-  if (process.platform === "win32") {
-    process.emit("gracefulTermination" as any);
-    process.exit();
-  } else process.kill(process.pid);
 }
 
 /**
