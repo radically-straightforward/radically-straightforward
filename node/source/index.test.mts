@@ -40,7 +40,7 @@ test(
     process.once("gracefulTermination", () => {
       console.log("gracefulTermination: Starting graceful termination...");
     });
-    process.once("exit", () => {
+    process.once("beforeExit", () => {
       console.log("gracefulTermination: Succeeded.");
     });
   },
