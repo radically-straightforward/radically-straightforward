@@ -46,32 +46,15 @@ As one last step before termination, you may handle [Node.js’s `process.once("
 
 After the `"gracefulTermination"` event is emitted, if the application doesn’t terminate in 10 seconds, then it’s terminated forcefully with `process.exit(1)`.
 
-**Example**
+<!-- DOCUMENTATION START: ./source/index.mts -->
+
+### `exit()`
 
 ```typescript
-import http from "node:http";
-import "@radically-straightforward/node";
-
-const server = http
-  .createServer((request, response) => {
-    response.end("gracefulTermination");
-  })
-  .listen(8000);
-process.once("gracefulTermination", () => {
-  // If you comment the line below the application remains running for 10 seconds and then it is forcefully terminated.
-  server.close();
-});
-
-console.log("gracefulTermination: Press ⌃C to gracefully terminate...");
-process.once("gracefulTermination", () => {
-  console.log("gracefulTermination: Starting graceful termination...");
-});
-process.once("beforeExit", () => {
-  console.log("gracefulTermination: Succeeded.");
-});
+export function exit(): void;
 ```
 
-<!-- DOCUMENTATION START: ./source/index.mts -->
+`exit()` emits the `"gracefulTermination"` event. Upon this event, the application must finish operations that are in progress (for example, finish answering to HTTP requests) and empty the event loop by closing HTTP servers, clearing timeouts, and so forth. If the application is still running 10 seconds after `exit()` is called, then it’s terminated forcefully with `process.exit(1)`.
 
 ### `setInterval()`
 
