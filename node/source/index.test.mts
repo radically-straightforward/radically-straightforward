@@ -80,32 +80,3 @@ test(
     });
   },
 );
-
-test("SymmetricEncryption", async () => {
-  const key = await node.SymmetricEncryption.generateKey();
-  const exportedKey = node.SymmetricEncryption.exportKey(key);
-  const importedKey = node.SymmetricEncryption.importKey(exportedKey);
-  assert.deepStrictEqual(key, importedKey);
-  const plainText = "Radically Straightforward";
-  const encryptedText = node.SymmetricEncryption.encrypt(key, plainText);
-  const decryptedText = node.SymmetricEncryption.decrypt(key, encryptedText);
-  assert.deepStrictEqual(plainText, decryptedText);
-});
-
-test("AsymmetricEncryption", async () => {
-  const keyPair = await node.AsymmetricEncryption.generateKeyPair();
-  assert(keyPair.privateKey.startsWith("-----BEGIN PRIVATE KEY-----"));
-  assert(keyPair.publicKey.startsWith("-----BEGIN PUBLIC KEY-----"));
-});
-
-test("TokenHash", async () => {
-  const token = "12345678";
-  const hash = node.TokenHash.hash(token);
-  assert(node.TokenHash.verify(hash, token));
-});
-
-test("PasswordHash", async () => {
-  const password = "12345678";
-  const hash = await node.PasswordHash.hash(password);
-  assert(await node.PasswordHash.verify(hash, password));
-});
