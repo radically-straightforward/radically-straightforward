@@ -195,7 +195,7 @@ export class Database extends sqlite.DatabaseSync {
   /**
    * Run a DML statement, for example, `insert`, `update`, `delete`, and so forth.
    */
-  run(query: Query): BetterSQLite3Database.RunResult {
+  run(query: Query): sqlite.StatementResultingChanges {
     return this.getStatement(query).run(...query.parameters);
   }
 
@@ -663,11 +663,11 @@ export class Database extends sqlite.DatabaseSync {
     return value;
   }
 
-  #statements = new Map<string, BetterSQLite3Database.Statement>();
+  #statements = new Map<string, sqlite.StatementSync>();
   /**
-   * An internal method that returns a `better-sqlite3` prepared statement for a given query. Normally you don’t have to use this, but it’s available for advanced use-cases in which you’d like to manipulate a prepared statement (for example, to set [`safeIntegers()`](https://github.com/WiseLibs/better-sqlite3/blob/bd55c76c1520c7796aa9d904fe65b3fb4fe7aac0/docs/integer.md#getting-bigints-from-the-database)).
+   * An internal method that returns a `StatementSync` for a given query. Normally you don’t have to use this, but it’s available for advanced use-cases in which you’d like to manipulate a prepared statement (for example, to set [`setReadBigInts()`](https://nodejs.org/docs/latest/api/sqlite.html#statementsetreadbigintsenabled)).
    */
-  getStatement(query: Query): BetterSQLite3Database.Statement {
+  getStatement(query: Query): sqlite.StatementSync {
     const source = query.sourceParts.join("?");
     let statement = this.#statements.get(source);
     if (statement === undefined) {
