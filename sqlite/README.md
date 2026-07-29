@@ -1,6 +1,6 @@
 # Radically Straightforward · SQLite
 
-**🗃️ SQLite with tagged templates and migrations**
+**🗃️ SQLite with tagged templates, migrations, and other utilities**
 
 ## Installation
 
