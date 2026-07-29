@@ -1,13 +1,13 @@
+import sqlite from "node:sqlite";
 import timers from "node:timers/promises";
-import BetterSQLite3Database from "better-sqlite3";
 import { CronExpressionParser } from "cron-parser";
 import * as utilities from "@radically-straightforward/utilities";
 import * as node from "@radically-straightforward/node";
 
 /**
- * An extension of [`better-sqlite3`](https://www.npmjs.com/package/better-sqlite3)’s `Database` which includes:
+ * An extension of `node:sqlite`’s `DatabaseSync` which includes:
  *
- * 1. A simpler way to run queries using tagged templates instead of managing prepared statements by hand.
+ * 1. A way to run queries using tagged templates instead of managing prepared statements by hand. It’s similar to `SQLTagStore`, but it allows nesting of SQL in the form of `$${___}` interpolation.
  *
  * 2. A migration system.
  *
@@ -21,9 +21,9 @@ import * as node from "@radically-straightforward/node";
  *
  * 7. A caching mechanism.
  *
- * To appreciate the difference in ergonomics between `better-sqlite3` and `@radically-straightforward/sqlite`, consider the following example:
+ * To appreciate the difference in ergonomics between `node:sqlite` and `@radically-straightforward/sqlite`, consider the following example:
  *
- * **`better-sqlite3`**
+ * **`node:sqlite`**
  *
  * ```typescript
  * import Database from "better-sqlite3";
@@ -101,7 +101,7 @@ import * as node from "@radically-straightforward/node";
  *
  * 4. If you don’t call `close()` explicitly, it’s called for you before process exit.
  */
-export class Database extends BetterSQLite3Database {
+export class Database extends sqlite.DatabaseSync {
   #beforeExitEventListener = () => {
     this.close();
   };
