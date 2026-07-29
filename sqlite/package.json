@@ -30,8 +30,6 @@
   "dependencies": {
     "@radically-straightforward/node": "^3.1.11",
     "@radically-straightforward/utilities": "^2.0.24",
-    "@types/better-sqlite3": "^7.6.13",
-    "better-sqlite3": "^12.11.1",
     "cron-parser": "^5.6.1"
   },
   "devDependencies": {
@@ -42,8 +40,7 @@
     "typescript": "^6.0.3"
   },
   "allowScripts": {
-    "@radically-straightforward/typescript@1.0.5": true,
-    "better-sqlite3@12.11.1": true
+    "@radically-straightforward/typescript@1.0.5": true
   },
   "prettier": {}
 }
