@@ -59,16 +59,14 @@ export class Database extends sqlite.DatabaseSync {
    * 2. A function, which may be asynchronous:
    *
    *    ```javascript
-   *    async () => {
-   *      database.execute(
+   *    async (database) => {
+   *      database.run(
    *        sql`
    *          insert into "users" ("name") values (${"Leandro Facchinetti"});
    *        `,
    *      );
    *    };
    *    ```
-   *
-   *    > **Note:** For convenience, a migration function may receive the database as a parameter. This can be useful if you want to define migrations in separate files.
    *
    * **Guidelines**
    *
@@ -94,15 +92,20 @@ export class Database extends sqlite.DatabaseSync {
    *
    * - `migrate()` must be its own separate method instead of being part of the constructor because migrations may be asynchronous.
    *
-   * - We manage transactions by hand with `begin immediate` instead of using `executeTransaction()` because migrations are [the one exception](https://github.com/WiseLibs/better-sqlite3/blob/bd55c76c1520c7796aa9d904fe65b3fb4fe7aac0/docs/api.md#caveats) in which it makes sense to have an asynchronous function in the middle of a transaction, given that migrations don’t run in parallel.
+   * - `migrate()` uses an `exclusive` transaction because it’s modifying the schema.
    */
   async migrate(
     ...migrations: (Query | ((database: this) => void | Promise<void>))[]
   ): Promise<this> {
-    this.pragma<void>(`journal_mode = wal`);
-    this.pragma<void>(`synchronous = normal`);
-    this.pragma<void>(`busy_timeout = 5000`);
-    this.pragma<void>(`foreign_keys = false`);
+    this.execute(
+      sql`
+        pragma journal_mode = wal;
+        pragma synchronous = normal;
+        pragma busy_timeout = 5000;
+        pragma cache_size = -16000;
+        pragma foreign_keys = false;
+      `,
+    );
     try {
       this.executeTransaction(() => {
         this.execute(
