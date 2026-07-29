@@ -7,110 +7,31 @@ import * as node from "@radically-straightforward/node";
 /**
  * An extension of `node:sqlite`’s `DatabaseSync` which includes:
  *
- * 1. A way to run queries using tagged templates instead of managing prepared statements by hand. It’s similar to `SQLTagStore`, but it allows nesting of SQL in the form of `$${___}` interpolation and the tagged templates work well with syntax highlighting.
+ * 1. A way to run queries using tagged templates that improves on `SQLTagStore` in the following ways:
+ *
+ *    1. It allows nesting of SQL in the form of `$${___}` interpolation.
+ *
+ *    2. The tagged templates use the tag `` sql`___` `` instead of, for example, `SQLTagStore`’s `` sql.get`___` ``, which works well with syntax highlighting with the **[ES6 String HTML](https://marketplace.visualstudio.com/items?itemName=Tobermory.es6-string-html)** extension for Visual Studio Code .
  *
  * 2. A migration system.
  *
  * 3. Better defaults for running SQLite on the server, avoiding the `SQLITE_BUSY` error.
  *
- * 4. Automatic resource management (close the database before process exit).
+ * 4. Automatic resource management (close the database upon graceful termination).
  *
  * 5. A background job mechanism.
  *
  * 6. A scheduled background job mechanism.
  *
  * 7. A caching mechanism.
- *
- * To appreciate the difference in ergonomics between `node:sqlite` and `@radically-straightforward/sqlite`, consider the following example:
- *
- * **`node:sqlite`**
- *
- * ```typescript
- * import { DatabaseSync } from "node:sqlite";
- *
- * const database = new DatabaseSync("example.db");
- *
- * database.exec(
- *   `
- *     create table "users" (
- *       "id" integer primary key autoincrement,
- *       "name" text not null
- *     ) strict;
- *   `,
- * );
- *
- * const insertStatement = database.prepare(
- *   `insert into "users" ("name") values (?);`,
- * );
- * insertStatement.run("Leandro Facchinetti");
- *
- * const selectStatement = database.prepare(
- *   `select "id", "name" from "users" where "name" = ?;`,
- * );
- * console.log(selectStatement.get("Leandro Facchinetti")); // => { id: 1, name: 'Leandro Facchinetti' }
- *
- * database.close();
- * ```
- *
- * 1. You must manage the prepared statements yourself, making sure to reuse them as much as possible. You could choose to not do that and create a new prepared statement every time instead, but that would be much slower. You could also use `SQLTagStore`, but they don’t allow you to use the `` sql`___` `` tag, which makes syntax highlighting not work.
- *
- * 2. The queries and their corresponding binding parameters are specified separately. In this simple example they’re just one line apart, but in general they could be far from each other, which makes the program more difficult to maintain.
- *
- * 3. When you run the program above for the second time, it fails because the `users` table already exists. In this simple example you could work around that by using `create table if not exists`, but for anything more complicated you need a migration system.
- *
- * 4. You must remember to call `close()` or some temporary files may be left behind even after a graceful termination.
- *
- * **`@radically-straightforward/sqlite`**
- *
- * ```typescript
- * import sql, { Database } from "@radically-straightforward/sqlite";
- *
- * const database = await new Database("example.db").migrate(
- *   sql`
- *     create table "users" (
- *       "id" integer primary key autoincrement,
- *       "name" text not null
- *     ) strict;
- *   `,
- * );
- *
- * database.run(
- *   sql`
- *     insert into "users" ("name") values (${"Leandro Facchinetti"});
- *   `,
- * );
- *
- * console.log(
- *   database.get(
- *     sql`
- *       select "id", "name" from "users" where "name" = ${"Leandro Facchinetti"};
- *     `,
- *   ),
- * ); // => { id: 1, name: 'Leandro Facchinetti' }
- * ```
- *
- * 1. `@radically-straightforward/sqlite` manages the prepared statements for you, and makes sure to reuse them as much as possible.
- *
- * 2. The queries and their corresponding binding parameters are specified together, using interpolation in the `` sql`___` `` tagged template.
- *
- *    > **Note:** `@radically-straightforward/sqlite` does **not** do simple string interpolation, which would lead to SQL injection vulnerabilities. Under the hood `@radically-straightforward/sqlite` uses bind parameters similar to the `node:sqlite` example.
- *
- *    > **Note:** In Visual Studio Code you may install the **[ES6 String HTML](https://marketplace.visualstudio.com/items?itemName=Tobermory.es6-string-html)** extension to add syntax highlighting to `` sql`___` `` tagged templates.
- *
- * 3. You may run the program above many times and it will not fail, because it’s using `@radically-straightforward/sqlite`’s migration system.
- *
- * 4. If you don’t call `close()` explicitly, it’s called for you before process exit.
  */
 export class Database extends sqlite.DatabaseSync {
   #beforeExitEventListener = () => {
     this.close();
   };
 
-  constructor(
-    filename?: string | Buffer,
-    options?: BetterSQLite3Database.Options,
-  ) {
-    super(filename, options);
+  constructor(filename: string | Buffer | URL) {
+    super(filename);
     process.once("beforeExit", this.#beforeExitEventListener);
   }
 
