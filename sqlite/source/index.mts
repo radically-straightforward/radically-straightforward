@@ -136,9 +136,11 @@ export class Database extends sqlite.DatabaseSync {
         `,
       );
       for (
-        let migrationIndex = this.pragma<number>(`user_version`, {
-          simple: true,
-        });
+        let migrationIndex = this.get<{ user_version: number }>(
+          sql`
+            pragma user_version;
+          `,
+        )!.user_version;
         migrationIndex < migrations.length;
         migrationIndex++
       )
@@ -151,7 +153,11 @@ export class Database extends sqlite.DatabaseSync {
           const migration = migrations[migrationIndex];
           if (typeof migration === "function") await migration(this);
           else this.execute(migration);
-          this.pragma<void>(`user_version = ${migrationIndex + 1}`);
+          this.run(
+            sql`
+              pragma user_version = ${migrationIndex + 1};
+            `,
+          );
           this.execute(
             sql`
               commit;
