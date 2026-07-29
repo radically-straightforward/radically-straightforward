@@ -1,10 +1,11 @@
 {
-  "name": "@radically-straightforward/node",
-  "version": "3.1.13",
-  "description": "🔨 Utilities for Node.js",
+  "name": "@radically-straightforward/cryptography",
+  "version": "1.0.0",
+  "description": "🔐 Secure and easy to use cryptographic utilities",
   "keywords": [
     "node",
-    "utilities"
+    "utilities",
+    "cryptography"
   ],
   "homepage": "https://github.com/radically-straightforward/radically-straightforward",
   "repository": "https://github.com/radically-straightforward/radically-straightforward",
