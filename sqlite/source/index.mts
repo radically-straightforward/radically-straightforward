@@ -35,10 +35,9 @@ export class Database extends sqlite.DatabaseSync {
     process.once("beforeExit", this.#beforeExitEventListener);
   }
 
-  close(): this {
+  close(): void {
     super.close();
     process.off("beforeExit", this.#beforeExitEventListener);
-    return this;
   }
 
   /**
