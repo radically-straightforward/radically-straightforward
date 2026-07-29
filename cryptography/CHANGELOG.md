@@ -1,9 +1,5 @@
 # Changelog
 
-## 3.2.0 · 2026-07-29
-
-- Moved the cryptographic utilities into `@radically-straightforward/cryptography`.
-
 ## 3.1.12 · 2026-07-18
 
 - Added support for cryptographic utilities.
