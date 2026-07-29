@@ -97,49 +97,44 @@ export class Database extends sqlite.DatabaseSync {
   async migrate(
     ...migrations: (Query | ((database: this) => void | Promise<void>))[]
   ): Promise<this> {
-    this.execute(
-      sql`
-        pragma journal_mode = wal;
-        pragma synchronous = normal;
-        pragma busy_timeout = 5000;
-        pragma cache_size = -16000;
-        pragma foreign_keys = false;
-      `,
-    );
     try {
-      this.executeTransaction(() => {
-        this.execute(
-          sql`
-            create table if not exists "_backgroundJobs" (
-              "id" integer primary key autoincrement,
-              "type" text not null,
-              "startAt" text not null,
-              "parameters" text not null,
-              "startedAt" text null,
-              "retries" integer null
-            ) strict;
-            create index if not exists "_index_backgroundJobs_type" on "_backgroundJobs" ("type");
-            create index if not exists "_index_backgroundJobs_startAt" on "_backgroundJobs" ("startAt");
-            create index if not exists "_index_backgroundJobs_startedAt" on "_backgroundJobs" ("startedAt");
-            create index if not exists "_index_backgroundJobs_retries" on "_backgroundJobs" ("retries");
+      this.execute(
+        sql`
+          pragma journal_mode = wal;
+          pragma synchronous = normal;
+          pragma busy_timeout = 5000;
+          pragma cache_size = -16000;
+          pragma foreign_keys = false;
 
-            create table if not exists "_scheduledBackgroundJobs" (
-              "id" integer primary key autoincrement,
-              "type" text not null unique,
-              "lastScheduledAt" text not null
-            ) strict;
+          create table if not exists "_backgroundJobs" (
+            "id" integer primary key autoincrement,
+            "type" text not null,
+            "startAt" text not null,
+            "parameters" text not null,
+            "startedAt" text null,
+            "retries" integer null
+          ) strict;
+          create index if not exists "_index_backgroundJobs_type" on "_backgroundJobs" ("type");
+          create index if not exists "_index_backgroundJobs_startAt" on "_backgroundJobs" ("startAt");
+          create index if not exists "_index_backgroundJobs_startedAt" on "_backgroundJobs" ("startedAt");
+          create index if not exists "_index_backgroundJobs_retries" on "_backgroundJobs" ("retries");
 
-            create table if not exists "_cache" (
-              "id" integer primary key autoincrement,
-              "key" text not null,
-              "value" text not null,
-              "usedAt" text not null
-            ) strict;
-            create index if not exists "_index_cache_key" on "_cache" ("key");
-            create index if not exists "_index_cache_usedAt" on "_cache" ("usedAt");
-          `,
-        );
-      });
+          create table if not exists "_scheduledBackgroundJobs" (
+            "id" integer primary key autoincrement,
+            "type" text not null unique,
+            "lastScheduledAt" text not null
+          ) strict;
+
+          create table if not exists "_cache" (
+            "id" integer primary key autoincrement,
+            "key" text not null,
+            "value" text not null,
+            "usedAt" text not null
+          ) strict;
+          create index if not exists "_index_cache_key" on "_cache" ("key");
+          create index if not exists "_index_cache_usedAt" on "_cache" ("usedAt");
+        `,
+      );
       for (
         let migrationIndex = this.pragma<number>(`user_version`, {
           simple: true,
@@ -170,10 +165,14 @@ export class Database extends sqlite.DatabaseSync {
           );
           throw error;
         }
+      return this;
     } finally {
-      this.pragma<void>(`foreign_keys = true`);
+      this.execute(
+        sql`
+          pragma foreign_keys = true;
+        `,
+      );
     }
-    return this;
   }
 
   /**
