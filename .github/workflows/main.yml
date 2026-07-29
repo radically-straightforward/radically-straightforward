@@ -10,6 +10,7 @@ jobs:
           - typescript
           - documentation
           - html
+          - cryptography
           - examples
           - utilities
           - css
