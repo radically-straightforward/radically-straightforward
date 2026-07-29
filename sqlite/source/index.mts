@@ -182,24 +182,14 @@ export class Database extends sqlite.DatabaseSync {
   }
 
   /**
-   * Execute DDL statements, for example, `create table`, `drop index`, and so forth. Multiple statements may be included in the same query.
+   * Execute DDL statements, for example, `create table`, `drop index`, and so forth. Multiple statements may be included in the same query. The query must not include interpolation.
    */
-  execute(query: Query): this {
-    let source = "";
-    for (
-      let parametersIndex = 0;
-      parametersIndex < query.parameters.length;
-      parametersIndex++
-    )
-      source +=
-        query.sourceParts[parametersIndex] +
-        this.get<{ parameter: string }>(
-          sql`
-            select quote(${query.parameters[parametersIndex]}) as "parameter";
-          `,
-        )!.parameter;
-    source += query.sourceParts.at(-1);
-    return this.exec(source);
+  execute(query: Query): void {
+    if (query.sourceParts.length !== 1)
+      throw new Error(
+        "‘execute()’ can’t be called with SQL including interpolation",
+      );
+    this.exec(query.sourceParts[0]);
   }
 
   /**
