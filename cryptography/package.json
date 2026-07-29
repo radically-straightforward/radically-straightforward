@@ -27,9 +27,6 @@
     "prepare": "tsc && documentation",
     "test": "npm run prepare && node --test \"./build/**/*.test.mjs\" && prettier --check ./README.md ./CHANGELOG.md ./package.json ./tsconfig.json ./source/"
   },
-  "dependencies": {
-    "selfsigned": "^5.5.0"
-  },
   "devDependencies": {
     "@radically-straightforward/documentation": "^1.0.11",
     "@radically-straightforward/typescript": "^1.0.5",
