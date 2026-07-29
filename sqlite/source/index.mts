@@ -26,9 +26,9 @@ import * as node from "@radically-straightforward/node";
  * **`node:sqlite`**
  *
  * ```typescript
- * import Database from "better-sqlite3";
+ * import { DatabaseSync } from "node:sqlite";
  *
- * const database = new Database("example.db");
+ * const database = new DatabaseSync("example.db");
  *
  * database.exec(
  *   `
@@ -52,7 +52,7 @@ import * as node from "@radically-straightforward/node";
  * database.close();
  * ```
  *
- * 1. You must manage the prepared statements yourself, making sure to reuse them as much as possible. You could choose to not do that and create a new prepared statement every time instead, but that would be much slower.
+ * 1. You must manage the prepared statements yourself, making sure to reuse them as much as possible. You could choose to not do that and create a new prepared statement every time instead, but that would be much slower. You could also use `SQLTagStore`, but they don’t allow you to use the `` sql`___` `` tag, which makes syntax highlighting not work.
  *
  * 2. The queries and their corresponding binding parameters are specified separately. In this simple example they’re just one line apart, but in general they could be far from each other, which makes the program more difficult to maintain.
  *
@@ -93,7 +93,7 @@ import * as node from "@radically-straightforward/node";
  *
  * 2. The queries and their corresponding binding parameters are specified together, using interpolation in the `` sql`___` `` tagged template.
  *
- *    > **Note:** `@radically-straightforward/sqlite` does **not** do simple string interpolation, which would lead to SQL injection vulnerabilities. Under the hood `@radically-straightforward/sqlite` uses bind parameters similar to the `better-sqlite3` example.
+ *    > **Note:** `@radically-straightforward/sqlite` does **not** do simple string interpolation, which would lead to SQL injection vulnerabilities. Under the hood `@radically-straightforward/sqlite` uses bind parameters similar to the `node:sqlite` example.
  *
  *    > **Note:** In Visual Studio Code you may install the **[ES6 String HTML](https://marketplace.visualstudio.com/items?itemName=Tobermory.es6-string-html)** extension to add syntax highlighting to `` sql`___` `` tagged templates.
  *
