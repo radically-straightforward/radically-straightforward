@@ -41,5 +41,3 @@ jobs:
       - run: npm install-ci-test
       - if: ${{ matrix.os == 'ubuntu' && startsWith(github.ref, format('refs/tags/{0}--', matrix.package)) }}
         run: npm publish
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
