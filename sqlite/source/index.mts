@@ -35,6 +35,12 @@ export class Database extends sqlite.DatabaseSync {
     process.once("beforeExit", this.#beforeExitEventListener);
   }
 
+  close(): this {
+    super.close();
+    process.off("beforeExit", this.#beforeExitEventListener);
+    return this;
+  }
+
   /**
    * A migration system based on [the steps for general schema changes in SQLite](https://www.sqlite.org/lang_altertable.html#making_other_kinds_of_table_schema_changes). The migration system implements steps 1–2, 11–12, and you must implement steps 3–10 in the migrations that you define.
    *
@@ -658,12 +664,6 @@ export class Database extends sqlite.DatabaseSync {
       );
     }
     return value;
-  }
-
-  close(): this {
-    super.close();
-    process.off("beforeExit", this.#beforeExitEventListener);
-    return this;
   }
 
   #statements = new Map<string, BetterSQLite3Database.Statement>();
