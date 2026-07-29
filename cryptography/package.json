@@ -1,6 +1,6 @@
 {
   "name": "@radically-straightforward/cryptography",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "description": "🔐 Secure and easy to use cryptographic utilities",
   "keywords": [
     "node",
