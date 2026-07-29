@@ -687,7 +687,7 @@ export type Query = {
 };
 
 /**
- * A tagged template to generate a database query.
+ * A tagged template that generates a database query.
  *
  * Interpolation is turned into binding parameters to protect from SQL injection, for example:
  *
@@ -715,14 +715,13 @@ export type Query = {
 export default function sql(
   templateStrings: TemplateStringsArray,
   ...substitutions: (
-    | number
-    | string
-    | bigint
-    | Buffer
     | null
-    | undefined
-    | Array<number | string | bigint | Buffer | null | undefined>
-    | Set<number | string | bigint | Buffer | null | undefined>
+    | number
+    | bigint
+    | string
+    | Buffer
+    | Array<null | number | bigint | string | Buffer>
+    | Set<null | number | bigint | string | Buffer>
     | Query
   )[]
 ): Query {
