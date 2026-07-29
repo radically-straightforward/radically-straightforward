@@ -7,7 +7,7 @@ import * as node from "@radically-straightforward/node";
 /**
  * An extension of `node:sqlite`’s `DatabaseSync` which includes:
  *
- * 1. A way to run queries using tagged templates instead of managing prepared statements by hand. It’s similar to `SQLTagStore`, but it allows nesting of SQL in the form of `$${___}` interpolation.
+ * 1. A way to run queries using tagged templates instead of managing prepared statements by hand. It’s similar to `SQLTagStore`, but it allows nesting of SQL in the form of `$${___}` interpolation and the tagged templates work well with syntax highlighting.
  *
  * 2. A migration system.
  *
