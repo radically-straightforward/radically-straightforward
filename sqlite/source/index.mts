@@ -150,7 +150,7 @@ export class Database extends sqlite.DatabaseSync {
         try {
           this.execute(
             sql`
-              begin immediate;
+              begin exclusive;
             `,
           );
           const migration = migrations[migrationIndex];
