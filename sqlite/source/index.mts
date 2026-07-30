@@ -243,15 +243,15 @@ export class Database extends sqlite.DatabaseSync {
   }
 
   /**
-   * Execute a function in a transaction. Transactions are `immediate` to avoid `SQLITE_BUSY` errors. See <https://kerkour.com/sqlite-for-servers>.
+   * Execute a function in a transaction. The transaction is `immediate` to avoid `SQLITE_BUSY` errors. See <https://kerkour.com/sqlite-for-servers>.
    */
   transaction<Type>(function_: () => Type): Type {
+    this.execute(
+      sql`
+        begin immediate;
+      `,
+    );
     try {
-      this.execute(
-        sql`
-          begin immediate;
-        `,
-      );
       const value = function_();
       this.execute(
         sql`
@@ -270,15 +270,15 @@ export class Database extends sqlite.DatabaseSync {
   }
 
   /**
-   * Execute an asynchronous function in a transaction. Transactions are `exclusive` to avoid issues with multiple asynchronous functions interleaving their transactions. This function is reserved for special cases, for example, migrations.
+   * Execute an asynchronous function in a transaction. The transaction is `exclusive` to avoid issues with multiple asynchronous functions interleaving their transactions. This function is reserved for special cases, for example, migrations.
    */
   async asyncTransaction<Type>(function_: () => Promise<Type>): Promise<Type> {
+    this.execute(
+      sql`
+        begin exclusive;
+      `,
+    );
     try {
-      this.execute(
-        sql`
-          begin exclusive;
-        `,
-      );
       const value = await function_();
       this.execute(
         sql`
