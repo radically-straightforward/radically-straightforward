@@ -7,23 +7,49 @@ import * as node from "@radically-straightforward/node";
 /**
  * An extension of `node:sqlite`’s `DatabaseSync` which adds the following features:
  *
- * 1. A way to run queries using tagged templates that improves on `SQLTagStore` in the following ways:
+ * 1. A way to run queries using tagged templates.
  *
- *    1. It allows nesting of SQL in the form of `$${___}` interpolation.
+ *   > **Note:** This is different from `SQLTagStore` in the following ways:
+ *   >
+ *   > 1. It allows nesting query fragments, for example:
+ *   >
+ *   >    ```typescript
+ *   >    sql`
+ *   >      select "id", "name"
+ *   >      from "users"
+ *   >      where
+ *   >        "name" = ${"Leandro Facchinetti"}
+ *   >        ${shouldFilterByAge ? sql`and "age" = ${35}` : sql``};
+ *   >    `;
+ *   >    ```
+ *   >
+ *   > 2. The tags in the tagged templates don’t execute the queries, for example:
+ *   >
+ *   >    ```typescript
+ *   >    // SQLTagStore
+ *   >    sql.get`select "name" from "users";`;
+ *   >
+ *   >    // Database
+ *   >    database.get(sql`select "name" from "users";`);
+ *   >    ```
+ *   >
+ *   >    This is better because it works with syntax highlighting with the **[ES6 String HTML](https://marketplace.visualstudio.com/items?itemName=Tobermory.es6-string-html)** extension for Visual Studio Code.
+ *   >
+ *   > 3. It isn’t a LRU cache. This shouldn’t be a problem because there’s a bounded number of queries in the source code.
  *
- *    2. The tagged templates use the tag `` sql`___` `` instead of, for example, `SQLTagStore`’s `` sql.get`___` ``, which works well with syntax highlighting with the **[ES6 String HTML](https://marketplace.visualstudio.com/items?itemName=Tobermory.es6-string-html)** extension for Visual Studio Code .
+ * 2. An auxiliary function for running transactions.
  *
- * 2. A migration system.
+ * 3. A migration system.
  *
- * 3. Better defaults for running SQLite on the server, avoiding the `SQLITE_BUSY` error.
+ * 4. Better defaults for running SQLite on the server, avoiding the `SQLITE_BUSY` error.
  *
- * 4. Automatic resource management (close the database upon graceful termination).
+ * 5. Automatic resource management (close the database upon graceful termination).
  *
- * 5. A background job mechanism.
+ * 6. A background job mechanism.
  *
- * 6. A scheduled background job mechanism.
+ * 7. A scheduled background job mechanism.
  *
- * 7. A caching mechanism.
+ * 8. A caching mechanism.
  */
 export class Database extends sqlite.DatabaseSync {
   #beforeExitEventListener = () => {
@@ -47,7 +73,7 @@ export class Database extends sqlite.DatabaseSync {
    *
    * 1. A SQL query, for example:
    *
-   *    ```javascript
+   *    ```typescript
    *    sql`
    *      create table "users" (
    *        "id" integer primary key autoincrement,
@@ -58,7 +84,7 @@ export class Database extends sqlite.DatabaseSync {
    *
    * 2. A function, which may be asynchronous:
    *
-   *    ```javascript
+   *    ```typescript
    *    async (database) => {
    *      database.run(
    *        sql`
@@ -691,7 +717,7 @@ export type Query = {
  *
  * You may interpolate values and query fragments, for example:
  *
- * ```javascript
+ * ```typescript
  * sql`
  *   select "id", "name"
  *   from "users"
