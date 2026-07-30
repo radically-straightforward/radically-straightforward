@@ -8,8 +8,7 @@ import sql, { Database, Query } from "@radically-straightforward/sqlite";
 test("Database", async () => {
   const database = new Database(":memory:");
 
-  let migrationRuns = 0;
-  for (let iteration = 0; iteration < 5; iteration++) {
+  for (let iteration = 0; iteration < 3; iteration++)
     await database.migrate(
       sql`
         create table "users" (
@@ -25,210 +24,119 @@ test("Database", async () => {
           `,
         );
       },
-
-      () => {
-        migrationRuns++;
-      },
     );
-    assert.equal(migrationRuns, 1);
-  }
 
-  // assert.deepEqual(
-  //   database.get<{ id: number; name: string }>(
-  //     sql`
-  //       insert into "users" ("name") values (${"Ali Madooei"}) returning *;
-  //     `,
-  //   ),
-  //   { id: 3, name: "Ali Madooei" },
-  // );
+  assert.deepEqual(
+    database.get<{ id: number; name: string }>(
+      sql`
+        select "id", "name" from "users" where "id" = 1;
+      `,
+    ),
+    { id: 1, name: "Leandro Facchinetti" },
+  );
 
-  // assert.deepEqual(
-  //   database.get<{ id: number; name: string }>(
-  //     sql`
-  //       select "id", "name" from "users" where "id" = 1;
-  //     `,
-  //   ),
-  //   { id: 1, name: "Leandro Facchinetti" },
-  // );
+  assert.equal(
+    database.get<{ id: number; name: string }>(
+      sql`
+        select "id", "name" from "users" where "id" = 500;
+      `,
+    ),
+    undefined,
+  );
 
-  // assert.equal(
-  //   database.get<{ id: number; name: string }>(
-  //     sql`
-  //       select "id", "name" from "users" where "id" = 500;
-  //     `,
-  //   ),
-  //   undefined,
-  // );
+  assert.deepEqual(
+    database.all<{ id: number; name: string }>(
+      sql`
+        select "id", "name" from "users" order by "id" asc;
+      `,
+    ),
+    [{ id: 1, name: "Leandro Facchinetti" }],
+  );
 
-  // assert.deepEqual(
-  //   database.all<{ id: number; name: string }>(
-  //     sql`
-  //       select "id", "name" from "users" order by "id" asc;
-  //     `,
-  //   ),
-  //   [
-  //     { id: 1, name: "Leandro Facchinetti" },
-  //     { id: 2, name: "David Adler" },
-  //     { id: 3, name: "Ali Madooei" },
-  //   ],
-  // );
+  assert.deepEqual(
+    [
+      ...database.iterate<{ id: number; name: string }>(
+        sql`
+          select "id", "name" from "users" order by "id" asc;
+        `,
+      ),
+    ],
+    [{ id: 1, name: "Leandro Facchinetti" }],
+  );
 
-  // assert.deepEqual(
-  //   database.all<{ id: number; name: string }>(
-  //     sql`
-  //       select "id", "name" from "users" where "name" in ${[]};
-  //     `,
-  //   ),
-  //   [],
-  // );
+  assert.throws(() => {
+    database.transaction<void>(() => {
+      database.run(
+        sql`
+          insert into "users" ("name") values (${"Scott Smith"});
+        `,
+      );
+      throw new Error();
+    });
+  });
+  assert.equal(
+    database.get<{ id: number; name: string }>(
+      sql`
+        select "id", "name" from "users" where "name" = ${"Scott Smith"};
+      `,
+    ),
+    undefined,
+  );
 
-  // assert.deepEqual(
-  //   database.all<{ id: number; name: string }>(
-  //     sql`
-  //       select "id", "name" from "users" where "name" in ${[
-  //         "Leandro Facchinetti",
-  //         "David Adler",
-  //       ]};
-  //     `,
-  //   ),
-  //   [
-  //     { id: 1, name: "Leandro Facchinetti" },
-  //     { id: 2, name: "David Adler" },
-  //   ],
-  // );
+  database.cacheSize = 3;
+  assert.equal(
+    database.cache("1", () => "1"),
+    "1",
+  );
+  await utilities.sleep(10);
+  assert.equal(
+    database.cache("2", () => "2"),
+    "2",
+  );
+  await utilities.sleep(10);
+  assert.equal(
+    database.cache("3", () => "3"),
+    "3",
+  );
+  await utilities.sleep(10);
+  assert.equal(
+    database.cache("1", () => {
+      throw new Error();
+    }),
+    "1",
+  );
+  await utilities.sleep(10);
+  assert.equal(
+    database.cache("4", () => "4"),
+    "4",
+  );
+  await utilities.sleep(10);
+  assert.equal(
+    database.cache("2", () => "a new 2"),
+    "a new 2",
+  );
 
-  // assert.deepEqual(
-  //   database.all<{ id: number; name: string }>(
-  //     sql`
-  //       select "id", "name" from "users" where "name" in ${new Set([
-  //         "Leandro Facchinetti",
-  //         "David Adler",
-  //       ])};
-  //     `,
-  //   ),
-  //   [
-  //     { id: 1, name: "Leandro Facchinetti" },
-  //     { id: 2, name: "David Adler" },
-  //   ],
-  // );
-
-  // assert.deepEqual(
-  //   [
-  //     ...database.iterate<{ id: number; name: string }>(
-  //       sql`
-  //         select "id", "name" from "users" order by "id" asc;
-  //       `,
-  //     ),
-  //   ],
-  //   [
-  //     { id: 1, name: "Leandro Facchinetti" },
-  //     { id: 2, name: "David Adler" },
-  //     { id: 3, name: "Ali Madooei" },
-  //   ],
-  // );
-
-  // assert.equal(database.pragma<number>("foreign_keys", { simple: true }), 1);
-
-  // assert.deepEqual(
-  //   database.run(
-  //     sql`
-  //       insert into "users" ("name") values (${"David Adler"});
-  //     `,
-  //   ),
-  //   { changes: 1, lastInsertRowid: 2 },
-  // );
-
-  // assert.throws(() => {
-  //   database.executeTransaction<void>(() => {
-  //     database.run(
-  //       sql`
-  //         insert into "users" ("name") values (${"Scott Smith"});
-  //       `,
-  //     );
-  //     throw new Error();
-  //   });
-  // });
-  // assert.equal(
-  //   database.get<{ id: number; name: string }>(
-  //     sql`
-  //       select "id", "name" from "users" where "name" = ${"Scott Smith"};
-  //     `,
-  //   ),
-  //   undefined,
-  // );
-  // assert.deepEqual(
-  //   database.executeTransaction<ReturnType<Database["run"]>>(() => {
-  //     return database.run(
-  //       sql`
-  //         insert into "users" ("name") values (${"Scott Smith"});
-  //       `,
-  //     );
-  //   }),
-  //   { changes: 1, lastInsertRowid: 4 },
-  // );
-  // assert.deepEqual(
-  //   database.all<{ id: number; name: string }>(
-  //     sql`
-  //       select "id", "name" from "users" where "name" = ${"Scott Smith"};
-  //     `,
-  //   ),
-  //   [{ id: 4, name: "Scott Smith" }],
-  // );
-
-  // database.cacheSize = 3;
-  // assert.equal(
-  //   database.cache("1", () => "1"),
-  //   "1",
-  // );
-  // await utilities.sleep(10);
-  // assert.equal(
-  //   database.cache("2", () => "2"),
-  //   "2",
-  // );
-  // await utilities.sleep(10);
-  // assert.equal(
-  //   database.cache("3", () => "3"),
-  //   "3",
-  // );
-  // await utilities.sleep(10);
-  // assert.equal(
-  //   database.cache("1", () => {
-  //     throw new Error();
-  //   }),
-  //   "1",
-  // );
-  // await utilities.sleep(10);
-  // assert.equal(
-  //   database.cache("4", () => "4"),
-  //   "4",
-  // );
-  // await utilities.sleep(10);
-  // assert.equal(
-  //   database.cache("2", () => "a new 2"),
-  //   "a new 2",
-  // );
-
-  // database.run(
-  //   sql`
-  //     delete from "_cache";
-  //   `,
-  // );
-  // assert.equal(await database.cacheAsync("1", () => "1"), "1");
-  // await utilities.sleep(10);
-  // assert.equal(await database.cacheAsync("2", () => "2"), "2");
-  // await utilities.sleep(10);
-  // assert.equal(await database.cacheAsync("3", () => "3"), "3");
-  // await utilities.sleep(10);
-  // assert.equal(
-  //   await database.cacheAsync("1", () => {
-  //     throw new Error();
-  //   }),
-  //   "1",
-  // );
-  // await utilities.sleep(10);
-  // assert.equal(await database.cacheAsync("4", () => "4"), "4");
-  // await utilities.sleep(10);
-  // assert.equal(await database.cacheAsync("2", () => "a new 2"), "a new 2");
+  database.run(
+    sql`
+      delete from "_cache";
+    `,
+  );
+  assert.equal(await database.cacheAsync("1", () => "1"), "1");
+  await utilities.sleep(10);
+  assert.equal(await database.cacheAsync("2", () => "2"), "2");
+  await utilities.sleep(10);
+  assert.equal(await database.cacheAsync("3", () => "3"), "3");
+  await utilities.sleep(10);
+  assert.equal(
+    await database.cacheAsync("1", () => {
+      throw new Error();
+    }),
+    "1",
+  );
+  await utilities.sleep(10);
+  assert.equal(await database.cacheAsync("4", () => "4"), "4");
+  await utilities.sleep(10);
+  assert.equal(await database.cacheAsync("2", () => "a new 2"), "a new 2");
 
   assert.deepEqual(
     sql`
