@@ -222,7 +222,7 @@ export class Database extends sqlite.DatabaseSync {
    * Run a DML statement, for example, `insert`, `update`, `delete`, and so forth.
    */
   run(query: Query): sqlite.StatementResultingChanges {
-    return this.getStatement(query.source).run(...query.parameters);
+    return this.#getStatement(query.source).run(...query.parameters);
   }
 
   /**
@@ -230,12 +230,10 @@ export class Database extends sqlite.DatabaseSync {
    *
    * > **Note:** If the `select` statement returns multiple results, only the first result is returned, so it’s better to write statements that return a single result (for example, using `limit`).
    *
-   * > **Note:** You may also use `get()` to run an [`insert ___ returning ___` statement](https://www.sqlite.org/lang_returning.html), but you probably shouldn’t use `returning`, because it runs into issues in edge cases. Instead, you should use `run()`, get the `lastInsertRowid`, and perform a follow-up `select`. See <https://github.com/WiseLibs/better-sqlite3/issues/654> and <https://github.com/WiseLibs/better-sqlite3/issues/657>.
-   *
-   * > **Note:** The `Type` parameter is [an assertion](https://www.typescriptlang.org/docs/handbook/2/everyday-types.html#type-assertions). If you’d like to make sure that the values returned from the database are of a certain type, you must implement a runtime check instead. See <https://github.com/DefinitelyTyped/DefinitelyTyped/issues/50794>, <https://github.com/DefinitelyTyped/DefinitelyTyped/discussions/62205>, and <https://github.com/DefinitelyTyped/DefinitelyTyped/pull/65035>. Note that the `get() as ___` pattern also works because by default `Type` is `unknown`.
+   * > **Note:** The `Type` parameter is [an assertion](https://www.typescriptlang.org/docs/handbook/2/everyday-types.html#type-assertions). If you’d like to ensure that the values returned from the database are of a certain type, you must implement a runtime check instead.
    */
   get<Type>(query: Query): Type | undefined {
-    return this.getStatement(query).get(...query.parameters) as
+    return this.#getStatement(query.source).get(...query.parameters) as
       Type | undefined;
   }
 
@@ -247,7 +245,7 @@ export class Database extends sqlite.DatabaseSync {
    * > **Note:** If the results are big and you don’t want to load them all at once, then use `iterate()` instead.
    */
   all<Type>(query: Query): Type[] {
-    return this.getStatement(query).all(...query.parameters) as Type[];
+    return this.#getStatement(query.source).all(...query.parameters) as Type[];
   }
 
   /**
@@ -255,27 +253,37 @@ export class Database extends sqlite.DatabaseSync {
    *
    * > **Note:** If the results are small and you may load them all at once, then use `all()` instead.
    */
-  iterate<Type>(query: Query): IterableIterator<Type> {
-    return this.getStatement(query).iterate(
+  iterate<Type>(query: Query): NodeJS.Iterator<Type> {
+    return this.#getStatement(query.source).iterate(
       ...query.parameters,
-    ) as IterableIterator<Type>;
+    ) as NodeJS.Iterator<Type>;
   }
 
   /**
-   * Run a `pragma`. Similar to `better-sqlite3`’s `pragma()`, but includes the `Type` assertion similar to other methods.
+   * Execute a function in a transaction. Transactions are `immediate` to avoid `SQLITE_BUSY` errors. See <https://kerkour.com/sqlite-for-servers>.
    */
-  pragma<Type>(
-    source: string,
-    options?: BetterSQLite3Database.PragmaOptions,
-  ): Type {
-    return super.pragma(source, options) as Type;
-  }
-
-  /**
-   * Execute a function in a transaction. All the [caveats](https://github.com/WiseLibs/better-sqlite3/blob/bd55c76c1520c7796aa9d904fe65b3fb4fe7aac0/docs/api.md#caveats) about `better-sqlite3`’s transactions still apply. Transactions are `immediate` to avoid `SQLITE_BUSY` errors. See <https://kerkour.com/sqlite-for-servers>.
-   */
-  executeTransaction<Type>(fn: () => Type): Type {
-    return this.transaction(fn).immediate();
+  transaction<Type>(function_: () => Type): Type {
+    try {
+      this.execute(
+        sql`
+          begin immediate;
+        `,
+      );
+      const value = function_();
+      this.execute(
+        sql`
+          commit;
+        `,
+      );
+      return value;
+    } catch (error) {
+      this.execute(
+        sql`
+          rollback;
+        `,
+      );
+      throw error;
+    }
   }
 
   /**
@@ -693,7 +701,7 @@ export class Database extends sqlite.DatabaseSync {
   /**
    * An internal method that returns a `StatementSync` for a given query. Normally you don’t have to use this, but it’s available for advanced use-cases in which you’d like to manipulate a prepared statement (for example, to set [`setReadBigInts()`](https://nodejs.org/docs/latest/api/sqlite.html#statementsetreadbigintsenabled)).
    */
-  getStatement(query: Query): sqlite.StatementSync {
+  #getStatement(query: Query): sqlite.StatementSync {
     const source = query.sourceParts.join("?");
     let statement = this.#statements.get(source);
     if (statement === undefined) {
