@@ -164,12 +164,12 @@ export class Database extends sqlite.DatabaseSync {
         migrationIndex < migrations.length;
         migrationIndex++
       )
-        this.transactionAsync(async () => {
+        await this.transactionAsync(async () => {
           const migration = migrations[migrationIndex];
           if (typeof migration === "function") await migration(this);
           else this.execute(migration);
-          this.run(
-            sql`
+          this.exec(
+            `
               pragma user_version = ${migrationIndex + 1};
             `,
           );
