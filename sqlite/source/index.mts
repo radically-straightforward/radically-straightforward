@@ -5,7 +5,7 @@ import * as utilities from "@radically-straightforward/utilities";
 import * as node from "@radically-straightforward/node";
 
 /**
- * An extension of `node:sqlite`’s `DatabaseSync` which includes:
+ * An extension of `node:sqlite`’s `DatabaseSync` which adds the following features:
  *
  * 1. A way to run queries using tagged templates that improves on `SQLTagStore` in the following ways:
  *
