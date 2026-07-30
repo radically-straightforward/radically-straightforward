@@ -709,5 +709,20 @@ export default function sql(
 ): Query {
   let source = "";
   const parameters = new Array<null | number | bigint | string | Buffer>();
+  for (let index = 0; index < substitutions.length; index++) {
+    const templateString = templateStrings[index];
+    const substitution = substitutions[index];
+    source += templateString;
+    if (
+      typeof substitution === "object" &&
+      substitution !== null &&
+      typeof (substitution as Query).source === "string" &&
+      Array.isArray((substitution as any).parameters)
+    ) {
+      source += (substitution as Query).source;
+      parameters.push(...(substitution as any).parameters);
+    } else parameters.push(substitution as any);
+  }
+  source += templateStrings.at(-1);
   return { source, parameters };
 }
