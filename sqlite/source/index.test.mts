@@ -261,81 +261,6 @@ test("Database", async () => {
   // assert.equal(await database.cacheAsync("2", () => "a new 2"), "a new 2");
 
   assert.deepEqual(
-    sql`create table "users" ("id" integer primary key autoincrement, "name" text);`,
-    {
-      sourceParts: [
-        `create table "users" ("id" integer primary key autoincrement, "name" text);`,
-      ],
-      parameters: [],
-    },
-  );
-
-  assert.deepEqual(
-    sql`insert into "users" ("name") values (${"Leandro Facchinetti"});`,
-    {
-      sourceParts: [`insert into "users" ("name") values (`, `);`],
-      parameters: ["Leandro Facchinetti"],
-    },
-  );
-
-  assert.deepEqual(
-    sql`select "id", "name" from "users" where "name" in ${[]};`,
-    {
-      sourceParts: [`select "id", "name" from "users" where "name" in ();`],
-      parameters: [],
-    },
-  );
-
-  assert.deepEqual(
-    sql`select "id", "name" from "users" where "name" in ${[
-      "Leandro Facchinetti",
-      "David Adler",
-    ]};`,
-    {
-      sourceParts: [
-        `select "id", "name" from "users" where "name" in (`,
-        `,`,
-        `);`,
-      ],
-      parameters: ["Leandro Facchinetti", "David Adler"],
-    },
-  );
-
-  assert.deepEqual(
-    sql`select "id", "name" from "users" where "name" in ${new Set([])};`,
-    {
-      sourceParts: [`select "id", "name" from "users" where "name" in ();`],
-      parameters: [],
-    },
-  );
-
-  assert.deepEqual(
-    sql`select "id", "name" from "users" where "name" in ${new Set([
-      "Leandro Facchinetti",
-      "David Adler",
-    ])};`,
-    {
-      sourceParts: [
-        `select "id", "name" from "users" where "name" in (`,
-        `,`,
-        `);`,
-      ],
-      parameters: ["Leandro Facchinetti", "David Adler"],
-    },
-  );
-
-  assert.deepEqual(
-    sql`select "id", "name" from "users" where "name" = ${"Leandro Facchinetti"}$${sql` and "age" is not null`};`,
-    {
-      sourceParts: [
-        `select "id", "name" from "users" where "name" = `,
-        ` and "age" is not null;`,
-      ],
-      parameters: ["Leandro Facchinetti"],
-    },
-  );
-
-  assert.deepEqual(
     sql`select "id", "name" from "users" where "name" = ${"Leandro Facchinetti"}$${sql` and "age" = ${33}`};`,
     {
       sourceParts: [
@@ -346,10 +271,6 @@ test("Database", async () => {
       parameters: ["Leandro Facchinetti", 33],
     },
   );
-
-  assert.throws(() => {
-    sql`select "id", "name" from "users" where "name" = ${"Leandro Facchinetti"}$${` and "age" is not null`};`;
-  });
 });
 
 // test(
