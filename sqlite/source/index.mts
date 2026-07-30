@@ -71,7 +71,7 @@ export class Database extends sqlite.DatabaseSync {
    *
    * A migration may be:
    *
-   * 1. A SQL query, for example:
+   * 1. A query, for example:
    *
    *    ```typescript
    *    sql`
