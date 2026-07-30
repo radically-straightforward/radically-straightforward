@@ -27,11 +27,13 @@ test("Database", async () => {
     );
 
   assert.deepEqual(
-    database.get<{ id: number; name: string }>(
-      sql`
+    {
+      ...database.get<{ id: number; name: string }>(
+        sql`
         select "id", "name" from "users" where "id" = 1;
       `,
-    ),
+      ),
+    },
     { id: 1, name: "Leandro Facchinetti" },
   );
 
@@ -45,11 +47,13 @@ test("Database", async () => {
   );
 
   assert.deepEqual(
-    database.all<{ id: number; name: string }>(
-      sql`
+    database
+      .all<{ id: number; name: string }>(
+        sql`
         select "id", "name" from "users" order by "id" asc;
       `,
-    ),
+      )
+      .map((row) => ({ ...row })),
     [{ id: 1, name: "Leandro Facchinetti" }],
   );
 
@@ -60,7 +64,7 @@ test("Database", async () => {
           select "id", "name" from "users" order by "id" asc;
         `,
       ),
-    ],
+    ].map((row) => ({ ...row })),
     [{ id: 1, name: "Leandro Facchinetti" }],
   );
 
