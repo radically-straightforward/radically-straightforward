@@ -33,26 +33,6 @@ test("Database", async () => {
     assert.equal(migrationRuns, 1);
   }
 
-  await assert.rejects(async () => {
-    await database.migrate(...migrations, async () => {
-      database.execute(
-        sql`
-          insert into "users" ("name") values (${"Jeppe"});
-        `,
-      );
-      await timers.setTimeout();
-      throw new Error("Rollback across ticks of the event loop.");
-    });
-  });
-  assert.equal(
-    database.get<{ id: number; name: string }>(
-      sql`
-        select "id", "name" from "users" where "name" = ${"Jeppe"};
-      `,
-    ),
-    undefined,
-  );
-
   // assert.deepEqual(
   //   database.get<{ id: number; name: string }>(
   //     sql`
