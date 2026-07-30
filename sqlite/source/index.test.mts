@@ -8,32 +8,50 @@ import sql, { Database, Query } from "@radically-straightforward/sqlite";
 test("Database", async () => {
   const database = new Database(":memory:");
 
-  const migrations: (Query | (() => void | Promise<void>))[] = [
-    sql`
-      create table "users" (
-        "id" integer primary key autoincrement,
-        "name" text not null
-      ) strict;
-    `,
+  let migrationRuns = 0;
+  for (let iteration = 0; iteration < 5; iteration++) {
+    await database.migrate(
+      sql`
+        create table "users" (
+          "id" integer primary key autoincrement,
+          "name" text not null
+        ) strict;
+      `,
 
-    async () => {
-      database.run(
+      async () => {
+        database.run(
+          sql`
+            insert into "users" ("name") values (${"Leandro Facchinetti"});
+          `,
+        );
+      },
+
+      () => {
+        migrationRuns++;
+      },
+    );
+    assert.equal(migrationRuns, 1);
+  }
+
+  await assert.rejects(async () => {
+    await database.migrate(...migrations, async () => {
+      database.execute(
         sql`
-          insert into "users" ("name") values (${"Leandro Facchinetti"});
+          insert into "users" ("name") values (${"Jeppe"});
         `,
       );
-    },
-  ];
-  await database.migrate(...migrations);
-
-  // assert.deepEqual(
-  //   database.run(
-  //     sql`
-  //       insert into "users" ("name") values (${"David Adler"});
-  //     `,
-  //   ),
-  //   { changes: 1, lastInsertRowid: 2 },
-  // );
+      await timers.setTimeout();
+      throw new Error("Rollback across ticks of the event loop.");
+    });
+  });
+  assert.equal(
+    database.get<{ id: number; name: string }>(
+      sql`
+        select "id", "name" from "users" where "name" = ${"Jeppe"};
+      `,
+    ),
+    undefined,
+  );
 
   // assert.deepEqual(
   //   database.get<{ id: number; name: string }>(
@@ -131,6 +149,15 @@ test("Database", async () => {
 
   // assert.equal(database.pragma<number>("foreign_keys", { simple: true }), 1);
 
+  // assert.deepEqual(
+  //   database.run(
+  //     sql`
+  //       insert into "users" ("name") values (${"David Adler"});
+  //     `,
+  //   ),
+  //   { changes: 1, lastInsertRowid: 2 },
+  // );
+
   // assert.throws(() => {
   //   database.executeTransaction<void>(() => {
   //     database.run(
@@ -166,35 +193,6 @@ test("Database", async () => {
   //     `,
   //   ),
   //   [{ id: 4, name: "Scott Smith" }],
-  // );
-
-  // let runsToCompletion = 0;
-  // migrations.push(() => {
-  //   runsToCompletion++;
-  // });
-  // for (let iteration = 0; iteration < 5; iteration++) {
-  //   await database.migrate(...migrations);
-  //   assert.equal(runsToCompletion, 1);
-  // }
-
-  // await assert.rejects(async () => {
-  //   await database.migrate(...migrations, async () => {
-  //     database.execute(
-  //       sql`
-  //         insert into "users" ("name") values (${"Jeppe"});
-  //       `,
-  //     );
-  //     await timers.setTimeout();
-  //     throw new Error("Rollback across ticks of the event loop.");
-  //   });
-  // });
-  // assert.equal(
-  //   database.get<{ id: number; name: string }>(
-  //     sql`
-  //       select "id", "name" from "users" where "name" = ${"Jeppe"};
-  //     `,
-  //   ),
-  //   undefined,
   // );
 
   // database.cacheSize = 3;
