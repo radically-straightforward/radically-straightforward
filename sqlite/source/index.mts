@@ -211,11 +211,11 @@ export class Database extends sqlite.DatabaseSync {
    * Execute DDL statements, for example, `create table`, `drop index`, and so forth. Multiple statements may be included in the same query. The query must not include interpolation.
    */
   execute(query: Query): void {
-    if (query.sourceParts.length !== 1)
+    if (0 < query.parameters.length)
       throw new Error(
-        "‘execute()’ can’t be called with SQL including interpolation",
+        "‘execute()’ can’t be called with a query including interpolation",
       );
-    this.exec(query.sourceParts[0]);
+    this.exec(query.source);
   }
 
   /**
