@@ -695,22 +695,11 @@ export type Query = {
  * sql`insert into "users" ("name") values (${"Leandro Facchinetti"});`;
  * ```
  *
- * Arrays and Sets may be interpolated for `in` clauses, for example:
+ * You may interpolate fragments within a query, for example:
  *
  * ```javascript
- * sql`select "id", "name" from "users" where "name" in ${[
- *   "Leandro Facchinetti",
- *   "Scott Smith",
- * ]};`;
+ * sql`select "id", "name" from "users" where "name" = ${"Leandro Facchinetti"}$${shouldFilterByAge ? sql` and "age" = ${35}` : sql``};`;
  * ```
- *
- * You may use the pattern `$${___}` (note the two `$`) to interpolate a clause within a query, for example:
- *
- * ```javascript
- * sql`select "id", "name" from "users" where "name" = ${"Leandro Facchinetti"}$${sql` and "age" = ${33}`};`;
- * ```
- *
- * > **Note:** This is useful, for example, to build queries for advanced search forms by conditionally including clauses for fields that have been filled in.
  */
 export default function sql(
   templateStrings: TemplateStringsArray,
