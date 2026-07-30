@@ -687,13 +687,19 @@ export class Database extends sqlite.DatabaseSync {
           );
         `,
       );
-      this.run(
+      for (const oldValueRow of this.all<{ id: number }>(
         sql`
-          delete from "_cache"
+          select "id"
+          from "_cache"
           order by "usedAt" desc
-          limit -1 offset ${this.cacheSize};
+          limit -1 offset ${this.cacheSize}
         `,
-      );
+      ))
+        this.run(
+          sql`
+            delete from "_cache" where "id" = ${oldValueRow.id};
+          `,
+        );
     } else {
       value = valueRow.value;
       this.run(
