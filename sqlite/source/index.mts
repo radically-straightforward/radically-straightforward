@@ -222,7 +222,7 @@ export class Database extends sqlite.DatabaseSync {
    * Run a DML statement, for example, `insert`, `update`, `delete`, and so forth.
    */
   run(query: Query): sqlite.StatementResultingChanges {
-    return this.getStatement(query).run(...query.parameters);
+    return this.getStatement(query.source).run(...query.parameters);
   }
 
   /**
@@ -709,7 +709,7 @@ export class Database extends sqlite.DatabaseSync {
  */
 export type Query = {
   source: string;
-  parameters: (null | number | bigint | string | Buffer)[];
+  parameters: (null | number | string | Buffer)[];
 };
 
 /**
@@ -731,10 +731,10 @@ export type Query = {
  */
 export default function sql(
   templateStrings: TemplateStringsArray,
-  ...substitutions: (null | number | bigint | string | Buffer | Query)[]
+  ...substitutions: (null | number | string | Buffer | Query)[]
 ): Query {
   let source = "";
-  const parameters = new Array<null | number | bigint | string | Buffer>();
+  const parameters = new Array<null | number | string | Buffer>();
   for (let index = 0; index < substitutions.length; index++) {
     const templateString = templateStrings[index];
     const substitution = substitutions[index];
