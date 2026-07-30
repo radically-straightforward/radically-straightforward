@@ -714,16 +714,7 @@ export type Query = {
  */
 export default function sql(
   templateStrings: TemplateStringsArray,
-  ...substitutions: (
-    | null
-    | number
-    | bigint
-    | string
-    | Buffer
-    | Array<null | number | bigint | string | Buffer>
-    | Set<null | number | bigint | string | Buffer>
-    | Query
-  )[]
+  ...substitutions: (null | number | bigint | string | Buffer | Query)[]
 ): Query {
   const templateParts = [...templateStrings];
   const query: Query = { sourceParts: [], parameters: [] };
