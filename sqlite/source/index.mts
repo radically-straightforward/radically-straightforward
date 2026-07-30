@@ -707,54 +707,7 @@ export default function sql(
   templateStrings: TemplateStringsArray,
   ...substitutions: (null | number | bigint | string | Buffer | Query)[]
 ): Query {
-  const templateParts = [...templateStrings];
-  const query: Query = { sourceParts: [], parameters: [] };
-  for (
-    let substitutionsIndex = 0;
-    substitutionsIndex < substitutions.length;
-    substitutionsIndex++
-  ) {
-    let templatePart = templateParts[substitutionsIndex];
-    let substitution = substitutions[substitutionsIndex];
-    if (substitution instanceof Set) substitution = [...substitution];
-    if (templatePart.endsWith("$")) {
-      templatePart = templatePart.slice(0, -1);
-      const substitutionQuery = substitution as Query;
-      if (substitutionQuery.sourceParts.length === 1)
-        templateParts[substitutionsIndex + 1] = `${templatePart}${
-          substitutionQuery.sourceParts[0]
-        }${templateParts[substitutionsIndex + 1]}`;
-      else {
-        query.sourceParts.push(
-          `${templatePart}${substitutionQuery.sourceParts[0]}`,
-          ...substitutionQuery.sourceParts.slice(1, -1),
-        );
-        templateParts[substitutionsIndex + 1] =
-          `${substitutionQuery.sourceParts.at(-1)}${
-            templateParts[substitutionsIndex + 1]
-          }`;
-        query.parameters.push(...substitutionQuery.parameters);
-      }
-    } else if (Array.isArray(substitution)) {
-      if (substitution.length === 0)
-        templateParts[substitutionsIndex + 1] = `${templatePart}()${
-          templateParts[substitutionsIndex + 1]
-        }`;
-      else {
-        query.sourceParts.push(
-          `${templatePart}(`,
-          ...new Array(substitution.length - 1).fill(","),
-        );
-        templateParts[substitutionsIndex + 1] = `)${
-          templateParts[substitutionsIndex + 1]
-        }`;
-        query.parameters.push(...substitution);
-      }
-    } else {
-      query.sourceParts.push(templatePart);
-      query.parameters.push(substitution);
-    }
-  }
-  query.sourceParts.push(templateParts.at(-1)!);
-  return query;
+  let source = "";
+  const parameters = new Array<null | number | bigint | string | Buffer>();
+  return { source, parameters };
 }
