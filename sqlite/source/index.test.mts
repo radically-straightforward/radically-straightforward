@@ -261,14 +261,22 @@ test("Database", async () => {
   // assert.equal(await database.cacheAsync("2", () => "a new 2"), "a new 2");
 
   assert.deepEqual(
-    sql`select "id", "name" from "users" where "name" = ${"Leandro Facchinetti"}$${sql` and "age" = ${33}`};`,
+    sql`
+      select "id", "name"
+      from "users"
+      where
+        "name" = ${"Leandro Facchinetti"}
+        ${sql`and "age" = ${35}`};
+    `,
     {
-      sourceParts: [
-        `select "id", "name" from "users" where "name" = `,
-        ` and "age" = `,
-        `;`,
-      ],
-      parameters: ["Leandro Facchinetti", 33],
+      source: `
+      select "id", "name"
+      from "users"
+      where
+        "name" = ?
+        and "age" = ?;
+    `,
+      parameters: ["Leandro Facchinetti", 35],
     },
   );
 });

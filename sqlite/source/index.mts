@@ -697,7 +697,7 @@ export type Query = {
  *   from "users"
  *   where
  *     "name" = ${"Leandro Facchinetti"}
- *     $${shouldFilterByAge ? sql` and "age" = ${35}` : sql``};
+ *     ${shouldFilterByAge ? sql`and "age" = ${35}` : sql``};
  * `;
  * ```
  *
@@ -721,7 +721,10 @@ export default function sql(
     ) {
       source += (substitution as Query).source;
       parameters.push(...(substitution as any).parameters);
-    } else parameters.push(substitution as any);
+    } else {
+      source += "?";
+      parameters.push(substitution as any);
+    }
   }
   source += templateStrings.at(-1);
   return { source, parameters };
