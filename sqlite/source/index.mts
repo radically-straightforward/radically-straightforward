@@ -689,17 +689,19 @@ export type Query = {
 /**
  * A tagged template that generates a database query.
  *
- * Interpolation is turned into binding parameters to protect from SQL injection, for example:
+ * You may interpolate values and query fragments, for example:
  *
  * ```javascript
- * sql`insert into "users" ("name") values (${"Leandro Facchinetti"});`;
+ * sql`
+ *   select "id", "name"
+ *   from "users"
+ *   where
+ *     "name" = ${"Leandro Facchinetti"}
+ *     $${shouldFilterByAge ? sql` and "age" = ${35}` : sql``};
+ * `;
  * ```
  *
- * You may interpolate fragments within a query, for example:
- *
- * ```javascript
- * sql`select "id", "name" from "users" where "name" = ${"Leandro Facchinetti"}$${shouldFilterByAge ? sql` and "age" = ${35}` : sql``};`;
- * ```
+ * > **Note:** The interpolated values are turned into binding parameters to protect from SQL injection.
  */
 export default function sql(
   templateStrings: TemplateStringsArray,
