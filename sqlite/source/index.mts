@@ -113,12 +113,6 @@ export class Database extends sqlite.DatabaseSync {
    * 6. You may consult the status of your database schema with the [`pragma user_version`](https://www.sqlite.org/pragma.html#pragma_user_version), which holds the number of migrations that have been run successfully.
    *
    * 7. The migration system sets several `pragma`s that make SQLite better suited for running on the server, avoiding the `SQLITE_BUSY` error. See <https://kerkour.com/sqlite-for-servers>.
-   *
-   * **Implementation Notes**
-   *
-   * - `migrate()` must be its own separate method instead of being part of the constructor because migrations may be asynchronous.
-   *
-   * - `migrate()` uses an `exclusive` transaction because it’s modifying the schema.
    */
   async migrate(
     ...migrations: (Query | ((database: this) => void | Promise<void>))[]
