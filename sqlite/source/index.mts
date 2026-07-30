@@ -170,12 +170,7 @@ export class Database extends sqlite.DatabaseSync {
         migrationIndex < migrations.length;
         migrationIndex++
       )
-        try {
-          this.execute(
-            sql`
-              begin exclusive;
-            `,
-          );
+        this.asyncTransaction(async () => {
           const migration = migrations[migrationIndex];
           if (typeof migration === "function") await migration(this);
           else this.execute(migration);
@@ -184,19 +179,7 @@ export class Database extends sqlite.DatabaseSync {
               pragma user_version = ${migrationIndex + 1};
             `,
           );
-          this.execute(
-            sql`
-              commit;
-            `,
-          );
-        } catch (error) {
-          this.execute(
-            sql`
-              rollback;
-            `,
-          );
-          throw error;
-        }
+        });
       return this;
     } finally {
       this.execute(
@@ -270,6 +253,33 @@ export class Database extends sqlite.DatabaseSync {
         `,
       );
       const value = function_();
+      this.execute(
+        sql`
+          commit;
+        `,
+      );
+      return value;
+    } catch (error) {
+      this.execute(
+        sql`
+          rollback;
+        `,
+      );
+      throw error;
+    }
+  }
+
+  /**
+   * Execute an asynchronous function in a transaction. Transactions are `exclusive` to avoid issues with multiple asynchronous functions interleaving their transactions. This function is reserved for special cases, for example, migrations.
+   */
+  async asyncTransaction<Type>(function_: () => Promise<Type>): Promise<Type> {
+    try {
+      this.execute(
+        sql`
+          begin exclusive;
+        `,
+      );
+      const value = await function_();
       this.execute(
         sql`
           commit;

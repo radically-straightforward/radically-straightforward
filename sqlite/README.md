@@ -30,33 +30,33 @@ An extension of `node:sqlite`’s `DatabaseSync` which adds the following featur
 
 1. A way to run queries using tagged templates.
 
-> **Note:** This is different from `SQLTagStore` in the following ways:
->
-> 1. It allows nesting query fragments, for example:
->
->    ```typescript
->    sql`
->      select "id", "name"
->      from "users"
->      where
->        "name" = ${"Leandro Facchinetti"}
->        ${shouldFilterByAge ? sql`and "age" = ${35}` : sql``};
->    `;
->    ```
->
-> 2. The tags in the tagged templates don’t execute the queries, for example:
->
->    ```typescript
->    // SQLTagStore
->    sql.get`select "name" from "users";`;
->
->    // Database
->    database.get(sql`select "name" from "users";`);
->    ```
->
->    This is better because it works with syntax highlighting with the **[ES6 String HTML](https://marketplace.visualstudio.com/items?itemName=Tobermory.es6-string-html)** extension for Visual Studio Code.
->
-> 3. It isn’t a LRU cache. This shouldn’t be a problem because there’s a bounded number of queries in the source code.
+   > **Note:** This is different from `SQLTagStore` in the following ways:
+   >
+   > 1. It allows nesting query fragments, for example:
+   >
+   >    ```typescript
+   >    sql`
+   >      select "id", "name"
+   >      from "users"
+   >      where
+   >        "name" = ${"Leandro Facchinetti"}
+   >        ${shouldFilterByAge ? sql`and "age" = ${35}` : sql``};
+   >    `;
+   >    ```
+   >
+   > 2. The tags in the tagged templates don’t execute the queries, for example:
+   >
+   >    ```typescript
+   >    // SQLTagStore
+   >    sql.get`select "name" from "users";`;
+   >
+   >    // Database
+   >    database.get(sql`select "name" from "users";`);
+   >    ```
+   >
+   >    This is better because it works with syntax highlighting with the **[ES6 String HTML](https://marketplace.visualstudio.com/items?itemName=Tobermory.es6-string-html)** extension for Visual Studio Code.
+   >
+   > 3. It isn’t a LRU cache. This shouldn’t be a problem because there’s a bounded number of queries in the source code.
 
 2. An auxiliary function for running transactions.
 
