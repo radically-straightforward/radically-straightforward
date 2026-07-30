@@ -729,7 +729,7 @@ export class Database extends sqlite.DatabaseSync {
  */
 export type Query = {
   source: string;
-  parameters: (null | number | string | Buffer)[];
+  parameters: (null | number | bigint | string | Buffer)[];
 };
 
 /**
@@ -751,10 +751,10 @@ export type Query = {
  */
 export default function sql(
   templateStrings: TemplateStringsArray,
-  ...substitutions: (null | number | string | Buffer | Query)[]
+  ...substitutions: (null | number | bigint | string | Buffer | Query)[]
 ): Query {
   let source = "";
-  const parameters = new Array<null | number | string | Buffer>();
+  const parameters = new Array<null | number | bigint | string | Buffer>();
   for (let index = 0; index < substitutions.length; index++) {
     const templateString = templateStrings[index];
     const substitution = substitutions[index];
