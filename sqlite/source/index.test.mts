@@ -163,99 +163,99 @@ test("Database", async () => {
   );
 });
 
-// test(
-//   "backgroundJobWorker()",
-//   {
-//     skip:
-//       process.stdin.isTTY && process.argv[2] === "backgroundJobWorker()"
-//         ? false
-//         : `Run interactive test with ‘node ./build/index.test.mjs "backgroundJobWorker()"’.`,
-//   },
-//   async () => {
-//     const database = await new Database(":memory:").migrate();
+test(
+  "backgroundJobWorker()",
+  {
+    skip:
+      process.stdin.isTTY && process.argv[2] === "backgroundJobWorker()"
+        ? false
+        : `Run interactive test with ‘node ./build/index.test.mjs "backgroundJobWorker()"’.`,
+  },
+  async () => {
+    const database = await new Database(":memory:").migrate();
 
-//     database.backgroundJob({ type: "aJobWithNoWorker" });
+    database.backgroundJob({ type: "aJobWithNoWorker" });
 
-//     database.run(
-//       sql`
-//         insert into "_backgroundJobs" (
-//           "type",
-//           "startAt",
-//           "startedAt",
-//           "retries",
-//           "parameters"
-//         )
-//         values (
-//           ${"aJobWhichWasLeftBehind"},
-//           ${new Date(Date.now() - 20 * 60 * 1000).toISOString()},
-//           ${new Date(Date.now() - 15 * 60 * 1000).toISOString()},
-//           ${0},
-//           ${JSON.stringify(null)}
-//         );
-//       `,
-//     );
-//     database.backgroundJobWorker({ type: "aJobWhichWasLeftBehind" }, () => {});
+    database.run(
+      sql`
+        insert into "_backgroundJobs" (
+          "type",
+          "startAt",
+          "startedAt",
+          "retries",
+          "parameters"
+        )
+        values (
+          ${"aJobWhichWasLeftBehind"},
+          ${new Date(Date.now() - 20 * 60 * 1000).toISOString()},
+          ${new Date(Date.now() - 15 * 60 * 1000).toISOString()},
+          ${0},
+          ${JSON.stringify(null)}
+        );
+      `,
+    );
+    database.backgroundJobWorker({ type: "aJobWhichWasLeftBehind" }, () => {});
 
-//     console.log("backgroundJobWorker(): Press ⌃Z to continue...");
-//     await new Promise((resolve) => process.once("SIGTSTP", resolve));
+    console.log("backgroundJobWorker(): Press ⌃Z to continue...");
+    await new Promise((resolve) => process.once("SIGTSTP", resolve));
 
-//     database.backgroundJobWorker(
-//       {
-//         type: "aJobWhichTimesOut",
-//         timeout: 1000,
-//         retries: 2,
-//       },
-//       async () => {
-//         await timers.setTimeout(5 * 1000);
-//       },
-//     );
-//     database.backgroundJob({
-//       type: "aJobWhichTimesOut",
-//       parameters: { name: "Leandro" },
-//     });
+    database.backgroundJobWorker(
+      {
+        type: "aJobWhichTimesOut",
+        timeout: 1000,
+        retries: 2,
+      },
+      async () => {
+        await timers.setTimeout(5 * 1000);
+      },
+    );
+    database.backgroundJob({
+      type: "aJobWhichTimesOut",
+      parameters: { name: "Leandro" },
+    });
 
-//     console.log("backgroundJobWorker(): Press ⌃Z to continue...");
-//     await new Promise((resolve) => process.once("SIGTSTP", resolve));
+    console.log("backgroundJobWorker(): Press ⌃Z to continue...");
+    await new Promise((resolve) => process.once("SIGTSTP", resolve));
 
-//     database.backgroundJobWorker(
-//       {
-//         type: "aJobWhichThrowsAnException",
-//         retryIn: 1000,
-//         retries: 2,
-//       },
-//       async () => {
-//         throw new Error("AN ERROR");
-//       },
-//     );
-//     database.backgroundJob({
-//       type: "aJobWhichThrowsAnException",
-//       parameters: { name: "Leandro" },
-//     });
+    database.backgroundJobWorker(
+      {
+        type: "aJobWhichThrowsAnException",
+        retryIn: 1000,
+        retries: 2,
+      },
+      async () => {
+        throw new Error("AN ERROR");
+      },
+    );
+    database.backgroundJob({
+      type: "aJobWhichThrowsAnException",
+      parameters: { name: "Leandro" },
+    });
 
-//     console.log("backgroundJobWorker(): Press ⌃Z to continue...");
-//     await new Promise((resolve) => process.once("SIGTSTP", resolve));
+    console.log("backgroundJobWorker(): Press ⌃Z to continue...");
+    await new Promise((resolve) => process.once("SIGTSTP", resolve));
 
-//     node.exit();
-//   },
-// );
+    node.exit();
+  },
+);
 
-// test(
-//   "scheduledBackgroundJobWorker()",
-//   {
-//     skip:
-//       process.stdin.isTTY &&
-//       process.argv[2] === "scheduledBackgroundJobWorker()"
-//         ? false
-//         : `Run interactive test with ‘node ./build/index.test.mjs "scheduledBackgroundJobWorker()"’.`,
-//   },
-//   async () => {
-//     const database = await new Database(":memory:").migrate();
+test(
+  "scheduledBackgroundJobWorker()",
+  {
+    skip:
+      process.stdin.isTTY &&
+      process.argv[2] === "scheduledBackgroundJobWorker()"
+        ? false
+        : `Run interactive test with ‘node ./build/index.test.mjs "scheduledBackgroundJobWorker()"’.`,
+  },
+  async () => {
+    const database = await new Database(":memory:").migrate();
 
-//     database.scheduledBackgroundJobWorker(
-//       { type: "test", schedule: "@minutely" },
-//       () => {
-//         console.log("scheduledBackgroundJobWorker()");
-//       },
-//     );
-//   },
-// );
+    database.scheduledBackgroundJobWorker(
+      { type: "test", schedule: "@minutely" },
+      () => {
+        console.log("scheduledBackgroundJobWorker()");
+      },
+    );
+  },
+);
