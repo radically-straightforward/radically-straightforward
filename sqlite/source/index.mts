@@ -170,7 +170,7 @@ export class Database extends sqlite.DatabaseSync {
         migrationIndex < migrations.length;
         migrationIndex++
       )
-        this.asyncTransaction(async () => {
+        this.transactionAsync(async () => {
           const migration = migrations[migrationIndex];
           if (typeof migration === "function") await migration(this);
           else this.execute(migration);
@@ -272,7 +272,7 @@ export class Database extends sqlite.DatabaseSync {
   /**
    * Execute an asynchronous function in a transaction. The transaction is `exclusive` to avoid issues with multiple asynchronous functions interleaving their transactions. This function is reserved for special cases, for example, migrations.
    */
-  async asyncTransaction<Type>(function_: () => Promise<Type>): Promise<Type> {
+  async transactionAsync<Type>(function_: () => Promise<Type>): Promise<Type> {
     this.execute(
       sql`
         begin exclusive;
