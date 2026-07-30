@@ -1,5 +1,15 @@
 # Changelog
 
+## 2.0.0 · 2026-07-30
+
+- Breaking changes:
+  - Switched from `better-sqlite3` to `node:sqlite`.
+  - `node:sqlite` is compiled without the `SQLITE_ENABLE_UPDATE_DELETE_LIMIT` compile-time flag, so `update`s and `delete`s may no longer use the `limit` clause.
+  - The `executeTransaction()` method was renamed to `transaction()`.
+  - Nested tagged templates don’t need to be marked with `$${___}`, but can use the regular `${___}`.
+  - The interpolated values may no longer be `undefined`, `Array`s, or `Set`s.
+  - `execute()` no longer supports interpolating values.
+
 ## 1.1.17 · 2026-07-08
 
 - Added `backgroundJob()` as an auxiliary function to enqueue a job.
