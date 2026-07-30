@@ -363,7 +363,7 @@ export class Database extends sqlite.DatabaseSync {
     return node.setInterval(
       { ...nodeSetTimeoutOptions, duration: 5000 },
       async () => {
-        this.executeTransaction(() => {
+        this.transaction(() => {
           for (const backgroundJob of this.all<{
             id: number;
             parameters: string;
@@ -397,7 +397,7 @@ export class Database extends sqlite.DatabaseSync {
             );
           }
         });
-        this.executeTransaction(() => {
+        this.transaction(() => {
           for (const backgroundJob of this.all<{
             id: number;
           }>(
@@ -424,7 +424,7 @@ export class Database extends sqlite.DatabaseSync {
           }
         });
         while (true) {
-          const backgroundJob = this.executeTransaction<
+          const backgroundJob = this.transaction<
             | {
                 id: number;
                 parameters: string;
@@ -529,7 +529,7 @@ export class Database extends sqlite.DatabaseSync {
     node.setInterval(
       { ...sqliteBackgroundJobWorkerOptions, duration: 5000 },
       () => {
-        this.executeTransaction(() => {
+        this.transaction(() => {
           const lastScheduledBackgroundJob = this.get<{
             id: number;
             lastScheduledAt: string;
@@ -698,11 +698,7 @@ export class Database extends sqlite.DatabaseSync {
   }
 
   #statements = new Map<string, sqlite.StatementSync>();
-  /**
-   * An internal method that returns a `StatementSync` for a given query. Normally you don’t have to use this, but it’s available for advanced use-cases in which you’d like to manipulate a prepared statement (for example, to set [`setReadBigInts()`](https://nodejs.org/docs/latest/api/sqlite.html#statementsetreadbigintsenabled)).
-   */
-  #getStatement(query: Query): sqlite.StatementSync {
-    const source = query.sourceParts.join("?");
+  #getStatement(source: string): sqlite.StatementSync {
     let statement = this.#statements.get(source);
     if (statement === undefined) {
       statement = this.prepare(source);
