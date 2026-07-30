@@ -84,7 +84,7 @@ A migration system based on [the steps for general schema changes in SQLite](htt
 
 A migration may be:
 
-1. A SQL query, for example:
+1. A query, for example:
 
    ```typescript
    sql`
@@ -126,12 +126,6 @@ A migration may be:
 6. You may consult the status of your database schema with the [`pragma user_version`](https://www.sqlite.org/pragma.html#pragma_user_version), which holds the number of migrations that have been run successfully.
 
 7. The migration system sets several `pragma`s that make SQLite better suited for running on the server, avoiding the `SQLITE_BUSY` error. See <https://kerkour.com/sqlite-for-servers>.
-
-**Implementation Notes**
-
-- `migrate()` must be its own separate method instead of being part of the constructor because migrations may be asynchronous.
-
-- `migrate()` uses an `exclusive` transaction because it’s modifying the schema.
 
 #### `Database.execute()`
 
@@ -189,7 +183,15 @@ Run a `select` statement that returns multiple results as an iterator.
 transaction<Type>(function_: () => Type): Type;
 ```
 
-Execute a function in a transaction. Transactions are `immediate` to avoid `SQLITE_BUSY` errors. See <https://kerkour.com/sqlite-for-servers>.
+Execute a function in a transaction. The transaction is `immediate` to avoid `SQLITE_BUSY` errors. See <https://kerkour.com/sqlite-for-servers>.
+
+#### `Database.transactionAsync()`
+
+```typescript
+async transactionAsync<Type>(function_: () => Promise<Type>): Promise<Type>;
+```
+
+Execute an asynchronous function in a transaction. The transaction is `exclusive` to avoid issues with multiple asynchronous functions interleaving their transactions. This function is reserved for special cases, for example, migrations.
 
 #### `Database.backgroundJob()`
 

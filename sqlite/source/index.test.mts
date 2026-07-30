@@ -3,36 +3,28 @@ import assert from "node:assert/strict";
 import timers from "node:timers/promises";
 import * as utilities from "@radically-straightforward/utilities";
 import * as node from "@radically-straightforward/node";
-import sql, {
-  // Database,
-  Query,
-} from "@radically-straightforward/sqlite";
+import sql, { Database, Query } from "@radically-straightforward/sqlite";
 
 test("Database", async () => {
-  // const database = new Database(":memory:");
+  const database = new Database(":memory:");
 
-  // const migrations: (Query | (() => void | Promise<void>))[] = [
-  //   sql`
-  //     create table "users" (
-  //       "id" integer primary key autoincrement,
-  //       "name" text not null
-  //     ) strict;
-  //     create table "posts" (
-  //       "id" integer primary key autoincrement,
-  //       "content" text not null,
-  //       "author" integer not null references "users"
-  //     ) strict;
-  //   `,
+  const migrations: (Query | (() => void | Promise<void>))[] = [
+    sql`
+      create table "users" (
+        "id" integer primary key autoincrement,
+        "name" text not null
+      ) strict;
+    `,
 
-  //   async () => {
-  //     database.execute(
-  //       sql`
-  //         insert into "users" ("name") values (${"Leandro Facchinetti"});
-  //       `,
-  //     );
-  //   },
-  // ];
-  // await database.migrate(...migrations);
+    async () => {
+      database.run(
+        sql`
+          insert into "users" ("name") values (${"Leandro Facchinetti"});
+        `,
+      );
+    },
+  ];
+  await database.migrate(...migrations);
 
   // assert.deepEqual(
   //   database.run(
