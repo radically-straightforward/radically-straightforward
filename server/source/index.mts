@@ -109,7 +109,7 @@ export type RequestBodyFile = busboy.FileInfo & { path: string };
  *
  * - **`send()`:** Similar to `response.end()`, but sets the `ended` flag (see below) and supports Live Connections.
  *
- * - **`redirect()`:** Sends the [`Location` header](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Location) and an HTTP status of [303 (`"see-other"`)](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/303) (default), [307 (`"temporary"`)](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/307), or [308 (`"permanent"`)](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/308). Note that there are no options for the legacy statuses of [301](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/301) and [302](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/302), because they may lead some clients to change the HTTP method of the redirected request by mistake. The `destination` parameter is relative to `request.URL`, for example, if no `destination` is provided, then the default is to redirect to the same `request.URL`. (This function is only available in requests that are **not** Live Connections, because Live Connections must not set headers.)
+ * - **`redirect()`:** Sends the [`Location` header](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Location) and an HTTP status of [303 (`"see-other"`)](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/303) (default), [307 (`"temporary"`)](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/307), or [308 (`"permanent"`)](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/308). Note that there are no options for the legacy statuses of [301](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/301) and [302](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/302), because they may lead some clients to change the HTTP method of the redirected request by mistake. The `destination` parameter is relative to `request.URL`, for example, if no `destination` is provided, then the default is to redirect to the same `request.URL`. (This function is only available in requests that are **not** Live Connections, because Live Connections must not set headers.) There’s a special `type` of redirect, `"live-navigation"`, which can be used with Live Navigation to force a browser to load the `Location` normally (that is, without the Live Navigation mechanism), which clears the Live Navigation cache. This is useful, for example, upon signing in and signing out, because the user can’t use the browser navigation to, after a sign in, go back to the sign in form, or, more importantly, after a sign out, go back to a page that’s only visible while signed in.
  *
  * - **`ended`:** Whether the response has been produced and no further Routes need to be considered. This flag is set by `send()` and `redirect()`, and it may be set manually if, for example, you respond with `stream.pipeline(___, response)`.
  */
@@ -165,7 +165,10 @@ export default function server({
         { [key: string]: string },
         {
           [key: string]:
-            string | RequestBodyFile | string[] | RequestBodyFile[];
+            | string
+            | RequestBodyFile
+            | string[]
+            | RequestBodyFile[];
         },
         { [key: string]: unknown }
       >,
@@ -265,7 +268,8 @@ export default function server({
                   if (name.endsWith("[]"))
                     (
                       (request.body[name.slice(0, -"[]".length)] ??= []) as (
-                        string | RequestBodyFile
+                        | string
+                        | RequestBodyFile
                       )[]
                     ).push(value);
                   else request.body[name] = value;
@@ -290,7 +294,8 @@ export default function server({
                   if (name.endsWith("[]"))
                     (
                       (request.body[name.slice(0, -"[]".length)] ??= []) as (
-                        string | RequestBodyFile
+                        | string
+                        | RequestBodyFile
                       )[]
                     ).push(value);
                   else request.body[name] = value;
