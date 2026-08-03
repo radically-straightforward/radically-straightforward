@@ -33,9 +33,9 @@
   "devDependencies": {
     "@radically-straightforward/typescript": "^1.0.5",
     "@types/archiver": "^8.0.0",
-    "@types/node": "^26.0.1",
-    "prettier": "^3.9.4",
-    "typescript": "^6.0.3"
+    "@types/node": "^26.1.2",
+    "prettier": "^3.9.6",
+    "typescript": "^7.0.2"
   },
   "allowScripts": {
     "@radically-straightforward/typescript@1.0.5": true

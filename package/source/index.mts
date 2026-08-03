@@ -47,7 +47,7 @@ await fs.copyFile(
       { win32: "win", darwin: "darwin", linux: "linux" }[
         process.platform as "win32" | "darwin" | "linux"
       ]
-    }-${process.arch}/bin/node${process.platform === "win32" ? ".exe" : ""}`,
+    }-${process.arch}${process.platform === "win32" ? "" : "/bin"}/node${process.platform === "win32" ? ".exe" : ""}`,
   ),
   `./node_modules/.bin/node${process.platform === "win32" ? ".exe" : ""}`,
 );
