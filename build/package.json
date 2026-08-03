@@ -37,16 +37,16 @@
     "base-x": "^5.0.1",
     "esbuild": "^0.28.1",
     "make-synchronized": "^0.8.0",
-    "postcss": "^8.5.16",
-    "prettier": "^3.9.4",
+    "postcss": "^8.5.25",
+    "prettier": "^3.9.6",
     "xxhash-addon": "^2.1.0"
   },
   "devDependencies": {
     "@radically-straightforward/typescript": "^1.0.5",
     "@types/babel__core": "^7.20.5",
     "@types/babel__generator": "^7.27.0",
-    "@types/node": "^26.0.1",
-    "typescript": "^6.0.3"
+    "@types/node": "^26.1.2",
+    "typescript": "^7.0.2"
   },
   "allowScripts": {
     "@radically-straightforward/typescript@1.0.5": true,
