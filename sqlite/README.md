@@ -72,6 +72,14 @@ An extension of `node:sqlite`’s `DatabaseSync` which adds the following featur
 
 8. A caching mechanism.
 
+#### `Database.loadExtension()`
+
+```typescript
+loadExtension(extension: string): this;
+```
+
+Load an SQLite extension and disable loading extensions afterward. This is a security measure to avoid loading malicious extensions through SQL injection, for example, `select load_extension('malicious.so');`).
+
 #### `Database.migrate()`
 
 ```typescript

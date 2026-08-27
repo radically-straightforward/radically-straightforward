@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.0.2 · 2026-08-27
+
+- Added `loadExtension()`, which manages enabling/disabling the loading of extensions.
+
 ## 2.0.0 · 2026-07-30
 
 - Breaking changes:

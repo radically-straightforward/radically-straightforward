@@ -3,10 +3,22 @@ import assert from "node:assert/strict";
 import timers from "node:timers/promises";
 import * as utilities from "@radically-straightforward/utilities";
 import * as node from "@radically-straightforward/node";
-import sql, { Database, Query } from "@radically-straightforward/sqlite";
+import sql, { Database } from "@radically-straightforward/sqlite";
+import * as sqliteVec from "sqlite-vec";
 
 test("Database", async () => {
   const database = new Database(":memory:");
+
+  database.loadExtension(sqliteVec.getLoadablePath());
+
+  assert.equal(
+    typeof database.get<{ version: string }>(
+      sql`
+        select vec_version() as "version";
+      `,
+    )!.version,
+    "string",
+  );
 
   for (let iteration = 0; iteration < 3; iteration++)
     await database.migrate(

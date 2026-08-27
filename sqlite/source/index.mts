@@ -57,13 +57,24 @@ export class Database extends sqlite.DatabaseSync {
   };
 
   constructor(filename: string | Buffer | URL) {
-    super(filename);
+    super(filename, { allowExtension: true });
+    this.enableLoadExtension(false);
     process.once("beforeExit", this.#beforeExitEventListener);
   }
 
   close(): void {
     super.close();
     process.off("beforeExit", this.#beforeExitEventListener);
+  }
+
+  /**
+   * Load an SQLite extension and disable loading extensions afterward. This is a security measure to avoid loading malicious extensions through SQL injection, for example, `select load_extension('malicious.so');`).
+   */
+  loadExtension(extension: string): this {
+    this.enableLoadExtension(true);
+    super.loadExtension(extension);
+    this.enableLoadExtension(false);
+    return this;
   }
 
   /**
