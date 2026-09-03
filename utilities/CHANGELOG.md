@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.0.27 · 2026-09-03
+
+- Changed `snippet()` such that when it’s called with `search` that isn’t included in `text` (for example, because it’s the result of semantic search, so no words match exactly) it doesn’t throw an error anymore, instead it returns the first few words of the `text`.
+
 ## 2.0.25 · 2026-09-03
 
 - Added `reciprocalRankFusion()`.

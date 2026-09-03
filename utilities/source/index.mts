@@ -370,7 +370,7 @@ export function snippet(
     ...highlightOptions,
     stopWordsAction: "mark",
   });
-  const textTokenMatchIndex = textTokens.findIndex(
+  let textTokenMatchIndex = textTokens.findIndex(
     (tokenWithPosition) =>
       tokenWithPosition.tokenIsStopWord === false &&
       (highlightOptions.prefix
@@ -379,8 +379,7 @@ export function snippet(
           )
         : search.has(tokenWithPosition.token)),
   );
-  if (textTokenMatchIndex === -1)
-    throw new Error(`‘snippet()’ called with no matching token.`);
+  if (textTokenMatchIndex === -1) textTokenMatchIndex = 0;
   const textTokenSnippetIndexStart = Math.max(
     0,
     textTokenMatchIndex - surroundingTokens,
