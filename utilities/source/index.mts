@@ -408,7 +408,7 @@ export function snippet(
 /**
  * Merge multiple ranked lists into a single ranked list using [Reciprocal Rank Fusion](https://dl.acm.org/doi/10.1145/1571941.1572114). The `arrays` are expected to be sorted in descending order of relevance, for example, the first element is the most relevant and the last element is the least relevant.
  */
-export function reciprocalRankFusion(arrays: any[][]): any[] {
+export function reciprocalRankFusion(...arrays: any[][]): any[] {
   const elements = new Set(arrays.flat());
   const elementsWithScores = [...elements].map((element) => {
     let score = 0;

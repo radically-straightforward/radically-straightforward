@@ -221,11 +221,11 @@ test("snippet()", () => {
 
 test("reciprocalRankFusion()", () => {
   assert.deepEqual(
-    utilities.reciprocalRankFusion([
+    utilities.reciprocalRankFusion(
       ["a", "b", "c"],
       ["b", "c", "d"],
       ["c", "d", "e"],
-    ]),
+    ),
     ["c", "b", "d", "a", "e"],
   );
 });
