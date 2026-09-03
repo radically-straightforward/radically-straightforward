@@ -415,7 +415,7 @@ export function reciprocalRankFusion(arrays: any[][]): any[] {
     for (const array of arrays) {
       const index = array.indexOf(element);
       if (index !== -1) {
-        score += 1 / (index + 61);
+        score += 1 / (index + 1 + 60);
       }
     }
     return { element, score };
