@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.0.25 · 2026-09-03
+
+- Added `reciprocalRankFusion()`.
+
 ## 2.0.24 · 2026-06-29
 
 - **Breaking changes:**

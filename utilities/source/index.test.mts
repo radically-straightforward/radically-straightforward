@@ -219,6 +219,17 @@ test("snippet()", () => {
   );
 });
 
+test("reciprocalRankFusion()", () => {
+  assert.deepEqual(
+    utilities.reciprocalRankFusion([
+      ["a", "b", "c"],
+      ["b", "c", "d"],
+      ["c", "d", "e"],
+    ]),
+    ["c", "b", "d", "a", "e"],
+  );
+});
+
 test("isDate()", () => {
   assert(utilities.isDate("2024-04-01T14:57:46.638Z"));
   assert(!utilities.isDate("2024-04-01T14:57:46.68Z"));

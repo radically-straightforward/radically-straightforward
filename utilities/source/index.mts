@@ -406,6 +406,26 @@ export function snippet(
 }
 
 /**
+ * Merge multiple ranked lists into a single ranked list using [Reciprocal Rank Fusion](https://dl.acm.org/doi/10.1145/1571941.1572114). The `arrays` are expected to be sorted in descending order of relevance, for example, the first element is the most relevant and the last element is the least relevant.
+ */
+export function reciprocalRankFusion(arrays: any[][]): any[] {
+  const elements = new Set(arrays.flat());
+  const elementsWithScores = [...elements].map((element) => {
+    let score = 0;
+    for (const array of arrays) {
+      const index = array.indexOf(element);
+      if (index !== -1) {
+        score += 1 / (index + 61);
+      }
+    }
+    return { element, score };
+  });
+  return elementsWithScores
+    .sort((a, b) => b.score - a.score)
+    .map((elementWithScore) => elementWithScore.element);
+}
+
+/**
  * Determine whether the given `string` is a valid `Date`, that is, it’s in ISO format and corresponds to an existing date, for example, it is **not** April 32nd.
  */
 export function isDate(string: string): boolean {
