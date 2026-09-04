@@ -35,7 +35,7 @@ This guide teaches you how to install a project that uses Radically Straightforw
 All the application data is stored under the `data/` directory. You may perform backups and migrations to new machines by copying that directory, for example:
 
 ```console
-$ rsync -av --delete --progress root@EXAMPLE-APPLICATION.com:EXAMPLE-APPLICATION/data/ /path/to/backup/
+$ rsync -a --delete --progress root@EXAMPLE-APPLICATION.com:EXAMPLE-APPLICATION/data/ /path/to/backup/
 ```
 
 ## Upgrade
