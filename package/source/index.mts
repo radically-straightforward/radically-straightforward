@@ -5,7 +5,7 @@ import os from "node:os";
 import fs from "node:fs/promises";
 import childProcess from "node:child_process";
 import util from "node:util";
-import fsStream from "node:fs";
+import fsCallback from "node:fs";
 import stream from "node:stream/promises";
 import * as archiver from "archiver";
 import { dedent as batch } from "@radically-straightforward/utilities";
@@ -57,7 +57,7 @@ const archive =
   process.platform === "win32"
     ? new archiver.ZipArchive()
     : new archiver.TarArchive({ gzip: true });
-const archiveStream = fsStream.createWriteStream(
+const archiveStream = fsCallback.createWriteStream(
   path.join(
     `../${path.basename(process.cwd())}.${
       process.platform === "win32" ? "zip" : "tar.gz"
