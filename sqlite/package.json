@@ -29,7 +29,7 @@
   },
   "dependencies": {
     "@radically-straightforward/node": "^3.2.0",
-    "@radically-straightforward/utilities": "^2.0.24",
+    "@radically-straightforward/utilities": "^2.0.27",
     "cron-parser": "^5.10.0"
   },
   "devDependencies": {
