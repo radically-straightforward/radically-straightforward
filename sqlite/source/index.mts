@@ -570,7 +570,9 @@ export class Database extends sqlite.DatabaseSync {
           ) {
             this.backgroundJob({
               type: sqliteBackgroundJobWorkerOptions.type,
-              parameters: lastScheduledBackgroundJob?.lastScheduledAt ?? "TODO",
+              parameters:
+                lastScheduledBackgroundJob?.lastScheduledAt ??
+                CronExpressionParser.parse(schedule).prev().toISOString(),
             });
             if (lastScheduledBackgroundJob !== undefined)
               this.run(
