@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.0.4 · 2026-09-24
+
+- To `scheduledBackgroundJobWorker()`, added the parameter `lastScheduledAt`.
+
 ## 2.0.2 · 2026-08-27
 
 - Added `loadExtension()`, which manages enabling/disabling the loading of extensions.
