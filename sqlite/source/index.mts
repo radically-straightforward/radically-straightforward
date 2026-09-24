@@ -543,7 +543,13 @@ export class Database extends sqlite.DatabaseSync {
     }: {
       schedule: string;
     } & Parameters<typeof this.backgroundJobWorker>[0],
-    function_: (lastScheduledAt: string) => void | Promise<void>,
+    function_: ({
+      lastScheduledAt,
+      scheduledAt,
+    }: {
+      lastScheduledAt: string;
+      scheduledAt: string;
+    }) => void | Promise<void>,
   ): void {
     this.backgroundJobWorker(sqliteBackgroundJobWorkerOptions, function_);
     node.setInterval(
@@ -560,19 +566,28 @@ export class Database extends sqlite.DatabaseSync {
               where "type" = ${sqliteBackgroundJobWorkerOptions.type};
             `,
           );
+          const scheduledAt = new Date().toISOString();
           if (
             lastScheduledBackgroundJob === undefined ||
             CronExpressionParser.parse(schedule, {
               currentDate: new Date(lastScheduledBackgroundJob.lastScheduledAt),
             })
               .next()
-              .toISOString()! < new Date().toISOString()
+              .toISOString()! < scheduledAt
           ) {
             this.backgroundJob({
               type: sqliteBackgroundJobWorkerOptions.type,
-              parameters:
-                lastScheduledBackgroundJob?.lastScheduledAt ??
-                CronExpressionParser.parse(schedule).prev().toISOString(),
+              startAt: scheduledAt,
+              parameters: {
+                lastScheduledAt:
+                  lastScheduledBackgroundJob?.lastScheduledAt ??
+                  CronExpressionParser.parse(schedule, {
+                    currentDate: scheduledAt,
+                  })
+                    .prev()
+                    .toISOString(),
+                scheduledAt,
+              },
             });
             if (lastScheduledBackgroundJob !== undefined)
               this.run(
@@ -588,7 +603,7 @@ export class Database extends sqlite.DatabaseSync {
                 )
                 values (
                   ${sqliteBackgroundJobWorkerOptions.type},
-                  ${new Date().toISOString()}
+                  ${scheduledAt}
                 );
               `,
             );
