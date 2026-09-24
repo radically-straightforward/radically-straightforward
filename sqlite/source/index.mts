@@ -543,7 +543,7 @@ export class Database extends sqlite.DatabaseSync {
     }: {
       schedule: string;
     } & Parameters<typeof this.backgroundJobWorker>[0],
-    function_: Parameters<typeof utilities.setInterval>[1],
+    function_: (lastScheduledAt: string) => void | Promise<void>,
   ): void {
     this.backgroundJobWorker(sqliteBackgroundJobWorkerOptions, function_);
     node.setInterval(
