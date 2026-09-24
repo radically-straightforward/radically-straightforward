@@ -277,7 +277,13 @@ scheduledBackgroundJobWorker(
     }: {
       schedule: string;
     } & Parameters<typeof this.backgroundJobWorker>[0],
-    function_: (lastScheduledAt: string) => void | Promise<void>,
+    function_: ({
+      lastScheduledAt,
+      scheduledAt,
+    }: {
+      lastScheduledAt: string;
+      scheduledAt: string;
+    }) => void | Promise<void>,
   ): void;
 ```
 

@@ -265,9 +265,9 @@ test(
 
     database.scheduledBackgroundJobWorker(
       { type: "test", schedule: "@minutely" },
-      (lastScheduledAt) => {
+      (scheduling) => {
         console.log(
-          `scheduledBackgroundJobWorker(): lastScheduledAt ${lastScheduledAt}`,
+          `scheduledBackgroundJobWorker(): ${JSON.stringify(scheduling)}`,
         );
       },
     );
