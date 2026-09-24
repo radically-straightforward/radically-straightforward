@@ -568,20 +568,10 @@ export class Database extends sqlite.DatabaseSync {
               .next()
               .toISOString()! < new Date().toISOString()
           ) {
-            this.run(
-              sql`
-                insert into "_backgroundJobs" (
-                  "type",
-                  "startAt",
-                  "parameters"
-                )
-                values (
-                  ${sqliteBackgroundJobWorkerOptions.type},
-                  ${new Date().toISOString()},
-                  ${JSON.stringify({})}
-                );
-              `,
-            );
+            this.backgroundJob({
+              type: sqliteBackgroundJobWorkerOptions.type,
+              parameters: "TODO",
+            });
             if (lastScheduledBackgroundJob !== undefined)
               this.run(
                 sql`
