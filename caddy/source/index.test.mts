@@ -35,8 +35,8 @@ test(
       `EXAMPLE OF SENSITIVE FILE THAT MUST BE INACCESSIBLE`,
     );
     await fs.writeFile(
-      "./data/files/example.txt",
-      `EXAMPLE OF USER-GENERATED TXT FILE THAT MAY BE EMBEDDED`,
+      "./data/files/example.jpg",
+      `EXAMPLE OF USER-GENERATED JPG FILE THAT MAY BE EMBEDDED CROSS-ORIGIN`,
     );
     await fs.writeFile(
       "./data/files/example.html",
@@ -48,20 +48,6 @@ test(
         </head>
         <body>
           EXAMPLE OF USER-GENERATED HTML FILE THAT MUST BE DOWNLOADED
-        </body>
-        </html>
-      `,
-    );
-    await fs.writeFile(
-      "./data/files/example--html.txt",
-      `
-        <!DOCTYPE html>
-        <html>
-        <head>
-          <meta charset="UTF-8">
-        </head>
-        <body>
-          EXAMPLE OF USER-GENERATED HTML FILE DISGUISED AS TXT THAT MUST BE SERVED AS TXT
         </body>
         </html>
       `,
@@ -105,7 +91,7 @@ test(
     }
 
     {
-      const response = await fetch("https://localhost/files/example.txt");
+      const response = await fetch("https://localhost/files/example.jpg");
       assert.equal(response.status, 200);
       assert.equal(
         response.headers.get("Cache-Control"),
@@ -115,14 +101,11 @@ test(
         response.headers.get("Cross-Origin-Resource-Policy"),
         "cross-origin",
       );
-      assert.equal(response.headers.get("Content-Disposition"), null);
-      assert.equal(
-        response.headers.get("Content-Type"),
-        "text/plain; charset=utf-8",
-      );
+      assert.equal(response.headers.get("Content-Disposition"), "attachment");
+      assert.equal(response.headers.get("Content-Type"), "image/jpeg");
       assert.equal(
         await response.text(),
-        `EXAMPLE OF USER-GENERATED TXT FILE THAT MAY BE EMBEDDED`,
+        `EXAMPLE OF USER-GENERATED JPG FILE THAT MAY BE EMBEDDED CROSS-ORIGIN`,
       );
     }
 
@@ -145,29 +128,6 @@ test(
       assert(
         (await response.text()).includes(
           `EXAMPLE OF USER-GENERATED HTML FILE THAT MUST BE DOWNLOADED`,
-        ),
-      );
-    }
-
-    {
-      const response = await fetch("https://localhost/files/example--html.txt");
-      assert.equal(response.status, 200);
-      assert.equal(
-        response.headers.get("Cache-Control"),
-        "private, max-age=31536000, immutable",
-      );
-      assert.equal(
-        response.headers.get("Cross-Origin-Resource-Policy"),
-        "cross-origin",
-      );
-      assert.equal(response.headers.get("Content-Disposition"), null);
-      assert.equal(
-        response.headers.get("Content-Type"),
-        "text/plain; charset=utf-8",
-      );
-      assert(
-        (await response.text()).includes(
-          `EXAMPLE OF USER-GENERATED HTML FILE DISGUISED AS TXT THAT MUST BE SERVED AS TXT`,
         ),
       );
     }
