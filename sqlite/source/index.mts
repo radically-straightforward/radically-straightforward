@@ -52,12 +52,8 @@ import * as node from "@radically-straightforward/node";
  * 8. A caching mechanism.
  */
 export class Database extends sqlite.DatabaseSync {
-  #beforeExitEventListener = () => {
-    this.close();
-  };
-
   constructor(filename: string | Buffer | URL) {
-    super(filename, { allowExtension: true });
+    super(filename, { allowExtension: true, timeout: 5000 });
     this.enableLoadExtension(false);
     process.once("beforeExit", this.#beforeExitEventListener);
     this.execute(
@@ -103,6 +99,10 @@ export class Database extends sqlite.DatabaseSync {
     super.close();
     process.off("beforeExit", this.#beforeExitEventListener);
   }
+
+  #beforeExitEventListener = () => {
+    this.close();
+  };
 
   /**
    * Load an SQLite extension and disable loading extensions afterward. This is a security measure to avoid loading malicious extensions through SQL injection, for example, `select load_extension('malicious.so');`).
