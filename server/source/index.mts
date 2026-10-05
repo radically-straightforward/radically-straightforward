@@ -89,7 +89,7 @@ export type Request<Pathname, Search, Cookies, Body, State> =
 /**
  * A type that may appear under elements of `request.body` which includes information about the file that was uploaded and the `path` in a temporary directory where you may find the file. The files are deleted after the response is sent—if you wish to keep them you must move them to a permanent location.
  */
-export type RequestBodyFile = busboy.FileInfo & { path: string };
+export type RequestBodyFile = busboy.FileInfo & { file: true; path: string };
 
 /**
  * An extension of [Node.js’s `http.ServerResponse`](https://nodejs.org/api/http.html#class-httpserverresponse) with the following extra functionality:
@@ -277,6 +277,7 @@ export default function server({
                   }
                   const value = {
                     ...information,
+                    file: true,
                     path: path.join(
                       os.tmpdir(),
                       `server--file--${utilities.randomString()}`,
@@ -286,7 +287,7 @@ export default function server({
                             .replace(/[^A-Za-z0-9\-_\.]/gu, "-")
                             .toLowerCase(),
                     ),
-                  };
+                  } as const;
                   if (name.endsWith("[]"))
                     (
                       (request.body[name.slice(0, -"[]".length)] ??= []) as (

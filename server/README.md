@@ -396,6 +396,7 @@ An extension of [Node.js’s `http.IncomingMessage`](https://nodejs.org/api/http
 
 ```typescript
 export type RequestBodyFile = busboy.FileInfo & {
+  file: true;
   path: string;
 };
 ```
