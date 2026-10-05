@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.0.7 · 2026-10-05
+
+- Added to `RequestBodyFile` the field `file: true`, to make it easier to validate request body parameters.
+
 ## 2.0.3 · 2026-01-22
 
 - Fixed an issue in parsing cookies whose values include the character `=`.
