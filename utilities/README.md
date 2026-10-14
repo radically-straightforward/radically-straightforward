@@ -327,14 +327,6 @@ export function reciprocalRankFusion(...arrays: any[][]): any[];
 
 Merge multiple ranked lists into a single ranked list using [Reciprocal Rank Fusion](https://dl.acm.org/doi/10.1145/1571941.1572114). The `arrays` are expected to be sorted in descending order of relevance, for example, the first element is the most relevant and the last element is the least relevant.
 
-### `isDate()`
-
-```typescript
-export function isDate(string: string): boolean;
-```
-
-Determine whether the given `string` is a valid `Date`, that is, it’s in ISO format and corresponds to an existing date, for example, it is **not** April 32nd.
-
 ### `emailRegExp`
 
 ```typescript
@@ -342,14 +334,6 @@ export const emailRegExp: RegExp;
 ```
 
 A regular expression that matches valid email addresses. This regular expression is more restrictive than the RFC—it doesn’t match some email addresses that technically are valid, for example, `example@localhost`. But it strikes a good tradeoff for practical purposes, for example, signing up in a web application.
-
-### `ISODateRegExp`
-
-```typescript
-export const ISODateRegExp: RegExp;
-```
-
-A regular expression that matches ISO dates, for example, `2024-04-01T14:19:48.162Z`.
 
 ### `Intern`
 
