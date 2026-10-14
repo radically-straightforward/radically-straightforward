@@ -1,6 +1,7 @@
 {
   "compilerOptions": {
     "types": ["node"],
+    "lib": ["esnext"],
     "isolatedModules": true,
     "skipLibCheck": true,
     "sourceMap": true,

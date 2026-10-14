@@ -5,9 +5,11 @@ import * as utilities from "@radically-straightforward/utilities";
 import { intern as $ } from "@radically-straightforward/utilities";
 
 test("sleep()", async () => {
-  const before = Date.now();
-  await utilities.sleep(1000);
-  assert(Date.now() - before >= 1000);
+  const before = Temporal.Now.instant();
+  await utilities.sleep(
+    Temporal.Duration.from({ seconds: 1 }).total("millisecond"),
+  );
+  assert(1 <= before.until(Temporal.Now.instant()).total("seconds"));
 });
 
 test("PromiseWithResolvers()", async () => {
@@ -271,12 +273,6 @@ test("reciprocalRankFusion()", () => {
   );
 });
 
-test("isDate()", () => {
-  assert(utilities.isDate("2024-04-01T14:57:46.638Z"));
-  assert(!utilities.isDate("2024-04-01T14:57:46.68Z"));
-  assert(!utilities.isDate("2024-04-32T14:57:46.638Z"));
-});
-
 test("emailRegExp", () => {
   assert.match("leandro@leafac.com", utilities.emailRegExp);
   assert.doesNotMatch("leandro@leafac.c", utilities.emailRegExp);
@@ -284,11 +280,6 @@ test("emailRegExp", () => {
   assert.doesNotMatch("leafac.com", utilities.emailRegExp);
   assert.doesNotMatch("'hello'@leafac.com", utilities.emailRegExp);
   assert.doesNotMatch("leandro@lea_fac.com", utilities.emailRegExp);
-});
-
-test("ISODateRegExp", () => {
-  assert.match("2024-04-01T14:19:48.162Z", utilities.ISODateRegExp);
-  assert.doesNotMatch("2024-04-01 15:20", utilities.ISODateRegExp);
 });
 
 test("intern()", () => {

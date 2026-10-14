@@ -33,7 +33,12 @@ export function randomString(): string {
  * Tab-separated logging.
  */
 export function log(...messageParts: string[]): void {
-  console.log([new Date().toISOString(), ...messageParts].join(" \t"));
+  console.log(
+    [
+      Temporal.Now.instant().toString({ fractionalSecondDigits: 3 }),
+      ...messageParts,
+    ].join(" \t"),
+  );
 }
 
 /**
@@ -425,24 +430,9 @@ export function reciprocalRankFusion(...arrays: any[][]): any[] {
 }
 
 /**
- * Determine whether the given `string` is a valid `Date`, that is, it’s in ISO format and corresponds to an existing date, for example, it is **not** April 32nd.
- */
-export function isDate(string: string): boolean {
-  return (
-    string.match(ISODateRegExp) !== null && !isNaN(new Date(string).getTime())
-  );
-}
-
-/**
  * A regular expression that matches valid email addresses. This regular expression is more restrictive than the RFC—it doesn’t match some email addresses that technically are valid, for example, `example@localhost`. But it strikes a good tradeoff for practical purposes, for example, signing up in a web application.
  */
 export const emailRegExp: RegExp = /^[a-z0-9._%+-=]+@[a-z0-9.-]+\.[a-z]{2,}$/i;
-
-/**
- * A regular expression that matches ISO dates, for example, `2024-04-01T14:19:48.162Z`.
- */
-export const ISODateRegExp: RegExp =
-  /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/;
 
 /**
  * Utility type for `intern()`.

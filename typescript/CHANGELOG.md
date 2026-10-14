@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.6 · 2026-10-14
+
+- Added support for the Temporal API.
+
 ## 1.0.3 · 2026-04-20
 
 - Adapted `tsconfig.json` to TypeScript 6.
