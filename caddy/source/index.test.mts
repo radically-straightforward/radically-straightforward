@@ -55,7 +55,9 @@ test(
 
     const dynamicServer = http
       .createServer((request, response) => {
-        response.end(`DYNAMIC RESPONSE: ${new Date().toISOString()}`);
+        response.end(
+          `DYNAMIC RESPONSE: ${Temporal.Now.instant().toString({ fractionalSecondDigits: 3 })}`,
+        );
       })
       .listen(18000, "localhost");
 
