@@ -26,7 +26,9 @@ if (process.argv[2] === "collect") {
       .split(/[^a-z']+/)
       .filter((word) => word !== "");
     corpus[url] = {
-      collectedAt: new Date().toISOString(),
+      collectedAt: Temporal.Now.instant().toString({
+        fractionalSecondDigits: 3,
+      }),
       words,
       html,
     };
