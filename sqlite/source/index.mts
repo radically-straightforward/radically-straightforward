@@ -339,7 +339,7 @@ export class Database extends sqlite.DatabaseSync {
    */
   backgroundJob({
     type,
-    startAt = new Date().toISOString(),
+    startAt = Temporal.Now.instant().toString({ fractionalSecondDigits: 3 }),
     parameters = null,
   }: {
     type: string;
@@ -395,7 +395,9 @@ export class Database extends sqlite.DatabaseSync {
               where
                 "type" = ${type} and
                 "startedAt" is not null and
-                "startedAt" < ${new Date(Date.now() - timeout).toISOString()};
+                "startedAt" < ${Temporal.Now.instant()
+                  .subtract({ milliseconds: timeout })
+                  .toString({ fractionalSecondDigits: 3 })};
             `,
           )) {
             utilities.log(
@@ -409,7 +411,9 @@ export class Database extends sqlite.DatabaseSync {
               sql`
                 update "_backgroundJobs"
                 set
-                  "startAt" = ${new Date(Date.now()).toISOString()},
+                  "startAt" = ${Temporal.Now.instant().toString({
+                    fractionalSecondDigits: 3,
+                  })},
                   "startedAt" = null,
                   "retries" = ${(backgroundJob.retries ?? 0) + 1}
                 where "id" = ${backgroundJob.id};
@@ -462,7 +466,9 @@ export class Database extends sqlite.DatabaseSync {
                 from "_backgroundJobs"
                 where
                   "type" = ${type} and
-                  "startAt" <= ${new Date().toISOString()} and
+                  "startAt" <= ${Temporal.Now.instant().toString({
+                    fractionalSecondDigits: 3,
+                  })} and
                   "startedAt" is null and (
                     "retries" is null or
                     "retries" < ${retries}
@@ -475,7 +481,9 @@ export class Database extends sqlite.DatabaseSync {
             this.run(
               sql`
                 update "_backgroundJobs"
-                set "startedAt" = ${new Date().toISOString()}
+                set "startedAt" = ${Temporal.Now.instant().toString({
+                  fractionalSecondDigits: 3,
+                })}
                 where "id" = ${backgroundJob.id};
               `,
             );
@@ -520,7 +528,11 @@ export class Database extends sqlite.DatabaseSync {
               sql`
                 update "_backgroundJobs"
                 set
-                  "startAt" = ${new Date(Date.now() + (error === "TIMEOUT" ? 0 : retryIn)).toISOString()},
+                  "startAt" = ${Temporal.Now.instant()
+                    .add({
+                      milliseconds: error === "TIMEOUT" ? 0 : retryIn,
+                    })
+                    .toString({ fractionalSecondDigits: 3 })},
                   "startedAt" = null,
                   "retries" = ${(backgroundJob.retries ?? 0) + 1}
                 where "id" = ${backgroundJob.id};
@@ -566,11 +578,13 @@ export class Database extends sqlite.DatabaseSync {
               where "type" = ${sqliteBackgroundJobWorkerOptions.type};
             `,
           );
-          const scheduledAt = new Date().toISOString();
+          const scheduledAt = Temporal.Now.instant().toString({
+            fractionalSecondDigits: 3,
+          });
           if (
             lastScheduledBackgroundJob === undefined ||
             CronExpressionParser.parse(schedule, {
-              currentDate: new Date(lastScheduledBackgroundJob.lastScheduledAt),
+              currentDate: lastScheduledBackgroundJob.lastScheduledAt,
             })
               .next()
               .toISOString()! < scheduledAt
@@ -655,7 +669,7 @@ export class Database extends sqlite.DatabaseSync {
           values (
             ${key},
             ${value},
-            ${new Date().toISOString()}
+            ${Temporal.Now.instant().toString({ fractionalSecondDigits: 3 })}
           );
         `,
       );
@@ -677,7 +691,9 @@ export class Database extends sqlite.DatabaseSync {
       this.run(
         sql`
           update "_cache"
-          set "usedAt" = ${new Date().toISOString()}
+          set "usedAt" = ${Temporal.Now.instant().toString({
+            fractionalSecondDigits: 3,
+          })}
           where "id" = ${valueRow.id};
         `,
       );
@@ -706,7 +722,7 @@ export class Database extends sqlite.DatabaseSync {
           values (
             ${key},
             ${value},
-            ${new Date().toISOString()}
+            ${Temporal.Now.instant().toString({ fractionalSecondDigits: 3 })}
           );
         `,
       );
@@ -728,7 +744,9 @@ export class Database extends sqlite.DatabaseSync {
       this.run(
         sql`
           update "_cache"
-          set "usedAt" = ${new Date().toISOString()}
+          set "usedAt" = ${Temporal.Now.instant().toString({
+            fractionalSecondDigits: 3,
+          })}
           where "id" = ${valueRow.id};
         `,
       );

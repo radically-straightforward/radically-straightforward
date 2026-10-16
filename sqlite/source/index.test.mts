@@ -199,8 +199,12 @@ test(
         )
         values (
           ${"aJobWhichWasLeftBehind"},
-          ${new Date(Date.now() - 20 * 60 * 1000).toISOString()},
-          ${new Date(Date.now() - 15 * 60 * 1000).toISOString()},
+          ${Temporal.Now.instant()
+            .subtract({ minutes: 20 })
+            .toString({ fractionalSecondDigits: 3 })},
+          ${Temporal.Now.instant()
+            .subtract({ minutes: 15 })
+            .toString({ fractionalSecondDigits: 3 })},
           ${0},
           ${JSON.stringify(null)}
         );

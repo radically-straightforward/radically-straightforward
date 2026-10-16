@@ -206,7 +206,9 @@ Execute an asynchronous function in a transaction. The transaction is `exclusive
 ```typescript
 backgroundJob({
     type,
-    startAt = new Date().toISOString(),
+    startAt = Temporal.Now.instant().toString({
+      fractionalSecondDigits: 3,
+    }),
     parameters = null,
   }: {
     type: string;
