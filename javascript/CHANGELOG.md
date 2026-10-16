@@ -1,5 +1,16 @@
 # Changelog
 
+## 4.1.0 · 2026-10-16
+
+- **Breaking changes:** Removed the following functions, in favor of server-side rendering. See `@radically-straightforward/utilities`:
+  - `relativizeDateTimeElement()`
+  - `relativizeDateTime()`
+  - `localizeDateTime()`
+  - `validateLocalizedDateTime()`
+  - `localizeDate()`
+  - `localizeTime()`
+  - `formatUTCDateTime()`
+
 ## 4.0.39 · 2026-06-29
 
 - **Breaking changes:**
