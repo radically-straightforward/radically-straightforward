@@ -211,7 +211,7 @@ application.push({
               })();
             </script>
           </head>
-          <body>Live Connection: ${new Date().toISOString()}. Open the Developer Tools Console and see the updates arriving.</body>
+          <body>Live Connection: ${Temporal.Now.instant().toString({ fractionalSecondDigits: 3 })}. Open the Developer Tools Console and see the updates arriving.</body>
         </html>
       `,
     );
