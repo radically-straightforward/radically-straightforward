@@ -1,10 +1,10 @@
 # Changelog
 
-## 2.0.29 · 2026-10-22
+## 2.0.30 · 2026-10-22
 
-- Added `dateTimeDateTimeFormat`.
-- Added `dateDateTimeFormat`.
-- Added `timeDateTimeFormat`.
+- Added `formatDateTime()`.
+- Added `formatDate()`.
+- Added `formatTime()`.
 - Added `zonedDateTimeToRelativeTimeFormat()`.
 
 ## 2.0.28 · 2026-10-14

@@ -76,34 +76,34 @@ test("dedent()", () => {
   );
 });
 
-test("dateTimeDateTimeFormat", () => {
+test("formatDateTime()", () => {
   assert.equal(
-    utilities.dateTimeDateTimeFormat.format(
+    utilities.formatDateTime(
       Temporal.ZonedDateTime.from(
         "2026-10-22T15:25:11.520844971+01:00[Europe/Lisbon]",
-      ).toPlainDateTime(),
+      ),
     ),
     "2026-10-22 15:25",
   );
 });
 
-test("dateDateTimeFormat", () => {
+test("formatDate()", () => {
   assert.equal(
-    utilities.dateDateTimeFormat.format(
+    utilities.formatDate(
       Temporal.ZonedDateTime.from(
         "2026-10-22T15:25:11.520844971+01:00[Europe/Lisbon]",
-      ).toPlainDateTime(),
+      ),
     ),
     "2026-10-22",
   );
 });
 
-test("timeDateTimeFormat", () => {
+test("formatTime()", () => {
   assert.equal(
-    utilities.timeDateTimeFormat.format(
+    utilities.formatTime(
       Temporal.ZonedDateTime.from(
         "2026-10-22T15:25:11.520844971+01:00[Europe/Lisbon]",
-      ).toPlainDateTime(),
+      ),
     ),
     "15:25",
   );

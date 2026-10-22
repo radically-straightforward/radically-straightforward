@@ -150,32 +150,64 @@ export function dedent(
 }
 
 /**
- * A `Intl.DateTimeFormat` instance for formatting date and time in the format `2026-10-22 15:25`.
+ * Formats a `Temporal.ZonedDateTime` in the format `2026-10-22 15:25`.
  */
-export const dateTimeDateTimeFormat = new Intl.DateTimeFormat("sv-SE", {
-  year: "numeric",
-  month: "2-digit",
-  day: "2-digit",
-  hour: "2-digit",
-  minute: "2-digit",
-});
+export function formatDateTime(zonedDateTime: Temporal.ZonedDateTime): string {
+  let dateTimeFormat = formatDateTime.dateTimeFormats.get(
+    zonedDateTime.timeZoneId,
+  );
+  if (dateTimeFormat === undefined) {
+    dateTimeFormat = new Intl.DateTimeFormat("sv-SE", {
+      timeZone: zonedDateTime.timeZoneId,
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+    formatDateTime.dateTimeFormats.set(
+      zonedDateTime.timeZoneId,
+      dateTimeFormat,
+    );
+  }
+  return dateTimeFormat.format(zonedDateTime.toInstant());
+}
+formatDateTime.dateTimeFormats = new Map<string, Intl.DateTimeFormat>();
 
 /**
- * A `Intl.DateTimeFormat` instance for formatting date in the format `2026-10-22`.
+ * Formats a `Temporal.ZonedDateTime` in the format `2026-10-22`.
  */
-export const dateDateTimeFormat = new Intl.DateTimeFormat("sv-SE", {
-  year: "numeric",
-  month: "2-digit",
-  day: "2-digit",
-});
+export function formatDate(zonedDateTime: Temporal.ZonedDateTime): string {
+  let dateTimeFormat = formatDate.dateTimeFormats.get(zonedDateTime.timeZoneId);
+  if (dateTimeFormat === undefined) {
+    dateTimeFormat = new Intl.DateTimeFormat("sv-SE", {
+      timeZone: zonedDateTime.timeZoneId,
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+    });
+    formatDate.dateTimeFormats.set(zonedDateTime.timeZoneId, dateTimeFormat);
+  }
+  return dateTimeFormat.format(zonedDateTime.toInstant());
+}
+formatDate.dateTimeFormats = new Map<string, Intl.DateTimeFormat>();
 
 /**
- * A `Intl.DateTimeFormat` instance for formatting time in the format `15:25`.
+ * Formats a `Temporal.ZonedDateTime` in the format `15:25`.
  */
-export const timeDateTimeFormat = new Intl.DateTimeFormat("sv-SE", {
-  hour: "2-digit",
-  minute: "2-digit",
-});
+export function formatTime(zonedDateTime: Temporal.ZonedDateTime): string {
+  let dateTimeFormat = formatTime.dateTimeFormats.get(zonedDateTime.timeZoneId);
+  if (dateTimeFormat === undefined) {
+    dateTimeFormat = new Intl.DateTimeFormat("sv-SE", {
+      timeZone: zonedDateTime.timeZoneId,
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+    formatTime.dateTimeFormats.set(zonedDateTime.timeZoneId, dateTimeFormat);
+  }
+  return dateTimeFormat.format(zonedDateTime.toInstant());
+}
+formatTime.dateTimeFormats = new Map<string, Intl.DateTimeFormat>();
 
 /**
  * Returns a relative datetime, for example, `just now` (less than 5 minutes), `5 minutes ago` (rounded to the nearest 5 minutes), `in 5 minutes` (rounded to the nearest 5 minutes), `2 hours ago`, `in 2 hours`, `yesterday`, `tomorrow`, `2 days ago`, `in 2 days`, `on 2026-10-22`, and so forth.
@@ -194,7 +226,7 @@ export function zonedDateTimeToRelativeTimeFormat(
     roundingIncrement: 5,
   });
   return 6 < Math.abs(difference.days)
-    ? `${preposition ? "on " : ""}${dateDateTimeFormat.format(zonedDateTime.toPlainDateTime())}`
+    ? `${preposition ? "on " : ""}${formatDate(zonedDateTime)}`
     : 0 < Math.abs(difference.days)
       ? zonedDateTimeToRelativeTimeFormat.relativeTimeFormat.format(
           difference.days,

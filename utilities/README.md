@@ -123,29 +123,29 @@ utilities.dedent`
 // => "Here is an\n\nexample of\n an interpolated string including a newline and indentation\n\nfollowed by some more text."
 ```
 
-### `dateTimeDateTimeFormat`
+### `formatDateTime()`
 
 ```typescript
-export const dateTimeDateTimeFormat;
+export function formatDateTime(zonedDateTime: Temporal.ZonedDateTime): string;
 ```
 
-A `Intl.DateTimeFormat` instance for formatting date and time in the format `2026-10-22 15:25`.
+Formats a `Temporal.ZonedDateTime` in the format `2026-10-22 15:25`.
 
-### `dateDateTimeFormat`
+### `formatDate()`
 
 ```typescript
-export const dateDateTimeFormat;
+export function formatDate(zonedDateTime: Temporal.ZonedDateTime): string;
 ```
 
-A `Intl.DateTimeFormat` instance for formatting date in the format `2026-10-22`.
+Formats a `Temporal.ZonedDateTime` in the format `2026-10-22`.
 
-### `timeDateTimeFormat`
+### `formatTime()`
 
 ```typescript
-export const timeDateTimeFormat;
+export function formatTime(zonedDateTime: Temporal.ZonedDateTime): string;
 ```
 
-A `Intl.DateTimeFormat` instance for formatting time in the format `15:25`.
+Formats a `Temporal.ZonedDateTime` in the format `15:25`.
 
 ### `zonedDateTimeToRelativeTimeFormat()`
 
