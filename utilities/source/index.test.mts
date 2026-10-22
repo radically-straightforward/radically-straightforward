@@ -90,6 +90,103 @@ test("zonedDateTimeToRelativeTimeFormat()", (context) => {
     ),
     "just now",
   );
+  assert.equal(
+    utilities.zonedDateTimeToRelativeTimeFormat(
+      Temporal.ZonedDateTime.from(
+        "2026-10-22T15:23:11.520844971+01:00[Europe/Lisbon]",
+      ),
+    ),
+    "just now",
+  );
+  assert.equal(
+    utilities.zonedDateTimeToRelativeTimeFormat(
+      Temporal.ZonedDateTime.from(
+        "2026-10-22T15:28:11.520844971+01:00[Europe/Lisbon]",
+      ),
+    ),
+    "just now",
+  );
+  assert.equal(
+    utilities.zonedDateTimeToRelativeTimeFormat(
+      Temporal.ZonedDateTime.from(
+        "2026-10-22T15:20:11.520844971+01:00[Europe/Lisbon]",
+      ),
+    ),
+    "5 minutes ago",
+  );
+  assert.equal(
+    utilities.zonedDateTimeToRelativeTimeFormat(
+      Temporal.ZonedDateTime.from(
+        "2026-10-22T15:30:11.520844971+01:00[Europe/Lisbon]",
+      ),
+    ),
+    "in 5 minutes",
+  );
+  assert.equal(
+    utilities.zonedDateTimeToRelativeTimeFormat(
+      Temporal.ZonedDateTime.from(
+        "2026-10-22T13:25:11.520844971+01:00[Europe/Lisbon]",
+      ),
+    ),
+    "2 hours ago",
+  );
+  assert.equal(
+    utilities.zonedDateTimeToRelativeTimeFormat(
+      Temporal.ZonedDateTime.from(
+        "2026-10-22T17:25:11.520844971+01:00[Europe/Lisbon]",
+      ),
+    ),
+    "in 2 hours",
+  );
+  assert.equal(
+    utilities.zonedDateTimeToRelativeTimeFormat(
+      Temporal.ZonedDateTime.from(
+        "2026-10-21T15:25:11.520844971+01:00[Europe/Lisbon]",
+      ),
+    ),
+    "yesterday",
+  );
+  assert.equal(
+    utilities.zonedDateTimeToRelativeTimeFormat(
+      Temporal.ZonedDateTime.from(
+        "2026-10-23T15:25:11.520844971+01:00[Europe/Lisbon]",
+      ),
+    ),
+    "tomorrow",
+  );
+  assert.equal(
+    utilities.zonedDateTimeToRelativeTimeFormat(
+      Temporal.ZonedDateTime.from(
+        "2026-10-20T15:25:11.520844971+01:00[Europe/Lisbon]",
+      ),
+    ),
+    "2 days ago",
+  );
+  assert.equal(
+    utilities.zonedDateTimeToRelativeTimeFormat(
+      Temporal.ZonedDateTime.from(
+        "2026-10-24T15:25:11.520844971+01:00[Europe/Lisbon]",
+      ),
+    ),
+    "in 2 days",
+  );
+  assert.equal(
+    utilities.zonedDateTimeToRelativeTimeFormat(
+      Temporal.ZonedDateTime.from(
+        "2026-09-22T15:25:11.520844971+01:00[Europe/Lisbon]",
+      ),
+    ),
+    "2026-09-22",
+  );
+  assert.equal(
+    utilities.zonedDateTimeToRelativeTimeFormat(
+      Temporal.ZonedDateTime.from(
+        "2026-09-22T15:25:11.520844971+01:00[Europe/Lisbon]",
+      ),
+      { preposition: true },
+    ),
+    "on 2026-09-22",
+  );
 });
 
 test("tokenize()", () => {
