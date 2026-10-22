@@ -81,7 +81,7 @@ test("dateTimeDateTimeFormat", () => {
     utilities.dateTimeDateTimeFormat.format(
       Temporal.ZonedDateTime.from(
         "2026-10-22T15:25:11.520844971+01:00[Europe/Lisbon]",
-      ).toInstant(),
+      ).toPlainDateTime(),
     ),
     "2026-10-22 15:25",
   );
@@ -92,7 +92,7 @@ test("dateDateTimeFormat", () => {
     utilities.dateDateTimeFormat.format(
       Temporal.ZonedDateTime.from(
         "2026-10-22T15:25:11.520844971+01:00[Europe/Lisbon]",
-      ).toInstant(),
+      ).toPlainDateTime(),
     ),
     "2026-10-22",
   );
@@ -103,7 +103,7 @@ test("timeDateTimeFormat", () => {
     utilities.timeDateTimeFormat.format(
       Temporal.ZonedDateTime.from(
         "2026-10-22T15:25:11.520844971+01:00[Europe/Lisbon]",
-      ).toInstant(),
+      ).toPlainDateTime(),
     ),
     "15:25",
   );
