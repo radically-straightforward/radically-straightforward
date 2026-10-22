@@ -150,6 +150,36 @@ export function dedent(
 }
 
 /**
+ * Returns a relative datetime, for example, `just now` (less than 5 minutes), `5 minutes ago` (rounded to the nearest 5 minutes), `in 5 minutes` (rounded to the nearest 5 minutes), `2 hours ago`, `in 2 hours`, `yesterday`, `tomorrow`, `2 days ago`, `in 2 days`, `on 2026-10-22`, and so forth.
+ *
+ * - **`preposition`:** Whether to return `2026-10-22` or `on 2026-10-22`.
+ */
+export function zonedDateTimeToRelativeTimeFormat(
+  zonedDateTime: Temporal.ZonedDateTime,
+  { preposition = false }: { preposition?: boolean } = {},
+): string {
+  const difference = Temporal.Now.zonedDateTimeISO(
+    zonedDateTime.timeZoneId,
+  ).until(zonedDateTime, {
+    largestUnit: "days",
+    smallestUnit: "minutes",
+    roundingIncrement: 5,
+  });
+  const relativeTimeFormat = new Intl.RelativeTimeFormat("en-US", {
+    numeric: "auto",
+  });
+  return 6 < Math.abs(difference.days)
+    ? `${preposition ? "on " : ""}${zonedDateTime.toLocaleString("sv-SE", { year: "numeric", month: "2-digit", day: "2-digit" })}`
+    : 0 < Math.abs(difference.days)
+      ? relativeTimeFormat.format(difference.days, "days")
+      : 0 < Math.abs(difference.hours)
+        ? relativeTimeFormat.format(difference.hours, "hours")
+        : 0 < Math.abs(difference.minutes)
+          ? relativeTimeFormat.format(difference.minutes, "minutes")
+          : "just now";
+}
+
+/**
  * Process text into tokens that can be used for full-text search.
  *
  * The part that breaks the text into tokens matches the behavior of [SQLite’s Unicode61 Tokenizer](https://www.sqlite.org/fts5.html#unicode61_tokenizer).
