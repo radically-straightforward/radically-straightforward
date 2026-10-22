@@ -150,6 +150,34 @@ export function dedent(
 }
 
 /**
+ * A `Intl.DateTimeFormat` instance for formatting date and time in the format `2026-10-22 15:25`.
+ */
+export const dateTimeDateTimeFormat = new Intl.DateTimeFormat("sv-SE", {
+  year: "numeric",
+  month: "2-digit",
+  day: "2-digit",
+  hour: "2-digit",
+  minute: "2-digit",
+});
+
+/**
+ * A `Intl.DateTimeFormat` instance for formatting date in the format `2026-10-22`.
+ */
+export const dateDateTimeFormat = new Intl.DateTimeFormat("sv-SE", {
+  year: "numeric",
+  month: "2-digit",
+  day: "2-digit",
+});
+
+/**
+ * A `Intl.DateTimeFormat` instance for formatting time in the format `15:25`.
+ */
+export const timeDateTimeFormat = new Intl.DateTimeFormat("sv-SE", {
+  hour: "2-digit",
+  minute: "2-digit",
+});
+
+/**
  * Returns a relative datetime, for example, `just now` (less than 5 minutes), `5 minutes ago` (rounded to the nearest 5 minutes), `in 5 minutes` (rounded to the nearest 5 minutes), `2 hours ago`, `in 2 hours`, `yesterday`, `tomorrow`, `2 days ago`, `in 2 days`, `on 2026-10-22`, and so forth.
  *
  * - **`preposition`:** Whether to return `2026-10-22` or `on 2026-10-22`.

@@ -1,5 +1,12 @@
 # Changelog
 
+## 2.0.29 · 2026-10-22
+
+- Added `dateTimeDateTimeFormat`.
+- Added `dateDateTimeFormat`.
+- Added `timeDateTimeFormat`.
+- Added `zonedDateTimeToRelativeTimeFormat()`.
+
 ## 2.0.28 · 2026-10-14
 
 - Removed `isDate()` and `ISODateRegExp`.

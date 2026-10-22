@@ -76,6 +76,39 @@ test("dedent()", () => {
   );
 });
 
+test("dateTimeDateTimeFormat", () => {
+  assert.equal(
+    utilities.dateTimeDateTimeFormat.format(
+      Temporal.ZonedDateTime.from(
+        "2026-10-22T15:25:11.520844971+01:00[Europe/Lisbon]",
+      ).toInstant(),
+    ),
+    "2026-10-22 15:25",
+  );
+});
+
+test("dateDateTimeFormat", () => {
+  assert.equal(
+    utilities.dateDateTimeFormat.format(
+      Temporal.ZonedDateTime.from(
+        "2026-10-22T15:25:11.520844971+01:00[Europe/Lisbon]",
+      ).toInstant(),
+    ),
+    "2026-10-22",
+  );
+});
+
+test("timeDateTimeFormat", () => {
+  assert.equal(
+    utilities.timeDateTimeFormat.format(
+      Temporal.ZonedDateTime.from(
+        "2026-10-22T15:25:11.520844971+01:00[Europe/Lisbon]",
+      ).toInstant(),
+    ),
+    "15:25",
+  );
+});
+
 test("zonedDateTimeToRelativeTimeFormat()", (context) => {
   context.mock.method(Temporal.Now, "zonedDateTimeISO", () =>
     Temporal.ZonedDateTime.from(

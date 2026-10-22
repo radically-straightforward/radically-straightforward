@@ -123,6 +123,30 @@ utilities.dedent`
 // => "Here is an\n\nexample of\n an interpolated string including a newline and indentation\n\nfollowed by some more text."
 ```
 
+### `dateTimeDateTimeFormat`
+
+```typescript
+export const dateTimeDateTimeFormat;
+```
+
+A `Intl.DateTimeFormat` instance for formatting date and time in the format `2026-10-22 15:25`.
+
+### `dateDateTimeFormat`
+
+```typescript
+export const dateDateTimeFormat;
+```
+
+A `Intl.DateTimeFormat` instance for formatting date in the format `2026-10-22`.
+
+### `timeDateTimeFormat`
+
+```typescript
+export const timeDateTimeFormat;
+```
+
+A `Intl.DateTimeFormat` instance for formatting time in the format `15:25`.
+
 ### `zonedDateTimeToRelativeTimeFormat()`
 
 ```typescript
