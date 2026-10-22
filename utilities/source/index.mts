@@ -165,19 +165,31 @@ export function zonedDateTimeToRelativeTimeFormat(
     smallestUnit: "minutes",
     roundingIncrement: 5,
   });
-  const relativeTimeFormat = new Intl.RelativeTimeFormat("en-US", {
-    numeric: "auto",
-  });
   return 6 < Math.abs(difference.days)
-    ? `${preposition ? "on " : ""}${zonedDateTime.toLocaleString("sv-SE", { year: "numeric", month: "2-digit", day: "2-digit" })}`
+    ? `${preposition ? "on " : ""}${zonedDateTimeToRelativeTimeFormat.dateTimeFormat.format(zonedDateTime.toInstant())}`
     : 0 < Math.abs(difference.days)
-      ? relativeTimeFormat.format(difference.days, "days")
+      ? zonedDateTimeToRelativeTimeFormat.relativeTimeFormat.format(
+          difference.days,
+          "days",
+        )
       : 0 < Math.abs(difference.hours)
-        ? relativeTimeFormat.format(difference.hours, "hours")
+        ? zonedDateTimeToRelativeTimeFormat.relativeTimeFormat.format(
+            difference.hours,
+            "hours",
+          )
         : 0 < Math.abs(difference.minutes)
-          ? relativeTimeFormat.format(difference.minutes, "minutes")
+          ? zonedDateTimeToRelativeTimeFormat.relativeTimeFormat.format(
+              difference.minutes,
+              "minutes",
+            )
           : "just now";
 }
+zonedDateTimeToRelativeTimeFormat.relativeTimeFormat =
+  new Intl.RelativeTimeFormat("en-US", { numeric: "auto" });
+zonedDateTimeToRelativeTimeFormat.dateTimeFormat = new Intl.DateTimeFormat(
+  "sv-SE",
+  { year: "numeric", month: "2-digit", day: "2-digit" },
+);
 
 /**
  * Process text into tokens that can be used for full-text search.

@@ -123,6 +123,23 @@ utilities.dedent`
 // => "Here is an\n\nexample of\n an interpolated string including a newline and indentation\n\nfollowed by some more text."
 ```
 
+### `zonedDateTimeToRelativeTimeFormat()`
+
+```typescript
+export function zonedDateTimeToRelativeTimeFormat(
+  zonedDateTime: Temporal.ZonedDateTime,
+  {
+    preposition = false,
+  }: {
+    preposition?: boolean;
+  } = {},
+): string;
+```
+
+Returns a relative datetime, for example, `just now` (less than 5 minutes), `5 minutes ago` (rounded to the nearest 5 minutes), `in 5 minutes` (rounded to the nearest 5 minutes), `2 hours ago`, `in 2 hours`, `yesterday`, `tomorrow`, `2 days ago`, `in 2 days`, `on 2026-10-22`, and so forth.
+
+- **`preposition`:** Whether to return `2026-10-22` or `on 2026-10-22`.
+
 ### `tokenize()`
 
 ```typescript

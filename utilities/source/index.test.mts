@@ -76,6 +76,22 @@ test("dedent()", () => {
   );
 });
 
+test("zonedDateTimeToRelativeTimeFormat()", (context) => {
+  context.mock.method(Temporal.Now, "zonedDateTimeISO", () =>
+    Temporal.ZonedDateTime.from(
+      "2026-10-22T15:25:11.520844971+01:00[Europe/Lisbon]",
+    ),
+  );
+  assert.equal(
+    utilities.zonedDateTimeToRelativeTimeFormat(
+      Temporal.ZonedDateTime.from(
+        "2026-10-22T15:25:11.520844971+01:00[Europe/Lisbon]",
+      ),
+    ),
+    "just now",
+  );
+});
+
 test("tokenize()", () => {
   assert.deepEqual(
     utilities.tokenize(
